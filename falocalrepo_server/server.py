@@ -16,8 +16,10 @@ from falocalrepo.database import Connection
 from falocalrepo.database import connect_database
 from falocalrepo.database import keys_journals
 from falocalrepo.database import keys_submissions
+from falocalrepo.database import keys_users
 from falocalrepo.database import select
 from falocalrepo.database import tiered_path
+from falocalrepo.download import user_clean_name
 from falocalrepo.settings import setting_read
 from flask import Flask
 from flask import abort
@@ -59,6 +61,37 @@ def root():
         users_total=usr_n,
         last_update=last_update,
         version_db=version,
+    )
+
+
+@app.route("/user/<username>")
+def user(username: str):
+    db_temp: Connection = connect_database("FA.db")
+    entry: Optional[tuple] = select(db_temp, "USERS", ["*"], "USERNAME", user_clean_name(username)).fetchone()
+
+    if entry is None:
+        db_temp.close()
+        return abort(404)
+
+    folders = entry[keys_users.index("FOLDERS")]
+    gallery = entry[keys_users.index("GALLERY")]
+    scraps = entry[keys_users.index("SCRAPS")]
+    favorites = entry[keys_users.index("FAVORITES")]
+    mentions = entry[keys_users.index("MENTIONS")]
+    journals = entry[keys_users.index("JOURNALS")]
+
+    db_temp.close()
+
+    return render_template(
+        "user.html",
+        title=f"{app.name} · {username}",
+        user=username,
+        folders=folders,
+        gallery=gallery,
+        scraps=scraps,
+        favorites=favorites,
+        mentions=mentions,
+        journals=journals
     )
 
 

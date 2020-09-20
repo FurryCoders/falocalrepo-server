@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        :root {
+            --table_border_color: darkgray;
+            --table_background_color: lightgrey;
+        }
+
+        body > h2 {
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            border: 1px solid var(--table_border_color);
+        }
+
+        td {
+            padding: 2px;
+            border: 1px solid var(--table_border_color);
+        }
+
+        td:last-child {
+            max-width: available !important;
+        }
+
+        th {
+            padding: 2px;
+            border: 2px solid var(--table_border_color);
+            text-align: center;
+        }
+
+        tr.odd {
+            background-color: inherit;
+        }
+
+        tr.even {
+            background-color: var(--table_background_color);
+        }
+
+        td a.celllink {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        #user_metadata {
+            width: 200px;
+            max-width: 200px;
+            top: 20px;
+            margin: auto;
+            text-align: center
+        }
+
+        #user_metadata table {
+            width: 200px;
+            max-width: 200px;
+            margin: auto;
+        }
+
+        #user_metadata table td:first-child {
+            width: fit-content;
+        }
+    </style>
+</head>
+<body>
+<h2>{{ user }}</h2>
+<div id="user_metadata">
+    <table>
+        <tr>
+            <td><a class="celllink" href="/submissions/{{ user }}">Gallery</a></td>
+            <td><a class="celllink" href="/submissions/{{ user }}">{{ gallery|length }}</a></td>
+        </tr>
+        <tr>
+            <td><a class="celllink" href="/submissions/{{ user }}">Scraps</a></td>
+            <td><a class="celllink" href="/submissions/{{ user }}">{{ scraps|length }}</a></td>
+        </tr>
+        <tr>
+            <td>Favorites</td>
+            <td>{{ favorites|length }}</td>
+        </tr>
+        <tr>
+            <td>Mentions</td>
+            <td>{{ mentions|length }}</td>
+        </tr>
+        <tr>
+            <td><a class="celllink" href="/journals/{{ user }}">Journals</a></td>
+            <td><a class="celllink" href="/journals/{{ user }}">{{ journals|length }}</a></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
