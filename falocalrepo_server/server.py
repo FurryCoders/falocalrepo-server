@@ -27,6 +27,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import send_file
+from werkzeug.exceptions import NotFound
 
 app: Flask = Flask(
     "FurAffinity Local Repo",
@@ -43,6 +44,14 @@ last_search: dict = {
 @app.route("/favicon.ico")
 def favicon():
     return redirect("https://www.furaffinity.net/favicon.ico")
+
+
+@app.errorhandler(404)
+def not_found(err: NotFound):
+    return render_template(
+        "not_found.html",
+        title=f"{app.name} · Content not Found"
+    ), 404
 
 
 @app.route("/")
