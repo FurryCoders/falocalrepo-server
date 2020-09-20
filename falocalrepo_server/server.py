@@ -109,7 +109,7 @@ def search(table: str):
         if "offset" in params:
             del params["offset"]
 
-        if last_search["table"] != table or last_search["order"] != table or last_search["params"] != params:
+        if (last_search["table"], last_search["order"], last_search["params"]) != (table, order, params):
             last_search["table"] = table
             last_search["order"] = deepcopy(order)
             last_search["params"] = deepcopy(params)
