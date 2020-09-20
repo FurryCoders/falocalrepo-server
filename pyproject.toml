@@ -22,6 +22,7 @@ falocalrepo-server = "falocalrepo_server.__main__:main"
 [tool.poetry.dependencies]
 python = "^3.8"
 falocalrepo = "^3.6.2"
+flask = "1.1.2"
 
 [tool.poetry.dev-dependencies]
 
