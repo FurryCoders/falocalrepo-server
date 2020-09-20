@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "falocalrepo-server"
+version = "1.0.0"
+description = "Web interface for [falocalrepo."
+authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
+license = "EUPL-1.2"
+readme = "README.md"
+homepage = "https://gitlab.com/MatteoCampinoti94/falocalrepo-server"
+repository = "https://gitlab.com/MatteoCampinoti94/falocalrepo-server"
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: End Users/Desktop",
+]
+
+[tool.poetry.scripts]
+falocalrepo = "falocalrepo_server.__main__:main"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+falocalrepo = "^3.6.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
