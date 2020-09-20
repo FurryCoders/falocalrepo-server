@@ -17,7 +17,7 @@ classifiers = [
 ]
 
 [tool.poetry.scripts]
-falocalrepo = "falocalrepo_server.__main__:main"
+falocalrepo-server = "falocalrepo_server.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
