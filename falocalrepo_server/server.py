@@ -192,3 +192,7 @@ def submission(id_: int):
         file_type=file_type,
         keys=keys_submissions
     )
+
+
+def server(host: str = "0.0.0.0", port: int = 8080):
+    app.run(host=host, port=port)
