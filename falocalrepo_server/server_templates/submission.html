@@ -90,6 +90,12 @@
     <h2>{{ submission[keys.index('TITLE')] }} by {{ submission[keys.index('AUTHOR')] }}</h2>
     <table style="max-width: 300px">
         <tr>
+            <td>Author</td>
+            <td class="overflow value"><a href="/user/{{ submission[keys.index('AUTHOR')] }}">
+                {{ submission[keys.index('AUTHOR')] }}
+            </a></td>
+        </tr>
+        <tr>
             <td>Date</td>
             <td class="overflow value">{{ submission[keys.index('UDATE')] }}</td>
         </tr>

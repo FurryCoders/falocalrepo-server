@@ -62,6 +62,12 @@
     <h2>{{ journal[keys.index('TITLE')] }} by {{ journal[keys.index('AUTHOR')] }}</h2>
     <table style="max-width: 300px">
         <tr>
+            <td>Author</td>
+            <td class="overflow value"><a href="/user/{{ journal[keys.index('AUTHOR')] }}">
+                {{ journal[keys.index('AUTHOR')] }}
+            </a></td>
+        </tr>
+        <tr>
             <td>Date</td>
             <td class="overflow value">{{ journal[keys.index('UDATE')] }}</td>
         </tr>
