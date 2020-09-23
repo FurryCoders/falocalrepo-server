@@ -5,7 +5,7 @@ from os.path import dirname
 from os.path import isfile
 from os.path import join
 from os.path import split
-from re import sub
+from re import sub as re_sub
 from sqlite3 import Connection
 from typing import Dict
 from typing import List
@@ -15,8 +15,8 @@ from typing import Tuple
 from falocalrepo_database import connect_database
 from falocalrepo_database import journals_indexes
 from falocalrepo_database import read_setting
-from falocalrepo_database import search_journals
-from falocalrepo_database import search_submissions
+from falocalrepo_database import search_journals as db_search_journals
+from falocalrepo_database import search_submissions as db_search_submissions
 from falocalrepo_database import select
 from falocalrepo_database import submissions_indexes
 from falocalrepo_database import tiered_path
@@ -42,7 +42,7 @@ last_search: dict = {
 
 
 def clean_username(username: str) -> str:
-    return str(sub(r"[^a-zA-Z0-9\-.~,]", "", username.lower().strip()))
+    return str(re_sub(r"[^a-zA-Z0-9\-.~,]", "", username.lower().strip()))
 
 
 @app.route("/favicon.ico")
@@ -164,10 +164,10 @@ def search(table: str):
             last_search["params"] = deepcopy(params)
             db_temp: Connection = connect_database("FA.db")
             if table == "submissions":
-                last_search["results"] = search_submissions(db_temp, order=order, **params)
+                last_search["results"] = db_search_submissions(db_temp, **params)
                 indexes = submissions_indexes
             elif table == "journals":
-                last_search["results"] = search_journals(db_temp, order=order, **params)
+                last_search["results"] = db_search_journals(db_temp, **params)
                 indexes = journals_indexes
             db_temp.close()
 
