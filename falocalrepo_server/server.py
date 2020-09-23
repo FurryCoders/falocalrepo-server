@@ -35,7 +35,6 @@ app: Flask = Flask(
 )
 last_search: dict = {
     "table": "",
-    "order": [],
     "params": {},
     "results": []
 }
@@ -145,22 +144,17 @@ def search(table: str):
             lambda kv: (kv[0], json_loads(kv[1])),
             request.args.items()
         ))
-        order: List[str] = params.get("order", ["AUTHOR", "ID"])
         limit: int = 50
         offset: int = params.get("offset", 0)
         offset = 0 if offset < 0 else offset
         indexes: Dict[str, int] = {}
 
-        if "order" in params:
-            del params["order"]
-        if "limit" in params:
-            del params["limit"]
-        if "offset" in params:
-            del params["offset"]
+        params["order"] = params.get("order", ["AUTHOR", "ID"])
+        del params["limit"] if "limit" in params else None
+        del params["offset"] if "offset" in params else None
 
-        if (last_search["table"], last_search["order"], last_search["params"]) != (table, order, params):
+        if (last_search["table"], last_search["params"]) != (table, params):
             last_search["table"] = table
-            last_search["order"] = deepcopy(order)
             last_search["params"] = deepcopy(params)
             db_temp: Connection = connect_database("FA.db")
             if table == "submissions":
