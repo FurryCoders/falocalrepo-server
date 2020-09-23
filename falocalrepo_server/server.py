@@ -150,8 +150,10 @@ def search(table: str):
         indexes: Dict[str, int] = {}
 
         params["order"] = params.get("order", ["AUTHOR", "ID"])
-        del params["limit"] if "limit" in params else None
-        del params["offset"] if "offset" in params else None
+        if "limit" in params:
+            del params["limit"]
+        if "offset" in params:
+            del params["offset"]
 
         if (last_search["table"], last_search["params"]) != (table, params):
             last_search["table"] = table
