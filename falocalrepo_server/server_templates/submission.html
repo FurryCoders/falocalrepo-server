@@ -81,54 +81,54 @@
     {% else %}
         Download submission file:
         <a href="/submission/{{ sub_id }}/file">
-            submission.{{ submission[keys.index('FILEEXT')] }}
+            submission.{{ submission[indexes['FILEEXT']] }}
         </a>
     {% endif %}
 </div>
 <br>
 <div id="submission_metadata">
-    <h2>{{ submission[keys.index('TITLE')] }} by {{ submission[keys.index('AUTHOR')] }}</h2>
+    <h2>{{ submission[indexes['TITLE']] }} by {{ submission[indexes['AUTHOR']] }}</h2>
     <table style="max-width: 300px">
         <tr>
             <td>Author</td>
-            <td class="overflow value"><a href="/user/{{ submission[keys.index('AUTHOR')] }}">
-                {{ submission[keys.index('AUTHOR')] }}
+            <td class="overflow value"><a href="/user/{{ submission[indexes['AUTHOR']] }}">
+                {{ submission[indexes['AUTHOR']] }}
             </a></td>
         </tr>
         <tr>
             <td>Date</td>
-            <td class="overflow value">{{ submission[keys.index('UDATE')] }}</td>
+            <td class="overflow value">{{ submission[indexes['UDATE']] }}</td>
         </tr>
         <tr>
             <td>Tags</td>
             <td class="overflow value">
-                {% for tag in submission[keys.index('TAGS')].split(",") %}
+                {% for tag in submission[indexes['TAGS']].split(",") %}
                     <a href='/search/submissions/?tags=["%25{{ tag }}%25"]'>{{ tag }}</a>
                 {% endfor %}
             </td>
         </tr>
         <tr>
             <td>Category</td>
-            <td class="overflow value">{{ submission[keys.index('CATEGORY')] }}</td>
+            <td class="overflow value">{{ submission[indexes['CATEGORY']] }}</td>
         </tr>
         <tr>
             <td>Species</td>
-            <td class="overflow value">{{ submission[keys.index('SPECIES')] }}</td>
+            <td class="overflow value">{{ submission[indexes['SPECIES']] }}</td>
         </tr>
         <tr>
             <td>Gender</td>
-            <td class="overflow value">{{ submission[keys.index('GENDER')] }}</td>
+            <td class="overflow value">{{ submission[indexes['GENDER']] }}</td>
         </tr>
         <tr>
             <td>Rating</td>
-            <td class="overflow value">{{ submission[keys.index('RATING')] }}</td>
+            <td class="overflow value">{{ submission[indexes['RATING']] }}</td>
         </tr>
     </table>
 </div>
 <br><br>
 <div id="submission_description">
     {% autoescape false %}
-    {{ submission[keys.index('DESCRIPTION')] }}
+    {{ submission[indexes['DESCRIPTION']] }}
     {% endautoescape %}
 </div>
 </body>

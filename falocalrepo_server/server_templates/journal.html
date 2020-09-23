@@ -59,24 +59,24 @@
 </head>
 <body>
 <div id="journal_metadata">
-    <h2>{{ journal[keys.index('TITLE')] }} by {{ journal[keys.index('AUTHOR')] }}</h2>
+    <h2>{{ journal[indexes['TITLE']] }} by {{ journal[indexes['AUTHOR']] }}</h2>
     <table style="max-width: 300px">
         <tr>
             <td>Author</td>
-            <td class="overflow value"><a href="/user/{{ journal[keys.index('AUTHOR')] }}">
-                {{ journal[keys.index('AUTHOR')] }}
+            <td class="overflow value"><a href="/user/{{ journal[indexes['AUTHOR']] }}">
+                {{ journal[indexes['AUTHOR']] }}
             </a></td>
         </tr>
         <tr>
             <td>Date</td>
-            <td class="overflow value">{{ journal[keys.index('UDATE')] }}</td>
+            <td class="overflow value">{{ journal[indexes['UDATE']] }}</td>
         </tr>
     </table>
 </div>
 <br><br>
 <div id="journal_content">
     {% autoescape false %}
-    {{ journal[keys.index('CONTENT')] }}
+    {{ journal[indexes['CONTENT']] }}
     {% endautoescape %}
 </div>
 </body>

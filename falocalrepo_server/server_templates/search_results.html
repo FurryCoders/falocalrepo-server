@@ -166,14 +166,14 @@
     {% for item in results %}
         <tr class="clickable {{ loop.cycle('odd', 'even') }}">
             <td class="col_id">
-                <a class="rowlink" href="/{{ table_short }}/{{ item[keys.index("ID")] }}"></a>
-                {{ item[keys.index("ID")] }}
+                <a class="rowlink" href="/{{ table_short }}/{{ item[indexes["ID"]] }}"></a>
+                {{ item[indexes["ID"]] }}
             </td>
-            <td class="col_author">{{ item[keys.index("AUTHOR")] }}</td>
-            <td class="col_date">{{ item[keys.index("UDATE")] }}</td>
-            <td class="col_title">{{ item[keys.index("TITLE")] }}</td>
+            <td class="col_author">{{ item[indexes["AUTHOR"]] }}</td>
+            <td class="col_date">{{ item[indexes["UDATE"]] }}</td>
+            <td class="col_title">{{ item[indexes["TITLE"]] }}</td>
             {% if table == "submissions" %}
-                <td class="col_tags">{{ " ".join(item[keys.index("TAGS")].split(",")) }}</td>
+                <td class="col_tags">{{ " ".join(item[indexes["TAGS"]].split(",")) }}</td>
             {% endif %}
         </tr>
     {% endfor %}

@@ -5,22 +5,22 @@ from os.path import dirname
 from os.path import isfile
 from os.path import join
 from os.path import split
+from re import sub
+from sqlite3 import Connection
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
 
-from falocalrepo.commands import journals_search
-from falocalrepo.commands import submissions_search
-from falocalrepo.database import Connection
-from falocalrepo.database import connect_database
-from falocalrepo.database import keys_journals
-from falocalrepo.database import keys_submissions
-from falocalrepo.database import keys_users
-from falocalrepo.database import select
-from falocalrepo.database import tiered_path
-from falocalrepo.download import user_clean_name
-from falocalrepo.settings import setting_read
+from falocalrepo_database import connect_database
+from falocalrepo_database import journals_indexes
+from falocalrepo_database import read_setting
+from falocalrepo_database import search_journals
+from falocalrepo_database import search_submissions
+from falocalrepo_database import select
+from falocalrepo_database import submissions_indexes
+from falocalrepo_database import tiered_path
+from falocalrepo_database import users_indexes
 from flask import Flask
 from flask import abort
 from flask import redirect
@@ -41,6 +41,10 @@ last_search: dict = {
 }
 
 
+def clean_username(username: str) -> str:
+    return str(sub(r"[^a-zA-Z0-9\-.~,]", "", username.lower().strip()))
+
+
 @app.route("/favicon.ico")
 def favicon():
     return redirect("https://www.furaffinity.net/favicon.ico")
@@ -57,10 +61,10 @@ def not_found(err: NotFound):
 @app.route("/")
 def root():
     db_temp: Connection = connect_database("FA.db")
-    sub_n: int = int(setting_read(db_temp, "SUBN"))
-    usr_n: int = int(setting_read(db_temp, "USRN"))
-    last_update: float = float(setting_read(db_temp, "LASTUPDATE"))
-    version: str = setting_read(db_temp, "VERSION")
+    sub_n: int = int(read_setting(db_temp, "SUBN"))
+    usr_n: int = int(read_setting(db_temp, "USRN"))
+    last_update: float = float(read_setting(db_temp, "LASTUPDATE"))
+    version: str = read_setting(db_temp, "VERSION")
     db_temp.close()
 
     return render_template(
@@ -76,18 +80,18 @@ def root():
 @app.route("/user/<username>")
 def user(username: str):
     db_temp: Connection = connect_database("FA.db")
-    entry: Optional[tuple] = select(db_temp, "USERS", ["*"], "USERNAME", user_clean_name(username)).fetchone()
+    entry: Optional[tuple] = select(db_temp, "USERS", ["*"], "USERNAME", clean_username(username)).fetchone()
 
     if entry is None:
         db_temp.close()
         return abort(404)
 
-    folders = entry[keys_users.index("FOLDERS")]
-    gallery = entry[keys_users.index("GALLERY")]
-    scraps = entry[keys_users.index("SCRAPS")]
-    favorites = entry[keys_users.index("FAVORITES")]
-    mentions = entry[keys_users.index("MENTIONS")]
-    journals = entry[keys_users.index("JOURNALS")]
+    folders = entry[users_indexes["FOLDERS"]]
+    gallery = entry[users_indexes["GALLERY"]]
+    scraps = entry[users_indexes["SCRAPS"]]
+    favorites = entry[users_indexes["FAVORITES"]]
+    mentions = entry[users_indexes["MENTIONS"]]
+    journals = entry[users_indexes["JOURNALS"]]
 
     db_temp.close()
 
@@ -143,6 +147,7 @@ def search(table: str):
         limit: int = 50
         offset: int = params.get("offset", 0)
         offset = 0 if offset < 0 else offset
+        indexes: Dict[str, int] = {}
 
         if "order" in params:
             del params["order"]
@@ -157,9 +162,11 @@ def search(table: str):
             last_search["params"] = deepcopy(params)
             db_temp: Connection = connect_database("FA.db")
             if table == "submissions":
-                last_search["results"] = submissions_search(db_temp, order=order, **params)
+                last_search["results"] = search_submissions(db_temp, order=order, **params)
+                indexes = submissions_indexes
             elif table == "journals":
-                last_search["results"] = journals_search(db_temp, order=order, **params)
+                last_search["results"] = search_journals(db_temp, order=order, **params)
+                indexes = journals_indexes
             db_temp.close()
 
         return render_template(
@@ -171,7 +178,7 @@ def search(table: str):
             offset=offset,
             results=last_search["results"][offset:offset + limit],
             results_total=len(last_search["results"]),
-            keys=keys_submissions
+            indexes=indexes
         )
     else:
         return render_template(
@@ -184,7 +191,7 @@ def search(table: str):
 @app.route("/submission/<int:id_>/file/")
 def submission_file(id_: int):
     db_temp: Connection = connect_database("FA.db")
-    sub_dir: str = join(setting_read(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
+    sub_dir: str = join(read_setting(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
     sub_ext: Optional[Tuple[str]] = select(db_temp, "SUBMISSIONS", ["FILEEXT"], "ID", id_).fetchone()
     db_temp.close()
 
@@ -205,9 +212,9 @@ def journal(id_: int):
 
     return render_template(
         "journal.html",
-        title=f"{app.name} · {jrnl[keys_journals.index('TITLE')]} by {jrnl[keys_journals.index('AUTHOR')]}",
+        title=f"{app.name} · {jrnl[journals_indexes['TITLE']]} by {jrnl[journals_indexes['AUTHOR']]}",
         journal=jrnl,
-        keys=keys_journals
+        indexes=journals_indexes
     )
 
 
@@ -221,18 +228,18 @@ def submission(id_: int):
         return abort(404)
 
     file_type: Optional[str] = ""
-    if (ext := sub[keys_submissions.index('FILEEXT')]) in ("jpg", "jpeg", "png", "gif"):
+    if (ext := sub[submissions_indexes['FILEEXT']]) in ("jpg", "jpeg", "png", "gif"):
         file_type = "image"
     elif not ext:
         file_type = None
 
     return render_template(
         "submission.html",
-        title=f"{app.name} · {sub[keys_submissions.index('TITLE')]} by {sub[keys_submissions.index('AUTHOR')]}",
+        title=f"{app.name} · {sub[submissions_indexes['TITLE']]} by {sub[submissions_indexes['AUTHOR']]}",
         sub_id=id_,
         submission=sub,
         file_type=file_type,
-        keys=keys_submissions
+        indexes=submissions_indexes
     )
 
 
