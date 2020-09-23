@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "falocalrepo-server"
-version = "1.1.4"
+version = "1.1.5"
 description = "Web interface for falocalrepo."
 authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
 license = "EUPL-1.2"
@@ -21,7 +21,6 @@ falocalrepo-server = "falocalrepo_server.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-falocalrepo = "^3.6.2"
 flask = "1.1.2"
 
 [tool.poetry.dev-dependencies]
