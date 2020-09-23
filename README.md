@@ -28,6 +28,12 @@ _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 
 The root folder `/` displays basic information on the database and has links to perform submissions and journal searches.
 
+### User
+
+The `/user/<username>` path displays basic statistics of a user stored in the database. Clicking on gallery/scraps or journals counters opens submissions and journals by the user respectively.
+
+The `/submissions/<username>` and `/journals/<username>` paths open submissions and journals by the user respectively.
+
 ### Search
 
 The server search interface allows to search both submissions and journals. Respectively, these can be reached at `/search/submissions` and `/search/journals`. The `/search/` path defaults to submissions search.
