@@ -63,7 +63,6 @@ def root():
     sub_n: int = int(read_setting(db_temp, "SUBN"))
     jrn_n: int = int(read_setting(db_temp, "JRNN"))
     usr_n: int = int(read_setting(db_temp, "USRN"))
-    last_update: float = float(read_setting(db_temp, "LASTUPDATE"))
     version: str = read_setting(db_temp, "VERSION")
     db_temp.close()
 
@@ -73,7 +72,6 @@ def root():
         submissions_total=sub_n,
         journals_total=jrn_n,
         users_total=usr_n,
-        last_update=last_update,
         version_db=version,
     )
 
