@@ -31,7 +31,7 @@ from werkzeug.exceptions import NotFound
 
 app: Flask = Flask(
     "FurAffinity Local Repo",
-    template_folder=join(abspath(dirname(__file__)), "server_templates")
+    template_folder=join(abspath(dirname(__file__)), "templates")
 )
 last_search: dict = {
     "table": "",
