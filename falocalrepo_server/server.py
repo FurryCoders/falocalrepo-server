@@ -15,6 +15,7 @@ from typing import Tuple
 
 from falocalrepo_database import connect_database
 from falocalrepo_database import journals_indexes
+from falocalrepo_database import journals_table
 from falocalrepo_database import read_setting
 from falocalrepo_database import search_journals as db_search_journals
 from falocalrepo_database import search_submissions as db_search_submissions
@@ -38,6 +39,7 @@ app: Flask = Flask(
 )
 last_search: dict = {
     "table": "",
+    "order": [],
     "params": {},
     "results": [],
     "indexes": {}
@@ -83,7 +85,7 @@ def root():
 @app.route("/user/<username>")
 def user(username: str):
     db_temp: Connection = connect_database("FA.db")
-    entry: Optional[tuple] = select(db_temp, "USERS", ["*"], "USERNAME", clean_username(username)).fetchone()
+    entry: Optional[tuple] = select(db_temp, "USERS", ["*"], ["USERNAME"], [clean_username(username)]).fetchone()
 
     if entry is None:
         db_temp.close()
@@ -192,7 +194,7 @@ def search(table: str):
 def submission_file(id_: int):
     db_temp: Connection = connect_database("FA.db")
     sub_dir: str = join(read_setting(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
-    sub_ext: Optional[Tuple[str]] = select(db_temp, "SUBMISSIONS", ["FILEEXT"], "ID", id_).fetchone()
+    sub_ext: Optional[Tuple[str]] = select(db_temp, "SUBMISSIONS", ["FILEEXT"], ["ID"], [id_]).fetchone()
     db_temp.close()
 
     if isfile(path := join(sub_dir, f"submission.{sub_ext[0]}")):
@@ -204,7 +206,7 @@ def submission_file(id_: int):
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
     db_temp: Connection = connect_database("FA.db")
-    jrnl: Optional[tuple] = select(db_temp, "JOURNALS", ["*"], "ID", id_).fetchone()
+    jrnl: Optional[tuple] = select(db_temp, "JOURNALS", ["*"], ["ID"], [id_]).fetchone()
     db_temp.close()
 
     if jrnl is None:
@@ -221,7 +223,7 @@ def journal(id_: int):
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
     db_temp: Connection = connect_database("FA.db")
-    sub: Optional[tuple] = select(db_temp, "SUBMISSIONS", ["*"], "ID", id_).fetchone()
+    sub: Optional[tuple] = select(db_temp, "SUBMISSIONS", ["*"], ["ID"], [id_]).fetchone()
     db_temp.close()
 
     if sub is None:
