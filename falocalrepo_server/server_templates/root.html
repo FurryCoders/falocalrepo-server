@@ -82,13 +82,13 @@
 </div>
 <div id="search_menu">
     <h3>Search Database</h3>
-    <button onclick="openSearch('submissions')">Search Submissions</button>
-    <button onclick="openSearch('journals')">Search Journals</button>
+    <button onclick="openPath('/search/submissions')">Search Submissions</button>
+    <button onclick="openPath('/search/journals')">Search Journals</button>
 </div>
 <script>
-    const openSearch = (table) => {
+    const openPath = (path) => {
         let url = new URL(window.location.origin)
-        url.pathname = `/search/${table}`
+        url.pathname = path
         window.location = url.href
     }
 </script>
