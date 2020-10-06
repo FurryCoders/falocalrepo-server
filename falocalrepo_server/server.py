@@ -1,4 +1,5 @@
 from copy import deepcopy
+from json import dumps as json_dumps
 from json import loads as json_loads
 from os.path import abspath
 from os.path import dirname
@@ -180,7 +181,8 @@ def search(table: str):
         return render_template(
             "search.html",
             title=f"{app.name} · Search {table.title()}",
-            table=table
+            table=table,
+            params=json_dumps(last_search["params"])
         )
 
 
