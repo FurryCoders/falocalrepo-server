@@ -12,7 +12,7 @@ description = "Database functionality for falocalrepo."
 name = "falocalrepo-database"
 optional = false
 python-versions = ">=3.8,<4.0"
-version = "3.3.0"
+version = "3.4.0"
 
 [package.dependencies]
 filetype = "1.0.7"
@@ -87,7 +87,7 @@ dev = ["pytest", "pytest-timeout", "coverage", "tox", "sphinx", "pallets-sphinx-
 watchdog = ["watchdog"]
 
 [metadata]
-content-hash = "8bbcd61e9641d8ab385f5117e4a32c56dda0eb046fafc48c18088b21861631cf"
+content-hash = "86b2ab513b238743abad10489b34fa51f766ae79b7e38a32f2be20edd393687d"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -97,8 +97,8 @@ click = [
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
 ]
 falocalrepo-database = [
-    {file = "falocalrepo-database-3.3.0.tar.gz", hash = "sha256:5aa2d0ff015810ef1863a39c9663e3ac3eafd72c972a904aca5343139b4c9056"},
-    {file = "falocalrepo_database-3.3.0-py3-none-any.whl", hash = "sha256:4b9211abc0b71d8e1ab9b315ab5d84e595342897ba177c58bd3e96f7c7034e42"},
+    {file = "falocalrepo-database-3.4.0.tar.gz", hash = "sha256:b49077abcfe01b2025ad01747e81704ab7df7a29d7f24a2bc450a7019b1b895b"},
+    {file = "falocalrepo_database-3.4.0-py3-none-any.whl", hash = "sha256:d494197fae1d6a472a89c0765bb5f1a4c6f22b9afa7f52051df95742e502e3d6"},
 ]
 filetype = [
     {file = "filetype-1.0.7-py2.py3-none-any.whl", hash = "sha256:353369948bb1c09b8b3ea3d78390b5586e9399bff9aab894a1dff954e31a66f6"},
