@@ -163,10 +163,16 @@ def search(table: str):
             last_search["params"] = deepcopy(params)
             db_temp: Connection = connect_database("FA.db")
             if table == "submissions":
-                last_search["results"] = db_search_submissions(db_temp, **params)
+                if list(params.keys()) == ["order"]:
+                    last_search["results"] = select_all(db_temp, submissions_table, ["*"], params["order"]).fetchall()
+                else:
+                    last_search["results"] = db_search_submissions(db_temp, **params)
                 last_search["indexes"] = submissions_indexes
             elif table == "journals":
-                last_search["results"] = db_search_journals(db_temp, **params)
+                if list(params.keys()) == ["order"]:
+                    last_search["results"] = select_all(db_temp, journals_table, ["*"], params["order"]).fetchall()
+                else:
+                    last_search["results"] = db_search_journals(db_temp, **params)
                 last_search["indexes"] = journals_indexes
             db_temp.close()
 
