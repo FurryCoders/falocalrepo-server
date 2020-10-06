@@ -37,7 +37,8 @@ app: Flask = Flask(
 last_search: dict = {
     "table": "",
     "params": {},
-    "results": []
+    "results": [],
+    "indexes": {}
 }
 
 
@@ -146,7 +147,6 @@ def search(table: str):
         limit: int = 50
         offset: int = params.get("offset", 0)
         offset = 0 if offset < 0 else offset
-        indexes: Dict[str, int] = {}
 
         params["order"] = params.get("order", ["AUTHOR", "ID"])
         if "limit" in params:
@@ -160,10 +160,10 @@ def search(table: str):
             db_temp: Connection = connect_database("FA.db")
             if table == "submissions":
                 last_search["results"] = db_search_submissions(db_temp, **params)
-                indexes = submissions_indexes
+                last_search["indexes"] = submissions_indexes
             elif table == "journals":
                 last_search["results"] = db_search_journals(db_temp, **params)
-                indexes = journals_indexes
+                last_search["indexes"] = journals_indexes
             db_temp.close()
 
         return render_template(
@@ -175,7 +175,7 @@ def search(table: str):
             offset=offset,
             results=last_search["results"][offset:offset + limit],
             results_total=len(last_search["results"]),
-            indexes=indexes
+            indexes=last_search["indexes"]
         )
     else:
         return render_template(
