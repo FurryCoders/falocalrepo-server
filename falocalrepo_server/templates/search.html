@@ -98,6 +98,8 @@
         tr.appendChild(td2)
         tr.appendChild(td3)
         parent.insertBefore(tr, parent.childNodes[parent.childElementCount - 1])
+
+        return fieldInput
     }
     const search = () => {
         let params = {}
@@ -117,6 +119,8 @@
 
         window.location = url.href
     }
+    const params = {{ params|safe }};
+    Object.entries(params).forEach(([k, vs]) => vs.forEach((v) => addSearchField(k).value = v))
 </script>
 </body>
 </html>
