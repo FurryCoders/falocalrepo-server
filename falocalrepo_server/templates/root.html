@@ -45,6 +45,12 @@
             border: 1px solid var(--table_border_color);
         }
 
+        table td a.celllink {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
         #database_info table {
             width: 300px;
             max-width: 300px;
@@ -64,11 +70,11 @@
     <table>
         <tr>
             <td>Submissions</td>
-            <td>{{ submissions_total }}</td>
+            <td class="celllink"><a href='/search/submissions/?order=["ID%20DESC"]'>{{ submissions_total }}</a></td>
         </tr>
         <tr>
             <td>Journals</td>
-            <td>{{ journals_total }}</td>
+            <td class="celllink"><a href='/search/journals/?order=["ID%20DESC"]'>{{ journals_total }}</a></td>
         </tr>
         <tr>
             <td>Users</td>
