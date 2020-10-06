@@ -19,7 +19,9 @@ from falocalrepo_database import read_setting
 from falocalrepo_database import search_journals as db_search_journals
 from falocalrepo_database import search_submissions as db_search_submissions
 from falocalrepo_database import select
+from falocalrepo_database import select_all
 from falocalrepo_database import submissions_indexes
+from falocalrepo_database import submissions_table
 from falocalrepo_database import tiered_path
 from falocalrepo_database import users_indexes
 from flask import Flask
@@ -148,7 +150,7 @@ def search(table: str):
         offset: int = params.get("offset", 0)
         offset = 0 if offset < 0 else offset
 
-        params["order"] = params.get("order", ["AUTHOR", "ID"])
+        params["order"] = params.get("order", ["ID DESC"])
         if "limit" in params:
             del params["limit"]
         if "offset" in params:
