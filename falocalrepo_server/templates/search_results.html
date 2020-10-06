@@ -141,12 +141,11 @@
     Results: {{ offset }}-{{ offset + results|length }} of {{ results_total }}
     · Page {{ (offset // limit) + 1 }}
     <br>
-    <button onclick="pagePrev()" style="visibility: {{ 'visible' if offset > 0 else 'hidden' }}">
+    <button onclick="pagePrev()"{{ ' disabled' if offset <= 0 }}>
         Prev
     </button>
     <button onclick="newSearch()">New Search</button>
-    <button onclick="pageNext()"
-            style="visibility: {{ 'visible' if offset + results|length < results_total else 'hidden' }}">
+    <button onclick="pageNext()"{{ ' disabled' if offset + results|length >= results_total }}>
         Next
     </button>
     {% endset %}
