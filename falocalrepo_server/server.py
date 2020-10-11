@@ -226,6 +226,11 @@ def journal(id_: int):
     )
 
 
+@app.route("/view/<int:id_>/")
+def submission_view(id_: int):
+    return redirect(f"/submission/{id_}")
+
+
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
     db_temp: Connection = connect_database("FA.db")
