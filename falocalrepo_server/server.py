@@ -220,7 +220,7 @@ def journal(id_: int):
 
     return render_template(
         "journal.html",
-        title=f"{app.name} · {jrnl[journals_indexes['TITLE']]} by {jrnl[journals_indexes['AUTHOR']]}",
+        title=f"{app.name} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
         journal=jrnl
     )
 
