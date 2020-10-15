@@ -247,7 +247,6 @@ def submission(id_: int):
     return render_template(
         "submission.html",
         title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
-        sub_id=id_,
         submission=sub,
         file_type=file_type
     )

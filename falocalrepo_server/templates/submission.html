@@ -75,12 +75,12 @@
     {% if file_type == None %}
         Submission has no files
     {% elif file_type == "image" %}
-        <a href="/submission/{{ sub_id }}/file">
-            <img src="/submission/{{ sub_id }}/file" alt="">
+        <a href="/submission/{{ submission["ID"] }}/file">
+            <img src="/submission/{{ submission["ID"] }}/file" alt="">
         </a>
     {% else %}
         Download submission file:
-        <a href="/submission/{{ sub_id }}/file">
+        <a href="/submission/{{ submission["ID"] }}/file">
             submission.{{ submission["FILEEXT"] }}
         </a>
     {% endif %}
@@ -125,7 +125,7 @@
         </tr>
     </table>
     <br>
-    <button onclick="window.location.href = 'https://www.furaffinity.net/view/{{ sub_id }}'">
+    <button onclick="window.location.href = 'https://www.furaffinity.net/view/{{ submission["ID"] }}'">
         Open on Fur Affinity
     </button>
 </div>
