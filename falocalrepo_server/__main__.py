@@ -5,9 +5,10 @@ from .server import app
 
 
 def main():
-    assert isfile("FA.db")
-    host, port = argv[1].split(":") if argv[1:] else ("0.0.0.0", 8080)
-    app.run(host=host, port=int(port))
+    assert isfile(argv[1])
+
+    host, port = argv[2].split(":") if argv[2:] else ("0.0.0.0", 8080)
+    app.run(argv[1], host=host, port=int(port))
 
 
 if __name__ == '__main__':

@@ -44,6 +44,7 @@ last_search: dict = {
     "results": [],
     "indexes": {}
 }
+db_path: str = "FA.db"
 
 
 def clean_username(username: str) -> str:
@@ -84,7 +85,9 @@ def root():
 
 @app.route("/user/<username>")
 def user(username: str):
-    db_temp: Connection = connect_database("FA.db")
+    global db_path
+
+    db_temp: Connection = connect_database(db_path)
     user_entry: Optional[dict] = get_user(db_temp, clean_username(username))
     db_temp.close()
 
@@ -140,6 +143,7 @@ def search_user_journals(username: str):
 
 def search(table: str):
     global last_search
+    global db_path
 
     if request.args:
         params: Dict[str, List[str]] = dict(map(
@@ -159,7 +163,7 @@ def search(table: str):
         if (last_search["table"], last_search["params"]) != (table, params):
             last_search["table"] = table
             last_search["params"] = deepcopy(params)
-            db_temp: Connection = connect_database("FA.db")
+            db_temp: Connection = connect_database(db_path)
             if table == "submissions":
                 if list(params.keys()) == ["order"]:
                     last_search["results"] = select_all(db_temp, submissions_table, ["*"], params["order"]).fetchall()
@@ -196,7 +200,9 @@ def search(table: str):
 
 @app.route("/submission/<int:id_>/file/")
 def submission_file(id_: int):
-    db_temp: Connection = connect_database("FA.db")
+    global db_path
+
+    db_temp: Connection = connect_database(db_path)
     sub_dir: str = join(read_setting(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
     sub: Optional[dict] = get_submission(db_temp, id_)
     db_temp.close()
@@ -211,7 +217,9 @@ def submission_file(id_: int):
 
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
-    db_temp: Connection = connect_database("FA.db")
+    global db_path
+
+    db_temp: Connection = connect_database(db_path)
     jrnl: Optional[dict] = get_journal(db_temp, id_)
     db_temp.close()
 
@@ -232,7 +240,9 @@ def submission_view(id_: int):
 
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
-    db_temp: Connection = connect_database("FA.db")
+    global db_path
+
+    db_temp: Connection = connect_database(db_path)
     sub: Optional[dict] = get_submission(db_temp, id_)
 
     if sub is None:
@@ -252,5 +262,9 @@ def submission(id_: int):
     )
 
 
-def server(host: str = "0.0.0.0", port: int = 8080):
+def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
+    global db_path
+
+    db_path = database_path
+
     app.run(host=host, port=port)
