@@ -91,7 +91,7 @@ def user(username: str):
     if user_entry is None:
         return abort(404)
 
-    folders: List[int] = list(map(int, filter(bool, user_entry["FOLDERS"].split(","))))
+    folders: List[int] = list(filter(bool, user_entry["FOLDERS"].split(",")))
     gallery: List[int] = list(map(int, filter(bool, user_entry["GALLERY"].split(","))))
     scraps: List[int] = list(map(int, filter(bool, user_entry["SCRAPS"].split(","))))
     favorites: List[int] = list(map(int, filter(bool, user_entry["FAVORITES"].split(","))))
