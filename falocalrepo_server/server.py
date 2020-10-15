@@ -11,20 +11,20 @@ from sqlite3 import Connection
 from typing import Dict
 from typing import List
 from typing import Optional
-from typing import Tuple
 
 from falocalrepo_database import connect_database
+from falocalrepo_database import get_journal
+from falocalrepo_database import get_submission
+from falocalrepo_database import get_user
 from falocalrepo_database import journals_indexes
 from falocalrepo_database import journals_table
 from falocalrepo_database import read_setting
 from falocalrepo_database import search_journals as db_search_journals
 from falocalrepo_database import search_submissions as db_search_submissions
-from falocalrepo_database import select
 from falocalrepo_database import select_all
 from falocalrepo_database import submissions_indexes
 from falocalrepo_database import submissions_table
 from falocalrepo_database import tiered_path
-from falocalrepo_database import users_indexes
 from flask import Flask
 from flask import abort
 from flask import redirect
@@ -85,20 +85,18 @@ def root():
 @app.route("/user/<username>")
 def user(username: str):
     db_temp: Connection = connect_database("FA.db")
-    entry: Optional[tuple] = select(db_temp, "USERS", ["*"], ["USERNAME"], [clean_username(username)]).fetchone()
+    user_entry: Optional[dict] = get_user(db_temp, clean_username(username))
+    db_temp.close()
 
-    if entry is None:
-        db_temp.close()
+    if user_entry is None:
         return abort(404)
 
-    folders = entry[users_indexes["FOLDERS"]]
-    gallery = entry[users_indexes["GALLERY"]]
-    scraps = entry[users_indexes["SCRAPS"]]
-    favorites = entry[users_indexes["FAVORITES"]]
-    mentions = entry[users_indexes["MENTIONS"]]
-    journals = entry[users_indexes["JOURNALS"]]
-
-    db_temp.close()
+    folders: List[int] = list(map(int, filter(bool, user_entry["FOLDERS"].split(","))))
+    gallery: List[int] = list(map(int, filter(bool, user_entry["GALLERY"].split(","))))
+    scraps: List[int] = list(map(int, filter(bool, user_entry["SCRAPS"].split(","))))
+    favorites: List[int] = list(map(int, filter(bool, user_entry["FAVORITES"].split(","))))
+    mentions: List[int] = list(map(int, filter(bool, user_entry["MENTIONS"].split(","))))
+    journals: List[int] = list(map(int, filter(bool, user_entry["JOURNALS"].split(","))))
 
     return render_template(
         "user.html",
@@ -200,10 +198,12 @@ def search(table: str):
 def submission_file(id_: int):
     db_temp: Connection = connect_database("FA.db")
     sub_dir: str = join(read_setting(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
-    sub_ext: Optional[Tuple[str]] = select(db_temp, "SUBMISSIONS", ["FILEEXT"], ["ID"], [id_]).fetchone()
+    sub: Optional[dict] = get_submission(db_temp, id_)
     db_temp.close()
 
-    if isfile(path := join(sub_dir, f"submission.{sub_ext[0]}")):
+    if sub is None:
+        return abort(404)
+    elif isfile(path := join(sub_dir, f"submission.{sub['FILEEXT']}")):
         return send_file(path)
     else:
         return abort(404)
@@ -212,7 +212,7 @@ def submission_file(id_: int):
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
     db_temp: Connection = connect_database("FA.db")
-    jrnl: Optional[tuple] = select(db_temp, "JOURNALS", ["*"], ["ID"], [id_]).fetchone()
+    jrnl: Optional[dict] = get_journal(db_temp, id_)
     db_temp.close()
 
     if jrnl is None:
@@ -221,8 +221,7 @@ def journal(id_: int):
     return render_template(
         "journal.html",
         title=f"{app.name} · {jrnl[journals_indexes['TITLE']]} by {jrnl[journals_indexes['AUTHOR']]}",
-        journal=jrnl,
-        indexes=journals_indexes
+        journal=jrnl
     )
 
 
@@ -234,25 +233,23 @@ def submission_view(id_: int):
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
     db_temp: Connection = connect_database("FA.db")
-    sub: Optional[tuple] = select(db_temp, "SUBMISSIONS", ["*"], ["ID"], [id_]).fetchone()
-    db_temp.close()
+    sub: Optional[dict] = get_submission(db_temp, id_)
 
     if sub is None:
         return abort(404)
 
     file_type: Optional[str] = ""
-    if (ext := sub[submissions_indexes['FILEEXT']]) in ("jpg", "jpeg", "png", "gif"):
+    if (ext := sub["FILEEXT"]) in ("jpg", "jpeg", "png", "gif"):
         file_type = "image"
     elif not ext:
         file_type = None
 
     return render_template(
         "submission.html",
-        title=f"{app.name} · {sub[submissions_indexes['TITLE']]} by {sub[submissions_indexes['AUTHOR']]}",
+        title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
         sub_id=id_,
         submission=sub,
-        file_type=file_type,
-        indexes=submissions_indexes
+        file_type=file_type
     )
 
 
