@@ -17,10 +17,10 @@ For the program to run, a properly formatted database created by falocalrepo nee
 ## Usage
 
 ```
-falocalrepo-server [<host>:<port>]
+falocalrepo-server <database> [<host>:<port>]
 ```
 
-The command accepts a single optional argument to manually set host and port. By default the server is run on 0.0.0.0:8080.
+The server needs one argument pointing at the location of a valid [falocalrepo](https://pypi.org/project/falocalrepo/) database and accepts an optional argument to manually set host and port. By default the server is run on 0.0.0.0:8080.
 
 Once the server is running - it will display status messages in the terminal - the web app can be accessed at http://0.0.0.0:8080/, or any manually set host/port combination.
 
