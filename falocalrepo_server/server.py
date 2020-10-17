@@ -87,9 +87,9 @@ def root():
 def user(username: str):
     global db_path
 
-    db_temp: Connection = connect_database(db_path)
-    user_entry: Optional[dict] = get_user(db_temp, clean_username(username))
-    db_temp.close()
+    user_entry: Optional[dict]
+    with connect_database(db_path) as db_temp:
+        user_entry = get_user(db_temp, clean_username(username))
 
     if user_entry is None:
         return abort(404)
@@ -163,20 +163,19 @@ def search(table: str):
         if (last_search["table"], last_search["params"]) != (table, params):
             last_search["table"] = table
             last_search["params"] = deepcopy(params)
-            db_temp: Connection = connect_database(db_path)
-            if table == "submissions":
-                if list(params.keys()) == ["order"]:
-                    last_search["results"] = select_all(db_temp, submissions_table, ["*"], params["order"]).fetchall()
-                else:
-                    last_search["results"] = db_search_submissions(db_temp, **params)
-                last_search["indexes"] = submissions_indexes
-            elif table == "journals":
-                if list(params.keys()) == ["order"]:
-                    last_search["results"] = select_all(db_temp, journals_table, ["*"], params["order"]).fetchall()
-                else:
-                    last_search["results"] = db_search_journals(db_temp, **params)
-                last_search["indexes"] = journals_indexes
-            db_temp.close()
+            with connect_database(db_path) as db_temp:
+                if table == "submissions":
+                    if list(params.keys()) == ["order"]:
+                        last_search["results"] = select_all(db_temp, submissions_table, ["*"], params["order"]).fetchall()
+                    else:
+                        last_search["results"] = db_search_submissions(db_temp, **params)
+                    last_search["indexes"] = submissions_indexes
+                elif table == "journals":
+                    if list(params.keys()) == ["order"]:
+                        last_search["results"] = select_all(db_temp, journals_table, ["*"], params["order"]).fetchall()
+                    else:
+                        last_search["results"] = db_search_journals(db_temp, **params)
+                    last_search["indexes"] = journals_indexes
 
         return render_template(
             "search_results.html",
@@ -219,9 +218,9 @@ def submission_file(id_: int):
 def journal(id_: int):
     global db_path
 
-    db_temp: Connection = connect_database(db_path)
-    jrnl: Optional[dict] = get_journal(db_temp, id_)
-    db_temp.close()
+    jrnl: Optional[dict]
+    with connect_database(db_path) as db_temp:
+        jrnl = get_journal(db_temp, id_)
 
     if jrnl is None:
         return abort(404)
@@ -242,8 +241,9 @@ def submission_view(id_: int):
 def submission(id_: int):
     global db_path
 
-    db_temp: Connection = connect_database(db_path)
-    sub: Optional[dict] = get_submission(db_temp, id_)
+    sub: Optional[dict]
+    with connect_database(db_path) as db_temp:
+        sub = get_submission(db_temp, id_)
 
     if sub is None:
         return abort(404)
