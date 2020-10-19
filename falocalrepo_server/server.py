@@ -1,7 +1,10 @@
 from copy import deepcopy
 from json import dumps as json_dumps
 from json import loads as json_loads
+from os import chdir
+from os import getcwd
 from os.path import abspath
+from os.path import basename
 from os.path import dirname
 from os.path import isfile
 from os.path import join
@@ -166,7 +169,8 @@ def search(table: str):
             with connect_database(db_path) as db_temp:
                 if table == "submissions":
                     if list(params.keys()) == ["order"]:
-                        last_search["results"] = select_all(db_temp, submissions_table, ["*"], params["order"]).fetchall()
+                        last_search["results"] = select_all(db_temp, submissions_table, ["*"],
+                                                            params["order"]).fetchall()
                     else:
                         last_search["results"] = db_search_submissions(db_temp, **params)
                     last_search["indexes"] = submissions_indexes
@@ -202,7 +206,7 @@ def submission_file(id_: int):
     global db_path
 
     db_temp: Connection = connect_database(db_path)
-    sub_dir: str = join(read_setting(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
+    sub_dir: str = join(dirname(db_path), read_setting(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
     sub: Optional[dict] = get_submission(db_temp, id_)
     db_temp.close()
 
@@ -265,6 +269,8 @@ def submission(id_: int):
 def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
     global db_path
 
-    db_path = database_path
+    chdir(path if (path := dirname(database_path)) else ".")
+
+    db_path = join(abspath(getcwd()), basename(database_path))
 
     app.run(host=host, port=port)
