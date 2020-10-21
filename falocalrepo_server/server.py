@@ -201,23 +201,6 @@ def search(table: str):
         )
 
 
-@app.route("/submission/<int:id_>/file/")
-def submission_file(id_: int):
-    global db_path
-
-    db_temp: Connection = connect_database(db_path)
-    sub_dir: str = join(dirname(db_path), read_setting(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
-    sub: Optional[dict] = get_submission(db_temp, id_)
-    db_temp.close()
-
-    if sub is None:
-        return abort(404)
-    elif isfile(path := join(sub_dir, f"submission.{sub['FILEEXT']}")):
-        return send_file(path)
-    else:
-        return abort(404)
-
-
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
     global db_path
@@ -264,6 +247,23 @@ def submission(id_: int):
         submission=sub,
         file_type=file_type
     )
+
+
+@app.route("/submission/<int:id_>/file/")
+def submission_file(id_: int):
+    global db_path
+
+    db_temp: Connection = connect_database(db_path)
+    sub_dir: str = join(dirname(db_path), read_setting(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
+    sub: Optional[dict] = get_submission(db_temp, id_)
+    db_temp.close()
+
+    if sub is None:
+        return abort(404)
+    elif isfile(path := join(sub_dir, f"submission.{sub['FILEEXT']}")):
+        return send_file(path)
+    else:
+        return abort(404)
 
 
 def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
