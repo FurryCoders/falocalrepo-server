@@ -165,29 +165,29 @@
     {% for item in results %}
         <tr class="clickable {{ loop.cycle('odd', 'even') }}">
             <td class="col_id">
-                <a class="celllink" href="/{{ table_short }}/{{ item[indexes["ID"]] }}">
-                    <span>{{ item[indexes["ID"]] }}</span>
+                <a class="celllink" href="/{{ table_short }}/{{ item["ID"] }}">
+                    <span>{{ item["ID"] }}</span>
                 </a>
             </td>
             <td class="col_author">
-                <a class="celllink" href="/user/{{ item[indexes["AUTHOR"]] }}">
-                    <span>{{ item[indexes["AUTHOR"]] }}</span>
+                <a class="celllink" href="/user/{{ item["AUTHOR"] }}">
+                    <span>{{ item["AUTHOR"] }}</span>
                 </a>
             </td>
             <td class="col_date">
-                <a class="celllink" href="/{{ table_short }}/{{ item[indexes["ID"]] }}">
-                    <span>{{ item[indexes["UDATE"]] }}</span>
+                <a class="celllink" href="/{{ table_short }}/{{ item["ID"] }}">
+                    <span>{{ item["DATE"] }}</span>
                 </a>
             </td>
             <td class="col_title">
-                <a class="celllink" href="/{{ table_short }}/{{ item[indexes["ID"]] }}">
-                    <span>{{ item[indexes["TITLE"]] }}</span>
+                <a class="celllink" href="/{{ table_short }}/{{ item["ID"] }}">
+                    <span>{{ item["TITLE"] }}</span>
                 </a>
             </td>
             {% if table == "submissions" %}
                 <td class="col_tags">
-                    <a class="celllink" href="/{{ table_short }}/{{ item[indexes["ID"]] }}">
-                        <span>{{ " ".join(item[indexes["TAGS"]].split(",")) }}</span>
+                    <a class="celllink" href="/{{ table_short }}/{{ item["ID"] }}">
+                        <span>{{ " ".join(item["TAGS"].split(",")) }}</span>
                     </a>
                 </td>
             {% endif %}
