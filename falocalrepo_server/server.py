@@ -47,7 +47,7 @@ def favicon():
 
 
 @app.errorhandler(404)
-def not_found(err: NotFound):
+def not_found(_err: NotFound):
     return render_template(
         "not_found.html",
         title=f"{app.name} · Content not Found"
