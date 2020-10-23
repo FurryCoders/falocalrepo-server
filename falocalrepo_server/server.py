@@ -267,8 +267,6 @@ def submission_file(id_: int):
 def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
     global db_path
 
-    chdir(path if (path := dirname(database_path)) else ".")
-
-    db_path = join(abspath(getcwd()), basename(database_path))
+    db_path = abspath(database_path)
 
     app.run(host=host, port=port)
