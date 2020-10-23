@@ -15,18 +15,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from falocalrepo_database import connect_database
-from falocalrepo_database import get_journal
-from falocalrepo_database import get_submission
-from falocalrepo_database import get_user
-from falocalrepo_database import journals_indexes
-from falocalrepo_database import journals_table
-from falocalrepo_database import read_setting
-from falocalrepo_database import search_journals as db_search_journals
-from falocalrepo_database import search_submissions as db_search_submissions
-from falocalrepo_database import select_all
-from falocalrepo_database import submissions_indexes
-from falocalrepo_database import submissions_table
+from falocalrepo_database import FADatabase
 from falocalrepo_database import tiered_path
 from flask import Flask
 from flask import abort
@@ -44,8 +33,7 @@ last_search: dict = {
     "table": "",
     "order": [],
     "params": {},
-    "results": [],
-    "indexes": {}
+    "results": []
 }
 db_path: str = "FA.db"
 
@@ -69,12 +57,17 @@ def not_found(err: NotFound):
 
 @app.route("/")
 def root():
-    db_temp: Connection = connect_database("FA.db")
-    sub_n: int = int(read_setting(db_temp, "SUBN"))
-    jrn_n: int = int(read_setting(db_temp, "JRNN"))
-    usr_n: int = int(read_setting(db_temp, "USRN"))
-    version: str = read_setting(db_temp, "VERSION")
-    db_temp.close()
+    global db_path
+
+    sub_n: int
+    jrn_n: int
+    usr_n: int
+    version: str
+    with FADatabase(db_path) as db:
+        sub_n = int(db.settings["SUBN"])
+        jrn_n = int(db.settings["JRNN"])
+        usr_n = int(db.settings["USRN"])
+        version = db.settings["VERSION"]
 
     return render_template(
         "root.html",
@@ -88,11 +81,14 @@ def root():
 
 @app.route("/user/<username>")
 def user(username: str):
+    if username != (username_clean := clean_username(username)):
+        return redirect(f"/user/{username_clean}")
+
     global db_path
 
     user_entry: Optional[dict]
-    with connect_database(db_path) as db_temp:
-        user_entry = get_user(db_temp, clean_username(username))
+    with FADatabase(db_path) as db:
+        user_entry = db.users[username]
 
     if user_entry is None:
         return abort(404)
@@ -153,11 +149,13 @@ def search(table: str):
             lambda kv: (kv[0], json_loads(kv[1])),
             request.args.items()
         ))
+        order: List[str] = params.get("order", ["ID DESC"])
         limit: int = 50
         offset: int = params.get("offset", 0)
         offset = 0 if offset < 0 else offset
 
-        params["order"] = params.get("order", ["ID DESC"])
+        if "order" in params:
+            del params["order"]
         if "limit" in params:
             del params["limit"]
         if "offset" in params:
@@ -166,20 +164,19 @@ def search(table: str):
         if (last_search["table"], last_search["params"]) != (table, params):
             last_search["table"] = table
             last_search["params"] = deepcopy(params)
-            with connect_database(db_path) as db_temp:
+            with FADatabase(db_path) as db:
                 if table == "submissions":
                     if list(params.keys()) == ["order"]:
-                        last_search["results"] = select_all(db_temp, submissions_table, ["*"],
-                                                            params["order"]).fetchall()
+                        last_search["results"] = list(db.submissions)
                     else:
-                        last_search["results"] = db_search_submissions(db_temp, **params)
-                    last_search["indexes"] = submissions_indexes
+                        last_search["results"] = list(db.submissions.cursor_to_dict(
+                            db.submissions.select(params, like=True, order=order)))
                 elif table == "journals":
                     if list(params.keys()) == ["order"]:
-                        last_search["results"] = select_all(db_temp, journals_table, ["*"], params["order"]).fetchall()
+                        last_search["results"] = list(db.journals)
                     else:
-                        last_search["results"] = db_search_journals(db_temp, **params)
-                    last_search["indexes"] = journals_indexes
+                        last_search["results"] = list(db.journals.cursor_to_dict(
+                            db.journals.select(params, like=True, order=order)))
 
         return render_template(
             "search_results.html",
@@ -189,8 +186,7 @@ def search(table: str):
             limit=limit,
             offset=offset,
             results=last_search["results"][offset:offset + limit],
-            results_total=len(last_search["results"]),
-            indexes=last_search["indexes"]
+            results_total=len(last_search["results"])
         )
     else:
         return render_template(
@@ -206,8 +202,8 @@ def journal(id_: int):
     global db_path
 
     jrnl: Optional[dict]
-    with connect_database(db_path) as db_temp:
-        jrnl = get_journal(db_temp, id_)
+    with FADatabase(db_path) as db:
+        jrnl = db.journals[id_]
 
     if jrnl is None:
         return abort(404)
@@ -229,8 +225,8 @@ def submission(id_: int):
     global db_path
 
     sub: Optional[dict]
-    with connect_database(db_path) as db_temp:
-        sub = get_submission(db_temp, id_)
+    with FADatabase(db_path) as db:
+        sub: Optional[dict] = db.submissions[id_]
 
     if sub is None:
         return abort(404)
@@ -255,10 +251,11 @@ def submission(id_: int):
 def submission_file(id_: int):
     global db_path
 
-    db_temp: Connection = connect_database(db_path)
-    sub_dir: str = join(dirname(db_path), read_setting(db_temp, "FILESFOLDER"), *split(tiered_path(id_)))
-    sub: Optional[dict] = get_submission(db_temp, id_)
-    db_temp.close()
+    sub: Optional[dict]
+    sub_dir: str
+    with FADatabase(db_path) as db:
+        sub = db.submissions[id_]
+        sub_dir = join(dirname(db_path), db.settings["FILESFOLDER"], *split(tiered_path(id_)))
 
     if sub is None:
         return abort(404)
