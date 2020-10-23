@@ -10,7 +10,6 @@ from os.path import isfile
 from os.path import join
 from os.path import split
 from re import sub as re_sub
-from sqlite3 import Connection
 from typing import Dict
 from typing import List
 from typing import Optional
