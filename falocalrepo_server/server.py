@@ -160,6 +160,9 @@ def search(table: str):
         if (last_search["table"], last_search["params"]) != (table, params):
             last_search["table"] = table
             last_search["params"] = deepcopy(params)
+            if "author" in params:
+                params["replace(author, '_', '')"] = list(map(clean_username, params["author"]))
+                del params["author"]
             with FADatabase(db_path) as db:
                 if table == "submissions":
                     if list(params.keys()) == ["order"]:
@@ -178,7 +181,7 @@ def search(table: str):
             "search_results.html",
             title=f"{app.name} · {table.title()} Search Results",
             table=table,
-            params=params,
+            params=last_search["params"],
             limit=limit,
             offset=offset,
             results=last_search["results"][offset:offset + limit],
