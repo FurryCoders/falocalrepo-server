@@ -144,7 +144,7 @@
     <button onclick="pagePrev()" {{ 'disabled' if offset <= 0 }}>
         Prev
     </button>
-    <button onclick="window.location = (new URL(window.location.href)).pathname">New Search</button>
+    <button onclick="window.location = window.location.pathname">New Search</button>
     <button onclick="pageNext()" {{ 'disabled' if offset + results|length >= results_total }}>
         Next
     </button>
