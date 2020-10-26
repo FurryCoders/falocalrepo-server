@@ -144,7 +144,7 @@
     <button onclick="pagePrev()" {{ 'disabled' if offset <= 0 }}>
         Prev
     </button>
-    <button onclick="newSearch()">New Search</button>
+    <button onclick="window.location = (new URL(window.location.href)).pathname">New Search</button>
     <button onclick="pageNext()" {{ 'disabled' if offset + results|length >= results_total }}>
         Next
     </button>
@@ -200,11 +200,6 @@
     <br>&nbsp;<br>
 </div>
 <script>
-    const newSearch = () => {
-        let url = new URL(window.location.origin)
-        url.pathname = "/search/"
-        window.location = url.href
-    }
     const sortBy = (sortField) => {
         let url = new URL(window.location.href)
         url.searchParams.set("order", JSON.stringify([sortField.toUpperCase()]))
