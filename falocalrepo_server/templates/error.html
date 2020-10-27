@@ -6,6 +6,10 @@
 </head>
 <body>
 <br><br><br>
-<div style="text-align: center">{{ message }}</div>
+<div style="text-align: center">
+    {% autoescape false %}
+    {{ message }}
+    {% endautoescape %}
+</div>
 </body>
 </html>
