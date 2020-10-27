@@ -145,5 +145,12 @@
     {{ submission["DESCRIPTION"] }}
     {% endautoescape %}
 </div>
+<script>
+    window.onload = () => {
+        const dpi = Number(window.devicePixelRatio || 1)
+        if (dpi <= 1) return
+        document.getElementById("submission_description").style.maxWidth = `${600 * (dpi / Math.floor(dpi))}px`
+    }
+</script>
 </body>
 </html>
