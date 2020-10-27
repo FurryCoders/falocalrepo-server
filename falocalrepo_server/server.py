@@ -175,8 +175,6 @@ def search(table: str = "submissions"):
             column_id = "USERNAME"
             order: List[str] = params.get("order", [f"USERNAME ASC"])
 
-
-
         if "order" in params:
             del params["order"]
         if "limit" in params:
