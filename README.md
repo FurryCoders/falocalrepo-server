@@ -32,7 +32,7 @@ _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 
 The root folder `/` displays basic information on the database and has links to perform submissions and journal searches.
 
-### User
+### Users
 
 The `/user/<username>` path displays basic statistics of a user stored in the database. Clicking on gallery/scraps or journals counters opens submissions and journals by the user respectively.
 
@@ -40,7 +40,7 @@ The `/submissions/<username>` and `/journals/<username>` paths open submissions 
 
 ### Search
 
-The server search interface allows to search both submissions and journals. Respectively, these can be reached at `/search/submissions` and `/search/journals`. The `/search/` path defaults to submissions search.
+The server search interface allows to search submissions, journals, and users. Respectively, these can be reached at `/search/submissions`, `/search/journals`, and `/search/users`. The `/search/` path defaults to submissions search.
 
 The interface supports the search fields supported by the command line database search commands. To add a field press on the `+` button after selecting one in the dropdown menu. The `-` buttons allow to remove a field from the search.
 
