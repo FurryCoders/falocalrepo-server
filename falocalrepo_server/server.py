@@ -38,6 +38,10 @@ def clean_username(username: str) -> str:
     return str(re_sub(r"[^a-zA-Z0-9\-.~,]", "", username.lower().strip()))
 
 
+def button(href: str, text: str) -> str:
+    return f'<button onclick="window.location = \'{href}\'">{text}</button>'
+
+
 @app.route("/favicon.ico")
 def favicon():
     return redirect("https://www.furaffinity.net/favicon.ico")
@@ -92,7 +96,10 @@ def user(username: str):
         user_entry = db.users[username]
 
     if user_entry is None:
-        return error("User not found.", 404)
+        return error(
+            f"User not found.<br>{button(f'https://www.furaffinity.net/user/{id_}', 'Open on Fur Affinity')}",
+            404
+        )
 
     folders: List[int] = list(filter(bool, user_entry["FOLDERS"].split(",")))
     gallery: List[int] = list(map(int, filter(bool, user_entry["GALLERY"].split(","))))
@@ -218,7 +225,10 @@ def journal(id_: int):
         jrnl = db.journals[id_]
 
     if jrnl is None:
-        return error("Journal not found.", 404)
+        return error(
+            f"Journal not found.<br>{button(f'https://www.furaffinity.net/journal/{id_}', 'Open on Fur Affinity')}",
+            404
+        )
 
     return render_template(
         "journal.html",
@@ -241,7 +251,10 @@ def submission(id_: int):
         sub: Optional[dict] = db.submissions[id_]
 
     if sub is None:
-        return error("Submission not found.", 404)
+        return error(
+            f"Submission not found.<br>{button(f'https://www.furaffinity.net/view/{id_}', 'Open on Fur Affinity')}",
+            404
+        )
 
     file_type: Optional[str] = ""
     if (ext := sub["FILEEXT"]) in ("jpg", "jpeg", "png", "gif"):
