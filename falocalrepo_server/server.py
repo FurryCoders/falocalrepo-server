@@ -97,7 +97,7 @@ def user(username: str):
 
     if user_entry is None:
         return error(
-            f"User not found.<br>{button(f'https://www.furaffinity.net/user/{id_}', 'Open on Fur Affinity')}",
+            f"User not found.<br>{button(f'https://www.furaffinity.net/user/{username}', 'Open on Fur Affinity')}",
             404
         )
 
