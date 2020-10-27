@@ -47,6 +47,7 @@
                 {% for col in columns[1:] %}
                     <option value="{{ col.lower() }}">{{ col.title() }}</option>
                 {% endfor %}
+                <option value="order">Order</option>
             </select></td>
             <td class="col3">
                 <button onclick="addSearchField($('search_field_type').value)">+</button>
