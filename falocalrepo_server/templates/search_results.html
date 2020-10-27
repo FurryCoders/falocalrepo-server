@@ -135,7 +135,7 @@
     </style>
 </head>
 <body>
-{% set table_short %}{{ "submission" if table == "submissions" }}{{ "journal" if table == "journals" }}{% endset %}
+{% set table_short %}{{ table[:-1] }}{% endset %}
 <h2>{{ title }}</h2>
 <div class="header">
     <table>
@@ -171,10 +171,16 @@
     {% for item in results %}
         <tr class="hover_highlight clickable {{ loop.cycle('odd', 'even') }}">
             {% for column in columns %}
-                <td class="col_{{ column.lower() }} {{ 'hover_underline' if column == column_underline }}">
-                    <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
-                        <span>{{ item[column] }}</span>
-                    </a>
+                <td class="col_{{ column.lower() }} {{ 'hover_underline' if column == "AUTHOR" }}">
+                    {% if column == "AUTHOR" %}
+                        <a class="celllink" href="/user/{{ item[column] }}">
+                            <span>{{ item[column] }}</span>
+                        </a>
+                    {% else %}
+                        <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
+                            <span>{{ " ".join(item[column].split(",")) if column in columns_list else item[column] }}</span>
+                        </a>
+                    {% endif %}
                 </td>
             {% endfor %}
         </tr>
