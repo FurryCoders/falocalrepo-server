@@ -114,13 +114,16 @@
             bottom: 10px;
         }
 
-        .clickable:hover {
+        .clickable {
             cursor: pointer;
+        }
+
+        .hover_highlight:hover {
             background-blend-mode: multiply;
             background-color: cyan;
         }
 
-        .underline_hover:hover {
+        .hover_underline:hover {
             text-decoration: underline;
         }
 
@@ -160,44 +163,20 @@
     <br>&nbsp;<br>
 </div>
 <table id="search_results">
-    <tr class="even header">
-        <th class="col_id clickable" onclick="sortBy('ID')">ID</th>
-        <th class="col_author clickable" onclick="sortBy('AUTHOR')">Author</th>
-        <th class="col_date clickable" onclick="sortBy('UDATE')">Date</th>
-        <th class="col_title clickable" onclick="sortBy('TITLE')">Title</th>
-        {% if table == "submissions" %}
-            <th class="col_tags clickable" onclick="sortBy('TAGS')">Tags</th>
-        {% endif %}
+    <tr class="even" style="text-align: center">
+        {% for column in columns %}
+            <th class="col_{{ column.lower() }} clickable hover_underline" onclick="sortBy('{{ column }}')">{{ column }}</th>
+        {% endfor %}
     </tr>
     {% for item in results %}
-        <tr class="clickable {{ loop.cycle('odd', 'even') }}">
-            <td class="col_id">
-                <a class="celllink" href="/{{ table_short }}/{{ item["ID"] }}">
-                    <span>{{ item["ID"] }}</span>
-                </a>
-            </td>
-            <td class="col_author underline_hover">
-                <a class="celllink" href="/user/{{ item["AUTHOR"] }}">
-                    <span>{{ item["AUTHOR"] }}</span>
-                </a>
-            </td>
-            <td class="col_date">
-                <a class="celllink" href="/{{ table_short }}/{{ item["ID"] }}">
-                    <span>{{ item["DATE"] }}</span>
-                </a>
-            </td>
-            <td class="col_title">
-                <a class="celllink" href="/{{ table_short }}/{{ item["ID"] }}">
-                    <span>{{ item["TITLE"] }}</span>
-                </a>
-            </td>
-            {% if table == "submissions" %}
-                <td class="col_tags">
-                    <a class="celllink" href="/{{ table_short }}/{{ item["ID"] }}">
-                        <span>{{ " ".join(item["TAGS"].split(",")) }}</span>
+        <tr class="hover_highlight clickable {{ loop.cycle('odd', 'even') }}">
+            {% for column in columns %}
+                <td class="col_{{ column.lower() }} {{ 'hover_underline' if column == column_underline }}">
+                    <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
+                        <span>{{ item[column] }}</span>
                     </a>
                 </td>
-            {% endif %}
+            {% endfor %}
         </tr>
     {% endfor %}
 </table>

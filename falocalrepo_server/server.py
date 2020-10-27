@@ -140,6 +140,8 @@ def search(table: str):
     global last_search
     global db_path
 
+    table = table.lower()
+
     with FADatabase(db_path) as db:
         if not request.args:
             return render_template(
@@ -158,6 +160,9 @@ def search(table: str):
         limit: int = 50
         offset: int = params.get("offset", 0)
         offset = 0 if offset < 0 else offset
+        columns: List[str]
+        column_id: str = ""
+        column_underline: str = ""
 
         if "order" in params:
             del params["order"]
@@ -165,6 +170,12 @@ def search(table: str):
             del params["limit"]
         if "offset" in params:
             del params["offset"]
+
+        if table in ("submissions", "journals"):
+            columns = ["ID", "AUTHOR", "TITLE"]
+            column_id = "ID"
+            column_underline = "AUTHOR"
+            columns += ["TAGS"] if table == "submissions" else []
 
         if (last_search["table"], last_search["params"]) != (table, params):
             last_search["table"] = table
@@ -183,6 +194,9 @@ def search(table: str):
             title=f"{app.name} · {table.title()} Search Results",
             table=table,
             params=last_search["params"],
+            columns=columns,
+            column_id=column_id,
+            column_underline=column_underline,
             limit=limit,
             offset=offset,
             results=last_search["results"][offset:offset + limit],
