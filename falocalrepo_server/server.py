@@ -50,7 +50,7 @@ def not_found(err: NotFound):
 
 def error(message: str, code: int):
     return render_template(
-        "error_page.html",
+        "error.html",
         title=f"{app.name} · Content not Found",
         message=f"{code} {message}"
     ), code
