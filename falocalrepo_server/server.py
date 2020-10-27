@@ -114,16 +114,6 @@ def search_default():
     return redirect("/search/submissions/")
 
 
-@app.route("/search/submissions/")
-def search_submissions():
-    return search("submissions")
-
-
-@app.route("/search/journals/")
-def search_journals():
-    return search("journals")
-
-
 @app.route("/submissions/<username>/")
 @app.route("/search/submissions/<username>/")
 def search_user_submissions(username: str):
@@ -136,11 +126,14 @@ def search_user_journals(username: str):
     return redirect(f'/search/journals/?author=["{username}"]')
 
 
-def search(table: str):
+@app.route("/search/<string:table>/")
+def search(table: str = "submissions"):
     global last_search
     global db_path
 
     table = table.lower()
+    if table not in ("submissions", "journals", "users"):
+        return abort(404)
 
     with FADatabase(db_path) as db:
         if not request.args:
@@ -156,13 +149,28 @@ def search(table: str):
             lambda kv: (kv[0], json_loads(kv[1])),
             request.args.items()
         ))
-        order: List[str] = params.get("order", ["ID DESC"])
+
         limit: int = 50
         offset: int = params.get("offset", 0)
         offset = 0 if offset < 0 else offset
         columns: List[str]
-        column_id: str = ""
-        column_underline: str = ""
+        columns_list: List[str]
+        column_id: str
+        order: List[str]
+
+        if table in ("submissions", "journals"):
+            columns = ["ID", "AUTHOR", "TITLE"]
+            columns += ["TAGS"] if table == "submissions" else []
+            columns_list = ["TAGS"] if table == "submissions" else []
+            column_id = "ID"
+            order: List[str] = params.get("order", [f"ID DESC"])
+        elif table == "users":
+            columns = ["USERNAME", "FOLDERS"]
+            columns_list = ["FOLDERS"]
+            column_id = "USERNAME"
+            order: List[str] = params.get("order", [f"USERNAME ASC"])
+
+
 
         if "order" in params:
             del params["order"]
@@ -170,12 +178,6 @@ def search(table: str):
             del params["limit"]
         if "offset" in params:
             del params["offset"]
-
-        if table in ("submissions", "journals"):
-            columns = ["ID", "AUTHOR", "TITLE"]
-            column_id = "ID"
-            column_underline = "AUTHOR"
-            columns += ["TAGS"] if table == "submissions" else []
 
         if (last_search["table"], last_search["params"]) != (table, params):
             last_search["table"] = table
@@ -195,8 +197,8 @@ def search(table: str):
             table=table,
             params=last_search["params"],
             columns=columns,
+            columns_list=columns_list,
             column_id=column_id,
-            column_underline=column_underline,
             limit=limit,
             offset=offset,
             results=last_search["results"][offset:offset + limit],
