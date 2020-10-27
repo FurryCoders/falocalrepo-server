@@ -120,6 +120,10 @@
             background-color: cyan;
         }
 
+        .underline_hover:hover {
+            text-decoration: underline;
+        }
+
         td a.celllink {
             display: block;
             text-decoration: none;
@@ -172,7 +176,7 @@
                     <span>{{ item["ID"] }}</span>
                 </a>
             </td>
-            <td class="col_author">
+            <td class="col_author underline_hover">
                 <a class="celllink" href="/user/{{ item["AUTHOR"] }}">
                     <span>{{ item["AUTHOR"] }}</span>
                 </a>
