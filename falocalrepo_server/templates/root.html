@@ -51,6 +51,15 @@
             color: inherit;
         }
 
+        .clickable {
+            cursor: pointer;
+        }
+
+        .hover_highlight:hover {
+            background-blend-mode: multiply;
+            background-color: cyan;
+        }
+
         #database_info table {
             width: 300px;
             max-width: 300px;
@@ -68,17 +77,17 @@
 <div id="database_info">
     <h3>Database Information</h3>
     <table>
-        <tr>
-            <td>Submissions</td>
+        <tr class="clickable hover_highlight">
+            <td><a href='/search/submissions/?order=["ID%20DESC"]'>Submissions</a></td>
             <td class="celllink"><a href='/search/submissions/?order=["ID%20DESC"]'>{{ submissions_total }}</a></td>
         </tr>
-        <tr>
-            <td>Journals</td>
+        <tr class="clickable hover_highlight">
+            <td><a href='/search/journals/?order=["ID%20DESC"]'>Journals</a></td>
             <td class="celllink"><a href='/search/journals/?order=["ID%20DESC"]'>{{ journals_total }}</a></td>
         </tr>
-        <tr>
-            <td>Users</td>
-            <td>{{ users_total }}</td>
+        <tr class="clickable hover_highlight">
+            <td><a href='/search/users/?order=["USERNAME%20ASC"]'>Users</a></td>
+            <td class="celllink"><a href='/search/users/?order=["USERNAME%20ASC"]'>{{ users_total }}</a></td>
         </tr>
         <tr>
             <td>Database version</td>
@@ -88,15 +97,9 @@
 </div>
 <div id="search_menu">
     <h3>Search Database</h3>
-    <button onclick="openPath('/search/submissions')">Search Submissions</button>
-    <button onclick="openPath('/search/journals')">Search Journals</button>
+    <button onclick="window.location = '/search/submissions'">Search Submissions</button>
+    <button onclick="window.location = '/search/journals'">Search Journals</button>
+    <button onclick="window.location = '/search/users'">Search Users</button>
 </div>
-<script>
-    const openPath = (path) => {
-        let url = new URL(window.location.origin)
-        url.pathname = path
-        window.location = url.href
-    }
-</script>
 </body>
 </html>
