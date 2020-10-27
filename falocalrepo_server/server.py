@@ -140,7 +140,16 @@ def search(table: str):
     global last_search
     global db_path
 
-    if request.args:
+    with FADatabase(db_path) as db:
+        if not request.args:
+            return render_template(
+                "search.html",
+                title=f"{app.name} · Search {table.title()}",
+                table=table,
+                columns=db[table].columns,
+                params=json_dumps(last_search["params"])
+            )
+
         params: Dict[str, List[str]] = dict(map(
             lambda kv: (kv[0], json_loads(kv[1])),
             request.args.items()
@@ -163,19 +172,18 @@ def search(table: str):
             if "author" in params:
                 params["replace(author, '_', '')"] = list(map(clean_username, params["author"]))
                 del params["author"]
-            with FADatabase(db_path) as db:
-                if table == "submissions":
-                    if list(params.keys()) == ["order"]:
-                        last_search["results"] = list(db.submissions)
-                    else:
-                        last_search["results"] = list(db.submissions.cursor_to_dict(
-                            db.submissions.select(params, like=True, order=order)))
-                elif table == "journals":
-                    if list(params.keys()) == ["order"]:
-                        last_search["results"] = list(db.journals)
-                    else:
-                        last_search["results"] = list(db.journals.cursor_to_dict(
-                            db.journals.select(params, like=True, order=order)))
+            if table == "submissions":
+                if list(params.keys()) == ["order"]:
+                    last_search["results"] = list(db.submissions)
+                else:
+                    last_search["results"] = list(db.submissions.cursor_to_dict(
+                        db.submissions.select(params, like=True, order=order)))
+            elif table == "journals":
+                if list(params.keys()) == ["order"]:
+                    last_search["results"] = list(db.journals)
+                else:
+                    last_search["results"] = list(db.journals.cursor_to_dict(
+                        db.journals.select(params, like=True, order=order)))
 
         return render_template(
             "search_results.html",
@@ -186,13 +194,6 @@ def search(table: str):
             offset=offset,
             results=last_search["results"][offset:offset + limit],
             results_total=len(last_search["results"])
-        )
-    else:
-        return render_template(
-            "search.html",
-            title=f"{app.name} · Search {table.title()}",
-            table=table,
-            params=json_dumps(last_search["params"])
         )
 
 
