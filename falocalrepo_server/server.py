@@ -44,11 +44,16 @@ def favicon():
 
 
 @app.errorhandler(404)
-def not_found(_err: NotFound):
+def not_found(err: NotFound):
+    return error(err.description, 404)
+
+
+def error(message: str, code: int):
     return render_template(
-        "not_found.html",
-        title=f"{app.name} · Content not Found"
-    ), 404
+        "error.html",
+        title=f"{app.name} · Content not Found",
+        message=f"{code} {message}"
+    ), code
 
 
 @app.route("/")
@@ -87,7 +92,7 @@ def user(username: str):
         user_entry = db.users[username]
 
     if user_entry is None:
-        return abort(404)
+        return error("User not found.", 404)
 
     folders: List[int] = list(filter(bool, user_entry["FOLDERS"].split(",")))
     gallery: List[int] = list(map(int, filter(bool, user_entry["GALLERY"].split(","))))
@@ -133,7 +138,7 @@ def search(table: str = "submissions"):
 
     table = table.lower()
     if table not in ("submissions", "journals", "users"):
-        return abort(404)
+        return error(f"Table {table} not found.", 404)
 
     with FADatabase(db_path) as db:
         if not request.args:
@@ -215,7 +220,7 @@ def journal(id_: int):
         jrnl = db.journals[id_]
 
     if jrnl is None:
-        return abort(404)
+        return error("Journal not found.", 404)
 
     return render_template(
         "journal.html",
@@ -238,7 +243,7 @@ def submission(id_: int):
         sub: Optional[dict] = db.submissions[id_]
 
     if sub is None:
-        return abort(404)
+        return error("Submission not found.", 404)
 
     file_type: Optional[str] = ""
     if (ext := sub["FILEEXT"]) in ("jpg", "jpeg", "png", "gif"):
