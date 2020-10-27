@@ -82,15 +82,11 @@
     {% elif file_type == "audio" %}
         <audio src="/submission/{{ submission["ID"] }}/file" controls>
             Your browser does not support audio tags. Download submission file:
-            <a href="/submission/{{ submission["ID"] }}/file">
-                submission.{{ submission["FILEEXT"] }}
-            </a>
+            <a href="/submission/{{ submission["ID"] }}/file">submission.{{ submission["FILEEXT"] }}</a>
         </audio>
     {% else %}
         Download submission file:
-        <a href="/submission/{{ submission["ID"] }}/file">
-            submission.{{ submission["FILEEXT"] }}
-        </a>
+        <a href="/submission/{{ submission["ID"] }}/file">submission.{{ submission["FILEEXT"] }}</a>
     {% endif %}
 </div>
 <br>
