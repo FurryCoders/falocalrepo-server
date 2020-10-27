@@ -76,7 +76,8 @@
         Submission has no files
     {% elif file_type == "image" %}
         <a href="/submission/{{ submission["ID"] }}/file">
-            <img src="/submission/{{ submission["ID"] }}/file" alt="">
+            <img src="/submission/{{ submission["ID"] }}/file" alt=""
+                 onerror="document.getElementById('submission_file').innerText = 'File not found'">
         </a>
     {% elif file_type == "audio" %}
         <audio src="/submission/{{ submission["ID"] }}/file" controls>
