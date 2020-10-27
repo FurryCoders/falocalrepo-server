@@ -47,6 +47,12 @@
             color: inherit;
         }
 
+        .clickable:hover {
+            cursor: pointer;
+            background-blend-mode: multiply;
+            background-color: cyan;
+        }
+
         #user_metadata {
             width: 200px;
             max-width: 200px;
@@ -70,11 +76,11 @@
 <h2>{{ user }}</h2>
 <div id="user_metadata">
     <table>
-        <tr>
+        <tr class="clickable">
             <td><a class="celllink" href="/submissions/{{ user }}">Gallery</a></td>
             <td><a class="celllink" href="/submissions/{{ user }}">{{ gallery|length }}</a></td>
         </tr>
-        <tr>
+        <tr class="clickable">
             <td><a class="celllink" href="/submissions/{{ user }}">Scraps</a></td>
             <td><a class="celllink" href="/submissions/{{ user }}">{{ scraps|length }}</a></td>
         </tr>
@@ -86,7 +92,7 @@
             <td>Mentions</td>
             <td>{{ mentions|length }}</td>
         </tr>
-        <tr>
+        <tr class="clickable">
             <td><a class="celllink" href="/journals/{{ user }}">Journals</a></td>
             <td><a class="celllink" href="/journals/{{ user }}">{{ journals|length }}</a></td>
         </tr>
