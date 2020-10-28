@@ -69,9 +69,9 @@ def root():
     usr_n: int
     version: str
     with FADatabase(db_path) as db:
-        sub_n = int(db.settings["SUBN"])
-        jrn_n = int(db.settings["JRNN"])
-        usr_n = int(db.settings["USRN"])
+        sub_n = len(db.submissions)
+        jrn_n = len(db.journals)
+        usr_n = len(db.users)
         version = db.settings["VERSION"]
 
     return render_template(
