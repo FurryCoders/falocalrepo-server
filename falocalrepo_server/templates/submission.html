@@ -138,7 +138,7 @@
 <br><br>
 <div id="submission_description">
     {% autoescape false %}
-    {{ submission["DESCRIPTION"] }}
+    {{ submission["DESCRIPTION"].replace("https://www.furaffinity.net/", "/").replace("http://www.furaffinity.net/", "/") }}
     {% endautoescape %}
 </div>
 <script>

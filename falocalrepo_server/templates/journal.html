@@ -80,7 +80,7 @@
 <br><br>
 <div id="journal_content">
     {% autoescape false %}
-    {{ journal["CONTENT"] }}
+    {{ journal["CONTENT"].replace("https://www.furaffinity.net/", "/").replace("http://www.furaffinity.net/", "/") }}
     {% endautoescape %}
 </div>
 <script>
