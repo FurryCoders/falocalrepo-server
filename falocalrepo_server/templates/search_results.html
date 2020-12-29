@@ -151,12 +151,18 @@
     Results: {{ offset }}-{{ offset + results|length }} of {{ results_total }}
     · Page {{ (offset // limit) + 1 }}
     <br>
-    <button onclick="pagePrev()" {{ 'disabled' if offset <= 0 }}>
+    <button onclick="page(-Infinity)" {{ 'disabled' if offset <= 0 }}>
+        First
+    </button>
+    <button onclick="page(-1)" {{ 'disabled' if offset <= 0 }}>
         Prev
     </button>
     <button onclick="window.location = window.location.pathname">New Search</button>
-    <button onclick="pageNext()" {{ 'disabled' if offset + results|length >= results_total }}>
+    <button onclick="page(+1)" {{ 'disabled' if offset + results|length >= results_total }}>
         Next
+    </button>
+    <button onclick="page(Infinity)" {{ 'disabled' if offset + results|length >= results_total }}>
+        Last
     </button>
     {% endset %}
     {{ navigation }}
@@ -165,7 +171,8 @@
 <table id="search_results">
     <tr class="even" style="text-align: center">
         {% for column in columns %}
-            <th class="col_{{ column.lower() }} clickable hover_underline" onclick="sortBy('{{ column }}')">{{ column }}</th>
+            <th class="col_{{ column.lower() }} clickable hover_underline"
+                onclick="sortBy('{{ column }}')">{{ column }}</th>
         {% endfor %}
     </tr>
     {% for item in results %}
@@ -193,19 +200,30 @@
 </div>
 <script>
     const sortBy = (sortField) => {
-        let url = new URL(window.location.href)
+        const url = new URL(window.location.href)
         url.searchParams.set("order", JSON.stringify([sortField.toUpperCase()]))
         window.location = url.href
     }
-    const pagePrev = () => {
-        let url = new URL(window.location.href)
-        let offset = Number(url.searchParams.get("offset") || 0)
-        url.searchParams.set("offset", offset - {{ limit }} > 0 ? offset - {{ limit }} : 0)
-        window.location = url.href
-    }
-    const pageNext = () => {
-        let url = new URL(window.location.href)
-        url.searchParams.set("offset", Number(url.searchParams.get("offset") || 0) + {{ limit }})
+
+    const page = (page_offset) => {
+        if (page_offset === 0) return
+
+        const url = new URL(window.location.href)
+        const offset = Number(url.searchParams.get("offset") || 0)
+        const limit = Number({{ limit }})
+        const total = Number({{ results_total }})
+
+        if (page_offset === -Infinity)
+            url.searchParams.set("offset", "0")
+        else if (page_offset === Infinity)
+            url.searchParams.set("offset", String(total % limit === 0 ? total - limit : limit * Math.floor(total / limit)))
+        else if (page_offset > 0)
+            url.searchParams.set("offset", String(offset + (limit * page_offset)))
+        else if (page_offset < 0) {
+            const offset_new = offset - (limit * page_offset)
+            url.searchParams.set("offset", String(offset_new < 0 ? 0 : offset_new))
+        }
+
         window.location = url.href
     }
 </script>
