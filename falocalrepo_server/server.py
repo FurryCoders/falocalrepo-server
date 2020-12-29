@@ -11,7 +11,8 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from falocalrepo_database import FADatabase, FADatabaseTable
+from falocalrepo_database import FADatabase
+from falocalrepo_database import FADatabaseTable
 from falocalrepo_database import tiered_path
 from flask import Flask
 from flask import abort
@@ -196,10 +197,8 @@ def search(table: str = "submissions"):
             if "author" in params:
                 params["replace(author, '_', '')"] = list(map(clean_username, params["author"]))
                 del params["author"]
-            if list(params.keys()) == ["order"]:
-                last_search["results"] = list(db_table)
-            else:
-                last_search["results"] = list(db_table.cursor_to_dict(db_table.select(params, like=True, order=order)))
+            last_search["results"] = list(
+                db_table.cursor_to_dict(db_table.select(params, columns, like=True, order=order), columns))
 
         return render_template(
             "search_results.html",
