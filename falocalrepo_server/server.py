@@ -190,9 +190,10 @@ def search(table: str = "submissions"):
         if "offset" in params:
             del params["offset"]
 
-        if (last_search["table"], last_search["params"]) != (table, params):
+        if (last_search["table"], last_search["params"], last_search["order"]) != (table, params, order):
             last_search["table"] = table
             last_search["params"] = deepcopy(params)
+            last_search["order"] = deepcopy(order)
             db_table: FADatabaseTable = db[table]
             if "author" in params:
                 params["replace(author, '_', '')"] = list(map(clean_username, params["author"]))
