@@ -198,6 +198,8 @@ def search(table: str = "submissions"):
             if "author" in params:
                 params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%"), params["author"]))
                 del params["author"]
+            if "username" in params:
+                params["username"] = list(map(lambda u: clean_username(u, "%"), params["username"]))
             last_search["results"] = list(
                 db_table.cursor_to_dict(db_table.select(params, columns, like=True, order=order), columns))
 
