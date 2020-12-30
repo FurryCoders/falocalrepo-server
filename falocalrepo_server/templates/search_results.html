@@ -217,10 +217,8 @@
             url.searchParams.set("offset", "0")
         else if (page_offset === Infinity)
             url.searchParams.set("offset", String(total % limit === 0 ? total - limit : limit * Math.floor(total / limit)))
-        else if (page_offset > 0)
-            url.searchParams.set("offset", String(offset + (limit * page_offset)))
-        else if (page_offset < 0) {
-            const offset_new = offset - (limit * page_offset)
+        else {
+            const offset_new = offset + (limit * page_offset)
             url.searchParams.set("offset", String(offset_new < 0 ? 0 : offset_new))
         }
 
