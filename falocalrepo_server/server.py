@@ -35,8 +35,8 @@ last_search: dict = {
 db_path: str = "FA.db"
 
 
-def clean_username(username: str) -> str:
-    return str(re_sub(r"[^a-zA-Z0-9\-.~,]", "", username.lower().strip()))
+def clean_username(username: str, exclude: str = "") -> str:
+    return str(re_sub(rf"[^a-zA-Z0-9\-.~,{exclude}]", "", username.lower().strip()))
 
 
 def button(href: str, text: str) -> str:
@@ -196,7 +196,7 @@ def search(table: str = "submissions"):
             last_search["order"] = deepcopy(order)
             db_table: FADatabaseTable = db[table]
             if "author" in params:
-                params["replace(author, '_', '')"] = list(map(clean_username, params["author"]))
+                params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%"), params["author"]))
                 del params["author"]
             last_search["results"] = list(
                 db_table.cursor_to_dict(db_table.select(params, columns, like=True, order=order), columns))
