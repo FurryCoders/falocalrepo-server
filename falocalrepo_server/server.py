@@ -28,7 +28,6 @@ app: Flask = Flask(
 )
 last_search: dict = {
     "table": "",
-    "order": [],
     "params": {},
     "results": []
 }
@@ -176,30 +175,28 @@ def search(table: str = "submissions"):
             columns += ["TAGS"] if table == "submissions" else []
             columns_list = ["TAGS"] if table == "submissions" else []
             column_id = "ID"
-            order: List[str] = params.get("order", [f"ID DESC"])
+            order = params["order"] = params.get("order", [f"ID DESC"])
         elif table == "users":
             columns = ["USERNAME", "FOLDERS"]
             columns_list = ["FOLDERS"]
             column_id = "USERNAME"
-            order: List[str] = params.get("order", [f"USERNAME ASC"])
+            order = params["order"] = params.get("order", [f"USERNAME ASC"])
 
-        if "order" in params:
-            del params["order"]
         if "limit" in params:
             del params["limit"]
         if "offset" in params:
             del params["offset"]
 
-        if (last_search["table"], last_search["params"], last_search["order"]) != (table, params, order):
+        if (last_search["table"], last_search["params"]) != (table, params):
             last_search["table"] = table
             last_search["params"] = deepcopy(params)
-            last_search["order"] = deepcopy(order)
-            db_table: FADatabaseTable = db[table]
+            del params["order"]
             if "author" in params:
                 params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%"), params["author"]))
                 del params["author"]
             if "username" in params:
                 params["username"] = list(map(lambda u: clean_username(u, "%"), params["username"]))
+            db_table: FADatabaseTable = db[table]
             last_search["results"] = list(
                 db_table.cursor_to_dict(db_table.select(params, columns, like=True, order=order), columns))
 
