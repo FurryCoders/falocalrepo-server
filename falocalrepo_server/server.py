@@ -171,7 +171,7 @@ def search(table: str = "submissions"):
         order: List[str]
 
         if table in ("submissions", "journals"):
-            columns = ["ID", "AUTHOR", "TITLE"]
+            columns = ["ID", "AUTHOR", "DATE", "TITLE"]
             columns += ["TAGS"] if table == "submissions" else []
             columns_list = ["TAGS"] if table == "submissions" else []
             column_id = "ID"
