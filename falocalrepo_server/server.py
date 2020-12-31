@@ -246,8 +246,16 @@ def submission(id_: int):
     global db_path
 
     sub: Optional[dict]
+    prev_id: int
+    next_id: int
     with FADatabase(db_path) as db:
-        sub: Optional[dict] = db.submissions[id_]
+        sub = db.submissions[id_]
+        prev_id, next_id = db.submissions.select(
+            {"AUTHOR": sub["AUTHOR"]},
+            ["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
+            order=[f"ABS(ID - {id_})"],
+            limit=1
+        ).fetchone() if sub else (0, 0)
 
     if sub is None:
         return error(
@@ -267,7 +275,9 @@ def submission(id_: int):
         "submission.html",
         title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
         submission=sub,
-        file_type=file_type
+        file_type=file_type,
+        prev=prev_id,
+        next=next_id
     )
 
 
