@@ -109,7 +109,7 @@ ENV/
 .mypy_cache/
 
 # database
-FA*
+FA.*
 
 # system files
 .DS_Store
