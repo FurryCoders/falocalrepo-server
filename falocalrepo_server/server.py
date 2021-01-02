@@ -192,10 +192,10 @@ def search(table: str = "submissions"):
             last_search["params"] = deepcopy(params)
             del params["order"]
             if "author" in params:
-                params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%"), params["author"]))
+                params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
                 del params["author"]
             if "username" in params:
-                params["username"] = list(map(lambda u: clean_username(u, "%"), params["username"]))
+                params["username"] = list(map(lambda u: clean_username(u, "%_"), params["username"]))
             db_table: FADatabaseTable = db[table]
             last_search["results"] = list(
                 db_table.cursor_to_dict(db_table.select(params, columns, like=True, order=order), columns))
