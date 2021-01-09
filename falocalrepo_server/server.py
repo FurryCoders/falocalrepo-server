@@ -101,23 +101,16 @@ def user(username: str):
             404
         )
 
-    folders: List[int] = list(filter(bool, user_entry["FOLDERS"].split(",")))
-    gallery: List[int] = list(map(int, filter(bool, user_entry["GALLERY"].split(","))))
-    scraps: List[int] = list(map(int, filter(bool, user_entry["SCRAPS"].split(","))))
-    favorites: List[int] = list(map(int, filter(bool, user_entry["FAVORITES"].split(","))))
-    mentions: List[int] = list(map(int, filter(bool, user_entry["MENTIONS"].split(","))))
-    journals: List[int] = list(map(int, filter(bool, user_entry["JOURNALS"].split(","))))
-
     return render_template(
         "user.html",
         title=f"{app.name} · {username}",
         user=username,
-        folders=folders,
-        gallery=gallery,
-        scraps=scraps,
-        favorites=favorites,
-        mentions=mentions,
-        journals=journals
+        folders=list(filter(bool, user_entry["FOLDERS"].split(","))),
+        gallery_length=f.count(",") + 1 if (f := user_entry["GALLERY"]) else 0,
+        scraps_length=f.count(",") + 1 if (f := user_entry["SCRAPS"]) else 0,
+        favorites_length=f.count(",") + 1 if (f := user_entry["FAVORITES"]) else 0,
+        mentions_length=f.count(",") + 1 if (f := user_entry["MENTIONS"]) else 0,
+        journals_length=f.count(",") + 1 if (f := user_entry["JOURNALS"]) else 0
     )
 
 
