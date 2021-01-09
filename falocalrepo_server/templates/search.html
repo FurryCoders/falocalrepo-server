@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>{{ title }}</title>
     <style>
+        :root {
+            --table_border_color: darkgray;
+            --table_background_color_odd: white;
+            --table_background_color_even: lightgrey;
+        }
+
         body > h2 {
             text-align: center;
         }
@@ -22,6 +28,13 @@
             text-align: left
         }
 
+        #header, #footer {
+            width: 95%;
+            top: 20px;
+            margin: auto;
+            text-align: center
+        }
+
         td.col1 {
             width: 90px;
         }
@@ -34,17 +47,113 @@
             width: 25px;
             text-align: center;
         }
+
+        td a.celllink {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .clickable {
+            cursor: pointer;
+        }
+
+        .hover_highlight:hover {
+            background-blend-mode: multiply;
+            background-color: cyan;
+        }
+
+        .hover_underline:hover {
+            text-decoration: underline;
+        }
+
+        #search_results table {
+            border-collapse: collapse;
+            border: 1px solid var(--table_border_color);
+            width: 95%;
+            top: 20px;
+            margin: auto;
+        }
+
+        #search_results table td {
+            border: 1px solid var(--table_border_color);
+        }
+
+        #search_results table td span {
+            padding: 2px;
+        }
+
+        #search_results table td:last-child {
+            max-width: available !important;
+        }
+
+        #search_results table th {
+            padding: 2px;
+            border: 2px solid var(--table_border_color);
+            text-align: center;
+        }
+
+        #search_results table th.id, #search_results table td.id {
+            min-width: fit-content;
+            text-align: center;
+        }
+
+        #search_results table th.author, #search_results table td.author {
+            min-width: fit-content;
+            text-align: center;
+        }
+
+        #search_results table th.date, #search_results table td.date {
+            min-width: fit-content;
+            text-align: center;
+        }
+
+        #search_results table th.title, #search_results table td.title {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #search_results table th.tags, #search_results table td.tags {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #search_results table th.description, #search_results table td.description {
+            max-width: 360px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #search_results table tr.odd {
+            background-image: linear-gradient(0deg, var(--table_background_color_odd), var(--table_background_color_odd));
+        }
+
+        #search_results table tr.even {
+            background-image: linear-gradient(0deg, var(--table_background_color_even), var(--table_background_color_even));
+        }
+
+        #header button, #footer button {
+            position: relative;
+            top: 10px;
+            bottom: 10px;
+        }
     </style>
 </head>
 <body>
+{% set table_short %}{{ table[:-1] }}{% endset %}
 <h2>{{ title }}</h2>
 <div id="search_form">
     <table id="search_fields">
         <tr>
             <td class="col1"><label for="search_field_type">New Field</label></td>
             <td class="col2"><select id="search_field_type" name="type" style="width: 100%;">
-                <option selected value="{{ columns[0].lower() }}">{{ columns[0].title() }}</option>
-                {% for col in columns[1:] %}
+                <option selected value="{{ columns_table[0].lower() }}">{{ columns_table[0].title() }}</option>
+                {% for col in columns_table[1:] %}
                     <option value="{{ col.lower() }}">{{ col.title() }}</option>
                 {% endfor %}
                 <option value="order">Order</option>
@@ -57,6 +166,62 @@
     <br>
     <button onclick="search()">Search</button>
 </div>
+{% if results %}
+<div id="header">
+    {% set navigation %}
+    Results: {{ offset }}-{{ offset + results|length }} of {{ results_total }}
+    · Page {{ (offset // limit) + 1 }}
+    <br>
+    <button onclick="page(-Infinity)" {{ 'disabled' if offset <= 0 }}>
+        First
+    </button>
+    <button onclick="page(-1)" {{ 'disabled' if offset <= 0 }}>
+        Prev
+    </button>
+    <button onclick="window.location = window.location.pathname">New Search</button>
+    <button onclick="page(+1)" {{ 'disabled' if offset + results|length >= results_total }}>
+        Next
+    </button>
+    <button onclick="page(Infinity)" {{ 'disabled' if offset + results|length >= results_total }}>
+        Last
+    </button>
+    {% endset %}
+    {{ navigation }}
+    <br>&nbsp;<br>
+</div>
+<div id="search_results">
+    <table>
+        <tr class="even" style="text-align: center">
+            {% for column in columns_results %}
+                <th class="{{ column.lower() }} clickable hover_underline"
+                    onclick="sortBy('{{ column }}')">{{ column }}</th>
+            {% endfor %}
+        </tr>
+        {% for item in results %}
+            <tr class="hover_highlight clickable {{ loop.cycle('odd', 'even') }}">
+                {% for column in columns_results %}
+                    <td class="{{ column.lower() }} {{ 'hover_underline' if column == "AUTHOR" }}">
+                        {% if column == "AUTHOR" %}
+                            <a class="celllink" href="/user/{{ item[column] }}">
+                                <span>{{ item[column] }}</span>
+                            </a>
+                        {% else %}
+                            <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
+                                <span>{{ " ".join(item[column].split(",")) if column in columns_list else item[column] }}</span>
+                            </a>
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+<br>
+<div id="footer">
+    {{ navigation }}
+    <br>&nbsp;<br>
+</div>
+{% endif %}
 <script>
     const $ = (id) => document.getElementById(id)
     const addSearchField = (fieldType) => {
@@ -107,6 +272,30 @@
 
         Object.entries(params)
             .forEach(([k, v]) => url.searchParams.set(k, JSON.stringify(v)))
+
+        window.location = url.href
+    }
+    const sortBy = (sortField) => {
+        const url = new URL(window.location.href)
+        url.searchParams.set("order", JSON.stringify([sortField.toUpperCase()]))
+        window.location = url.href
+    }
+    const page = (page_offset) => {
+        if (page_offset === 0) return
+
+        const url = new URL(window.location.href)
+        const offset = Number(url.searchParams.get("offset") || 0)
+        const limit = Number({{ limit }})
+        const total = Number({{ results_total }})
+
+        if (page_offset === -Infinity)
+            url.searchParams.set("offset", "0")
+        else if (page_offset === Infinity)
+            url.searchParams.set("offset", String(total % limit === 0 ? total - limit : limit * Math.floor(total / limit)))
+        else {
+            const offset_new = offset + (limit * page_offset)
+            url.searchParams.set("offset", String(offset_new < 0 ? 0 : offset_new))
+        }
 
         window.location = url.href
     }

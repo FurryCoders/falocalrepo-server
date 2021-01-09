@@ -1,5 +1,4 @@
-from copy import deepcopy
-from json import dumps as json_dumps
+from functools import lru_cache
 from json import loads as json_loads
 from os.path import abspath
 from os.path import dirname
@@ -26,11 +25,6 @@ app: Flask = Flask(
     "FurAffinity Local Repo",
     template_folder=join(abspath(dirname(__file__)), "templates")
 )
-last_search: dict = {
-    "table": "",
-    "params": {},
-    "results": []
-}
 db_path: str = "FA.db"
 
 
@@ -133,78 +127,84 @@ def search_user_journals(username: str):
 
 @app.route("/search/<string:table>/")
 def search(table: str = "submissions"):
-    global last_search
-    global db_path
-
     table = table.lower()
+
     if table not in ("submissions", "journals", "users"):
         return error(f"Table {table} not found.", 404)
 
+    params: Dict[str, str] = {k: request.args[k] for k in sorted(map(str.lower, request.args.keys()))}
+
+    results: List[dict]
+    columns_results: List[str]
+    columns_list: List[str]
+    column_id: str
+    limit: int = 50
+    offset: int = int(params.get("offset", 0))
+
+    if "offset" in params:
+        del params["offset"]
+
+    results, columns_table, columns_results, columns_list, column_id = search_table(table, **params)
+
+    return render_template(
+        "search.html",
+        title=f"{app.name} · {table.title()} Search Results",
+        table=table,
+        params={p: json_loads(v) for p, v in params.items()},
+        columns_table=columns_table,
+        columns_results=columns_results,
+        columns_list=columns_list,
+        column_id=column_id,
+        limit=limit,
+        offset=offset,
+        results=results[offset:offset + limit],
+        results_total=len(results)
+    )
+
+
+@lru_cache
+def search_table(table: str, **params):
+    global db_path
+
+    columns_results: List[str] = []
+    columns_list: List[str] = []
+    column_id: str = ""
+    params = {p: json_loads(v) for p, v in params.items()}
+    order: List[str] = params.get("order", None)
+
+    if table in ("submissions", "journals"):
+        columns_results = ["ID", "AUTHOR", "DATE", "TITLE"]
+        columns_results += ["TAGS"] if table == "submissions" else []
+        columns_list = ["TAGS"] if table == "submissions" else []
+        column_id = "ID"
+        order = [f"ID DESC"] if not order else order
+    elif table == "users":
+        columns_results = ["USERNAME", "FOLDERS"]
+        columns_list = ["FOLDERS"]
+        column_id = "USERNAME"
+        order = [f"USERNAME ASC"] if not order else order
+
     with FADatabase(db_path) as db:
-        if not request.args:
-            return render_template(
-                "search.html",
-                title=f"{app.name} · Search {table.title()}",
-                table=table,
-                columns=db[table].columns,
-                params=json_dumps(last_search["params"])
-            )
+        columns_table: List[str] = db[table].columns
 
-        params: Dict[str, List[str]] = dict(map(
-            lambda kv: (kv[0], json_loads(kv[1])),
-            request.args.items()
-        ))
+        if not params:
+            return [], columns_table, columns_results, columns_list, column_id
 
-        limit: int = 50
-        offset: int = params.get("offset", 0)
-        offset = 0 if offset < 0 else offset
-        columns: List[str]
-        columns_list: List[str]
-        column_id: str
-        order: List[str]
-
-        if table in ("submissions", "journals"):
-            columns = ["ID", "AUTHOR", "DATE", "TITLE"]
-            columns += ["TAGS"] if table == "submissions" else []
-            columns_list = ["TAGS"] if table == "submissions" else []
-            column_id = "ID"
-            order = params["order"] = params.get("order", [f"ID DESC"])
-        elif table == "users":
-            columns = ["USERNAME", "FOLDERS"]
-            columns_list = ["FOLDERS"]
-            column_id = "USERNAME"
-            order = params["order"] = params.get("order", [f"USERNAME ASC"])
-
-        if "limit" in params:
-            del params["limit"]
-        if "offset" in params:
-            del params["offset"]
-
-        if (last_search["table"], last_search["params"]) != (table, params):
-            last_search["table"] = table
-            last_search["params"] = deepcopy(params)
+        if "author" in params:
+            params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
+            del params["author"]
+        if "username" in params:
+            params["username"] = list(map(lambda u: clean_username(u, "%_"), params["username"]))
+        if "order" in params:
             del params["order"]
-            if "author" in params:
-                params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
-                del params["author"]
-            if "username" in params:
-                params["username"] = list(map(lambda u: clean_username(u, "%_"), params["username"]))
-            db_table: FADatabaseTable = db[table]
-            last_search["results"] = list(
-                db_table.cursor_to_dict(db_table.select(params, columns, like=True, order=order), columns))
 
-        return render_template(
-            "search_results.html",
-            title=f"{app.name} · {table.title()} Search Results",
-            table=table,
-            params=last_search["params"],
-            columns=columns,
-            columns_list=columns_list,
-            column_id=column_id,
-            limit=limit,
-            offset=offset,
-            results=last_search["results"][offset:offset + limit],
-            results_total=len(last_search["results"])
+        db_table: FADatabaseTable = db[table]
+        return (
+            list(db_table.cursor_to_dict(db_table.select(params, columns_results, like=True, order=order), columns_results)),
+            columns_table,
+            columns_results,
+            columns_list,
+            column_id
         )
 
 
