@@ -9,6 +9,7 @@ from re import sub as re_sub
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Tuple
 
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
@@ -78,16 +79,103 @@ def root():
     )
 
 
+@lru_cache
+def load_user(username: str) -> Optional[dict]:
+    global db_path
+    with FADatabase(db_path) as db:
+        return db.users[username]
+
+
+@lru_cache()
+def load_journal(id_: int) -> Optional[dict]:
+    global db_path
+    with FADatabase(db_path) as db:
+        return db.journals[id_]
+
+
+@lru_cache
+def load_submission(id_: int) -> Tuple[Optional[dict], int, int]:
+    global db_path
+
+    sub: Optional[dict]
+    prev_id: int
+    next_id: int
+    with FADatabase(db_path) as db:
+        sub = db.submissions[id_]
+        prev_id, next_id = db.submissions.select(
+            {"AUTHOR": sub["AUTHOR"]},
+            ["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
+            order=[f"ABS(ID - {id_})"],
+            limit=1
+        ).fetchone() if sub else (0, 0)
+
+    return sub, prev_id, next_id
+
+
+@lru_cache
+def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
+    global db_path
+
+    sub, *_ = load_submission(id_)
+    sub_dir: str
+    with FADatabase(db_path) as db:
+        sub_dir = join(dirname(db_path), db.settings["FILESFOLDER"], *split(tiered_path(id_)))
+
+    return sub["FILEEXT"] if sub else None, sub_dir
+
+
+@lru_cache
+def search_table(table: str, **params):
+    global db_path
+
+    cols_results: List[str] = []
+    cols_list: List[str] = []
+    col_id: str = ""
+    params = {p: json_loads(v) for p, v in params.items()}
+    order: List[str] = params.get("order", None)
+
+    if table in ("submissions", "journals"):
+        cols_results = ["ID", "AUTHOR", "DATE", "TITLE"]
+        cols_results += ["TAGS"] if table == "submissions" else []
+        cols_list = ["TAGS"] if table == "submissions" else []
+        col_id = "ID"
+        order = [f"ID DESC"] if not order else order
+    elif table == "users":
+        cols_results = ["USERNAME", "FOLDERS"]
+        cols_list = ["FOLDERS"]
+        col_id = "USERNAME"
+        order = [f"USERNAME ASC"] if not order else order
+
+    with FADatabase(db_path) as db:
+        cols_table: List[str] = db[table].columns
+
+        if not params:
+            return [], cols_table, cols_results, cols_list, col_id
+
+        if "author" in params:
+            params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
+            del params["author"]
+        if "username" in params:
+            params["username"] = list(map(lambda u: clean_username(u, "%_"), params["username"]))
+        if "order" in params:
+            del params["order"]
+
+        db_table: FADatabaseTable = db[table]
+        return (
+            list(db_table.cursor_to_dict(db_table.select(params, cols_results, like=True, order=order), cols_results)),
+            cols_table,
+            cols_results,
+            cols_list,
+            col_id
+        )
+
+
 @app.route("/user/<username>")
 def user(username: str):
     if username != (username_clean := clean_username(username)):
         return redirect(f"/user/{username_clean}")
 
-    global db_path
-
-    user_entry: Optional[dict]
-    with FADatabase(db_path) as db:
-        user_entry = db.users[username]
+    user_entry: Optional[dict] = load_user(username)
 
     if user_entry is None:
         return error(
@@ -162,59 +250,9 @@ def search(table: str = "submissions"):
     )
 
 
-@lru_cache
-def search_table(table: str, **params):
-    global db_path
-
-    columns_results: List[str] = []
-    columns_list: List[str] = []
-    column_id: str = ""
-    params = {p: json_loads(v) for p, v in params.items()}
-    order: List[str] = params.get("order", None)
-
-    if table in ("submissions", "journals"):
-        columns_results = ["ID", "AUTHOR", "DATE", "TITLE"]
-        columns_results += ["TAGS"] if table == "submissions" else []
-        columns_list = ["TAGS"] if table == "submissions" else []
-        column_id = "ID"
-        order = [f"ID DESC"] if not order else order
-    elif table == "users":
-        columns_results = ["USERNAME", "FOLDERS"]
-        columns_list = ["FOLDERS"]
-        column_id = "USERNAME"
-        order = [f"USERNAME ASC"] if not order else order
-
-    with FADatabase(db_path) as db:
-        columns_table: List[str] = db[table].columns
-
-        if not params:
-            return [], columns_table, columns_results, columns_list, column_id
-
-        if "author" in params:
-            params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
-            del params["author"]
-        if "username" in params:
-            params["username"] = list(map(lambda u: clean_username(u, "%_"), params["username"]))
-        if "order" in params:
-            del params["order"]
-
-        db_table: FADatabaseTable = db[table]
-        return (
-            list(db_table.cursor_to_dict(db_table.select(params, columns_results, like=True, order=order), columns_results)),
-            columns_table,
-            columns_results,
-            columns_list,
-            column_id
-        )
-
-
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
-    global db_path
-
-    jrnl: Optional[dict]
-    with FADatabase(db_path) as db:
-        jrnl = db.journals[id_]
+    jrnl: Optional[dict] = load_journal(id_)
 
     if jrnl is None:
         return error(
@@ -236,19 +274,7 @@ def submission_view(id_: int):
 
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
-    global db_path
-
-    sub: Optional[dict]
-    prev_id: int
-    next_id: int
-    with FADatabase(db_path) as db:
-        sub = db.submissions[id_]
-        prev_id, next_id = db.submissions.select(
-            {"AUTHOR": sub["AUTHOR"]},
-            ["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
-            order=[f"ABS(ID - {id_})"],
-            limit=1
-        ).fetchone() if sub else (0, 0)
+    sub, prev_id, next_id = load_submission(id_)
 
     if sub is None:
         return error(
@@ -276,17 +302,11 @@ def submission(id_: int):
 
 @app.route("/submission/<int:id_>/file/")
 def submission_file(id_: int):
-    global db_path
+    sub_ext, sub_dir = load_submission_file(id_)
 
-    sub: Optional[dict]
-    sub_dir: str
-    with FADatabase(db_path) as db:
-        sub = db.submissions[id_]
-        sub_dir = join(dirname(db_path), db.settings["FILESFOLDER"], *split(tiered_path(id_)))
-
-    if sub is None:
+    if sub_ext is None:
         return abort(404)
-    elif isfile(path := join(sub_dir, f"submission.{sub['FILEEXT']}")):
+    elif isfile(path := join(sub_dir, f"submission.{sub_ext}")):
         return send_file(path)
     else:
         return abort(404)
