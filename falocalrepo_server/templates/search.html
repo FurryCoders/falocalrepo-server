@@ -166,7 +166,7 @@
     <br>
     <button onclick="search()">Search</button>
 </div>
-{% if results %}
+{% if results or params %}
 <div id="header">
     {% set navigation %}
     Results: {{ offset }}-{{ offset + results|length }} of {{ results_total }}
@@ -189,38 +189,40 @@
     {{ navigation }}
     <br>&nbsp;<br>
 </div>
-<div id="search_results">
-    <table>
-        <tr class="even" style="text-align: center">
-            {% for column in columns_results %}
-                <th class="{{ column.lower() }} clickable hover_underline"
-                    onclick="sortBy('{{ column }}')">{{ column }}</th>
-            {% endfor %}
-        </tr>
-        {% for item in results %}
-            <tr class="hover_highlight clickable {{ loop.cycle('odd', 'even') }}">
+{% endif %}
+{% if results %}
+    <div id="search_results">
+        <table>
+            <tr class="even" style="text-align: center">
                 {% for column in columns_results %}
-                    <td class="{{ column.lower() }} {{ 'hover_underline' if column == "AUTHOR" }}">
-                        {% if column == "AUTHOR" %}
-                            <a class="celllink" href="/user/{{ item[column] }}">
-                                <span>{{ item[column] }}</span>
-                            </a>
-                        {% else %}
-                            <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
-                                <span>{{ " ".join(item[column].split(",")) if column in columns_list else item[column] }}</span>
-                            </a>
-                        {% endif %}
-                    </td>
+                    <th class="{{ column.lower() }} clickable hover_underline"
+                        onclick="sortBy('{{ column }}')">{{ column }}</th>
                 {% endfor %}
             </tr>
-        {% endfor %}
-    </table>
-</div>
-<br>
-<div id="footer">
-    {{ navigation }}
-    <br>&nbsp;<br>
-</div>
+            {% for item in results %}
+                <tr class="hover_highlight clickable {{ loop.cycle('odd', 'even') }}">
+                    {% for column in columns_results %}
+                        <td class="{{ column.lower() }} {{ 'hover_underline' if column == "AUTHOR" }}">
+                            {% if column == "AUTHOR" %}
+                                <a class="celllink" href="/user/{{ item[column] }}">
+                                    <span>{{ item[column] }}</span>
+                                </a>
+                            {% else %}
+                                <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
+                                    <span>{{ " ".join(item[column].split(",")) if column in columns_list else item[column] }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <br>
+    <div id="footer">
+        {{ navigation }}
+        <br>&nbsp;<br>
+    </div>
 {% endif %}
 <script>
     const $ = (id) => document.getElementById(id)
