@@ -14,6 +14,8 @@ from typing import Tuple
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
 from falocalrepo_database import tiered_path
+from falocalrepo_database.tables import journals_table
+from falocalrepo_database.tables import submissions_table
 from flask import Flask
 from flask import abort
 from flask import redirect
@@ -86,37 +88,31 @@ def load_user(username: str) -> Optional[dict]:
         return db.users[username]
 
 
-@lru_cache()
-def load_journal(id_: int) -> Optional[dict]:
-    global db_path
-    with FADatabase(db_path) as db:
-        return db.journals[id_]
-
-
 @lru_cache
-def load_submission(id_: int) -> Tuple[Optional[dict], int, int]:
+def load_item(table: str, id_: int):
     global db_path
 
-    sub: Optional[dict]
+    item: Optional[dict]
     prev_id: int
     next_id: int
     with FADatabase(db_path) as db:
-        sub = db.submissions[id_]
-        prev_id, next_id = db.submissions.select(
-            {"AUTHOR": sub["AUTHOR"]},
+        db_table: FADatabaseTable = db[table]
+        item = db_table[id_]
+        prev_id, next_id = db_table.select(
+            {"AUTHOR": item["AUTHOR"]},
             ["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
             order=[f"ABS(ID - {id_})"],
             limit=1
-        ).fetchone() if sub else (0, 0)
+        ).fetchone() if item else (0, 0)
 
-    return sub, prev_id, next_id
+    return item, prev_id, next_id
 
 
 @lru_cache
 def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
     global db_path
 
-    sub, *_ = load_submission(id_)
+    sub, *_ = load_item(submissions_table, id_)
     sub_dir: str
     with FADatabase(db_path) as db:
         sub_dir = join(dirname(db_path), db.settings["FILESFOLDER"], *split(tiered_path(id_)))
@@ -252,7 +248,7 @@ def search(table: str = "submissions"):
 
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
-    jrnl: Optional[dict] = load_journal(id_)
+    jrnl, prev_id, next_id = load_item(journals_table, id_)
 
     if jrnl is None:
         return error(
@@ -263,7 +259,9 @@ def journal(id_: int):
     return render_template(
         "journal.html",
         title=f"{app.name} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
-        journal=jrnl
+        journal=jrnl,
+        prev=prev_id,
+        next=next_id
     )
 
 
@@ -274,7 +272,7 @@ def submission_view(id_: int):
 
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
-    sub, prev_id, next_id = load_submission(id_)
+    sub, prev_id, next_id = load_item(submissions_table, id_)
 
     if sub is None:
         return error(

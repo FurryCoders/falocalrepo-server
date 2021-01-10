@@ -76,6 +76,13 @@
     <button onclick="window.location.href = 'https://www.furaffinity.net/journal/{{ journal["ID"] }}'">
         Open on Fur Affinity
     </button>
+    <br>
+    <button onclick="window.location.href = '/journal/{{ next }}'" {{ "disabled" if not next else "" }}>
+        Next
+    </button>
+    <button onclick="window.location.href = '/journal/{{ prev }}'" {{ "disabled" if not prev else "" }}>
+        Prev
+    </button>
 </div>
 <br><br>
 <div id="journal_content">
