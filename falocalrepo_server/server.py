@@ -285,8 +285,10 @@ def submission(id_: int):
     file_type: Optional[str] = ""
     if (ext := sub["FILEEXT"]) in ("jpg", "jpeg", "png", "gif"):
         file_type = "image"
-    elif ext == "mp3":
+    elif ext in ("mp3", "wav", "mid"):
         file_type = "audio"
+    elif ext == "txt":
+        file_type = "text"
     elif not ext:
         file_type = None
 

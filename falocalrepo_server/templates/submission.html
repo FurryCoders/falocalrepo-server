@@ -73,20 +73,27 @@
 <body>
 <div id="submission_file">
     {% if file_type == None %}
-        Submission has no files
-    {% elif file_type == "image" %}
-        <a href="/submission/{{ submission["ID"] }}/file">
-            <img src="/submission/{{ submission["ID"] }}/file" alt=""
-                 onerror="document.getElementById('submission_file').innerText = 'File not found'">
-        </a>
-    {% elif file_type == "audio" %}
-        <audio src="/submission/{{ submission["ID"] }}/file" controls>
-            Your browser does not support audio tags. Download submission file:
-            <a href="/submission/{{ submission["ID"] }}/file">submission.{{ submission["FILEEXT"] }}</a>
-        </audio>
+        Submission has no file
     {% else %}
-        Download submission file:
-        <a href="/submission/{{ submission["ID"] }}/file">submission.{{ submission["FILEEXT"] }}</a>
+        {% if file_type == "image" %}
+            <a href="/submission/{{ submission["ID"] }}/file">
+                <img src="/submission/{{ submission["ID"] }}/file" alt=""
+                     onerror="document.getElementById('submission_file').innerText = 'File not found'">
+            </a>
+        {% elif file_type == "audio" %}
+            <audio src="/submission/{{ submission["ID"] }}/file" controls>
+                Your browser does not support audio tags
+            </audio>
+        {% elif file_type == "text" %}
+            <object data="/submission/{{ submission["ID"] }}/file" type=""
+                    style="width: 100%; max-width: 600px; text-align: justify; height: 300px; border: 1px solid black">
+                Your browser does not support object tags
+            </object>
+        {% endif %}
+        <br>
+        <button onclick="window.location.href = '/submission/{{ submission["ID"] }}/file'">
+            Download: submission.{{ submission["FILEEXT"] }}
+        </button>
     {% endif %}
 </div>
 <br>
