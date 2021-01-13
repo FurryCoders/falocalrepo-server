@@ -21,7 +21,7 @@
             text-align: center
         }
 
-        #search_fields {
+        #search_fields, #search_fields_add {
             width: 40%;
             top: 20px;
             margin: auto;
@@ -147,43 +147,60 @@
 <body>
 {% set table_short %}{{ table[:-1] }}{% endset %}
 <h2>{{ title }}</h2>
-<div id="search_form">
+<form id="search_form" action="/search/{{ table }}">
     <table id="search_fields">
         <tr>
             <td class="col1"><label for="search_field_type">New Field</label></td>
-            <td class="col2"><select id="search_field_type" name="type" style="width: 100%;">
+            <td class="col2"><select id="search_field_type" style="width: 100%;">
                 <option selected value="{{ columns_table[0].lower() }}">{{ columns_table[0].title() }}</option>
                 {% for col in columns_table[1:] %}
                     <option value="{{ col.lower() }}">{{ col.title() }}</option>
                 {% endfor %}
-                <option value="order">Order</option>
             </select></td>
             <td class="col3">
-                <button onclick="addSearchField($('search_field_type').value)">+</button>
+                <button type="button" onclick="addSearchField($('search_field_type').value)">+</button>
             </td>
+        </tr>
+        <tr>
+            <td class="col1"><label for="sort_field">Sort by</label></td>
+            <td class="col2"><select id="sort_field" name="sort" style="width: 100%;">
+                {% for col in columns_table %}
+                    <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">{{ col.upper() }}</option>
+                {% endfor %}
+            </select></td>
+            <td class="col3"></td>
+        </tr>
+        <tr>
+            <td class="col1"><label for="order_field">Order </label></td>
+            <td class="col2"><select id="order_field" name="order" style="width: 100%;">
+                <option {{ "selected" if order == "asc" }} value="asc">Ascending</option>
+                <option {{ "selected" if order == "desc" }} value="desc">Descending</option>
+            </select></td>
+            <td class="col3"></td>
         </tr>
     </table>
     <br>
-    <button onclick="search()">Search</button>
-    <br><br>
-</div>
+    <button type="submit">Search</button>
+</form>
+<br>
 {% if results or params %}
 <div id="header">
     {% set navigation %}
     Results: {{ offset }}-{{ offset + results|length }} of {{ results_total }}
-    · Page {{ (offset // limit) + 1 }}
+    · Page {{ page }}
     <br>
-    <button onclick="page(-Infinity)" {{ 'disabled' if offset <= 0 }}>
+    <button type="submit" form="search_form" name="page" value="1" {{ 'disabled' if page == 1 }}>
         First
     </button>
-    <button onclick="page(-1)" {{ 'disabled' if offset <= 0 }}>
+    <button type="submit" form="search_form" name="page" value="{{ page - 1 }}" {{ 'disabled' if page == 1 }}>
         Prev
     </button>
-    <button onclick="window.location = window.location.pathname">New Search</button>
-    <button onclick="page(+1)" {{ 'disabled' if offset + results|length >= results_total }}>
+    <button type="button" onclick="window.location = window.location.pathname">New Search</button>
+    <button type="submit" form="search_form" name="page"
+            value="{{ page + 1 }}" {{ 'disabled' if offset + limit >= results_total }}>
         Next
     </button>
-    <button onclick="page(Infinity)" {{ 'disabled' if offset + results|length >= results_total }}>
+    <button type="submit" form="search_form" name="page" value="-1" {{ 'disabled' if offset + limit >= results_total }}>
         Last
     </button>
     {% endset %}
@@ -196,8 +213,7 @@
         <table>
             <tr class="even" style="text-align: center">
                 {% for column in columns_results %}
-                    <th class="{{ column.lower() }} clickable hover_underline"
-                        onclick="sortBy('{{ column }}')">{{ column }}</th>
+                    <th class="{{ column.lower() }}">{{ column }}</th>
                 {% endfor %}
             </tr>
             {% for item in results %}
@@ -259,48 +275,6 @@
         parent.insertBefore(tr, parent.childNodes[parent.childElementCount - 1])
 
         return fieldInput
-    }
-    const search = () => {
-        let params = {}
-        Array.from(document.getElementsByClassName("search_field"))
-            .forEach(f => {
-                f.value = f.value.trim()
-                if (f.value) params[f.name] = (params[f.name] || []).concat(f.value)
-            });
-
-        if (Object.keys(params).length === 0) return
-
-        let url = new URL(window.location.href)
-        url.pathname = "/search/{{ table }}"
-
-        Object.entries(params)
-            .forEach(([k, v]) => url.searchParams.set(k, JSON.stringify(v)))
-
-        window.location = url.href
-    }
-    const sortBy = (sortField) => {
-        const url = new URL(window.location.href)
-        url.searchParams.set("order", JSON.stringify([sortField.toUpperCase()]))
-        window.location = url.href
-    }
-    const page = (page_offset) => {
-        if (page_offset === 0) return
-
-        const url = new URL(window.location.href)
-        const offset = Number(url.searchParams.get("offset") || 0)
-        const limit = Number({{ limit }})
-        const total = Number({{ results_total }})
-
-        if (page_offset === -Infinity)
-            url.searchParams.set("offset", "0")
-        else if (page_offset === Infinity)
-            url.searchParams.set("offset", String(total % limit === 0 ? total - limit : limit * Math.floor(total / limit)))
-        else {
-            const offset_new = offset + (limit * page_offset)
-            url.searchParams.set("offset", String(offset_new < 0 ? 0 : offset_new))
-        }
-
-        window.location = url.href
     }
     const params = {{ params|safe }};
     Object.entries(params).forEach(([k, vs]) => vs.forEach((v) => addSearchField(k).value = v))

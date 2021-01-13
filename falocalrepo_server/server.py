@@ -1,4 +1,5 @@
 from functools import lru_cache
+from json import dumps as json_dumps
 from json import loads as json_loads
 from os.path import abspath
 from os.path import dirname
@@ -10,6 +11,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
+from urllib.parse import quote
 
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
@@ -121,31 +123,28 @@ def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
 
 
 @lru_cache
-def search_table(table: str, **params):
+def search_table(table: str, order: str, params_serialised: str = "{}", all_: bool = False):
     global db_path
 
     cols_results: List[str] = []
     cols_list: List[str] = []
     col_id: str = ""
-    params = {p: json_loads(v) for p, v in params.items()}
-    order: List[str] = params.get("order", None)
+    params: Dict[str, List[str]] = json_loads(params_serialised)
 
     if table in ("submissions", "journals"):
         cols_results = ["ID", "AUTHOR", "DATE", "TITLE"]
         cols_results += ["TAGS"] if table == "submissions" else []
         cols_list = ["TAGS"] if table == "submissions" else []
         col_id = "ID"
-        order = [f"ID DESC"] if not order else order
     elif table == "users":
         cols_results = ["USERNAME", "FOLDERS"]
         cols_list = ["FOLDERS"]
         col_id = "USERNAME"
-        order = [f"USERNAME ASC"] if not order else order
 
     with FADatabase(db_path) as db:
         cols_table: List[str] = db[table].columns
 
-        if not params:
+        if not params and not all_:
             return [], cols_table, cols_results, cols_list, col_id
 
         if "author" in params:
@@ -158,7 +157,8 @@ def search_table(table: str, **params):
 
         db_table: FADatabaseTable = db[table]
         return (
-            list(db_table.cursor_to_dict(db_table.select(params, cols_results, like=True, order=order), cols_results)),
+            list(
+                db_table.cursor_to_dict(db_table.select(params, cols_results, like=True, order=[order]), cols_results)),
             cols_table,
             cols_results,
             cols_list,
@@ -192,6 +192,11 @@ def user(username: str):
     )
 
 
+@app.route("/browse/")
+def browse_default():
+    return redirect("/browse/submissions/")
+
+
 @app.route("/search/")
 def search_default():
     return redirect("/search/submissions/")
@@ -200,47 +205,58 @@ def search_default():
 @app.route("/submissions/<username>/")
 @app.route("/search/submissions/<username>/")
 def search_user_submissions(username: str):
-    return redirect(f'/search/submissions/?author=["{username}"]')
+    return redirect(f'/search/submissions/?author={quote(username)}')
 
 
 @app.route("/journals/<username>/")
 @app.route("/search/journals/<username>/")
 def search_user_journals(username: str):
-    return redirect(f'/search/journals/?author=["{username}"]')
+    return redirect(f'/search/journals/?author={quote(username)}')
 
 
 @app.route("/search/<string:table>/")
+@app.route("/browse/<string:table>/")
 def search(table: str = "submissions"):
     table = table.lower()
 
     if table not in ("submissions", "journals", "users"):
         return error(f"Table {table} not found.", 404)
 
-    params: Dict[str, str] = {k: request.args[k] for k in sorted(map(str.lower, request.args.keys()))}
+    params: Dict[str, List[str]] = {
+        k: request.args.getlist(k) for k in sorted(map(str.lower, request.args.keys()))
+        if k not in ("page", "limit", "sort", "order")
+    }
 
     results: List[dict]
     columns_results: List[str]
     columns_list: List[str]
     column_id: str
-    limit: int = 50
-    offset: int = int(params.get("offset", 0))
+    limit: int = int(request.args.get("limit", 50))
+    page: int = int(request.args.get("page", 1))
+    sort: str = request.args.get('sort', 'id' if table in ('submissions', 'journals') else 'username').lower()
+    order: str = request.args.get('order', 'desc' if table in ('submissions', 'journals') else 'asc').lower()
 
-    if "offset" in params:
-        del params["offset"]
-
-    results, columns_table, columns_results, columns_list, column_id = search_table(table, **params)
+    results, columns_table, columns_results, columns_list, column_id = search_table(
+        table,
+        f"{sort} {order}",
+        json_dumps(params),
+        all_=request.path.startswith("/browse/")
+    )
 
     return render_template(
         "search.html",
         title=f"{app.name} · {table.title()} Search Results",
         table=table,
-        params={p: json_loads(v) for p, v in params.items()},
+        params=params,
+        sort=sort,
+        order=order,
         columns_table=columns_table,
         columns_results=columns_results,
         columns_list=columns_list,
         column_id=column_id,
         limit=limit,
-        offset=offset,
+        page=(page := len(results) // limit if page == -1 else page),
+        offset=(offset := (page - 1) * limit),
         results=results[offset:offset + limit],
         results_total=len(results)
     )
