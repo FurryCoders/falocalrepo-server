@@ -16,7 +16,6 @@ from falocalrepo_database import FADatabaseTable
 from falocalrepo_database import tiered_path
 from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
-import filetype
 from flask import Flask
 from flask import abort
 from flask import redirect
