@@ -133,23 +133,21 @@
             <td class="overflow value">{{ submission["RATING"] }}</td>
         </tr>
     </table>
-    {% if file_type != None %}
-        <br>
-        <button onclick="window.location.href = '/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}'">
-            Download File
+    <br>
+    <form action="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
+        <button type="submit" {{ "disabled" if file_type == None }}>Download File</button>
+    </form>
+    <form action="https://www.furaffinity.net/view/{{ submission["ID"] }}">
+        <button type="submit">Open on Fur Affinity</button>
+    </form>
+    <form id="prevNext" action="">
+        <button type="submit" onclick="this.form.action='/submission/{{ next }}'" {{ "disabled" if not next }}>
+            Next
         </button>
-    {% endif %}
-    <br>
-    <button onclick="window.location.href = 'https://www.furaffinity.net/view/{{ submission["ID"] }}'">
-        Open on Fur Affinity
-    </button>
-    <br>
-    <button onclick="window.location.href = '/submission/{{ next }}'" {{ "disabled" if not next else "" }}>
-        Next
-    </button>
-    <button onclick="window.location.href = '/submission/{{ prev }}'" {{ "disabled" if not prev else "" }}>
-        Prev
-    </button>
+        <button type="submit" onclick="this.form.action='/submission/{{ prev }}'" {{ "disabled" if not prev }}>
+            Prev
+        </button>
+    </form>
 </div>
 <br><br>
 <div id="submission_description">

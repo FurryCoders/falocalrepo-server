@@ -9,7 +9,7 @@
             --table_background_color_even: lightgrey;
         }
 
-        body>h2 {
+        body > h2 {
             text-align: center;
         }
 
@@ -103,9 +103,11 @@
 </div>
 <div id="search_menu">
     <h3>Search Database</h3>
-    <button onclick="window.location = '/search/submissions'">Submissions</button>
-    <button onclick="window.location = '/search/journals'">Journals</button>
-    <button onclick="window.location = '/search/users'">Users</button>
+    <form action="">
+        <button type="submit" onclick="this.form.action = '/search/submissions'">Submissions</button>
+        <button type="submit" onclick="this.form.action = '/search/journals'">Journals</button>
+        <button type="submit" onclick="this.form.action = '/search/users'">Users</button>
+    </form>
 </div>
 </body>
 </html>

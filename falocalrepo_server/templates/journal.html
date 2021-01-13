@@ -73,16 +73,17 @@
         </tr>
     </table>
     <br>
-    <button onclick="window.location.href = 'https://www.furaffinity.net/journal/{{ journal["ID"] }}'">
-        Open on Fur Affinity
-    </button>
-    <br>
-    <button onclick="window.location.href = '/journal/{{ next }}'" {{ "disabled" if not next else "" }}>
-        Next
-    </button>
-    <button onclick="window.location.href = '/journal/{{ prev }}'" {{ "disabled" if not prev else "" }}>
-        Prev
-    </button>
+    <form action="https://www.furaffinity.net/journal/{{ journal["ID"] }}">
+        <button type="submit">Open on Fur Affinity</button>
+    </form>
+    <form id="prevNext" action="">
+        <button type="submit" onclick="this.form.action='/journal/{{ next }}'" {{ "disabled" if not next }}>
+            Next
+        </button>
+        <button type="submit" onclick="this.form.action='/journal/{{ prev }}'" {{ "disabled" if not prev }}>
+            Prev
+        </button>
+    </form>
 </div>
 <br><br>
 <div id="journal_content">
