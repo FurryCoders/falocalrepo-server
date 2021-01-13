@@ -16,6 +16,7 @@ from falocalrepo_database import FADatabaseTable
 from falocalrepo_database import tiered_path
 from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
+import filetype
 from flask import Flask
 from flask import abort
 from flask import redirect
@@ -301,13 +302,14 @@ def submission(id_: int):
 
 
 @app.route("/submission/<int:id_>/file/")
-def submission_file(id_: int):
+@app.route("/submission/<int:id_>/file/<filename>")
+def submission_file(id_: int, filename: str = ""):
     sub_ext, sub_dir = load_submission_file(id_)
 
     if sub_ext is None:
         return abort(404)
     elif isfile(path := join(sub_dir, f"submission.{sub_ext}")):
-        return send_file(path)
+        return send_file(path, attachment_filename=filename if filename else None)
     else:
         return abort(404)
 
