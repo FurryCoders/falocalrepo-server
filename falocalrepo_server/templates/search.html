@@ -147,7 +147,7 @@
 <body>
 {% set table_short %}{{ table[:-1] }}{% endset %}
 <h2>{{ title }}</h2>
-<form id="search_form" action="/search/{{ table }}">
+<form id="search_form" action="">
     <table id="search_fields">
         <tr>
             <td class="col1"><label for="search_field_type">New Field</label></td>
@@ -180,7 +180,7 @@
         </tr>
     </table>
     <br>
-    <button type="submit">Search</button>
+    <button type="submit" onclick="this.form.action = window.location.pathname">Search</button>
 </form>
 <br>
 {% if results or params %}
