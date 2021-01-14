@@ -276,8 +276,13 @@
 
         return fieldInput
     }
-    const params = {{ params|safe }};
-    Object.entries(params).forEach(([k, vs]) => vs.forEach((v) => addSearchField(k).value = v))
+    window.onload = () => {
+        const url = new URL(window.location.href)
+        Array.from(document.getElementById("search_field_type").children)
+            .map((e) => e.value)
+            .filter((c) => url.searchParams.has(c))
+            .forEach((c) => addSearchField(c).value = url.searchParams.get(c))
+    }
 </script>
 </body>
 </html>
