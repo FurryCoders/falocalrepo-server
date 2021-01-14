@@ -1,4 +1,5 @@
 from functools import lru_cache
+from io import BytesIO
 from json import dumps as json_dumps
 from json import loads as json_loads
 from os.path import abspath
@@ -11,7 +12,9 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import Union
 from urllib.parse import quote
+from zipfile import ZipFile
 
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
@@ -91,7 +94,7 @@ def load_user(username: str) -> Optional[dict]:
 
 
 @lru_cache
-def load_item(table: str, id_: int):
+def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int]], int, int]:
     global db_path
 
     item: Optional[dict]
@@ -327,6 +330,27 @@ def submission_file(id_: int, filename: str = ""):
         return send_file(path, attachment_filename=filename if filename else None)
     else:
         return abort(404)
+
+
+@app.route("/submission/<int:id_>/zip/")
+@app.route("/submission/<int:id_>/zip/<filename>")
+def submission_zip(id_: int, filename: str = ""):
+    sub, _, _ = load_item(submissions_table, id_)
+
+    if sub is None:
+        return abort(404)
+
+    sub_ext, sub_dir = load_submission_file(id_)
+    f_obj: BytesIO = BytesIO()
+
+    with ZipFile(f_obj, "w") as z:
+        if isfile(path := join(sub_dir, f"submission.{sub_ext}")):
+            z.writestr(f"submission.{sub_ext}", open(path, "rb").read())
+        z.writestr("description.html", sub["DESCRIPTION"].encode())
+        z.writestr("metadata.json", json_dumps({k: v for k, v in sub.items() if k != "DESCRIPTION"}).encode())
+
+    f_obj.seek(0)
+    return send_file(f_obj, mimetype="application/zip", attachment_filename=filename if filename else None)
 
 
 def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
