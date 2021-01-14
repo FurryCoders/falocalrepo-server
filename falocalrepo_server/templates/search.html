@@ -186,8 +186,7 @@
 {% if results or params %}
 <div id="header">
     {% set navigation %}
-    Results: {{ offset }}-{{ offset + results|length }} of {{ results_total }}
-    · Page {{ page }}
+    Results: {{ offset }}-{{ offset + results|length }} of {{ results_total }} · Page {{ page }}
     <br>
     <button type="submit" form="search_form" name="page" value="1" {{ 'disabled' if page == 1 }}>
         First
@@ -195,7 +194,7 @@
     <button type="submit" form="search_form" name="page" value="{{ page - 1 }}" {{ 'disabled' if page == 1 }}>
         Prev
     </button>
-    <button type="button" onclick="window.location = window.location.pathname">New Search</button>
+    <button type="button" onclick="window.location = '/search/{{ table }}'">New Search</button>
     <button type="submit" form="search_form" name="page"
             value="{{ page + 1 }}" {{ 'disabled' if offset + limit >= results_total }}>
         Next
