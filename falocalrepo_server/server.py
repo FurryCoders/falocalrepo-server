@@ -126,7 +126,7 @@ def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
 
 
 @lru_cache
-def search_table(table: str, order: str, params_serialised: str = "{}", all_: bool = False):
+def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", all_query: bool = False):
     global db_path
 
     cols_results: List[str] = []
@@ -139,15 +139,19 @@ def search_table(table: str, order: str, params_serialised: str = "{}", all_: bo
         cols_results += ["TAGS"] if table == "submissions" else []
         cols_list = ["TAGS"] if table == "submissions" else []
         col_id = "ID"
+        order = "DESC" if not order else order
     elif table == "users":
         cols_results = ["USERNAME", "FOLDERS"]
         cols_list = ["FOLDERS"]
         col_id = "USERNAME"
+        order = "ASC" if not order else order
+
+    sort = col_id if not sort else sort
 
     with FADatabase(db_path) as db:
         cols_table: List[str] = db[table].columns
 
-        if not params and not all_:
+        if not params and not all_query:
             return [], cols_table, cols_results, cols_list, col_id
 
         if "author" in params:
@@ -155,17 +159,18 @@ def search_table(table: str, order: str, params_serialised: str = "{}", all_: bo
             del params["author"]
         if "username" in params:
             params["username"] = list(map(lambda u: clean_username(u, "%_"), params["username"]))
-        if "order" in params:
-            del params["order"]
 
         db_table: FADatabaseTable = db[table]
         return (
-            list(
-                db_table.cursor_to_dict(db_table.select(params, cols_results, like=True, order=[order]), cols_results)),
+            list(db_table.cursor_to_dict(
+                db_table.select(params, cols_results, like=True, order=[f"{sort} {order}"]),
+                cols_results)),
             cols_table,
             cols_results,
             cols_list,
-            col_id
+            col_id,
+            sort,
+            order
         )
 
 
@@ -236,14 +241,15 @@ def search(table: str = "submissions"):
     column_id: str
     limit: int = int(request.args.get("limit", 50))
     page: int = int(request.args.get("page", 1))
-    sort: str = request.args.get('sort', 'id' if table in ('submissions', 'journals') else 'username').lower()
-    order: str = request.args.get('order', 'desc' if table in ('submissions', 'journals') else 'asc').lower()
+    sort: str = request.args.get("sort", "").lower()
+    order: str = request.args.get("order", "").lower()
 
-    results, columns_table, columns_results, columns_list, column_id = search_table(
+    results, columns_table, columns_results, columns_list, column_id, sort, order = search_table(
         table,
-        f"{sort} {order}",
+        sort,
+        order,
         json_dumps(params),
-        all_=request.path.startswith("/browse/")
+        all_query=request.path.startswith("/browse/")
     )
 
     return render_template(
@@ -251,8 +257,8 @@ def search(table: str = "submissions"):
         title=f"{app.name} · {table.title()} Search Results",
         table=table,
         params=params,
-        sort=sort,
-        order=order,
+        sort=sort.lower(),
+        order=order.lower(),
         columns_table=columns_table,
         columns_results=columns_results,
         columns_list=columns_list,
