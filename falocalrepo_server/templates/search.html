@@ -67,6 +67,10 @@
             text-decoration: underline;
         }
 
+        #search_fields tr:first-of-type hr {
+            visibility: hidden;
+        }
+
         #search_results table {
             border-collapse: collapse;
             border: 1px solid var(--table_border_color);
@@ -149,6 +153,11 @@
 <h2>{{ title }}</h2>
 <form id="search_form" action="">
     <table id="search_fields">
+        <tr>
+            <td colspan="3">
+                <hr style="width: 100%">
+            </td>
+        </tr>
         <tr>
             <td class="col1"><label for="search_field_type">New Field</label></td>
             <td class="col2"><select id="search_field_type" style="width: 100%;">
