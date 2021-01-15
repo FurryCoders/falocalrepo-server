@@ -253,18 +253,18 @@
 <script>
     const $ = (id) => document.getElementById(id)
     const addSearchField = (fieldType) => {
-        let parent = $("search_fields")
+        let table = $("search_fields")
 
-        let tr = document.createElement("tr")
+        let row = table.insertRow(table.rows.length - 4)
+        let col1 = row.insertCell(0)
+        let col2 = row.insertCell(1)
+        let col3 = row.insertCell(2)
 
-        let td1 = document.createElement("td")
-        let td2 = document.createElement("td")
-        let td3 = document.createElement("td")
 
-        td1.textContent = fieldType[0].toUpperCase() + fieldType.substring(1)
-        td1.classList.add("col1")
-        td2.classList.add("col2")
-        td3.classList.add("col3")
+        col1.textContent = fieldType.length > 2 ? fieldType[0].toUpperCase() + fieldType.substring(1) : fieldType.toUpperCase()
+        col1.classList.add("col1")
+        col2.classList.add("col2")
+        col3.classList.add("col3")
 
         let fieldInput = document.createElement("input")
         fieldInput.type = "text"
@@ -275,14 +275,10 @@
         let fieldRemove = document.createElement("button")
         fieldRemove.textContent = "-"
         fieldRemove.type = "button"
-        fieldRemove.onclick = () => parent.removeChild(tr)
+        fieldRemove.onclick = () => table.deleteRow(row.rowIndex)
 
-        td2.appendChild(fieldInput)
-        td3.appendChild(fieldRemove)
-        tr.appendChild(td1)
-        tr.appendChild(td2)
-        tr.appendChild(td3)
-        parent.insertBefore(tr, parent.childNodes[parent.childElementCount - 1])
+        col2.appendChild(fieldInput)
+        col3.appendChild(fieldRemove)
 
         return fieldInput
     }
