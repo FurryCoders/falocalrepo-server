@@ -117,7 +117,7 @@ def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int]], int, in
 def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
     global db_path
 
-    sub, *_ = load_item(submissions_table, id_)
+    sub, _, _ = load_item(submissions_table, id_)
     sub_dir: str
     with FADatabase(db_path) as db:
         sub_dir = join(dirname(db_path), db.settings["FILESFOLDER"], *split(tiered_path(id_)))
