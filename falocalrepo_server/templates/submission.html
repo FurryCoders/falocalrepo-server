@@ -123,19 +123,27 @@
         </tr>
         <tr>
             <td>Category</td>
-            <td class="overflow value">{{ submission["CATEGORY"] }}</td>
+            <td class="overflow value"><a href="/search/submissions/?category=%25{{ submission["CATEGORY"] }}%25">
+                {{ submission["CATEGORY"] }}
+            </a></td>
         </tr>
         <tr>
             <td>Species</td>
-            <td class="overflow value">{{ submission["SPECIES"] }}</td>
+            <td class="overflow value"><a href="/search/submissions/?species=%25{{ submission["SPECIES"] }}%25">
+                {{ submission["SPECIES"] }}
+            </a></td>
         </tr>
         <tr>
             <td>Gender</td>
-            <td class="overflow value">{{ submission["GENDER"] }}</td>
+            <td class="overflow value"><a href="/search/submissions/?gender=%25{{ submission["GENDER"] }}%25">
+                {{ submission["GENDER"] }}
+            </a></td>
         </tr>
         <tr>
             <td>Rating</td>
-            <td class="overflow value">{{ submission["RATING"] }}</td>
+            <td class="overflow value"><a href="/search/submissions/?rating=%25{{ submission["RATING"] }}%25">
+                {{ submission["RATING"] }}
+            </a></td>
         </tr>
     </table>
     <br>
