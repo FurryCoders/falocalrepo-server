@@ -219,7 +219,7 @@ def search_default():
 @app.route("/search/submissions/<username>/")
 def search_user_submissions(username: str):
     return redirect(url_for(
-        "search", table="users", **{**{k: request.args.getlist(k) for k in request.args}, "author": username}))
+        "search", table="submissions", **{**{k: request.args.getlist(k) for k in request.args}, "author": username}))
 
 
 @app.route("/journals/<username>/")
