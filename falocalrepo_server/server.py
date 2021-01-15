@@ -27,6 +27,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import send_file
+from flask import url_for
 from werkzeug.exceptions import NotFound
 
 app: Flask = Flask(
@@ -222,8 +223,8 @@ def search_user_journals(username: str):
     return redirect(f'/search/journals/?author={quote(username)}')
 
 
-@app.route("/search/<string:table>/")
 @app.route("/browse/<string:table>/")
+@app.route("/search/<string:table>/")
 def search(table: str = "submissions"):
     table = table.lower()
 
@@ -236,7 +237,7 @@ def search(table: str = "submissions"):
     }
 
     if params and request.path.startswith("/browse/"):
-        return redirect(f"/search/{table}/")
+        return redirect(url_for("search", table=table, **request.args))
 
     results: List[dict]
     columns_results: List[str]
