@@ -277,11 +277,12 @@
         return fieldInput
     }
     window.onload = () => {
-        const url = new URL(window.location.href)
+        const params = new URL(window.location.href).searchParams
         Array.from(document.getElementById("search_field_type").children)
             .map((e) => e.value)
-            .filter((c) => url.searchParams.has(c))
-            .forEach((c) => addSearchField(c).value = url.searchParams.get(c))
+            .forEach((c) => params.getAll(c)
+                .filter((v) => v.length !== 0)
+                .forEach((v) => addSearchField(c).value = v))
     }
 </script>
 </body>
