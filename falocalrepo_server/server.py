@@ -301,6 +301,24 @@ def journal(id_: int):
     )
 
 
+@app.route("/journal/<int:id_>/zip/")
+@app.route("/journal/<int:id_>/zip/<filename>")
+def journal_zip(id_: int, filename: str = ""):
+    jrn, _, _ = load_item(journals_table, id_)
+
+    if jrn is None:
+        return abort(404)
+
+    f_obj: BytesIO = BytesIO()
+
+    with ZipFile(f_obj, "w") as z:
+        z.writestr("content.html", jrn["CONTENT"].encode())
+        z.writestr("metadata.json", json_dumps({k: v for k, v in jrn.items() if k != "CONTENT"}).encode())
+
+    f_obj.seek(0)
+    return send_file(f_obj, mimetype="application/zip", attachment_filename=filename if filename else None)
+
+
 @app.route("/view/<int:id_>/")
 def submission_view(id_: int):
     return redirect(f"/submission/{id_}")
