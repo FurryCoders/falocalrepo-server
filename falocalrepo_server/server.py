@@ -13,7 +13,6 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
-from urllib.parse import quote
 from zipfile import ZipFile
 
 from falocalrepo_database import FADatabase
@@ -203,29 +202,33 @@ def user(username: str):
 
 @app.route("/browse/")
 def browse_default():
-    return redirect("/browse/submissions/")
+    return redirect(url_for("browse", table="submissions", **request.args))
+
+
+@app.route("/browse/<string:table>/")
+def browse(table: str):
+    return search(table)
 
 
 @app.route("/search/")
 def search_default():
-    return redirect("/search/submissions/")
+    return redirect(url_for("search", table="submissions", **request.args))
 
 
 @app.route("/submissions/<username>/")
 @app.route("/search/submissions/<username>/")
 def search_user_submissions(username: str):
-    return redirect(f'/search/submissions/?author={quote(username)}')
+    return redirect(url_for("search", table="users", **{**request.args, "author": username}))
 
 
 @app.route("/journals/<username>/")
 @app.route("/search/journals/<username>/")
 def search_user_journals(username: str):
-    return redirect(f'/search/journals/?author={quote(username)}')
+    return redirect(url_for("search", table="journals", **{**request.args, "author": username}))
 
 
-@app.route("/browse/<string:table>/")
 @app.route("/search/<string:table>/")
-def search(table: str = "submissions"):
+def search(table: str):
     table = table.lower()
 
     if table not in ("submissions", "journals", "users"):
