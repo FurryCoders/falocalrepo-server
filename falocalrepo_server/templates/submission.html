@@ -78,17 +78,19 @@
     {% elif file_type == "image" %}
         <a href="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
             <img src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
-                 alt="" onerror="document.getElementById('submission_file').innerText = 'File not found'">
+                 alt="" onerror="$('submission_file').innerText = 'File not found'; $('download_file').disabled = true">
         </a>
     {% elif file_type == "audio" %}
         <audio src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
+               onerror="$('submission_file').innerText = 'File not found'; $('download_file').disabled = true"
                controls>
             Your browser does not support audio tags
         </audio>
     {% elif file_type == "text" %}
         <object data="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
                 type=""
-                style="width: 100%; max-width: 600px; text-align: justify; height: 300px; border: 1px solid black">
+                style="width: 100%; max-width: 600px; text-align: justify; height: 300px; border: 1px solid black"
+                onerror="$('submission_file').innerText = 'File not found'; $('download_file').disabled = true">
             Your browser does not support object tags
         </object>
     {% else %}
@@ -148,7 +150,7 @@
     </table>
     <br>
     <form action="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
-        <button type="submit" {{ "disabled" if file_type == None }}>Download File</button>
+        <button id="download_file" type="submit" {{ "disabled" if file_type == None }}>Download File</button>
     </form>
     <form action="/submission/{{ submission["ID"] }}/zip/{{ submission["ID"] }}.zip">
         <button type="submit">Download Submission as ZIP</button>
@@ -172,6 +174,7 @@
     {% endautoescape %}
 </div>
 <script>
+    const $ = (id) => document.getElementById(id)
     window.onload = () => {
         const dpi = Number(window.devicePixelRatio || 1)
         if (dpi <= 1) return
