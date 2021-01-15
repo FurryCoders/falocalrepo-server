@@ -71,6 +71,7 @@
     </style>
 </head>
 <body>
+<div style="text-align: center"><h2>{{ submission["TITLE"] }}</h2></div>
 <div id="submission_file">
     {% if file_type == None %}
         Submission has no file
@@ -90,11 +91,15 @@
                 style="width: 100%; max-width: 600px; text-align: justify; height: 300px; border: 1px solid black">
             Your browser does not support object tags
         </object>
+    {% else %}
+        <a href="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
+           style="border: 1px solid black; padding: 3px">
+            Submission.{{ submission["FILEEXT"] }}
+        </a>
     {% endif %}
 </div>
 <br>
 <div id="submission_metadata">
-    <h2>{{ submission["TITLE"] }}</h2>
     <table style="max-width: 300px">
         <tr>
             <td>Author</td>
