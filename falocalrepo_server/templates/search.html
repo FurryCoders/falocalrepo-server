@@ -277,12 +277,12 @@
         return fieldInput
     }
     window.onload = () => {
-        const params = new URL(window.location.href).searchParams
-        Array.from(document.getElementById("search_field_type").children)
-            .map((e) => e.value)
-            .forEach((c) => params.getAll(c)
-                .filter((v) => v.length !== 0)
-                .forEach((v) => addSearchField(c).value = v))
+        const columns = Array.from(document.getElementById("search_field_type").children)
+            .map((e) => e.value.toLowerCase());
+        Array.from((new URL(window.location.href)).searchParams.entries())
+            .map(([k, v]) => [k.toLowerCase(), v])
+            .filter(([k, _]) => columns.find((c) => c === k))
+            .forEach(([k, v]) => addSearchField(k).value = v)
     }
 </script>
 </body>
