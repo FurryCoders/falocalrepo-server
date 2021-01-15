@@ -24,7 +24,7 @@ For the program to run, a properly formatted database created by falocalrepo nee
 falocalrepo-server <database> [<host>:<port>]
 ```
 
-The server needs one argument pointing at the location of a valid [falocalrepo](https://pypi.org/project/falocalrepo/) database and accepts an optional argument to manually set host and port. By default the server is run on 0.0.0.0:8080.
+The server needs one argument pointing at the location of a valid [falocalrepo](https://pypi.org/project/falocalrepo/) database and accepts an optional argument to manually set host and port. By default, the server is run on 0.0.0.0:8080.
 
 Once the server is running - it will display status messages in the terminal - the web app can be accessed at http://0.0.0.0:8080/, or any manually set host/port combination.
 
@@ -46,16 +46,22 @@ The interface supports the search fields supported by the command line database 
 
 Fields can be added multiple times and will act as OR options.
 
-The order field allows to sort the search result. By default submissions and journals are sorted by author and ID. For a list of possible sorting fields, see [#Submissions](https://gitlab.com/MatteoCampinoti94/FALocalRepo#submissions) and [#Journals](https://gitlab.com/MatteoCampinoti94/FALocalRepo#journals) in the database section of FALocalRepo readme.
-
 Fields are matched using the SQLite [`like`](https://sqlite.org/lang_expr.html#like) expression which allows for limited pattern matching. See [`database` command](https://gitlab.com/MatteoCampinoti94/FALocalRepo#database) for more details.
+
+The `Sort By` and `Order` selections allow to sort and order results using any field.
 
 The `/submissions/<username>/` and `/journals/<username>/` paths allow to quickly open a search for submissions and journals by `<username>`. `/search/submissions/<username>/` and `/search/journals/<username>/` are also allowed.
 
 Results of the search are displayed 50 per page in a table. Clicking on any row opens the specific item. Clicking on the table headers allows to perform re-sort the search results.
 
+### Browse
+
+The `/browse/submissions`, `/browse/journals`, and `/browse/users` paths allow to open a list of all entries in a specific table. From there the results can be refined using the search interface. 
+
 ### Submissions & Journals
 
 Submissions and journals can be accessed respectively at `/submission/<id>` and `/journal/<id>`. All the metadata, content and files that are recorded in the database are displayed in these pages.
 
-Submission files can be accessed at `/submission/<id>/file`.
+Submission files can be accessed at `/submission/<id>/file` or by using the `Download File` or `Download Submission as ZIP` buttons.
+
+For both submissions and journals it is possible to download a ZIP containing the metadata in a JSON-formatted file and the submission description/journal content in HTML format. For submissions, the ZIP file also contains the submission file. The ZIP of a submission/journal can be accessed directly using the `/submission/<id>/zip` and `/journal/<id>/zip` paths.
