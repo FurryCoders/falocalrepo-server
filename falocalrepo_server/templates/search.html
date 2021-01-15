@@ -161,9 +161,10 @@
         <tr>
             <td class="col1"><label for="search_field_type">New Field</label></td>
             <td class="col2"><select id="search_field_type" style="width: 100%;">
-                <option selected value="{{ columns_table[0].lower() }}">{{ columns_table[0].title() }}</option>
-                {% for col in columns_table[1:] %}
-                    <option value="{{ col.lower() }}">{{ col.title() }}</option>
+                {% for col in columns_table %}
+                    <option {{ "selected" if loop.first }} value="{{ col.lower() }}">
+                        {{ col.title() if col|length > 2 else col.upper() }}
+                    </option>
                 {% endfor %}
             </select></td>
             <td class="col3">
