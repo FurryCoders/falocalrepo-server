@@ -78,20 +78,22 @@
     {% elif file_type == "image" %}
         <a href="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
             <img src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
-                 alt="" onerror="$('submission_file').innerText = 'File not found'; $('download_file').disabled = true">
+                 alt=""
+                 onerror="$('submission_file').innerText = 'File not found'"
+                 onload="$('download_file').disabled = false">
         </a>
     {% elif file_type == "audio" %}
         <audio src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
-               onerror="$('submission_file').innerText = 'File not found'; $('download_file').disabled = true"
+               onload="$('download_file').disabled = false"
                controls>
-            Your browser does not support audio tags
+            File not found
         </audio>
     {% elif file_type == "text" %}
         <object data="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
                 type=""
                 style="width: 100%; max-width: 600px; text-align: justify; height: 300px; border: 1px solid black"
-                onerror="$('submission_file').innerText = 'File not found'; $('download_file').disabled = true">
-            Your browser does not support object tags
+                onload="$('download_file').disabled = false">
+            File not found
         </object>
     {% else %}
         <a href="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
@@ -150,7 +152,7 @@
     </table>
     <br>
     <form action="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
-        <button id="download_file" type="submit" {{ "disabled" if file_type == None }}>Download File</button>
+        <button id="download_file" type="submit" {{ "disabled" if file_type != "" }}>Download File</button>
     </form>
     <form action="/submission/{{ submission["ID"] }}/zip/{{ submission["ID"] }}.zip">
         <button type="submit">Download Submission as ZIP</button>
