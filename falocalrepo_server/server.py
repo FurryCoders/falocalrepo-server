@@ -244,7 +244,7 @@ def search(table: str):
     }
 
     if params and request.path.startswith("/browse/"):
-        return redirect(url_for("search", table=table, **request.args))
+        return redirect(url_for("search", table=table, **{k: request.args.getlist(k) for k in request.args}))
 
     results: List[dict]
     columns_results: List[str]
