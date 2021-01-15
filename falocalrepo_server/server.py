@@ -235,6 +235,9 @@ def search(table: str = "submissions"):
         if k not in ("page", "limit", "sort", "order")
     }
 
+    if params and request.path.startswith("/browse/"):
+        return redirect(f"/search/{table}/")
+
     results: List[dict]
     columns_results: List[str]
     columns_list: List[str]
