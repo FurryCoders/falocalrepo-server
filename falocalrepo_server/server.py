@@ -202,7 +202,7 @@ def user(username: str):
 
 @app.route("/browse/")
 def browse_default():
-    return redirect(url_for("browse", table="submissions", **request.args))
+    return redirect(url_for("browse", table="submissions", **{k: request.args.getlist(k) for k in request.args}))
 
 
 @app.route("/browse/<string:table>/")
@@ -212,19 +212,21 @@ def browse(table: str):
 
 @app.route("/search/")
 def search_default():
-    return redirect(url_for("search", table="submissions", **request.args))
+    return redirect(url_for("search", table="submissions", **{k: request.args.getlist(k) for k in request.args}))
 
 
 @app.route("/submissions/<username>/")
 @app.route("/search/submissions/<username>/")
 def search_user_submissions(username: str):
-    return redirect(url_for("search", table="users", **{**request.args, "author": username}))
+    return redirect(url_for(
+        "search", table="users", **{**{k: request.args.getlist(k) for k in request.args}, "author": username}))
 
 
 @app.route("/journals/<username>/")
 @app.route("/search/journals/<username>/")
 def search_user_journals(username: str):
-    return redirect(url_for("search", table="journals", **{**request.args, "author": username}))
+    return redirect(url_for(
+        "search", table="journals", **{**{k: request.args.getlist(k) for k in request.args}, "author": username}))
 
 
 @app.route("/search/<string:table>/")
