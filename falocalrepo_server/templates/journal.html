@@ -73,6 +73,9 @@
         </tr>
     </table>
     <br>
+    <form action="/journal/{{ journal["ID"] }}/zip/{{ journal["ID"] }}.zip">
+        <button type="submit">Download Journal as ZIP</button>
+    </form>
     <form action="https://www.furaffinity.net/journal/{{ journal["ID"] }}">
         <button type="submit">Open on Fur Affinity</button>
     </form>
