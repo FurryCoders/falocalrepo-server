@@ -116,7 +116,7 @@
             <td class="overflow value">
                 {% for tag in submission["TAGS"].split(",") %}
                     {% if tag != "" %}
-                        <a href='/search/submissions/?tags=["%25{{ tag }}%25"]'>{{ tag }}</a>
+                        <a href='/search/submissions/?tags=%25{{ tag }}%25'>{{ tag }}</a>
                     {% endif %}
                 {% endfor %}
             </td>
