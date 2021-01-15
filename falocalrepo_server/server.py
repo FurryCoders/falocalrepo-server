@@ -154,6 +154,8 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
         if not params and not all_query:
             return [], cols_table, cols_results, cols_list, col_id, sort, order
 
+        params = {k: vs for k, vs in params.items() if k in map(str.lower, cols_table)}
+
         if "author" in params:
             params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
             del params["author"]
