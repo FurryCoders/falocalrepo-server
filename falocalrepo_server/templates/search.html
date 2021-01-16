@@ -265,19 +265,16 @@
         col2.classList.add("col2")
         col3.classList.add("col3")
 
-        let fieldInput = document.createElement("input")
+        let fieldInput = col2.appendChild(document.createElement("input"))
         fieldInput.type = "text"
         fieldInput.name = fieldType
         fieldInput.classList.add("search_field")
         fieldInput.style.width = "100%"
 
-        let fieldRemove = document.createElement("button")
+        let fieldRemove = col3.appendChild(document.createElement("button"))
         fieldRemove.textContent = "-"
         fieldRemove.type = "button"
         fieldRemove.onclick = () => table.deleteRow(row.rowIndex)
-
-        col2.appendChild(fieldInput)
-        col3.appendChild(fieldRemove)
 
         return fieldInput
     }
