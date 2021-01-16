@@ -154,7 +154,7 @@
     <form action="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
         <button id="download_file" type="submit" {{ "disabled" if file_type != "" }}>Download File</button>
     </form>
-    <form action="/submission/{{ submission["ID"] }}/zip/{{ submission["ID"] }}.zip">
+    <form action="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
         <button type="submit">Download Submission as ZIP</button>
     </form>
     <form action="https://www.furaffinity.net/view/{{ submission["ID"] }}">
