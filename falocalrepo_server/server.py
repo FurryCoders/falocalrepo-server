@@ -319,6 +319,7 @@ def journal_zip(id_: int, filename: str = ""):
     return send_file(f_obj, mimetype="application/zip", attachment_filename=filename if filename else None)
 
 
+@app.route("/full/<int:id_>/")
 @app.route("/view/<int:id_>/")
 def submission_view(id_: int):
     return redirect(f"/submission/{id_}")
