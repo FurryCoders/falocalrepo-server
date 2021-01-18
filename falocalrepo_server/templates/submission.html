@@ -73,22 +73,22 @@
 <body>
 <div style="text-align: center"><h2>{{ submission["TITLE"] }}</h2></div>
 <div id="submission_file">
-    {% if file_type == None %}
+    {% if not submission["FILESAVED"] %}
         Submission has no file
-    {% elif file_type == "image" %}
+    {% elif submission["FILEEXT"] in ("jpg", "jpeg", "png", "gif") %}
         <a href="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
             <img src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
                  alt=""
                  onerror="$('submission_file').innerText = 'File not found'"
                  onload="$('download_file').disabled = false">
         </a>
-    {% elif file_type == "audio" %}
+    {% elif submission["FILEEXT"] in ("mp3", "wav", "mid") %}
         <audio src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
                onload="$('download_file').disabled = false"
                controls>
             File not found
         </audio>
-    {% elif file_type == "text" %}
+    {% elif submission["FILEEXT"] == "txt" %}
         <object data="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
                 type=""
                 style="width: 100%; max-width: 600px; text-align: justify; height: 300px; border: 1px solid black"
@@ -152,7 +152,10 @@
     </table>
     <br>
     <form action="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
-        <button id="download_file" type="submit" {{ "disabled" if file_type != "" }}>Download File</button>
+        <button id="download_file" type="submit"
+                {{ "disabled" if (submission["FILESAVED"] and submission["FILEEXT"]) or not submission["FILESAVED"] }}>
+            Download File
+        </button>
     </form>
     <form action="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
         <button type="submit">Download Submission as ZIP</button>
