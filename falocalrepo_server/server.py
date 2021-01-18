@@ -335,21 +335,10 @@ def submission(id_: int):
             404
         )
 
-    file_type: Optional[str] = ""
-    if (ext := sub["FILEEXT"]) in ("jpg", "jpeg", "png", "gif"):
-        file_type = "image"
-    elif ext in ("mp3", "wav", "mid"):
-        file_type = "audio"
-    elif ext == "txt":
-        file_type = "text"
-    elif not ext:
-        file_type = None
-
     return render_template(
         "submission.html",
         title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
         submission=sub,
-        file_type=file_type,
         prev=prev_id,
         next=next_id
     )
