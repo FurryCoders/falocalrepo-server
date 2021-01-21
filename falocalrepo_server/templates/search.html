@@ -90,13 +90,6 @@
             margin: auto;
         }
 
-        #search_results table.results_grid {
-            width: 95%;
-            top: 20px;
-            margin: auto;
-            text-align: center;
-        }
-
         #search_results table.results_list td {
             border: 1px solid var(--table_border_color);
         }
@@ -144,6 +137,22 @@
 
         #search_results table.results_list tr.even {
             background-image: linear-gradient(0deg, var(--table_background_color_even), var(--table_background_color_even));
+        }
+
+        #search_results table.results_grid {
+            border-collapse: collapse;
+            width: 95%;
+            top: 20px;
+            margin: auto;
+            text-align: center;
+        }
+
+        #search_results table.results_grid td {
+            padding: 15px;
+        }
+
+        #search_results table.results_grid tr:last-of-type td {
+            padding-bottom: 0 !important;
         }
 
         #header button, #footer button {
@@ -268,7 +277,7 @@
                 </tr>
             {% endfor %}
         </table>
-        <table id="results_table_grid" class="results_grid" {{ "" if view == "grid" and allow_view else "hidden"}}>
+        <table id="results_table_grid" class="results_grid" {{ "" if view == "grid" and allow_view else "hidden" }}>
             {% if allow_view %}
                 {% for i in range(0, results|length, 3) %}
                     <tr>
