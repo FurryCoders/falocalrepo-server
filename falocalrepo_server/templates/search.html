@@ -21,7 +21,7 @@
             text-align: center
         }
 
-        #search_fields, #search_fields_add {
+        #search_fields {
             width: 40%;
             top: 20px;
             margin: auto;
@@ -54,6 +54,17 @@
             color: inherit;
         }
 
+        a.nocolor {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        td img {
+            display: block;
+            margin: auto;
+            object-fit: contain;
+        }
+
         .clickable {
             cursor: pointer;
         }
@@ -71,7 +82,7 @@
             visibility: hidden;
         }
 
-        #search_results table {
+        #search_results table.results_list {
             border-collapse: collapse;
             border: 1px solid var(--table_border_color);
             width: 95%;
@@ -79,65 +90,59 @@
             margin: auto;
         }
 
-        #search_results table td {
+        #search_results table.results_grid {
+            width: 95%;
+            top: 20px;
+            margin: auto;
+            text-align: center;
+        }
+
+        #search_results table.results_list td {
             border: 1px solid var(--table_border_color);
         }
 
-        #search_results table td span {
+        #search_results table.results_list td span {
             padding: 2px;
         }
 
-        #search_results table td:last-child {
+        #search_results table.results_list td:last-child {
             max-width: available !important;
         }
 
-        #search_results table th {
+        #search_results table.results_list th {
             padding: 2px;
             border: 2px solid var(--table_border_color);
             text-align: center;
         }
 
-        #search_results table th.id, #search_results table td.id {
+        #search_results table.results_list th.id, #search_results table.results_list td.id {
             min-width: fit-content;
             text-align: center;
         }
 
-        #search_results table th.author, #search_results table td.author {
+        #search_results table.results_list th.author, #search_results table.results_list td.author {
             min-width: fit-content;
             text-align: center;
         }
 
-        #search_results table th.date, #search_results table td.date {
+        #search_results table.results_list th.date, #search_results table.results_list td.date {
             min-width: fit-content;
             text-align: center;
         }
 
-        #search_results table th.title, #search_results table td.title {
-            max-width: 180px;
+        #search_results table.results_list th.title, #search_results table.results_list td.title {
+            max-width: fit-content;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            text-align: left;
         }
 
-        #search_results table th.tags, #search_results table td.tags {
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        #search_results table th.description, #search_results table td.description {
-            max-width: 360px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        #search_results table tr.odd {
+        #search_results table.results_list tr.odd {
             background-image: linear-gradient(0deg, var(--table_background_color_odd), var(--table_background_color_odd));
         }
 
-        #search_results table tr.even {
+        #search_results table.results_list tr.even {
             background-image: linear-gradient(0deg, var(--table_background_color_even), var(--table_background_color_even));
         }
 
@@ -188,6 +193,14 @@
             </select></td>
             <td class="col3"></td>
         </tr>
+        <tr {{ "hidden" if not allow_view else "" }}>
+            <td class="col1"><label for="view">View</label></td>
+            <td class="col2"><select id="view" name="view" style="width: 100%;" onchange="changeView(this.value)">
+                <option {{ "selected" if view == "list" or not allow_view }} value="list">List</option>
+                <option {{ "selected" if view == "grid" and allow_view }} value="grid">Grid</option>
+            </select></td>
+            <td class="col3"></td>
+        </tr>
     </table>
     <br>
     <button type="submit" onclick="this.form.action = window.location.pathname">Search</button>
@@ -218,12 +231,18 @@
 </div>
 {% endif %}
 {% if results %}
-    <div id="search_results">
-        <table>
+    <div id="search_results" style="text-align: center">
+        {% if thumbnails %}
+            <img id="loading" src="/static/loading.gif" alt="" style="height: 100px; width: 100px">
+        {% endif %}
+        <table id="results_table_list" class="results_list" hidden>
             <tr class="even" style="text-align: center">
                 {% for column in columns_results %}
                     <th class="{{ column.lower() }}">{{ column }}</th>
                 {% endfor %}
+                {% if thumbnails %}
+                    <th style="background: var(--table_background_color_odd); border: none"></th>
+                {% endif %}
             </tr>
             {% for item in results %}
                 <tr class="hover_highlight clickable {{ loop.cycle('odd', 'even') }}">
@@ -240,8 +259,47 @@
                             {% endif %}
                         </td>
                     {% endfor %}
+                    {% if thumbnails %}
+                        <td style="vertical-align: center; height: fit-content; width: fit-content">
+                            <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
+                                <img src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/150/" alt=""
+                                     onerror="this.parentNode.removeChild(this){% if loop.last %}; $('loading').hidden = true{% endif %}"
+                                     onload="{% if loop.last %}$('loading').hidden = true{% endif %}">
+                            </a>
+                        </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
+        </table>
+        <table id="results_table_grid" class="results_grid" hidden>
+            {% if allow_view %}
+                {% for i in range(0, results|length, 3) %}
+                    <tr>
+                        {% for j in range(3) %}
+                            {% if i+j < results|length %}
+                                <td style="height: fit-content; width: fit-content; vertical-align: top">
+                                    {% if thumbnails %}
+                                        <a class="nocolor" href="/{{ table_short }}/{{ results[i+j][column_id] }}">
+                                            <img src="/{{ table_short }}/{{ results[i+j][column_id] }}/thumbnail/150/"
+                                                 alt="" onerror="this.parentNode.removeChild(this)">
+                                        </a>
+                                        <br>
+                                    {% endif %}
+                                    <b><a class="nocolor" href="/{{ table_short }}/{{ results[i+j][column_id] }}">
+                                        <span>{{ results[i+j]["TITLE"] }}</span>
+                                    </a></b>
+                                    <br>
+                                    <i>by</i>&nbsp;
+                                    <a class="nocolor hover_underline"
+                                       href="/user/{{ results[i+j]["AUTHOR"] }}">
+                                        <span>{{ results[i+j]["AUTHOR"] }}</span>
+                                    </a>
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            {% endif %}
         </table>
     </div>
     <br>
@@ -255,7 +313,7 @@
     const addSearchField = (fieldType) => {
         let table = $("search_fields")
 
-        let row = table.insertRow(table.rows.length - 4)
+        let row = table.insertRow(table.rows.length - 5)
         let col1 = row.insertCell(0)
         let col2 = row.insertCell(1)
         let col3 = row.insertCell(2)
@@ -278,7 +336,17 @@
 
         return fieldInput
     }
+    const changeView = (view) => {
+        if (view === "list") {
+            $("results_table_list").hidden = false
+            $("results_table_grid").hidden = true
+        } else if (view === "grid") {
+            $("results_table_list").hidden = true
+            $("results_table_grid").hidden = false
+        }
+    }
     window.onload = () => {
+        changeView($('view').value)
         const columns = Array.from(document.getElementById("search_field_type").children)
             .map((e) => e.value.toLowerCase());
         Array.from((new URL(window.location.href)).searchParams.entries())

@@ -15,6 +15,7 @@ from typing import Tuple
 from typing import Union
 from zipfile import ZipFile
 
+from PIL import Image
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
 from falocalrepo_database import tiered_path
@@ -238,7 +239,7 @@ def search(table: str):
 
     params: Dict[str, List[str]] = {
         k: request.args.getlist(k) for k in sorted(map(str.lower, request.args.keys()))
-        if k not in ("page", "limit", "sort", "order")
+        if k not in ("page", "limit", "sort", "order", "view")
     }
 
     if params and request.path.startswith("/browse/"):
@@ -268,6 +269,9 @@ def search(table: str):
         params=params,
         sort=sort.lower(),
         order=order.lower(),
+        view=request.args.get("view", "list").lower(),
+        allow_view=table == "submissions",
+        thumbnails=table == "submissions",
         columns_table=columns_table,
         columns_results=columns_results,
         columns_list=columns_list,
@@ -355,6 +359,30 @@ def submission_file(id_: int, filename: str = ""):
         return abort(404)
 
 
+@app.route("/submission/<int:id_>/thumbnail/")
+@app.route("/submission/<int:id_>/thumbnail/<string:filename>")
+@app.route("/submission/<int:id_>/thumbnail/<int:size>/")
+@app.route("/submission/<int:id_>/thumbnail/<int:size>/<string:filename>")
+def submission_thumbnail(id_: int, size: int = 150, filename: str = None):
+    sub_ext, sub_dir = load_submission_file(id_)
+
+    if sub_ext is None:
+        return abort(404)
+    elif sub_ext.lower() not in ("jpg", "jpeg", "png", "gif"):
+        return abort(404)
+    elif isfile(path := join(sub_dir, f"submission.{sub_ext}")):
+        sub_ext = sub_ext.lower()
+        sub_ext = "jpeg" if sub_ext == "jpg" else sub_ext
+        f_obj: BytesIO = BytesIO()
+        with Image.open(path) as img:
+            img.thumbnail((size, size))
+            img.save(f_obj, sub_ext)
+        f_obj.seek(0)
+        return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{sub_ext}")
+    else:
+        return abort(404)
+
+
 @app.route("/submission/<int:id_>/zip/")
 @app.route("/submission/<int:id_>/zip/<filename>")
 def submission_zip(id_: int, filename: str = ""):
@@ -374,6 +402,14 @@ def submission_zip(id_: int, filename: str = ""):
 
     f_obj.seek(0)
     return send_file(f_obj, mimetype="application/zip", attachment_filename=filename if filename else None)
+
+
+@app.route("/static/<filename>")
+def static_files(filename: str):
+    if isfile(path := join(app.template_folder, "static", filename)):
+        return send_file(path)
+    else:
+        return abort(404)
 
 
 def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
