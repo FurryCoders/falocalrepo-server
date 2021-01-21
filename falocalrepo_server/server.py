@@ -33,7 +33,8 @@ from werkzeug.exceptions import NotFound
 
 app: Flask = Flask(
     "FurAffinity Local Repo",
-    template_folder=join(abspath(dirname(__file__)), "templates")
+    template_folder=join(abspath(dirname(__file__)), "templates"),
+    static_folder=join(abspath(dirname(__file__)), "static")
 )
 db_path: str = "FA.db"
 
@@ -416,10 +417,7 @@ def submission_zip(id_: int, filename: str = ""):
 
 @app.route("/static/<filename>")
 def static_files(filename: str):
-    if isfile(path := join(app.template_folder, "static", filename)):
-        return send_file(path)
-    else:
-        return abort(404)
+    return send_file(path) if isfile(path := join(app.static_folder, filename)) else abort(404)
 
 
 def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
