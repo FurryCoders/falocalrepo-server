@@ -24,6 +24,7 @@ python = "^3.8"
 falocalrepo-database = "~4.3.0"
 flask = "^1.1.2"
 Pillow = "^8.1.0"
+htmlmin = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 
