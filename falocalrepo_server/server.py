@@ -136,8 +136,6 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
 
     if table in ("submissions", "journals"):
         cols_results = ["ID", "AUTHOR", "DATE", "TITLE"]
-        cols_results += ["TAGS"] if table == "submissions" else []
-        cols_list = ["TAGS"] if table == "submissions" else []
         col_id = "ID"
         order = "DESC" if not order else order
     elif table == "users":
