@@ -185,6 +185,7 @@ def response_minify(response):
     return response
 
 
+@lru_cache
 @app.route("/user/<username>")
 def user(username: str):
     if username != (username_clean := clean_username(username)):
@@ -295,6 +296,7 @@ def search(table: str):
     )
 
 
+@lru_cache
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
     jrnl, prev_id, next_id = load_item(journals_table, id_)
@@ -314,6 +316,7 @@ def journal(id_: int):
     )
 
 
+@lru_cache(maxsize=10)
 @app.route("/journal/<int:id_>/zip/")
 @app.route("/journal/<int:id_>/zip/<filename>")
 def journal_zip(id_: int, filename: str = ""):
@@ -338,6 +341,7 @@ def submission_view(id_: int):
     return redirect(f"/submission/{id_}")
 
 
+@lru_cache
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
     sub, prev_id, next_id = load_item(submissions_table, id_)
@@ -357,6 +361,7 @@ def submission(id_: int):
     )
 
 
+@lru_cache(maxsize=10)
 @app.route("/submission/<int:id_>/file/")
 @app.route("/submission/<int:id_>/file/<filename>")
 def submission_file(id_: int, filename: str = ""):
@@ -370,6 +375,7 @@ def submission_file(id_: int, filename: str = ""):
         return abort(404)
 
 
+@lru_cache
 @app.route("/submission/<int:id_>/thumbnail/")
 @app.route("/submission/<int:id_>/thumbnail/<string:filename>")
 @app.route("/submission/<int:id_>/thumbnail/<int:size>/")
@@ -394,6 +400,7 @@ def submission_thumbnail(id_: int, size: int = 150, filename: str = None):
         return abort(404)
 
 
+@lru_cache(maxsize=10)
 @app.route("/submission/<int:id_>/zip/")
 @app.route("/submission/<int:id_>/zip/<filename>")
 def submission_zip(id_: int, filename: str = ""):
@@ -415,6 +422,7 @@ def submission_zip(id_: int, filename: str = ""):
     return send_file(f_obj, mimetype="application/zip", attachment_filename=filename if filename else None)
 
 
+@lru_cache(maxsize=10)
 @app.route("/static/<filename>")
 def static_files(filename: str):
     return send_file(path) if isfile(path := join(app.static_folder, filename)) else abort(404)
