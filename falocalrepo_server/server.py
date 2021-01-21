@@ -288,7 +288,7 @@ def search(table: str):
         columns_list=columns_list,
         column_id=column_id,
         limit=limit,
-        page=(page := len(results) // limit if page == -1 else page),
+        page=(page := (len(results) // limit) + (1 * bool(len(results) % limit)) if page == -1 else page),
         offset=(offset := (page - 1) * limit),
         results=results[offset:offset + limit],
         results_total=len(results)
