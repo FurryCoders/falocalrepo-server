@@ -28,6 +28,7 @@ from flask import render_template
 from flask import request
 from flask import send_file
 from flask import url_for
+from htmlmin.main import minify
 from werkzeug.exceptions import NotFound
 
 app: Flask = Flask(
@@ -173,6 +174,14 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
             sort,
             order
         )
+
+
+@app.after_request
+def response_minify(response):
+    if response.content_type == u'text/html; charset=utf-8':
+        response.set_data(minify(response.get_data(as_text=True)))
+
+    return response
 
 
 @app.route("/user/<username>")
