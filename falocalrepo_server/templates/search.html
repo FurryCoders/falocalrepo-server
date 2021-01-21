@@ -232,10 +232,7 @@
 {% endif %}
 {% if results %}
     <div id="search_results" style="text-align: center">
-        {% if thumbnails %}
-            <img id="loading" src="/static/loading.gif" alt="" style="height: 100px; width: 100px">
-        {% endif %}
-        <table id="results_table_list" class="results_list" hidden>
+        <table id="results_table_list" class="results_list" {{ "" if view == "list" or not allow_view else "hidden" }}>
             <tr class="even" style="text-align: center">
                 {% for column in columns_results %}
                     <th class="{{ column.lower() }}">{{ column }}</th>
@@ -271,7 +268,7 @@
                 </tr>
             {% endfor %}
         </table>
-        <table id="results_table_grid" class="results_grid" hidden>
+        <table id="results_table_grid" class="results_grid" {{ "" if view == "grid" and allow_view else "hidden"}}>
             {% if allow_view %}
                 {% for i in range(0, results|length, 3) %}
                     <tr>
@@ -301,6 +298,9 @@
                 {% endfor %}
             {% endif %}
         </table>
+        {% if thumbnails %}
+            <img id="loading" src="/static/loading.gif" alt="" style="height: 50px; width: 50px">
+        {% endif %}
     </div>
     <br>
     <div id="footer">
@@ -346,7 +346,6 @@
         }
     }
     window.onload = () => {
-        changeView($('view').value)
         const columns = Array.from(document.getElementById("search_field_type").children)
             .map((e) => e.value.toLowerCase());
         Array.from((new URL(window.location.href)).searchParams.entries())

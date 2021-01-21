@@ -253,6 +253,7 @@ def search(table: str):
     page: int = int(request.args.get("page", 1))
     sort: str = request.args.get("sort", "").lower()
     order: str = request.args.get("order", "").lower()
+    view: str = v if (v := request.args.get("view", "list").lower()) in ("list", "grid") else "list"
 
     results, columns_table, columns_results, columns_list, column_id, sort, order = search_table(
         table,
@@ -269,7 +270,7 @@ def search(table: str):
         params=params,
         sort=sort.lower(),
         order=order.lower(),
-        view=request.args.get("view", "list").lower(),
+        view=view,
         allow_view=table == "submissions",
         thumbnails=table == "submissions",
         columns_table=columns_table,
