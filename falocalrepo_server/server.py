@@ -242,6 +242,7 @@ def search_user_journals(username: str):
 
 
 @app.route("/favorites/<username>")
+@app.route("/search/favorites/<username>/")
 def search_user_favorites(username: str):
     return redirect(url_for(
         "search", table="submissions", **{
