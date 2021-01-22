@@ -50,7 +50,9 @@ Fields are matched using the SQLite [`like`](https://sqlite.org/lang_expr.html#l
 
 The `Sort By` and `Order` selections allow to sort and order results using any field.
 
-The `/submissions/<username>/` and `/journals/<username>/` paths allow to quickly open a search for submissions and journals by `<username>`. `/search/submissions/<username>/` and `/search/journals/<username>/` are also allowed.
+The `View` option allows to switch from a list view to a grid view of the search results. The view selector and grid view are only supported for submission searches, all others will default to the list view.
+
+The `/submissions/<username>/`, `/journals/<username>/`, and `/favorites/<username>/` paths allow to quickly open a search for submissions, journals, and favorites associated to `<username>`. `/search/submissions/<username>/`, `/search/journals/<username>/`, and `/search/favorites/<username>/` are also allowed.
 
 Results of the search are displayed 50 per page in a table. Clicking on any row opens the specific item. Clicking on the table headers allows to perform re-sort the search results.
 
