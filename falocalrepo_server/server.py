@@ -241,6 +241,14 @@ def search_user_journals(username: str):
         "search", table="journals", **{**{k: request.args.getlist(k) for k in request.args}, "author": username}))
 
 
+@app.route("/favorites/<username>")
+def search_user_favorites(username: str):
+    return redirect(url_for(
+        "search", table="submissions", **{
+            **{k: request.args.getlist(k) for k in request.args},
+            "favorite": f"%{username}%"}))
+
+
 @app.route("/search/<string:table>/")
 def search(table: str):
     table = table.lower()
