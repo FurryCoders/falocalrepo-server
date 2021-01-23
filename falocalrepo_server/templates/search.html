@@ -266,9 +266,12 @@
                         </td>
                     {% endfor %}
                     {% if thumbnails %}
-                        <td style="vertical-align: center; height: fit-content; width: fit-content">
+                        <td style="vertical-align: center; width: 100px; height: 50px">
                             <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
-                                <img src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/150/" alt=""
+                                <img class="lazy"
+                                     style="max-width: 100px; max-height: 50px"
+                                     src="/static/loading.gif"
+                                     data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/100x50/" alt=""
                                      onerror="this.parentNode.removeChild(this){% if loop.last %}; $('loading').hidden = true{% endif %}"
                                      onload="{% if loop.last %}$('loading').hidden = true{% endif %}">
                             </a>
@@ -286,8 +289,12 @@
                                 <td style="height: fit-content; width: fit-content; vertical-align: top">
                                     {% if thumbnails %}
                                         <a class="nocolor" href="/{{ table_short }}/{{ results[i+j][column_id] }}">
-                                            <img src="/{{ table_short }}/{{ results[i+j][column_id] }}/thumbnail/150/"
-                                                 alt="" onerror="this.parentNode.removeChild(this)">
+                                            <img class="lazy" alt=""
+                                                 style="max-width: 200px; max-height: 200px"
+                                                 src="/static/loading.gif"
+                                                 data-src="/{{ table_short }}/{{ results[i+j][column_id] }}/thumbnail/200/"
+                                                 onerror="this.parentNode.removeChild(this){% if loop.last %}; $('loading').hidden = true{% endif %}"
+                                                 onload="{% if loop.last %}$('loading').hidden = true{% endif %}">
                                         </a>
                                         <br>
                                     {% endif %}
@@ -354,6 +361,16 @@
             $("results_table_grid").hidden = false
         }
     }
+    const lazyLoad = (element, container) => {
+        if (element.hidden) return
+        const bounding = container.getBoundingClientRect()
+        if (element.loaded ||
+            (bounding.top >= 0 && bounding.top <= (window.innerHeight || document.documentElement.clientHeight)) ||
+            (bounding.bottom >= 0 && bounding.top <= (window.innerHeight || document.documentElement.clientHeight))) {
+            element.src = element.dataset.src
+            element.classList.remove("lazy")
+        }
+    }
 
     const columns = Array.from(document.getElementById("search_field_type").children)
         .map((e) => e.value.toLowerCase());
@@ -361,6 +378,9 @@
         .map(([k, v]) => [k.toLowerCase(), v])
         .filter(([k, _]) => columns.find((c) => c === k))
         .forEach(([k, v]) => addSearchField(k).value = v)
+    document.querySelectorAll("img.lazy").forEach((img) => lazyLoad(img, img.parentElement.parentElement))
+    window.onscroll = window.onresize = () =>
+        document.querySelectorAll("img.lazy").forEach((img) => lazyLoad(img, img.parentElement.parentElement))
 </script>
 </body>
 </html>
