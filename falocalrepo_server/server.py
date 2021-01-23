@@ -387,9 +387,11 @@ def submission_file(id_: int, filename: str = ""):
 @lru_cache
 @app.route("/submission/<int:id_>/thumbnail/")
 @app.route("/submission/<int:id_>/thumbnail/<string:filename>")
-@app.route("/submission/<int:id_>/thumbnail/<int:size>/")
-@app.route("/submission/<int:id_>/thumbnail/<int:size>/<string:filename>")
-def submission_thumbnail(id_: int, size: int = 150, filename: str = None):
+@app.route("/submission/<int:id_>/thumbnail/<int:x>/")
+@app.route("/submission/<int:id_>/thumbnail/<int:x>/<string:filename>")
+@app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/")
+@app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/<string:filename>")
+def submission_thumbnail(id_: int, x: int = 150, y: int = 150, filename: str = None):
     sub_ext, sub_dir = load_submission_file(id_)
 
     if sub_ext is None:
@@ -401,7 +403,7 @@ def submission_thumbnail(id_: int, size: int = 150, filename: str = None):
         sub_ext = "jpeg" if sub_ext == "jpg" else sub_ext
         f_obj: BytesIO = BytesIO()
         with Image.open(path) as img:
-            img.thumbnail((size, size))
+            img.thumbnail((x, y))
             img.save(f_obj, sub_ext)
         f_obj.seek(0)
         return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{sub_ext}")
