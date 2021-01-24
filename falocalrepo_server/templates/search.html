@@ -139,22 +139,20 @@
             background-image: linear-gradient(0deg, var(--table_background_color_even), var(--table_background_color_even));
         }
 
-        #search_results table.results_grid {
-            border-collapse: collapse;
+        #search_results div.results_grid {
             width: 96%;
             top: 20px;
             margin: auto;
+            justify-content: center;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        #search_results div.results_grid div.grid_item {
+            padding: 15px;
+            max-width: 250px;
             text-align: center;
-        }
-
-        #search_results table.results_grid td {
-            padding-top: 15px;
-            padding-bottom: 15px;
-            width: 32%;
-        }
-
-        #search_results table.results_grid tr:last-of-type td {
-            padding-bottom: 0 !important;
         }
 
         #header button, #footer button {
@@ -282,40 +280,34 @@
                 </tr>
             {% endfor %}
         </table>
-        <table id="results_table_grid" class="results_grid" {{ "" if view == "grid" and allow_view else "hidden" }}>
+        <div id="results_table_grid" class="results_grid" {{ "" if view == "grid" and allow_view else "hidden" }}>
             {% if allow_view %}
-                {% for i in range(0, results|length, 3) %}
-                    <tr>
-                        {% for j in range(3) %}
-                            {% if i+j < results|length %}
-                                <td style="height: fit-content; vertical-align: top">
-                                    {% if thumbnails %}
-                                        <a class="nocolor" href="/{{ table_short }}/{{ results[i+j][column_id] }}">
-                                            <img class="lazy" alt=""
-                                                 style="max-width: 200px; max-height: 200px"
-                                                 src="/static/loading.gif"
-                                                 data-src="/{{ table_short }}/{{ results[i+j][column_id] }}/thumbnail/200/"
-                                                 onerror="this.parentNode.removeChild(this){% if loop.last %}; $('loading').hidden = true{% endif %}"
-                                                 onload="{% if loop.last %}$('loading').hidden = true{% endif %}">
-                                        </a>
-                                        <br>
-                                    {% endif %}
-                                    <b><a class="nocolor" href="/{{ table_short }}/{{ results[i+j][column_id] }}">
-                                        <span>{{ results[i+j]["TITLE"] }}</span>
-                                    </a></b>
-                                    <br>
-                                    <i>by</i>&nbsp;
-                                    <a class="nocolor hover_underline"
-                                       href="/user/{{ results[i+j]["AUTHOR"] }}">
-                                        <span>{{ results[i+j]["AUTHOR"] }}</span>
-                                    </a>
-                                </td>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
+                {% for item in results %}
+                    <div class="grid_item">
+                        {% if thumbnails %}
+                            <a class="nocolor" href="/{{ table_short }}/{{ item[column_id] }}">
+                                <img class="lazy" alt=""
+                                     style="max-width: 200px; max-height: 200px"
+                                     src="/static/loading.gif"
+                                     data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/200/"
+                                     onerror="this.parentNode.removeChild(this){% if loop.last %}; $('loading').hidden = true{% endif %}"
+                                     onload="{% if loop.last %}$('loading').hidden = true{% endif %}">
+                            </a>
+                            <br>
+                        {% endif %}
+                        <b><a class="nocolor" href="/{{ table_short }}/{{ item[column_id] }}">
+                            <span>{{ item["TITLE"] }}</span>
+                        </a></b>
+                        <br>
+                        <i>by</i>&nbsp;
+                        <a class="nocolor hover_underline"
+                           href="/user/{{ item["AUTHOR"] }}">
+                            <span>{{ item["AUTHOR"] }}</span>
+                        </a>
+                    </div>
                 {% endfor %}
             {% endif %}
-        </table>
+        </div>
         {% if thumbnails %}
             <img id="loading" src="/static/loading.gif" alt="" style="height: 50px; width: 50px">
         {% endif %}
@@ -364,7 +356,6 @@
         }
     }
     const lazyLoad = (element, container) => {
-        if (element.hidden) return
         const bounding = container.getBoundingClientRect()
         if (element.loaded ||
             (bounding.top >= 0 && bounding.top <= (window.innerHeight || document.documentElement.clientHeight)) ||
