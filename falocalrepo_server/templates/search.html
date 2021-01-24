@@ -141,14 +141,16 @@
 
         #search_results table.results_grid {
             border-collapse: collapse;
-            width: 95%;
+            width: 96%;
             top: 20px;
             margin: auto;
             text-align: center;
         }
 
         #search_results table.results_grid td {
-            padding: 15px;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            width: 32%;
         }
 
         #search_results table.results_grid tr:last-of-type td {
@@ -286,7 +288,7 @@
                     <tr>
                         {% for j in range(3) %}
                             {% if i+j < results|length %}
-                                <td style="height: fit-content; width: fit-content; vertical-align: top">
+                                <td style="height: fit-content; vertical-align: top">
                                     {% if thumbnails %}
                                         <a class="nocolor" href="/{{ table_short }}/{{ results[i+j][column_id] }}">
                                             <img class="lazy" alt=""

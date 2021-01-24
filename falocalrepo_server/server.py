@@ -269,7 +269,7 @@ def search(table: str):
     columns_results: List[str]
     columns_list: List[str]
     column_id: str
-    limit: int = int(request.args.get("limit", 50))
+    limit: int = int(request.args.get("limit", 48))
     page: int = int(request.args.get("page", 1))
     sort: str = request.args.get("sort", "").lower()
     order: str = request.args.get("order", "").lower()
