@@ -86,49 +86,75 @@
             border-collapse: collapse;
             border: 1px solid var(--table_border_color);
             width: 95%;
+            max-width: 95% !important;
             top: 20px;
             margin: auto;
         }
 
         #search_results table.results_list td {
             border: 1px solid var(--table_border_color);
+        {% if table == "submissions" %}
+            height: 50px;
+            min-height: 50px;
+            max-height: 50px;
+        {% endif %}
+            text-align: center;
+            vertical-align: center;
         }
 
         #search_results table.results_list td span {
             padding: 2px;
         }
 
-        #search_results table.results_list td:last-child {
-            max-width: available !important;
-        }
-
         #search_results table.results_list th {
             padding: 2px;
             border: 2px solid var(--table_border_color);
             text-align: center;
+            vertical-align: center;
         }
 
         #search_results table.results_list th.id, #search_results table.results_list td.id {
-            min-width: fit-content;
-            text-align: center;
+            width: 80px;
+            min-width: 80px;
+            max-width: 80px;
         }
 
-        #search_results table.results_list th.author, #search_results table.results_list td.author {
-            min-width: fit-content;
-            text-align: center;
+        #search_results table.results_list th.author, #search_results table.results_list td.author,
+        #search_results table.results_list th.username, #search_results table.results_list td.username {
+            width: 190px;
+            min-width: 190px;
+            max-width: 190px;
         }
 
         #search_results table.results_list th.date, #search_results table.results_list td.date {
-            min-width: fit-content;
-            text-align: center;
+            width: 90px;
+            min-width: 90px;
+            max-width: 90px;
         }
 
         #search_results table.results_list th.title, #search_results table.results_list td.title {
-            max-width: fit-content;
+            min-width: 50px;
+            width: available;
+            max-width: available;
             overflow: hidden;
-            text-overflow: ellipsis;
+            text-overflow: fade;
             white-space: nowrap;
             text-align: left;
+        }
+
+        #search_results table.results_list th.folders, #search_results table.results_list td.folders {
+            max-width: 300px;
+        }
+
+        #search_results table.results_list th.thumbnail {
+            background: var(--table_background_color_odd);
+            border: none;
+        }
+
+        #search_results table.results_list td.thumbnail {
+            width: 100px;
+            min-width: 100px;
+            max-width: 100px;
         }
 
         #search_results table.results_list tr.odd {
@@ -244,12 +270,12 @@
 {% if results %}
     <div id="search_results" style="text-align: center">
         <table id="results_table_list" class="results_list" {{ "" if view == "list" or not allow_view else "hidden" }}>
-            <tr class="even" style="text-align: center">
+            <tr class="even">
                 {% for column in columns_results %}
                     <th class="{{ column.lower() }}">{{ column }}</th>
                 {% endfor %}
                 {% if thumbnails %}
-                    <th style="background: var(--table_background_color_odd); border: none"></th>
+                    <th class="thumbnail"></th>
                 {% endif %}
             </tr>
             {% for item in results %}
@@ -268,7 +294,7 @@
                         </td>
                     {% endfor %}
                     {% if thumbnails %}
-                        <td style="vertical-align: center; width: 100px; height: 50px">
+                        <td class="thumbnail">
                             <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
                                 <img class="lazy"
                                      style="max-width: 100px; max-height: 50px"
@@ -356,6 +382,9 @@
             $("results_table_list").hidden = true
             $("results_table_grid").hidden = false
         }
+        const url = new URL(window.location.href)
+        url.searchParams.set("view", view)
+        window.history.replaceState({}, document.title, url.href)
     }
     const lazyLoad = (element, container) => {
         const bounding = container.getBoundingClientRect()
