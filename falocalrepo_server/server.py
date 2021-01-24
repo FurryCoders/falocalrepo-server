@@ -40,7 +40,7 @@ db_path: str = "FA.db"
 
 
 def clean_username(username: str, exclude: str = "") -> str:
-    return str(re_sub(rf"[^a-zA-Z0-9\-.~,{exclude}]", "", username.lower().strip()))
+    return str(re_sub(rf"[^a-zA-Z0-9\-.~{exclude}]", "", username.lower().strip()))
 
 
 def button(href: str, text: str) -> str:
