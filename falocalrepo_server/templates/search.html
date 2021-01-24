@@ -265,7 +265,7 @@
 {% endif %}
 {% if results %}
     <div id="search_results" style="text-align: center">
-        <table id="results_table_list" class="results_list" {{ "" if view == "list" or not allow_view else "hidden" }}>
+        <table id="results_table_list" class="results_list" {{ "" if view == "list" or not allow_view else "style=\"display: none\""|safe }}>
             <tr class="even">
                 {% for column in columns_results %}
                     <th class="{{ column.lower() }}">{{ column }}</th>
@@ -304,7 +304,7 @@
                 </tr>
             {% endfor %}
         </table>
-        <div id="results_table_grid" class="results_grid" {{ "" if view == "grid" and allow_view else "hidden" }}>
+        <div id="results_table_grid" class="results_grid" style="display: {{ "flex" if view == "grid" and allow_view else "none" }}">
             {% if allow_view %}
                 {% for item in results %}
                     <div class="grid_item">
@@ -372,11 +372,11 @@
     }
     const changeView = (view) => {
         if (view === "list") {
-            $("results_table_list").hidden = false
-            $("results_table_grid").hidden = true
+            $("results_table_list").style.display = ""
+            $("results_table_grid").style.display = "none"
         } else if (view === "grid") {
-            $("results_table_list").hidden = true
-            $("results_table_grid").hidden = false
+            $("results_table_list").style.display = "none"
+            $("results_table_grid").style.display = "flex"
         }
         const url = new URL(window.location.href)
         url.searchParams.set("view", view)
