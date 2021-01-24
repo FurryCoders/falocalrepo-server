@@ -273,7 +273,9 @@ def search(table: str):
     page: int = int(request.args.get("page", 1))
     sort: str = request.args.get("sort", "").lower()
     order: str = request.args.get("order", "").lower()
-    view: str = v if (v := request.args.get("view", "list").lower()) in ("list", "grid") else "list"
+    view: str = request.args.get("view", "").lower()
+    view = "grid" if view not in ("list", "grid") and table == "submissions" else view
+    view = "list" if table != "submissions" else view
 
     results, columns_table, columns_results, columns_list, column_id, sort, order = search_table(
         table,
