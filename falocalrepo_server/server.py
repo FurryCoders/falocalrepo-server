@@ -150,25 +150,28 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
     sort = col_id if not sort else sort
 
     with FADatabase(db_path) as db:
-        cols_table: List[str] = db[table].columns
+        db_table: FADatabaseTable = db[table]
+        cols_table: List[str] = db_table.columns
 
         if not params and not all_query:
             return [], cols_table, cols_results, cols_list, col_id, sort, order
 
-        params = {k: vs for k, vs in params.items() if k in map(str.lower, cols_table)}
+        params = {k: vs for k, vs in params.items() if k in map(str.lower, cols_table + ["any"])}
 
         if "author" in params:
             params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
             del params["author"]
         if "username" in params:
             params["username"] = list(map(lambda u: clean_username(u, "%_"), params["username"]))
+        if "any" in params:
+            params[f"({'||'.join(cols_table)})"] = params["any"]
+            del params["any"]
 
-        db_table: FADatabaseTable = db[table]
         return (
             list(db_table.cursor_to_dict(
                 db_table.select(params, cols_results, like=True, order=[f"{sort} {order}"]),
                 cols_results)),
-            cols_table,
+            cols_table + ["any"],
             cols_results,
             cols_list,
             col_id,
