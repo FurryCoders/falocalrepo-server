@@ -333,7 +333,7 @@ def journal(id_: int):
 @lru_cache(maxsize=10)
 @app.route("/journal/<int:id_>/zip/")
 @app.route("/journal/<int:id_>/zip/<filename>")
-def journal_zip(id_: int, filename: str = ""):
+def journal_zip(id_: int, filename: str = None):
     jrn, _, _ = load_item(journals_table, id_)
 
     if jrn is None:
@@ -346,7 +346,7 @@ def journal_zip(id_: int, filename: str = ""):
         z.writestr("metadata.json", json_dumps({k: v for k, v in jrn.items() if k != "CONTENT"}).encode())
 
     f_obj.seek(0)
-    return send_file(f_obj, mimetype="application/zip", attachment_filename=filename if filename else None)
+    return send_file(f_obj, mimetype="application/zip", attachment_filename=filename)
 
 
 @app.route("/full/<int:id_>/")
@@ -378,13 +378,13 @@ def submission(id_: int):
 @lru_cache(maxsize=10)
 @app.route("/submission/<int:id_>/file/")
 @app.route("/submission/<int:id_>/file/<filename>")
-def submission_file(id_: int, filename: str = ""):
+def submission_file(id_: int, filename: str = None):
     sub_ext, sub_dir = load_submission_file(id_)
 
     if sub_ext is None:
         return abort(404)
     elif isfile(path := join(sub_dir, f"submission.{sub_ext}")):
-        return send_file(path, attachment_filename=filename if filename else None)
+        return send_file(path, attachment_filename=filename)
     else:
         return abort(404)
 
@@ -419,7 +419,7 @@ def submission_thumbnail(id_: int, x: int = 150, y: int = 150, filename: str = N
 @lru_cache(maxsize=10)
 @app.route("/submission/<int:id_>/zip/")
 @app.route("/submission/<int:id_>/zip/<filename>")
-def submission_zip(id_: int, filename: str = ""):
+def submission_zip(id_: int, filename: str = None):
     sub, _, _ = load_item(submissions_table, id_)
 
     if sub is None:
@@ -435,7 +435,7 @@ def submission_zip(id_: int, filename: str = ""):
         z.writestr("metadata.json", json_dumps({k: v for k, v in sub.items() if k != "DESCRIPTION"}).encode())
 
     f_obj.seek(0)
-    return send_file(f_obj, mimetype="application/zip", attachment_filename=filename if filename else None)
+    return send_file(f_obj, mimetype="application/zip", attachment_filename=filename)
 
 
 @lru_cache(maxsize=10)
