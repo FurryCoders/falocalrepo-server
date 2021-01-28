@@ -212,7 +212,7 @@
         <tr>
             <td class="col1"><label for="sort_field">Sort by</label></td>
             <td class="col2"><select id="sort_field" name="sort" style="width: 100%;">
-                {% for col in columns_table %}
+                {% for col in columns_table if col.lower() != "any" %}
                     <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">{{ col.upper() }}</option>
                 {% endfor %}
             </select></td>
