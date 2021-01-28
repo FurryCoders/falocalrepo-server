@@ -78,10 +78,6 @@
             text-decoration: underline;
         }
 
-        #search_fields tr:first-of-type hr {
-            visibility: hidden;
-        }
-
         #search_results table.results_list {
             border-collapse: collapse;
             border: 1px solid var(--table_border_color);
@@ -192,21 +188,13 @@
 <form id="search_form" action="">
     <table id="search_fields">
         <tr>
-            <td colspan="3">
-                <hr style="width: 100%">
+            <td colspan="3" style="text-align: center">
+                <button type="button" onclick="addSearchField()">Add Field</button>
             </td>
         </tr>
         <tr>
-            <td class="col1"><label for="search_field_type">New Field</label></td>
-            <td class="col2"><select id="search_field_type" style="width: 100%;">
-                {% for col in columns_table %}
-                    <option {{ "selected" if loop.first }} value="{{ col.lower() }}">
-                        {{ col.title() if col|length > 2 else col.upper() }}
-                    </option>
-                {% endfor %}
-            </select></td>
-            <td class="col3">
-                <button type="button" onclick="addSearchField($('search_field_type').value)">+</button>
+            <td colspan="3">
+                <hr style="width: 100%">
             </td>
         </tr>
         <tr>
@@ -348,7 +336,7 @@
 {% endif %}
 <script async>
     const $ = (id) => document.getElementById(id)
-    const addSearchField = (fieldType) => {
+    const addSearchField = (fieldType = null) => {
         let table = $("search_fields")
 
         let row = table.insertRow(table.rows.length - 5)
@@ -356,14 +344,22 @@
         let col2 = row.insertCell(1)
         let col3 = row.insertCell(2)
 
-        col1.textContent = fieldType.length > 2 ? fieldType[0].toUpperCase() + fieldType.substring(1) : fieldType.toUpperCase()
         col1.classList.add("col1")
         col2.classList.add("col2")
         col3.classList.add("col3")
 
+        let fieldSelect = col1.appendChild(document.createElement("select"))
+        columns.forEach(([c, C]) => {
+            let o = document.createElement("option")
+            o.name = c
+            o.text = C
+            if (fieldType === o.name) o.selected = true
+            fieldSelect.options.add(o)
+        })
+
         let fieldInput = col2.appendChild(document.createElement("input"))
         fieldInput.type = "text"
-        fieldInput.name = fieldType
+        fieldInput.name = fieldSelect.options[fieldSelect.selectedIndex].name
         fieldInput.classList.add("search_field")
         fieldInput.style.width = "100%"
 
@@ -371,6 +367,8 @@
         fieldRemove.textContent = "-"
         fieldRemove.type = "button"
         fieldRemove.onclick = () => table.deleteRow(row.rowIndex)
+
+        fieldSelect.onchange = () => fieldInput.name = fieldSelect.options[fieldSelect.selectedIndex].name
 
         return fieldInput
     }
@@ -396,11 +394,13 @@
         }
     }
 
-    const columns = Array.from(document.getElementById("search_field_type").children)
-        .map((e) => e.value.toLowerCase());
+    const columns = Array.from(document.getElementById("sort_field").children)
+        .map((e) => e.value.toLowerCase())
+        .concat("any")
+        .map((c) => [c, c.length > 2 ? c[0].toUpperCase() + c.substring(1) : c.toUpperCase()])
     Array.from((new URL(window.location.href)).searchParams.entries())
         .map(([k, v]) => [k.toLowerCase(), v])
-        .filter(([k, _]) => columns.find((c) => c === k))
+        .filter(([k, _]) => columns.find(([c, _]) => c === k))
         .forEach(([k, v]) => addSearchField(k).value = v)
     document.querySelectorAll("img.lazy").forEach((img) => lazyLoad(img, img.parentElement.parentElement))
     window.onscroll = window.onresize = () =>
