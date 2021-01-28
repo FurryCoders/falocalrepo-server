@@ -213,7 +213,9 @@
             <td class="col1"><label for="sort_field">Sort by</label></td>
             <td class="col2"><select id="sort_field" name="sort" style="width: 100%;">
                 {% for col in columns_table if col.lower() != "any" %}
-                    <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">{{ col.upper() }}</option>
+                    <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">
+                        {{ col.title() if col|length > 2 else col.upper() }}
+                    </option>
                 {% endfor %}
             </select></td>
             <td class="col3"></td>
@@ -265,7 +267,8 @@
 {% endif %}
 {% if results %}
     <div id="search_results" style="text-align: center">
-        <table id="results_table_list" class="results_list" {{ "" if view == "list" or not allow_view else "style=\"display: none\""|safe }}>
+        <table id="results_table_list"
+               class="results_list" {{ "" if view == "list" or not allow_view else "style=\"display: none\""|safe }}>
             <tr class="even">
                 {% for column in columns_results %}
                     <th class="{{ column.lower() }}">{{ column }}</th>
@@ -304,7 +307,8 @@
                 </tr>
             {% endfor %}
         </table>
-        <div id="results_table_grid" class="results_grid" style="display: {{ "flex" if view == "grid" and allow_view else "none" }}">
+        <div id="results_table_grid" class="results_grid"
+             style="display: {{ "flex" if view == "grid" and allow_view else "none" }}">
             {% if allow_view %}
                 {% for item in results %}
                     <div class="grid_item">
