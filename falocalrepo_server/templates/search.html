@@ -287,8 +287,7 @@
                                      style="max-width: 100px; max-height: 50px"
                                      src="/static/loading.gif"
                                      data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/100x50/" alt=""
-                                     onerror="this.parentNode.removeChild(this){% if loop.last %}; $('loading').hidden = true{% endif %}"
-                                     onload="{% if loop.last %}$('loading').hidden = true{% endif %}">
+                                     onerror="this.parentNode.removeChild(this)">
                             </a>
                         </td>
                     {% endif %}
@@ -306,8 +305,7 @@
                                      style="max-width: 200px; max-height: 200px"
                                      src="/static/loading.gif"
                                      data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/200/"
-                                     onerror="this.parentNode.removeChild(this){% if loop.last %}; $('loading').hidden = true{% endif %}"
-                                     onload="{% if loop.last %}$('loading').hidden = true{% endif %}">
+                                     onerror="this.parentNode.removeChild(this)">
                             </a>
                             <br>
                         {% endif %}
@@ -324,9 +322,6 @@
                 {% endfor %}
             {% endif %}
         </div>
-        {% if thumbnails %}
-            <img id="loading" src="/static/loading.gif" alt="" style="height: 50px; width: 50px">
-        {% endif %}
     </div>
     <br>
     <div id="footer">
