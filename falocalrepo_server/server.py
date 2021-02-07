@@ -130,7 +130,7 @@ def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
 
 
 @lru_cache
-def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", all_query: bool = False, _cache_id=None):
+def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", force: bool = False, _cache_id=None):
     global db_path
 
     cols_results: List[str] = []
@@ -154,7 +154,7 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
         db_table: FADatabaseTable = db[table]
         cols_table: List[str] = db_table.columns
 
-        if not params and not all_query:
+        if not params and not force:
             return [], cols_table, cols_results, cols_list, col_id, sort, order
 
         params = {k: vs for k, vs in params.items() if k in map(str.lower, cols_table + ["any"])}
@@ -286,7 +286,7 @@ def search(table: str):
         sort,
         order,
         json_dumps(params),
-        all_query=request.path.startswith("/browse/"),
+        force=request.path.startswith("/browse/"),
         _cache_id=time() // 3600
     )
 
