@@ -2,6 +2,7 @@ from functools import lru_cache
 from io import BytesIO
 from json import dumps as json_dumps
 from json import loads as json_loads
+from os import stat
 from os.path import abspath
 from os.path import dirname
 from os.path import isfile
@@ -256,6 +257,7 @@ def search_user_favorites(username: str):
 
 @app.route("/search/<string:table>/")
 def search(table: str):
+    global db_path
     table = table.lower()
 
     if table not in ("submissions", "journals", "users"):
@@ -287,7 +289,7 @@ def search(table: str):
         order,
         json_dumps(params),
         force=request.path.startswith("/browse/"),
-        _cache_id=time() // 3600
+        _cache_id=stat(db_path).st_mtime
     )
 
     return render_template(
