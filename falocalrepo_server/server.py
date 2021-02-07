@@ -398,8 +398,9 @@ def submission_file(id_: int, filename: str = None):
 @app.route("/submission/<int:id_>/thumbnail/<int:x>/<string:filename>")
 @app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/")
 @app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/<string:filename>")
-def submission_thumbnail(id_: int, x: int = 150, y: int = 150, filename: str = None):
+def submission_thumbnail(id_: int, x: int = 150, y: int = None, filename: str = None):
     sub_ext, sub_dir = load_submission_file(id_)
+    y = x if y is None else y
 
     if sub_ext is None:
         return abort(404)
