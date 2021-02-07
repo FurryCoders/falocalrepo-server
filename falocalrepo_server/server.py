@@ -8,6 +8,7 @@ from os.path import isfile
 from os.path import join
 from os.path import split
 from re import sub as re_sub
+from time import time
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -129,7 +130,7 @@ def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
 
 
 @lru_cache
-def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", all_query: bool = False):
+def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", all_query: bool = False, _cache_id=None):
     global db_path
 
     cols_results: List[str] = []
@@ -285,7 +286,8 @@ def search(table: str):
         sort,
         order,
         json_dumps(params),
-        all_query=request.path.startswith("/browse/")
+        all_query=request.path.startswith("/browse/"),
+        _cache_id=time() // 3600
     )
 
     return render_template(
