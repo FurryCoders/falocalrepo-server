@@ -167,6 +167,9 @@
         <button type="submit" onclick="this.form.action='/submission/{{ next }}'" {{ "disabled" if not next }}>
             Next
         </button>
+        <button type="submit" onclick="this.form.action='/submissions/{{ submission["AUTHOR"] }}'">
+            All Submissions
+        </button>
         <button type="submit" onclick="this.form.action='/submission/{{ prev }}'" {{ "disabled" if not prev }}>
             Prev
         </button>
