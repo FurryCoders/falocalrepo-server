@@ -149,6 +149,26 @@
                 {{ submission["RATING"] }}
             </a></td>
         </tr>
+        <tr>
+            <td>Favorites</td>
+            <td class="overflow value">
+                {% for user in submission["FAVORITE"].split(",") %}
+                    {% if user != "" %}
+                        <a href="/search/favorites/{{ user }}">{{ user }}</a>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>Mentions</td>
+            <td class="overflow value">
+                {% for user in submission["MENTIONS"].split(",") %}
+                    {% if user != "" %}
+                        <a href="/search/mentions/{{ user }}">{{ user }}</a>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
     </table>
     <br>
     <form action="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
