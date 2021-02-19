@@ -42,9 +42,11 @@ The `/submissions/<username>` and `/journals/<username>` paths open submissions 
 
 The server search interface allows to search submissions, journals, and users. Respectively, these can be reached at `/search/submissions`, `/search/journals`, and `/search/users`. The `/search/` path defaults to submissions search.
 
-The interface supports the search fields supported by the command line database search commands. To add a field press on the `+` button after selecting one in the dropdown menu. The `-` buttons allow to remove a field from the search.
+The interface supports searching all columns of the three tables. In addition to those, the `Any` option will match to any field, and the advanced `SQL` option allows to use SQLite [`WHERE`](https://www.sqlite.org/lang_select.html#whereclause) queries.
 
-Fields can be added multiple times and will act as OR options.
+To add a field, click on the `Add Field`, then select the search field in the drop-down menu beside the newly created input box.
+
+Fields can be added multiple times and will act as OR options. The `SQL` option will override other fields.
 
 Fields are matched using the SQLite [`like`](https://sqlite.org/lang_expr.html#like) expression which allows for limited pattern matching. See [`database` command](https://gitlab.com/MatteoCampinoti94/FALocalRepo#database) for more details.
 
