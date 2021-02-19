@@ -9,6 +9,7 @@ from os.path import isfile
 from os.path import join
 from os.path import split
 from re import sub as re_sub
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -38,6 +39,7 @@ app: Flask = Flask(
     static_folder=join(abspath(dirname(__file__)), "static")
 )
 db_path: str = "FA.db"
+m_time: Callable[[str], float] = lambda f: stat(f).st_mtime
 
 
 def clean_username(username: str, exclude: str = "") -> str:
@@ -98,7 +100,7 @@ def load_user(username: str) -> Optional[dict]:
 
 
 @lru_cache
-def load_user_stats(username: str, _cache: int = None) -> Dict[str, int]:
+def load_user_stats(username: str, _cache=None) -> Dict[str, int]:
     username = clean_username(username)
     stats: Dict[str, int] = {}
     with FADatabase(db_path) as db:
@@ -215,6 +217,7 @@ def response_minify(response):
 @lru_cache
 @app.route("/user/<username>")
 def user(username: str):
+    global db_path
     if username != (username_clean := clean_username(username)):
         return redirect(f"/user/{username_clean}")
 
@@ -226,7 +229,7 @@ def user(username: str):
             404
         )
 
-    user_stats: Dict[str, int] = load_user_stats(username)
+    user_stats: Dict[str, int] = load_user_stats(username, _cache=m_time(db_path))
 
     return render_template(
         "user.html",
@@ -338,7 +341,7 @@ def search(table: str):
         order,
         json_dumps(params),
         force=request.path.startswith("/browse/"),
-        _cache_id=stat(db_path).st_mtime
+        _cache_id=m_time(db_path)
     )
 
     return render_template(
