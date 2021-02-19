@@ -182,8 +182,21 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
         if not params and not force:
             return [], cols_table, cols_results, cols_list, col_id, sort, order
 
-        params = {k: vs for k, vs in params.items() if k in map(str.lower, cols_table + ["any"])}
+        params = {k: vs for k, vs in params.items() if k in map(str.lower, cols_table + ["any", "sql"])}
 
+        if "sql" in params:
+            query: str = " or ".join(map(lambda q: f"({q})", params["sql"]))
+            return (
+                list(db_table.cursor_to_dict(
+                    db_table.select_sql(query, columns=cols_results, order=[f"{sort} {order}"]),
+                    cols_results)),
+                cols_table + ["any"],
+                cols_results,
+                cols_list,
+                col_id,
+                sort,
+                order
+            )
         if "author" in params:
             params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
             del params["author"]
