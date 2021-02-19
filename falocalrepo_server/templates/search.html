@@ -395,8 +395,9 @@
 
     const columns = Array.from(document.getElementById("sort_field").options)
         .map((o) => o.value)
-        .concat("any")
         .map((c) => [c, c.length > 2 ? c[0].toUpperCase() + c.substring(1) : c.toUpperCase()])
+        .concat([["any", "Any"]])
+        .concat([["sql", "SQL"]])
     Array.from((new URL(window.location.href)).searchParams.entries())
         .map(([k, v]) => [k.toLowerCase(), v])
         .filter(([k, _]) => columns.find(([c, _]) => c === k))
