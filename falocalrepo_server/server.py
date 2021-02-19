@@ -9,7 +9,6 @@ from os.path import isfile
 from os.path import join
 from os.path import split
 from re import sub as re_sub
-from time import time
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -230,6 +229,22 @@ def browse(table: str):
 @app.route("/search/")
 def search_default():
     return redirect(url_for("search", table="submissions", **{k: request.args.getlist(k) for k in request.args}))
+
+
+@app.route("/gallery/<username>")
+@app.route("/search/gallery/<username>/")
+def search_user_gallery(username: str):
+    return redirect(url_for(
+        "search", table="submissions",
+        **{**{k: request.args.getlist(k) for k in request.args}, "author": username, "folder": "gallery"}))
+
+
+@app.route("/scraps/<username>")
+@app.route("/search/scraps/<username>/")
+def search_user_scraps(username: str):
+    return redirect(url_for(
+        "search", table="submissions",
+        **{**{k: request.args.getlist(k) for k in request.args}, "author": username, "folder": "scraps"}))
 
 
 @app.route("/submissions/<username>/")
