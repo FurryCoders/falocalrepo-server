@@ -155,7 +155,7 @@ def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
 
 
 @lru_cache
-def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", force: bool = False, _cache_id=None):
+def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", force: bool = False, _cache=None):
     global db_path
 
     cols_results: List[str] = []
@@ -341,7 +341,7 @@ def search(table: str):
         order,
         json_dumps(params),
         force=request.path.startswith("/browse/"),
-        _cache_id=m_time(db_path)
+        _cache=m_time(db_path)
     )
 
     return render_template(
