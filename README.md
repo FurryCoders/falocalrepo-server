@@ -54,7 +54,7 @@ The `Sort By` and `Order` selections allow to sort and order results using any f
 
 The `View` option allows to switch from a list view to a grid view of the search results. The view selector and grid view are only supported for submission searches, all others will default to the list view.
 
-The `/submissions/<username>/`, `/journals/<username>/`, and `/favorites/<username>/` paths allow to quickly open a search for submissions, journals, and favorites associated to `<username>`. `/search/submissions/<username>/`, `/search/journals/<username>/`, and `/search/favorites/<username>/` are also allowed.
+The `/submissions/<username>/`, `/gallery/<username>/`, `/scraps/<username>/`, `/favorites/<username>/`, `/mentions/<username>/`, and `/journals/<username>/` paths allow to quickly open a search for submissions, favorites,  and journals associated to `<username>`. `/search/submissions/<username>/`, `/search/gallery/<username>/`, etc. are valid aliases.
 
 Results of the search are displayed 50 per page in a table. Clicking on any row opens the specific item. Clicking on the table headers allows to perform re-sort the search results.
 
