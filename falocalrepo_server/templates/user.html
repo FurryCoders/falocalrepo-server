@@ -80,20 +80,20 @@
 <div id="user_metadata">
     <table>
         <tr class="clickable hover_highlight">
-            <td><a class="celllink" href="/submissions/{{ user }}">Gallery</a></td>
-            <td><a class="celllink" href="/submissions/{{ user }}">{{ gallery_length }}</a></td>
+            <td><a class="celllink" href="/gallery/{{ user }}">Gallery</a></td>
+            <td><a class="celllink" href="/gallery/{{ user }}">{{ gallery_length }}</a></td>
         </tr>
         <tr class="clickable hover_highlight">
-            <td><a class="celllink" href="/submissions/{{ user }}">Scraps</a></td>
-            <td><a class="celllink" href="/submissions/{{ user }}">{{ scraps_length }}</a></td>
+            <td><a class="celllink" href="/scraps/{{ user }}">Scraps</a></td>
+            <td><a class="celllink" href="/scraps/{{ user }}">{{ scraps_length }}</a></td>
         </tr>
         <tr class="clickable hover_highlight">
             <td><a class="celllink" href="/favorites/{{ user }}">Favorites</a></td>
             <td><a class="celllink" href="/favorites/{{ user }}">{{ favorites_length }}</a></td>
         </tr>
-        <tr>
-            <td>Mentions</td>
-            <td>{{ mentions_length }}</td>
+        <tr class="clickable hover_highlight">
+            <td><a class="celllink" href="/mentions/{{ user }}">Mentions</a></td>
+            <td><a class="celllink" href="/mentions/{{ user }}">{{ mentions_length }}</a></td>
         </tr>
         <tr class="clickable hover_highlight">
             <td><a class="celllink" href="/journals/{{ user }}">Journals</a></td>
