@@ -98,6 +98,29 @@ def load_user(username: str) -> Optional[dict]:
 
 
 @lru_cache
+def load_user_stats(username: str, _cache: int = None) -> Dict[str, int]:
+    username = clean_username(username)
+    stats: Dict[str, int] = {}
+    with FADatabase(db_path) as db:
+        stats["gallery"] = db.submissions.select(
+            {"replace(lower(author), '_', '')": username, "folder": "gallery"}, ["count(ID)"]
+        ).fetchone()[0]
+        stats["scraps"] = db.submissions.select(
+            {"replace(lower(author), '_', '')": username, "folder": "scraps"}, ["count(ID)"]
+        ).fetchone()[0]
+        stats["favorites"] = db.submissions.select(
+            {"favorite": f"%{username}%"}, ["count(ID)"], like=True
+        ).fetchone()[0]
+        stats["mentions"] = db.submissions.select(
+            {"mentions": f"%{username}%"}, ["count(ID)"], like=True
+        ).fetchone()[0]
+        stats["journals"] = db.journals.select(
+            {"replace(lower(author), '_', '')": username}, ["count(ID)"]
+        ).fetchone()[0]
+    return stats
+
+
+@lru_cache
 def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int]], int, int]:
     global db_path
 
@@ -203,16 +226,18 @@ def user(username: str):
             404
         )
 
+    user_stats: Dict[str, int] = load_user_stats(username)
+
     return render_template(
         "user.html",
         title=f"{app.name} · {username}",
         user=username,
         folders=list(filter(bool, user_entry["FOLDERS"].split(","))),
-        gallery_length=f.count(",") + 1 if (f := user_entry["GALLERY"]) else 0,
-        scraps_length=f.count(",") + 1 if (f := user_entry["SCRAPS"]) else 0,
-        favorites_length=f.count(",") + 1 if (f := user_entry["FAVORITES"]) else 0,
-        mentions_length=f.count(",") + 1 if (f := user_entry["MENTIONS"]) else 0,
-        journals_length=f.count(",") + 1 if (f := user_entry["JOURNALS"]) else 0
+        gallery_length=user_stats["gallery"],
+        scraps_length=user_stats["scraps"],
+        favorites_length=user_stats["favorites"],
+        mentions_length=user_stats["mentions"],
+        journals_length=user_stats["journals"],
     )
 
 
