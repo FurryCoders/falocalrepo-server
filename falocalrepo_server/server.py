@@ -270,6 +270,15 @@ def search_user_favorites(username: str):
             "favorite": f"%{username}%"}))
 
 
+@app.route("/mentions/<username>")
+@app.route("/search/mentions/<username>/")
+def search_user_mentions(username: str):
+    return redirect(url_for(
+        "search", table="submissions", **{
+            **{k: request.args.getlist(k) for k in request.args},
+            "mentions": f"%{username}%"}))
+
+
 @app.route("/search/<string:table>/")
 def search(table: str):
     global db_path
