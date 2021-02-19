@@ -56,8 +56,6 @@ The `View` option allows to switch from a list view to a grid view of the search
 
 The `/submissions/<username>/`, `/gallery/<username>/`, `/scraps/<username>/`, `/favorites/<username>/`, `/mentions/<username>/`, and `/journals/<username>/` paths allow to quickly open a search for submissions, favorites,  and journals associated to `<username>`. `/search/submissions/<username>/`, `/search/gallery/<username>/`, etc. are valid aliases.
 
-Results of the search are displayed 50 per page in a table. Clicking on any row opens the specific item. Clicking on the table headers allows to perform re-sort the search results.
-
 ### Browse
 
 The `/browse/submissions`, `/browse/journals`, and `/browse/users` paths allow to open a list of all entries in a specific table. From there the results can be refined using the search interface. 
