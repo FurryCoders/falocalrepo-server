@@ -235,20 +235,13 @@ def user(username: str):
         return redirect(f"/user/{username_clean}")
 
     user_entry: Optional[dict] = load_user(username)
-
-    if user_entry is None:
-        return error(
-            f"User not found.<br>{button(f'https://www.furaffinity.net/user/{username}', 'Open on Fur Affinity')}",
-            404
-        )
-
     user_stats: Dict[str, int] = load_user_stats(username, _cache=m_time(db_path))
 
     return render_template(
         "user.html",
         title=f"{app.name} · {username}",
         user=username,
-        folders=list(filter(bool, user_entry["FOLDERS"].split(","))),
+        folders=list(filter(bool, user_entry["FOLDERS"].split(","))) if user_entry else [],
         gallery_length=user_stats["gallery"],
         scraps_length=user_stats["scraps"],
         favorites_length=user_stats["favorites"],
