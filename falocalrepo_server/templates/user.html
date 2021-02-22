@@ -99,6 +99,10 @@
             <td><a class="celllink" href="/journals/{{ user }}">Journals</a></td>
             <td><a class="celllink" href="/journals/{{ user }}">{{ journals_length }}</a></td>
         </tr>
+        <tr class="">
+            <td>Folders</td>
+            <td>{{ " ".join(folders) }}</td>
+        </tr>
     </table>
     <form action="https://www.furaffinity.net/user/{{ user }}">
         <button type="submit">Open on Fur Affinity</button>
