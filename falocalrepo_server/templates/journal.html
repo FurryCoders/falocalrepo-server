@@ -71,6 +71,16 @@
             <td>Date</td>
             <td class="overflow value">{{ journal["DATE"] }}</td>
         </tr>
+        <tr>
+            <td>Mentions</td>
+            <td class="overflow value">
+                {% for user in journal["MENTIONS"].split(",") %}
+                    {% if user != "" %}
+                        <a href="/search/mentions/{{ user }}">{{ user }}</a>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
     </table>
     <br>
     <form action="/journal/{{ journal["ID"] }}/zip/journal-{{ "{0:010}".format(journal["ID"]) }}.zip">
