@@ -395,8 +395,8 @@
         Array.from(document.querySelectorAll("img.lazy"))
             .filter((img) => isInView(img.parentElement.parentElement))
             .map((img) => {
-                img.src = img.dataset.src
                 img.classList.remove("lazy")
+                img.src = img.dataset.src
             })
     }
 
