@@ -186,6 +186,7 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
 
         if "sql" in params:
             query: str = " or ".join(map(lambda q: f"({q})", params["sql"]))
+            query = re_sub(r"any(?= (!?=|(not )?(like|glob)|[<>]=?))", f"({'||'.join(cols_table)})", query)
             return (
                 list(db_table.cursor_to_dict(
                     db_table.select_sql(query, columns=cols_results, order=[f"{sort} {order}"]),
