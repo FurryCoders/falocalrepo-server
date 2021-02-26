@@ -392,12 +392,12 @@
             (bounding.bottom >= 0 && bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight))
     }
     const lazyLoad = () => {
-        Array.from(document.querySelectorAll("img.lazy"))
+        const img = Array.from(document.querySelectorAll("img.lazy"))
             .filter((img) => isInView(img.parentElement.parentElement))
-            .map((img) => {
-                img.classList.remove("lazy")
-                img.src = img.dataset.src
-            })
+            .shift()
+        if (img === undefined) return
+        img.classList.remove("lazy")
+        img.src = img.dataset.src
     }
 
     window.onload = () => {
