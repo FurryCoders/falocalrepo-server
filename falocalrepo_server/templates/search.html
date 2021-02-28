@@ -218,8 +218,8 @@
         </tr>
         <tr {{ "hidden" if not allow_view else "" }}>
             <td class="col1"><label for="view">View</label></td>
-            <td class="col2"><select id="view" name="view" style="width: 100%;" onchange="changeView(this.value)">
-                <option {{ "selected" if view == "list" or not allow_view }} value="list">List</option>
+            <td class="col2"><select id="view" name="view" style="width: 100%;" onchange="changeView(this.value); lazyLoad()">
+                <option {{ "selected" if view == "list" or not allow_view or not view }} value="list">List</option>
                 <option {{ "selected" if view == "grid" and allow_view }} value="grid">Grid</option>
             </select></td>
             <td class="col3"></td>
@@ -336,6 +336,7 @@
         .map((c) => [c, c.length > 2 ? c[0].toUpperCase() + c.substring(1) : c.toUpperCase()])
         .concat([["any", "Any"]])
         .concat([["sql", "SQL"]])
+    let view = document.getElementById("view").value === "grid" ? document.getElementById("results_table_grid") : document.getElementById("results_table_list")
 
     const $ = (id) => document.getElementById(id)
     const addSearchField = (fieldType = null) => {
@@ -374,16 +375,18 @@
 
         return fieldInput
     }
-    const changeView = (view) => {
-        if (view === "list") {
-            $("results_table_list").style.display = ""
+    const changeView = (view_) => {
+        if (view_ === "list") {
+            view = $("results_table_list")
+            view.style.display = ""
             $("results_table_grid").style.display = "none"
-        } else if (view === "grid") {
+        } else if (view_ === "grid") {
+            view = $("results_table_grid")
             $("results_table_list").style.display = "none"
-            $("results_table_grid").style.display = "flex"
+            view.style.display = "flex"
         }
         const url = new URL(window.location.href)
-        url.searchParams.set("view", view)
+        url.searchParams.set("view", view_)
         window.history.replaceState({}, document.title, url.href)
     }
     const isInView = (element) => {
@@ -391,13 +394,13 @@
         return (bounding.top >= 0 && bounding.top <= (window.innerHeight || document.documentElement.clientHeight)) ||
             (bounding.bottom >= 0 && bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight))
     }
-    const lazyLoad = () => {
-        const img = Array.from(document.querySelectorAll("img.lazy"))
+    const lazyLoad = async () => {
+        Array.from(view.querySelectorAll("img.lazy"))
             .filter((img) => isInView(img.parentElement.parentElement))
-            .shift()
-        if (img === undefined) return
-        img.classList.remove("lazy")
-        img.src = img.dataset.src
+            .map(async (img) => {
+                img.classList.remove("lazy")
+                img.src = img.dataset.src
+            })
     }
 
     window.onload = () => {
