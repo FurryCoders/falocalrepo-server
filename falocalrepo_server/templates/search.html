@@ -331,14 +331,15 @@
     </div>
 {% endif %}
 <script async>
-    const columns = Array.from(document.getElementById("sort_field").options)
+    const $ = (id) => document.getElementById(id)
+
+    const columns = Array.from($("sort_field").options)
         .map((o) => o.value)
         .map((c) => [c, c.length > 2 ? c[0].toUpperCase() + c.substring(1) : c.toUpperCase()])
         .concat([["any", "Any"]])
         .concat([["sql", "SQL"]])
-    let view = document.getElementById("view").value === "grid" ? document.getElementById("results_table_grid") : document.getElementById("results_table_list")
+    let view = $("view").value === "grid" ? $("results_table_grid") : $("results_table_list")
 
-    const $ = (id) => document.getElementById(id)
     const addSearchField = (fieldType = null) => {
         let table = $("search_fields")
 
