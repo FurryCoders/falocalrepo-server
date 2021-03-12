@@ -465,6 +465,13 @@ def submission_thumbnail(id_: int, x: int = 150, y: int = None, filename: str = 
 
     if sub_ext is None:
         return abort(404)
+    elif isfile(path := join(sub_dir, f"thumbnail.jpg")):
+        f_obj: BytesIO = BytesIO()
+        with Image.open(path) as img:
+            img.thumbnail((x, y)) if img.width > x or img.height > y else None
+            img.save(f_obj, "jpeg")
+        f_obj.seek(0)
+        return send_file(f_obj, attachment_filename=filename, mimetype="image/jpeg")
     elif sub_ext.lower() not in ("jpg", "jpeg", "png", "gif"):
         return abort(404)
     elif isfile(path := join(sub_dir, f"submission.{sub_ext}")):
