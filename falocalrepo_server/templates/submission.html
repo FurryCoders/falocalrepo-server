@@ -171,9 +171,9 @@
         </tr>
     </table>
     <br>
-    <form action="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
-        <button id="download_file" type="submit"
-                {{ "disabled" if (submission["FILESAVED"] and submission["FILEEXT"]) or not submission["FILESAVED"] }}>
+    <form action="/submission/{{ submission["ID"] }}/file/
+            {{ submission["ID"] }}{{ ("." + submission["FILEEXT"]) if submission["FILEEXT"] }}">
+        <button id="download_file" type="submit" {{ "disabled" if not submission["FILESAVED"] }}>
             Download File
         </button>
     </form>
