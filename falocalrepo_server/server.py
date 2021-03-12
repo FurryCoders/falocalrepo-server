@@ -93,7 +93,7 @@ def root():
 
 
 @lru_cache
-def load_user(username: str) -> Optional[dict]:
+def load_user(username: str, _cache=None) -> Optional[dict]:
     global db_path
     with FADatabase(db_path) as db:
         return db.users[username]
@@ -235,7 +235,7 @@ def user(username: str):
     if username != (username_clean := clean_username(username)):
         return redirect(f"/user/{username_clean}")
 
-    user_entry: Optional[dict] = load_user(username)
+    user_entry: Optional[dict] = load_user(username, _cache=m_time(db_path))
     user_stats: Dict[str, int] = load_user_stats(username, _cache=m_time(db_path))
 
     return render_template(
