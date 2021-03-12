@@ -8,7 +8,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "falocalrepo-database"
-version = "4.8.0"
+version = "4.8.3"
 description = "Database functionality for falocalrepo."
 category = "main"
 optional = false
@@ -113,8 +113,8 @@ click = [
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
 ]
 falocalrepo-database = [
-    {file = "falocalrepo-database-4.8.0.tar.gz", hash = "sha256:12585ccecfad0e3bfe635b9db088cd5592412dc29a6de5f9e51b499e017a4486"},
-    {file = "falocalrepo_database-4.8.0-py3-none-any.whl", hash = "sha256:840fadd160d508f3fcffe55c8298b033a36c99f8197b68c22f812c9ad808a293"},
+    {file = "falocalrepo-database-4.8.3.tar.gz", hash = "sha256:67db4e559a3bd4a9b2cd07fcaca3579ad4a58837d0da4a8f3047b7a71780f4f8"},
+    {file = "falocalrepo_database-4.8.3-py3-none-any.whl", hash = "sha256:3ec412f0482ec96a4ccb2f508b5610976de9129c9d31123ba9920dc3b6cf4842"},
 ]
 filetype = [
     {file = "filetype-1.0.7-py2.py3-none-any.whl", hash = "sha256:353369948bb1c09b8b3ea3d78390b5586e9399bff9aab894a1dff954e31a66f6"},
