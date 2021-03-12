@@ -143,7 +143,7 @@ def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int]], int, in
 
 
 @lru_cache
-def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
+def load_submission_file(id_: int) -> Tuple[Optional[str], Optional[str], str]:
     global db_path
 
     sub, _, _ = load_item(submissions_table, id_)
@@ -151,7 +151,7 @@ def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
     with FADatabase(db_path) as db:
         sub_dir = join(dirname(db_path), db.settings["FILESFOLDER"], *split(tiered_path(id_)))
 
-    return sub["FILEEXT"] if sub else None, sub_dir
+    return sub["FILEEXT"] if sub else None, sub["TYPE"] if sub else None, sub_dir
 
 
 @lru_cache
@@ -442,7 +442,7 @@ def submission(id_: int):
 @app.route("/submission/<int:id_>/file/")
 @app.route("/submission/<int:id_>/file/<filename>")
 def submission_file(id_: int, filename: str = None):
-    sub_ext, sub_dir = load_submission_file(id_)
+    sub_ext, _, sub_dir = load_submission_file(id_)
 
     if sub_ext is None:
         return abort(404)
@@ -460,7 +460,7 @@ def submission_file(id_: int, filename: str = None):
 @app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/")
 @app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/<string:filename>")
 def submission_thumbnail(id_: int, x: int = 150, y: int = None, filename: str = None):
-    sub_ext, sub_dir = load_submission_file(id_)
+    sub_ext, sub_type, sub_dir = load_submission_file(id_)
     y = x if y is None else y
 
     if isfile(path := join(sub_dir, f"thumbnail.jpg")):
@@ -470,7 +470,7 @@ def submission_thumbnail(id_: int, x: int = 150, y: int = None, filename: str = 
             img.save(f_obj, "jpeg")
         f_obj.seek(0)
         return send_file(f_obj, attachment_filename=filename, mimetype="image/jpeg")
-    elif sub_ext is None or sub_ext.lower() not in ("jpg", "jpeg", "png", "gif"):
+    elif sub_type is not "image":
         return abort(404)
     elif isfile(path := join(sub_dir, f"submission.{sub_ext}")):
         sub_ext = sub_ext.lower()
@@ -494,7 +494,7 @@ def submission_zip(id_: int, filename: str = None):
     if sub is None:
         return abort(404)
 
-    sub_ext, sub_dir = load_submission_file(id_)
+    sub_ext, _, sub_dir = load_submission_file(id_)
     f_obj: BytesIO = BytesIO()
 
     with ZipFile(f_obj, "w") as z:
