@@ -111,10 +111,10 @@ def load_user_stats(username: str, _cache=None) -> Dict[str, int]:
             {"replace(lower(author), '_', '')": username, "folder": "scraps"}, ["count(ID)"]
         ).fetchone()[0]
         stats["favorites"] = db.submissions.select(
-            {"favorite": f"%{username}%"}, ["count(ID)"], like=True
+            {"favorite": f"%|{username}|%"}, ["count(ID)"], like=True
         ).fetchone()[0]
         stats["mentions"] = db.submissions.select(
-            {"mentions": f"%{username}%"}, ["count(ID)"], like=True
+            {"mentions": f"%|{username}|%"}, ["count(ID)"], like=True
         ).fetchone()[0]
         stats["journals"] = db.journals.select(
             {"replace(lower(author), '_', '')": username}, ["count(ID)"]
@@ -242,7 +242,7 @@ def user(username: str):
         "user.html",
         title=f"{app.name} · {username}",
         user=username,
-        folders=list(filter(bool, user_entry["FOLDERS"].split(","))) if user_entry else [],
+        folders=user_entry["FOLDERS"] if user_entry else [],
         gallery_length=user_stats["gallery"],
         scraps_length=user_stats["scraps"],
         favorites_length=user_stats["favorites"],
@@ -302,7 +302,7 @@ def search_user_favorites(username: str):
     return redirect(url_for(
         "search", table="submissions", **{
             **{k: request.args.getlist(k) for k in request.args},
-            "favorite": f"%{username}%"}))
+            "favorite": f"%|{username}|%"}))
 
 
 @app.route("/mentions/<username>")
@@ -311,7 +311,7 @@ def search_user_mentions(username: str):
     return redirect(url_for(
         "search", table="submissions", **{
             **{k: request.args.getlist(k) for k in request.args},
-            "mentions": f"%{username}%"}))
+            "mentions": f"%|{username}|%"}))
 
 
 @app.route("/search/<string:table>/")

@@ -118,9 +118,9 @@
         <tr>
             <td>Tags</td>
             <td class="overflow value">
-                {% for tag in submission["TAGS"].split(",") %}
+                {% for tag in submission["TAGS"] %}
                     {% if tag != "" %}
-                        <a href='/search/submissions/?tags=%25{{ tag }}%25'>{{ tag }}</a>
+                        <a href='/search/submissions/?tags=%25%7C{{ tag }}%7C%25'>{{ tag }}</a>
                     {% endif %}
                 {% endfor %}
             </td>
@@ -152,7 +152,7 @@
         <tr>
             <td>Favorites</td>
             <td class="overflow value">
-                {% for user in submission["FAVORITE"].split(",") %}
+                {% for user in submission["FAVORITE"] %}
                     {% if user != "" %}
                         <a href="/search/favorites/{{ user }}">{{ user }}</a>
                     {% endif %}
@@ -162,7 +162,7 @@
         <tr>
             <td>Mentions</td>
             <td class="overflow value">
-                {% for user in submission["MENTIONS"].split(",") %}
+                {% for user in submission["MENTIONS"] %}
                     {% if user != "" %}
                         <a href="/user/{{ user }}">{{ user }}</a>
                     {% endif %}

@@ -275,7 +275,7 @@
                                 </a>
                             {% else %}
                                 <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
-                                    <span>{{ " ".join(item[column].split(",")) if column in columns_list else item[column] }}</span>
+                                    <span>{{ " ".join(item[column]) if column in columns_list else item[column] }}</span>
                                 </a>
                             {% endif %}
                         </td>
