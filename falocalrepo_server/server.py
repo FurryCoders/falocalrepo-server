@@ -148,16 +148,16 @@ def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
     global db_path
 
     sub, _, _ = load_item(submissions_table, id_)
-    sub_file: str
-    if sub is not None:
-        with FADatabase(db_path) as db:
-            sub_file = join(
-                dirname(db_path), db.settings["FILESFOLDER"],
-                *split(tiered_path(id_)), "submission" + f".{(e := sub['FILEEXT'])}" * bool(e))
-    else:
-        sub_file = ""
 
-    return sub["TYPE"] if sub else None, sub_file
+    if sub is None:
+        return None, ""
+
+    with FADatabase(db_path) as db:
+        sub_file: str = join(
+            dirname(db_path), db.settings["FILESFOLDER"],
+            *split(tiered_path(id_)), "submission" + f".{(e := sub['FILEEXT'])}" * bool(e))
+
+    return sub["TYPE"], sub_file
 
 
 @lru_cache
