@@ -470,9 +470,7 @@ def submission_thumbnail(id_: int, x: int = 150, y: int = None, filename: str = 
             img.save(f_obj, "jpeg")
         f_obj.seek(0)
         return send_file(f_obj, attachment_filename=filename, mimetype="image/jpeg")
-    elif sub_type is not "image":
-        return abort(404)
-    elif isfile(path := join(sub_dir, f"submission.{sub_ext}")):
+    elif isfile(path := join(sub_dir, f"submission.{sub_ext}")) and sub_type == "image":
         sub_ext = sub_ext.lower()
         sub_ext = "jpeg" if sub_ext == "jpg" else sub_ext
         f_obj: BytesIO = BytesIO()
