@@ -4,6 +4,7 @@ from json import dumps as json_dumps
 from json import loads as json_loads
 from os import stat
 from os.path import abspath
+from os.path import basename
 from os.path import dirname
 from os.path import isfile
 from os.path import join
@@ -123,7 +124,7 @@ def load_user_stats(username: str, _cache=None) -> Dict[str, int]:
 
 
 @lru_cache
-def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int]], int, int]:
+def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int, List[str]]], int, int]:
     global db_path
 
     item: Optional[dict]
@@ -143,15 +144,20 @@ def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int]], int, in
 
 
 @lru_cache
-def load_submission_file(id_: int) -> Tuple[Optional[str], Optional[str], str]:
+def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
     global db_path
 
     sub, _, _ = load_item(submissions_table, id_)
-    sub_dir: str
-    with FADatabase(db_path) as db:
-        sub_dir = join(dirname(db_path), db.settings["FILESFOLDER"], *split(tiered_path(id_)))
+    sub_file: str
+    if sub is not None:
+        with FADatabase(db_path) as db:
+            sub_file = join(
+                dirname(db_path), db.settings["FILESFOLDER"],
+                *split(tiered_path(id_)), "submission" + f".{(e := sub['FILEEXT'])}" * bool(e))
+    else:
+        sub_file = ""
 
-    return sub["FILEEXT"] if sub else None, sub["TYPE"] if sub else None, sub_dir
+    return sub["TYPE"] if sub else None, sub_file
 
 
 @lru_cache
@@ -442,12 +448,10 @@ def submission(id_: int):
 @app.route("/submission/<int:id_>/file/")
 @app.route("/submission/<int:id_>/file/<filename>")
 def submission_file(id_: int, filename: str = None):
-    sub_ext, _, sub_dir = load_submission_file(id_)
-
-    if sub_ext is None:
+    if not (sub_file := load_submission_file(id_)[1]):
         return abort(404)
-    elif isfile(path := join(sub_dir, f"submission.{sub_ext}")):
-        return send_file(path, attachment_filename=filename)
+    elif isfile(sub_file):
+        return send_file(sub_file, attachment_filename=filename)
     else:
         return abort(404)
 
@@ -460,27 +464,25 @@ def submission_file(id_: int, filename: str = None):
 @app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/")
 @app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/<string:filename>")
 def submission_thumbnail(id_: int, x: int = 150, y: int = None, filename: str = None):
-    sub_ext, sub_type, sub_dir = load_submission_file(id_)
+    sub_type, sub_file = load_submission_file(id_)
     y = x if y is None else y
 
-    if sub_ext is None:
+    if sub_type is None:
         return abort(404)
-    elif isfile(path := join(sub_dir, f"thumbnail.jpg")):
+    elif isfile(path := join(dirname(sub_file), f"thumbnail.jpg")):
         f_obj: BytesIO = BytesIO()
         with Image.open(path) as img:
             img.thumbnail((x, y)) if img.width > x or img.height > y else None
             img.save(f_obj, "jpeg")
         f_obj.seek(0)
         return send_file(f_obj, attachment_filename=filename, mimetype="image/jpeg")
-    elif isfile(path := join(sub_dir, f"submission.{sub_ext}")) and sub_type == "image":
-        sub_ext = sub_ext.lower()
-        sub_ext = "jpeg" if sub_ext == "jpg" else sub_ext
+    elif sub_type == "image" and isfile(sub_file):
         f_obj: BytesIO = BytesIO()
-        with Image.open(path) as img:
+        with Image.open(sub_file) as img:
             img.thumbnail((x, y))
-            img.save(f_obj, sub_ext)
+            img.save(f_obj, ext := img.format)
         f_obj.seek(0)
-        return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{sub_ext}")
+        return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
     else:
         return abort(404)
 
@@ -494,12 +496,12 @@ def submission_zip(id_: int, filename: str = None):
     if sub is None:
         return abort(404)
 
-    sub_ext, _, sub_dir = load_submission_file(id_)
+    _, sub_file = load_submission_file(id_)
     f_obj: BytesIO = BytesIO()
 
     with ZipFile(f_obj, "w") as z:
-        if isfile(path := join(sub_dir, f"submission.{sub_ext}")):
-            z.writestr(f"submission.{sub_ext}", open(path, "rb").read())
+        if isfile(sub_file):
+            z.writestr(basename(sub_file), open(sub_file, "rb").read())
         z.writestr("description.html", sub["DESCRIPTION"].encode())
         z.writestr("metadata.json", json_dumps({k: v for k, v in sub.items() if k != "DESCRIPTION"}).encode())
 
