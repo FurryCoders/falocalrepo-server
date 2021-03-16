@@ -469,7 +469,7 @@ def submission_thumbnail(id_: int, x: int = 150, y: int = None, filename: str = 
 
     if sub_type is None:
         return abort(404)
-    elif isfile(path := join(dirname(sub_file), f"thumbnail.jpg")):
+    elif isfile(path := join(dirname(sub_file), "thumbnail.jpg")):
         f_obj: BytesIO = BytesIO()
         with Image.open(path) as img:
             img.thumbnail((x, y)) if img.width > x or img.height > y else None
