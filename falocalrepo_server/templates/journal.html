@@ -74,7 +74,7 @@
         <tr>
             <td>Mentions</td>
             <td class="overflow value">
-                {% for user in journal["MENTIONS"].split(",") %}
+                {% for user in journal["MENTIONS"] %}
                     {% if user != "" %}
                         <a href="/user/{{ user }}">{{ user }}</a>
                     {% endif %}
