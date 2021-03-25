@@ -1,3 +1,4 @@
+from functools import cache
 from functools import lru_cache
 from io import BytesIO
 from json import dumps as json_dumps
@@ -93,14 +94,14 @@ def root():
     )
 
 
-@lru_cache
+@cache
 def load_user(username: str, _cache=None) -> Optional[dict]:
     global db_path
     with FADatabase(db_path) as db:
         return db.users[username]
 
 
-@lru_cache
+@cache
 def load_user_stats(username: str, _cache=None) -> Dict[str, int]:
     username = clean_username(username)
     stats: Dict[str, int] = {}
@@ -123,7 +124,7 @@ def load_user_stats(username: str, _cache=None) -> Dict[str, int]:
     return stats
 
 
-@lru_cache
+@cache
 def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int, List[str]]], int, int]:
     global db_path
 
@@ -143,7 +144,7 @@ def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int, List[str]
     return item, prev_id, next_id
 
 
-@lru_cache
+@cache
 def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
     global db_path
 
@@ -160,7 +161,7 @@ def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
     return sub["TYPE"], sub_file
 
 
-@lru_cache
+@cache
 def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", force: bool = False, _cache=None):
     global db_path
 
@@ -234,7 +235,7 @@ def response_minify(response):
     return response
 
 
-@lru_cache
+@cache
 @app.route("/user/<username>")
 def user(username: str):
     global db_path
@@ -379,7 +380,7 @@ def search(table: str):
     )
 
 
-@lru_cache
+@cache
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
     jrnl, prev_id, next_id = load_item(journals_table, id_)
@@ -424,7 +425,7 @@ def submission_view(id_: int):
     return redirect(f"/submission/{id_}")
 
 
-@lru_cache
+@cache
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
     sub, prev_id, next_id = load_item(submissions_table, id_)
@@ -456,7 +457,7 @@ def submission_file(id_: int, filename: str = None):
         return abort(404)
 
 
-@lru_cache
+@cache
 @app.route("/submission/<int:id_>/thumbnail/")
 @app.route("/submission/<int:id_>/thumbnail/<string:filename>")
 @app.route("/submission/<int:id_>/thumbnail/<int:x>/")
