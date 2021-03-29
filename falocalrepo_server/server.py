@@ -12,10 +12,7 @@ from os.path import join
 from os.path import split
 from re import sub as re_sub
 from typing import Callable
-from typing import Dict
-from typing import List
 from typing import Optional
-from typing import Tuple
 from typing import Union
 from zipfile import ZipFile
 
@@ -102,9 +99,9 @@ def load_user(username: str, _cache=None) -> Optional[dict]:
 
 
 @cache
-def load_user_stats(username: str, _cache=None) -> Dict[str, int]:
+def load_user_stats(username: str, _cache=None) -> dict[str, int]:
     username = clean_username(username)
-    stats: Dict[str, int] = {}
+    stats: dict[str, int] = {}
     with FADatabase(db_path) as db:
         stats["gallery"] = db.submissions.select(
             {"replace(lower(author), '_', '')": username, "folder": "gallery"}, ["count(ID)"]
@@ -125,7 +122,7 @@ def load_user_stats(username: str, _cache=None) -> Dict[str, int]:
 
 
 @cache
-def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int, List[str]]], int, int]:
+def load_item(table: str, id_: int) -> tuple[dict[str, Union[str, int, list[str]]], int, int]:
     global db_path
 
     item: Optional[dict]
@@ -145,7 +142,7 @@ def load_item(table: str, id_: int) -> Tuple[Dict[str, Union[str, int, List[str]
 
 
 @cache
-def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
+def load_submission_file(id_: int) -> tuple[Optional[str], str]:
     global db_path
 
     sub, _, _ = load_item(submissions_table, id_)
@@ -165,10 +162,10 @@ def load_submission_file(id_: int) -> Tuple[Optional[str], str]:
 def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", force: bool = False, _cache=None):
     global db_path
 
-    cols_results: List[str] = []
-    cols_list: List[str] = []
+    cols_results: list[str] = []
+    cols_list: list[str] = []
     col_id: str = ""
-    params: Dict[str, List[str]] = json_loads(params_serialised)
+    params: dict[str, list[str]] = json_loads(params_serialised)
 
     if table in ("submissions", "journals"):
         cols_results = ["ID", "AUTHOR", "DATE", "TITLE"]
@@ -184,7 +181,7 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
 
     with FADatabase(db_path) as db:
         db_table: FADatabaseTable = db[table]
-        cols_table: List[str] = db_table.columns
+        cols_table: list[str] = db_table.columns
 
         if not params and not force:
             return [], cols_table, cols_results, cols_list, col_id, sort, order
@@ -243,7 +240,7 @@ def user(username: str):
         return redirect(f"/user/{username_clean}")
 
     user_entry: Optional[dict] = load_user(username, _cache=m_time(db_path))
-    user_stats: Dict[str, int] = load_user_stats(username, _cache=m_time(db_path))
+    user_stats: dict[str, int] = load_user_stats(username, _cache=m_time(db_path))
 
     return render_template(
         "user.html",
@@ -329,7 +326,7 @@ def search(table: str):
     if table not in ("submissions", "journals", "users"):
         return error(f"Table {table} not found.", 404)
 
-    params: Dict[str, List[str]] = {
+    params: dict[str, list[str]] = {
         k: request.args.getlist(k) for k in sorted(map(str.lower, request.args.keys()))
         if k not in ("page", "limit", "sort", "order", "view")
     }
@@ -337,9 +334,9 @@ def search(table: str):
     if params and request.path.startswith("/browse/"):
         return redirect(url_for("search", table=table, **{k: request.args.getlist(k) for k in request.args}))
 
-    results: List[dict]
-    columns_results: List[str]
-    columns_list: List[str]
+    results: list[dict]
+    columns_results: list[str]
+    columns_list: list[str]
     column_id: str
     limit: int = int(request.args.get("limit", 48))
     page: int = int(request.args.get("page", 1))
