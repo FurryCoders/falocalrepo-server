@@ -121,23 +121,24 @@ def load_user_stats(username: str, _cache=None) -> dict[str, int]:
 
 
 @cache
-def load_item(table: str, id_: int) -> tuple[dict[str, Union[str, int, list[str]]], int, int]:
+def load_item(table: str, id_: int) -> Optional[dict[str, Union[str, int, list[str]]]]:
     global db_path
-
-    item: Optional[dict]
-    prev_id: int
-    next_id: int
     with FADatabase(db_path) as db:
         db_table: FADatabaseTable = db[table]
-        item = db_table[id_]
-        prev_id, next_id = db_table.select(
+        return db_table[id_]
+
+
+@cache
+def load_prev_next(table: str, id_: int) -> tuple[int, int]:
+    global db_path
+    with FADatabase(db_path) as db:
+        item: Optional[dict] = load_item(table, id_)
+        return db[table].select(
             {"AUTHOR": item["AUTHOR"]},
             ["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
             order=[f"ABS(ID - {id_})"],
             limit=1
         ).fetchone() if item else (0, 0)
-
-    return item, prev_id, next_id
 
 
 @cache
@@ -148,9 +149,7 @@ def load_files_folder() -> str:
 
 @cache
 def load_submission_file(id_: int) -> tuple[Optional[str], int, str, str]:
-    sub, _, _ = load_item(submissions_table, id_)
-
-    if sub is None:
+    if (sub := load_item(submissions_table, id_)) is None:
         return None, 0, "", ""
 
     sub_file, sub_thumb = "", ""
@@ -429,9 +428,7 @@ def submission_view(id_: int):
 @cache
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
-    sub, prev_id, next_id = load_item(submissions_table, id_)
-
-    if sub is None:
+    if (sub := load_item(submissions_table, id_)) is None:
         return error(
             f"Submission not found.<br>{button(f'https://www.furaffinity.net/view/{id_}', 'Open on Fur Affinity')}",
             404
@@ -441,8 +438,8 @@ def submission(id_: int):
         "submission.html",
         title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
         submission=sub,
-        prev=prev_id,
-        next=next_id
+        prev=(prev_next := load_prev_next(submissions_table, id_))[0],
+        next=prev_next[1]
     )
 
 
@@ -493,9 +490,7 @@ def submission_thumbnail(id_: int, x: int = 150, y: int = None, filename: str = 
 @app.route("/submission/<int:id_>/zip/")
 @app.route("/submission/<int:id_>/zip/<filename>")
 def submission_zip(id_: int, filename: str = None):
-    sub, _, _ = load_item(submissions_table, id_)
-
-    if sub is None:
+    if (sub := load_item(submissions_table, id_, False)) is None:
         return abort(404)
 
     _, sub_filesaved, sub_file, _ = load_submission_file(id_)
