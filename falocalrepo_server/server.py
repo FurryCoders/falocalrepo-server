@@ -489,12 +489,14 @@ def submission_zip(id_: int, filename: str = None):
     if (sub := load_item(submissions_table, id_, False)) is None:
         return abort(404)
 
-    _, sub_filesaved, sub_file, _ = load_submission_file(id_)
+    _, sub_filesaved, sub_file, sub_thumb = load_submission_file(id_)
     f_obj: BytesIO = BytesIO()
 
     with ZipFile(f_obj, "w") as z:
         if sub_filesaved >= 10 and isfile(sub_file):
             z.writestr(basename(sub_file), open(sub_file, "rb").read())
+        if sub_filesaved % 10 == 1 and isfile(sub_thumb):
+            z.writestr(basename(sub_thumb), open(sub_thumb, "rb").read())
         z.writestr("description.html", sub["DESCRIPTION"].encode())
         z.writestr("metadata.json", json_dumps({k: v for k, v in sub.items() if k != "DESCRIPTION"}).encode())
 
