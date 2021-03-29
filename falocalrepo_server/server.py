@@ -383,9 +383,7 @@ def search(table: str):
 @cache
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
-    jrnl, prev_id, next_id = load_item(journals_table, id_)
-
-    if jrnl is None:
+    if (jrnl := load_item(journals_table, id_)) is None:
         return error(
             f"Journal not found.<br>{button(f'https://www.furaffinity.net/journal/{id_}', 'Open on Fur Affinity')}",
             404
@@ -395,8 +393,8 @@ def journal(id_: int):
         "journal.html",
         title=f"{app.name} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
         journal=jrnl,
-        prev=prev_id,
-        next=next_id
+        prev=(prev_next := load_prev_next(journals_table, id_))[0],
+        next=prev_next[1]
     )
 
 
@@ -404,9 +402,7 @@ def journal(id_: int):
 @app.route("/journal/<int:id_>/zip/")
 @app.route("/journal/<int:id_>/zip/<filename>")
 def journal_zip(id_: int, filename: str = None):
-    jrn, _, _ = load_item(journals_table, id_)
-
-    if jrn is None:
+    if (jrn := load_item(journals_table, id_)) is None:
         return abort(404)
 
     f_obj: BytesIO = BytesIO()
