@@ -8,7 +8,6 @@ readme = "README.md"
 homepage = "https://gitlab.com/MatteoCampinoti94/falocalrepo-server"
 repository = "https://gitlab.com/MatteoCampinoti94/falocalrepo-server"
 classifiers = [
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Operating System :: OS Independent",
     "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
@@ -20,7 +19,7 @@ classifiers = [
 falocalrepo-server = "falocalrepo_server.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 falocalrepo-database = "~4.10.0"
 flask = "^1.1.2"
 Pillow = "^8.1.0"

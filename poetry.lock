@@ -113,8 +113,8 @@ watchdog = ["watchdog"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.8"
-content-hash = "5b5704d131c48641685d5685c7c588bf8699b5bd8aad6237cee54d69f34d391b"
+python-versions = "^3.9"
+content-hash = "7069d5e5d7bce80ca4a437b612fd60944a1709cdc6b95121f4567db66e56c52e"
 
 [metadata.files]
 chardet = [
