@@ -141,9 +141,13 @@ def load_item(table: str, id_: int) -> tuple[dict[str, Union[str, int, list[str]
 
 
 @cache
-def load_submission_file(id_: int) -> tuple[Optional[str], int, str, str]:
-    global db_path
+def load_files_folder() -> str:
+    with FADatabase(db_path) as db:
+        return join(dirname(db_path), db.settings["FILESFOLDER"])
 
+
+@cache
+def load_submission_file(id_: int) -> tuple[Optional[str], int, str, str]:
     sub, _, _ = load_item(submissions_table, id_)
 
     if sub is None:
@@ -151,10 +155,9 @@ def load_submission_file(id_: int) -> tuple[Optional[str], int, str, str]:
 
     sub_file, sub_thumb = "", ""
     if sub["FILESAVED"] != 0:
-        with FADatabase(db_path) as db:
-            sub_folder: str = join(dirname(db_path), db.settings["FILESFOLDER"], tiered_path(id_))
-            sub_file = join(sub_folder, "submission" + f".{(e := sub['FILEEXT'])}" * bool(e))
-            sub_thumb = join(sub_folder, "thumbnail.jpg")
+        sub_folder: str = join(load_files_folder(), tiered_path(id_))
+        sub_file = join(sub_folder, "submission" + f".{(e := sub['FILEEXT'])}" * bool(e))
+        sub_thumb = join(sub_folder, "thumbnail.jpg")
 
     return sub["TYPE"], sub["FILESAVED"], sub_file, sub_thumb
 
