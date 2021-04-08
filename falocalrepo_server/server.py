@@ -235,7 +235,6 @@ def response_minify(response):
     return response
 
 
-@cache
 @app.route("/user/<username>")
 def user(username: str):
     global db_path
