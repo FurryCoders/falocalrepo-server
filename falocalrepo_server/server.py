@@ -473,7 +473,7 @@ def submission_thumbnail(id_: int, x: int = None, y: int = None, filename: str =
             return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
     elif sub_filesaved >= 10 and sub_type == "image" and isfile(sub_file):
         with Image.open(sub_file) as img:
-            img.thumbnail((x or 150, y or x or 150))
+            img.thumbnail((x or 400, y or x or 400))
             img.save(f_obj := BytesIO(), ext := img.format, quality=95)
             f_obj.seek(0)
             return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
