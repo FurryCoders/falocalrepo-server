@@ -379,7 +379,6 @@ def search(table: str):
     )
 
 
-@cache
 @app.route("/journal/<int:id_>/")
 def journal(id_: int):
     if (jrnl := load_item(journals_table, id_)) is None:
@@ -420,7 +419,6 @@ def submission_view(id_: int):
     return redirect(f"/submission/{id_}")
 
 
-@cache
 @app.route("/submission/<int:id_>/")
 def submission(id_: int):
     if (sub := load_item(submissions_table, id_)) is None:
