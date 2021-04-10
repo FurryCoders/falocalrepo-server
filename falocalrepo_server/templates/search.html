@@ -286,7 +286,7 @@
                                 <img class="lazy"
                                      style="max-width: 100px; max-height: 50px"
                                      src="/static/loading.gif"
-                                     data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/100x50/" alt=""
+                                     data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/" alt=""
                                      onerror="this.parentNode.removeChild(this)">
                             </a>
                         </td>
@@ -304,7 +304,7 @@
                                 <img class="lazy" alt=""
                                      style="max-width: 200px; max-height: 200px"
                                      src="/static/loading.gif"
-                                     data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/200/"
+                                     data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
                                      onload="lazyLoad()"
                                      onerror="this.parentElement.removeChild(this); lazyLoad()">
                             </a>
