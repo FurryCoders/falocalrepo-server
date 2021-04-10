@@ -463,22 +463,20 @@ def submission_thumbnail(id_: int, x: int = None, y: int = None, filename: str =
     if sub_type is None or sub_filesaved == 0:
         return abort(404)
     elif sub_filesaved % 10 == 1 and isfile(sub_thumb):
-        if x:
-            f_obj: BytesIO = BytesIO()
-            with Image.open(sub_thumb) as img:
-                img = img.resize((x, y or x))
-                img.save(f_obj, ext := img.format)
+        if not x:
+            return send_file(sub_thumb, attachment_filename=filename, mimetype="image/jpeg")
+
+        with Image.open(sub_thumb), BytesIO() as (img, f_obj):
+            img = img.resize((x, y or x))
+            img.save(f_obj, ext := img.format)
             f_obj.seek(0)
             return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
-        else:
-            return send_file(sub_thumb, attachment_filename=filename, mimetype="image/jpeg")
     elif sub_filesaved >= 10 and sub_type == "image" and isfile(sub_file):
-        f_obj: BytesIO = BytesIO()
-        with Image.open(sub_file) as img:
+        with Image.open(sub_file), BytesIO() as (img, f_obj):
             img.thumbnail((x or 150, y or x or 150))
             img.save(f_obj, ext := img.format)
-        f_obj.seek(0)
-        return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
+            f_obj.seek(0)
+            return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
     else:
         return abort(404)
 
