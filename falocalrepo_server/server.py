@@ -466,15 +466,14 @@ def submission_thumbnail(id_: int, x: int = None, y: int = None, filename: str =
         if not x:
             return send_file(sub_thumb, attachment_filename=filename, mimetype="image/jpeg")
 
-        with Image.open(sub_thumb), BytesIO() as (img, f_obj):
-            img = img.resize((x, y or x))
-            img.save(f_obj, ext := img.format)
+        with Image.open(sub_thumb) as img:
+            img.resize((x, y or x)).save(f_obj := BytesIO(), ext := img.format, quality=95)
             f_obj.seek(0)
             return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
     elif sub_filesaved >= 10 and sub_type == "image" and isfile(sub_file):
-        with Image.open(sub_file), BytesIO() as (img, f_obj):
+        with Image.open(sub_file) as img:
             img.thumbnail((x or 150, y or x or 150))
-            img.save(f_obj, ext := img.format)
+            img.save(f_obj := BytesIO(), ext := img.format, quality=95)
             f_obj.seek(0)
             return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
     else:
