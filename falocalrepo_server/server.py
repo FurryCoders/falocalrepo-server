@@ -132,7 +132,7 @@ def load_prev_next(table: str, id_: int) -> tuple[int, int]:
             ["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
             order=[f"ABS(ID - {id_})"],
             limit=1
-        ).fetchone() if item else (0, 0)
+        ).cursor.fetchone() if item else (0, 0)
 
 
 @cache
