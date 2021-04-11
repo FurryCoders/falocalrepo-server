@@ -104,19 +104,19 @@ def load_user_stats(username: str, _cache=None) -> dict[str, int]:
     with FADatabase(db_path) as db:
         stats["gallery"] = db.submissions.select(
             {"replace(lower(author), '_', '')": username, "folder": "gallery"}, ["count(ID)"]
-        ).fetchone()[0]
+        ).cursor.fetchone()[0]
         stats["scraps"] = db.submissions.select(
             {"replace(lower(author), '_', '')": username, "folder": "scraps"}, ["count(ID)"]
-        ).fetchone()[0]
+        ).cursor.fetchone()[0]
         stats["favorites"] = db.submissions.select(
             {"favorite": f"%|{username}|%"}, ["count(ID)"], like=True
-        ).fetchone()[0]
+        ).cursor.fetchone()[0]
         stats["mentions"] = db.submissions.select(
             {"mentions": f"%|{username}|%"}, ["count(ID)"], like=True
-        ).fetchone()[0]
+        ).cursor.fetchone()[0]
         stats["journals"] = db.journals.select(
             {"replace(lower(author), '_', '')": username}, ["count(ID)"]
-        ).fetchone()[0]
+        ).cursor.fetchone()[0]
     return stats
 
 
@@ -195,9 +195,7 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
             query: str = " or ".join(map(lambda q: f"({q})", params["sql"]))
             query = re_sub(r"any(?= (!?=|(not )?(like|glob)|[<>]=?))", f"({'||'.join(cols_table)})", query)
             return (
-                list(db_table.cursor_to_dict(
-                    db_table.select_sql(query, columns=cols_results, order=[f"{sort} {order}"]),
-                    cols_results)),
+                list(db_table.select_sql(query, columns=cols_results, order=[f"{sort} {order}"])),
                 cols_table + ["any"],
                 cols_results,
                 cols_list,
@@ -215,9 +213,7 @@ def search_table(table: str, sort: str, order: str, params_serialised: str = "{}
             del params["any"]
 
         return (
-            list(db_table.cursor_to_dict(
-                db_table.select(params, cols_results, like=True, order=[f"{sort} {order}"]),
-                cols_results)),
+            list(db_table.select(params, cols_results, like=True, order=[f"{sort} {order}"])),
             cols_table + ["any"],
             cols_results,
             cols_list,
