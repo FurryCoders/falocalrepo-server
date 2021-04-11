@@ -70,15 +70,8 @@ def error(message: str, code: int):
 def root():
     global db_path
 
-    sub_n: int
-    jrn_n: int
-    usr_n: int
-    version: str
     with FADatabase(db_path) as db:
-        sub_n = len(db.submissions)
-        jrn_n = len(db.journals)
-        usr_n = len(db.users)
-        version = db.settings["VERSION"]
+        sub_n, jrn_n, usr_n, version = len(db.submissions), len(db.journals), len(db.users), db.settings["VERSION"]
 
     return render_template(
         "root.html",
