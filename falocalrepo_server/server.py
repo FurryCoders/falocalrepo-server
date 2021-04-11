@@ -99,6 +99,7 @@ def load_user(username: str, _cache=None) -> Optional[dict]:
 
 @cache
 def load_user_stats(username: str, _cache=None) -> dict[str, int]:
+    global db_path
     username = clean_username(username)
     stats: dict[str, int] = {}
     with FADatabase(db_path) as db:
