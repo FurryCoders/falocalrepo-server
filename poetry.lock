@@ -16,7 +16,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "falocalrepo-database"
-version = "4.13.3"
+version = "4.14.0"
 description = "Database functionality for falocalrepo."
 category = "main"
 optional = false
@@ -126,7 +126,7 @@ watchdog = ["watchdog"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "bca35f4243ff316e09f223e6ffbac818850651a7b6abd7e5ee18d842c0128987"
+content-hash = "d0f7a6c69071769d26f66c81f85173511a087b401f87805a198e6f0d90f5389c"
 
 [metadata.files]
 chardet = [
@@ -138,8 +138,8 @@ click = [
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
 ]
 falocalrepo-database = [
-    {file = "falocalrepo-database-4.13.3.tar.gz", hash = "sha256:daad35e6572907b601e7569537f53a3eb1d01735d9ba9c0cdea79784393a4f9a"},
-    {file = "falocalrepo_database-4.13.3-py3-none-any.whl", hash = "sha256:8c7e9ecfd39304f4315682ff54b22c0c94df92c7cb3b96ab5f1a553bc77404d2"},
+    {file = "falocalrepo-database-4.14.0.tar.gz", hash = "sha256:3548e7439b65f732af314e7d721eb7551006ec32d3a0a6e4a2f94b040cff1d6f"},
+    {file = "falocalrepo_database-4.14.0-py3-none-any.whl", hash = "sha256:72cc8ba6aed4132943bd89b9c8f3ee7e8cf1b20842b04c9286248bfaf09c8068"},
 ]
 filetype = [
     {file = "filetype-1.0.7-py2.py3-none-any.whl", hash = "sha256:353369948bb1c09b8b3ea3d78390b5586e9399bff9aab894a1dff954e31a66f6"},
