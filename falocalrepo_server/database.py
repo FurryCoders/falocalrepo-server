@@ -106,7 +106,6 @@ def load_search(db_path: str, table: str, sort: str, order: str, params_: str = 
         if "sql" in params:
             query: str = " or ".join(map(lambda p: f"({p})", params["sql"]))
             query = sub(r"any(?= +(!?=|(not +)?(like|glob)|[<>]=?))", f"({'||'.join(cols_table)})", query)
-            print(query)
             return (
                 list(db_table.select_sql(query, columns=cols_results, order=[f"{sort} {order}"])),
                 cols_table + ["any"],
