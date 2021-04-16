@@ -108,7 +108,7 @@ def load_search(db_path: str, table: str, sort: str, order: str, params_: str = 
             query = sub(r"any(?= +(!?=|(not +)?(like|glob)|[<>]=?))", f"({'||'.join(cols_table)})", query)
             return (
                 list(db_table.select_sql(query, columns=cols_results, order=[f"{sort} {order}"])),
-                cols_table + ["any"],
+                cols_table,
                 cols_results,
                 cols_list,
                 col_id,
@@ -126,7 +126,7 @@ def load_search(db_path: str, table: str, sort: str, order: str, params_: str = 
 
         return (
             list(db_table.select(params, cols_results, like=True, order=[f"{sort} {order}"])),
-            cols_table + ["any"],
+            cols_table,
             cols_results,
             cols_list,
             col_id,
