@@ -200,7 +200,7 @@
         <tr>
             <td class="col1"><label for="sort_field">Sort by</label></td>
             <td class="col2"><select id="sort_field" name="sort" style="width: 100%;">
-                {% for col in columns_table if col.lower() != "any" %}
+                {% for col in columns_table %}
                     <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">
                         {{ col.title() if col|length > 2 else col.upper() }}
                     </option>
@@ -333,10 +333,9 @@
 <script async>
     const $ = (id) => document.getElementById(id)
 
-    const columns = Array.from($("sort_field").options)
-        .map((o) => o.value)
+    const columns = ["any"]
+        .concat(Array.from($("sort_field").options.map((o) => o.value)))
         .map((c) => [c, c.length > 2 ? c[0].toUpperCase() + c.substring(1) : c.toUpperCase()])
-        .concat([["any", "Any"]])
         .concat([["sql", "SQL"]])
     let view = $("view").value === "grid" ? $("results_table_grid") : $("results_table_list")
 
