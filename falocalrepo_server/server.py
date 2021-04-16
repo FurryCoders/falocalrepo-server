@@ -184,8 +184,8 @@ def serve_search(table: str):
         return error(f"Table {table} not found.", 404)
 
     params: dict[str, list[str]] = {
-        k.lower(): list(map(str.lower, request.args.getlist(k))) for k in sorted(request.args.keys())
-        if k.lower() not in ("page", "limit", "sort", "order", "view")
+        k: request.args.getlist(k) for k in map(str.lower, request.args.keys())
+        if k not in ("page", "limit", "sort", "order", "view")
     }
 
     if params and request.path.startswith("/browse/"):
@@ -208,7 +208,7 @@ def serve_search(table: str):
         table,
         sort,
         order,
-        json_dumps(params),
+        json_dumps({k: list(map(str.lower, params[k])) for k in sorted(params.keys())}),
         force=request.path.startswith("/browse/"),
         _cache=m_time(app.config["db_path"])
     )
