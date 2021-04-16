@@ -2,25 +2,15 @@ from functools import cache
 from functools import lru_cache
 from io import BytesIO
 from json import dumps as json_dumps
-from json import loads as json_loads
-from os import stat
 from os.path import abspath
-from os.path import basename
 from os.path import dirname
 from os.path import isfile
 from os.path import join
 from re import sub as re_sub
-from typing import Callable
 from typing import Optional
-from typing import Union
 from zipfile import ZipFile
 
 from PIL import Image
-from falocalrepo_database import FADatabase
-from falocalrepo_database import FADatabaseTable
-from falocalrepo_database import tiered_path
-from falocalrepo_database.tables import journals_table
-from falocalrepo_database.tables import submissions_table
 from flask import Flask
 from flask import abort
 from flask import redirect
@@ -31,13 +21,25 @@ from flask import url_for
 from htmlmin.main import minify
 from werkzeug.exceptions import NotFound
 
+from .database import default_sort, default_order
+from .database import journals_table
+from .database import load_info
+from .database import load_journal
+from .database import load_prev_next
+from .database import load_search
+from .database import load_submission
+from .database import load_submission_files
+from .database import load_user
+from .database import load_user_stats
+from .database import m_time
+from .database import submissions_table
+from .database import users_table
+
 app: Flask = Flask(
     "FurAffinity Local Repo",
     template_folder=join(abspath(dirname(__file__)), "templates"),
     static_folder=join(abspath(dirname(__file__)), "static")
 )
-db_path: str = "FA.db"
-m_time: Callable[[str], float] = lambda f: stat(f).st_mtime
 
 
 def clean_username(username: str, exclude: str = "") -> str:
@@ -48,16 +50,6 @@ def button(href: str, text: str) -> str:
     return f'<button onclick="window.location = \'{href}\'">{text}</button>'
 
 
-@app.route("/favicon.ico")
-def favicon():
-    return redirect("https://www.furaffinity.net/favicon.ico")
-
-
-@app.errorhandler(404)
-def not_found(err: NotFound):
-    return error(err.description, 404)
-
-
 def error(message: str, code: int):
     return render_template(
         "error.html",
@@ -66,13 +58,26 @@ def error(message: str, code: int):
     ), code
 
 
+@app.errorhandler(404)
+def not_found(err: NotFound):
+    return error(err.description, 404)
+
+
+@app.after_request
+def response_minify(response):
+    if response.content_type == u'text/html; charset=utf-8':
+        response.set_data(minify(response.get_data(as_text=True)))
+    return response
+
+
+@app.route("/favicon.ico")
+def serve_favicon():
+    return redirect("https://www.furaffinity.net/favicon.ico")
+
+
 @app.route("/")
-def root():
-    global db_path
-
-    with FADatabase(db_path) as db:
-        sub_n, jrn_n, usr_n, version = len(db.submissions), len(db.journals), len(db.users), db.settings["VERSION"]
-
+def serve_info():
+    usr_n, sub_n, jrn_n, version = load_info(app.config["db_path"], _cache=m_time(app.config["db_path"]))
     return render_template(
         "root.html",
         title=app.name,
@@ -83,156 +88,13 @@ def root():
     )
 
 
-@cache
-def load_user(username: str, _cache=None) -> Optional[dict]:
-    global db_path
-    with FADatabase(db_path) as db:
-        return db.users[username]
-
-
-@cache
-def load_user_stats(username: str, _cache=None) -> dict[str, int]:
-    global db_path
-    username = clean_username(username)
-    stats: dict[str, int] = {}
-    with FADatabase(db_path) as db:
-        stats["gallery"] = db.submissions.select(
-            {"replace(lower(author), '_', '')": username, "folder": "gallery"}, ["count(ID)"]
-        ).cursor.fetchone()[0]
-        stats["scraps"] = db.submissions.select(
-            {"replace(lower(author), '_', '')": username, "folder": "scraps"}, ["count(ID)"]
-        ).cursor.fetchone()[0]
-        stats["favorites"] = db.submissions.select(
-            {"favorite": f"%|{username}|%"}, ["count(ID)"], like=True
-        ).cursor.fetchone()[0]
-        stats["mentions"] = db.submissions.select(
-            {"mentions": f"%|{username}|%"}, ["count(ID)"], like=True
-        ).cursor.fetchone()[0]
-        stats["journals"] = db.journals.select(
-            {"replace(lower(author), '_', '')": username}, ["count(ID)"]
-        ).cursor.fetchone()[0]
-    return stats
-
-
-@cache
-def load_item(table: str, id_: int) -> Optional[dict[str, Union[str, int, list[str]]]]:
-    global db_path
-    with FADatabase(db_path) as db:
-        db_table: FADatabaseTable = db[table]
-        return db_table[id_]
-
-
-@cache
-def load_prev_next(table: str, id_: int) -> tuple[int, int]:
-    global db_path
-    with FADatabase(db_path) as db:
-        item: Optional[dict] = load_item(table, id_)
-        return db[table].select(
-            {"AUTHOR": item["AUTHOR"]},
-            ["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
-            order=[f"ABS(ID - {id_})"],
-            limit=1
-        ).cursor.fetchone() if item else (0, 0)
-
-
-@cache
-def load_files_folder() -> str:
-    with FADatabase(db_path) as db:
-        return join(dirname(db_path), db.settings["FILESFOLDER"])
-
-
-@cache
-def load_submission_file(id_: int) -> tuple[Optional[str], int, str, str]:
-    if (sub := load_item(submissions_table, id_)) is None:
-        return None, 0, "", ""
-
-    sub_file, sub_thumb = "", ""
-    if sub["FILESAVED"] != 0:
-        sub_folder: str = join(load_files_folder(), tiered_path(id_))
-        sub_file = join(sub_folder, "submission" + f".{(e := sub['FILEEXT'])}" * bool(e))
-        sub_thumb = join(sub_folder, "thumbnail.jpg")
-
-    return sub["TYPE"], sub["FILESAVED"], sub_file, sub_thumb
-
-
-@cache
-def search_table(table: str, sort: str, order: str, params_serialised: str = "{}", force: bool = False, _cache=None):
-    global db_path
-
-    cols_results: list[str] = []
-    cols_list: list[str] = []
-    col_id: str = ""
-    params: dict[str, list[str]] = json_loads(params_serialised)
-
-    if table in ("submissions", "journals"):
-        cols_results = ["ID", "AUTHOR", "DATE", "TITLE"]
-        col_id = "ID"
-        order = "DESC" if not order else order
-    elif table == "users":
-        cols_results = ["USERNAME", "FOLDERS"]
-        cols_list = ["FOLDERS"]
-        col_id = "USERNAME"
-        order = "ASC" if not order else order
-
-    sort = col_id if not sort else sort
-
-    with FADatabase(db_path) as db:
-        db_table: FADatabaseTable = db[table]
-        cols_table: list[str] = db_table.columns
-
-        if not params and not force:
-            return [], cols_table, cols_results, cols_list, col_id, sort, order
-
-        params = {k: vs for k, vs in params.items() if k in map(str.lower, cols_table + ["any", "sql"])}
-
-        if "sql" in params:
-            query: str = " or ".join(map(lambda q: f"({q})", params["sql"]))
-            query = re_sub(r"any(?= (!?=|(not )?(like|glob)|[<>]=?))", f"({'||'.join(cols_table)})", query)
-            return (
-                list(db_table.select_sql(query, columns=cols_results, order=[f"{sort} {order}"])),
-                cols_table + ["any"],
-                cols_results,
-                cols_list,
-                col_id,
-                sort,
-                order
-            )
-        if "author" in params:
-            params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
-            del params["author"]
-        if "username" in params:
-            params["username"] = list(map(lambda u: clean_username(u, "%_"), params["username"]))
-        if "any" in params:
-            params[f"({'||'.join(cols_table)})"] = params["any"]
-            del params["any"]
-
-        return (
-            list(db_table.select(params, cols_results, like=True, order=[f"{sort} {order}"])),
-            cols_table + ["any"],
-            cols_results,
-            cols_list,
-            col_id,
-            sort,
-            order
-        )
-
-
-@app.after_request
-def response_minify(response):
-    if response.content_type == u'text/html; charset=utf-8':
-        response.set_data(minify(response.get_data(as_text=True)))
-
-    return response
-
-
 @app.route("/user/<username>")
-def user(username: str):
-    global db_path
+def serve_user(username: str):
     if username != (username_clean := clean_username(username)):
         return redirect(f"/user/{username_clean}")
 
-    user_entry: Optional[dict] = load_user(username, _cache=m_time(db_path))
-    user_stats: dict[str, int] = load_user_stats(username, _cache=m_time(db_path))
+    user_entry: Optional[dict] = load_user(app.config["db_path"], username, _cache=m_time(app.config["db_path"]))
+    user_stats: dict[str, int] = load_user_stats(app.config["db_path"], username, _cache=m_time(app.config["db_path"]))
 
     return render_template(
         "user.html",
@@ -248,115 +110,119 @@ def user(username: str):
 
 
 @app.route("/browse/")
-def browse_default():
-    return redirect(url_for("browse", table="submissions", **{k: request.args.getlist(k) for k in request.args}))
+def redirect_browse_default():
+    return redirect(url_for("serve_browse", table="submissions", **{k: request.args.getlist(k) for k in request.args}))
 
 
 @app.route("/browse/<string:table>/")
-def browse(table: str):
-    return search(table)
+def serve_browse(table: str):
+    return serve_search(table)
 
 
 @app.route("/search/")
-def search_default():
-    return redirect(url_for("search", table="submissions", **{k: request.args.getlist(k) for k in request.args}))
+def redirect_search_default():
+    return redirect(url_for("serve_search", table="submissions", **{k: request.args.getlist(k) for k in request.args}))
 
 
 @app.route("/gallery/<username>")
 @app.route("/search/gallery/<username>/")
-def search_user_gallery(username: str):
+def redirect_search_user_gallery(username: str):
     return redirect(url_for(
-        "search", table="submissions",
-        **{**{k: request.args.getlist(k) for k in request.args}, "author": username, "folder": "gallery"}))
+        "serve_search", table="submissions", **{
+            **{k: request.args.getlist(k) for k in request.args},
+            "author": username, "folder": "gallery"}))
 
 
 @app.route("/scraps/<username>")
 @app.route("/search/scraps/<username>/")
-def search_user_scraps(username: str):
+def redirect_search_user_scraps(username: str):
     return redirect(url_for(
-        "search", table="submissions",
-        **{**{k: request.args.getlist(k) for k in request.args}, "author": username, "folder": "scraps"}))
+        "serve_search", table="submissions", **{
+            **{k: request.args.getlist(k) for k in request.args},
+            "author": username, "folder": "scraps"}))
 
 
 @app.route("/submissions/<username>/")
 @app.route("/search/submissions/<username>/")
-def search_user_submissions(username: str):
+def redirect_search_user_submissions(username: str):
     return redirect(url_for(
-        "search", table="submissions", **{**{k: request.args.getlist(k) for k in request.args}, "author": username}))
+        "serve_search", table="submissions", **{
+            **{k: request.args.getlist(k) for k in request.args},
+            "author": username}))
 
 
 @app.route("/journals/<username>/")
 @app.route("/search/journals/<username>/")
-def search_user_journals(username: str):
+def redirect_search_user_journals(username: str):
     return redirect(url_for(
-        "search", table="journals", **{**{k: request.args.getlist(k) for k in request.args}, "author": username}))
+        "serve_search", table="journals", **{
+            **{k: request.args.getlist(k) for k in request.args},
+            "author": username}))
 
 
 @app.route("/favorites/<username>")
 @app.route("/search/favorites/<username>/")
-def search_user_favorites(username: str):
+def redirect_search_user_favorites(username: str):
     return redirect(url_for(
-        "search", table="submissions", **{
+        "serve_search", table="submissions", **{
             **{k: request.args.getlist(k) for k in request.args},
             "favorite": f"%|{username}|%"}))
 
 
 @app.route("/mentions/<username>")
 @app.route("/search/mentions/<username>/")
-def search_user_mentions(username: str):
+def redirect_search_user_mentions(username: str):
     return redirect(url_for(
-        "search", table="submissions", **{
+        "serve_search", table="submissions", **{
             **{k: request.args.getlist(k) for k in request.args},
             "mentions": f"%|{username}|%"}))
 
 
 @app.route("/search/<string:table>/")
-def search(table: str):
-    global db_path
-    table = table.lower()
-
-    if table not in ("submissions", "journals", "users"):
+def serve_search(table: str):
+    if (table := table.upper()) not in (submissions_table, journals_table, users_table):
         return error(f"Table {table} not found.", 404)
 
     params: dict[str, list[str]] = {
-        k: request.args.getlist(k) for k in sorted(map(str.lower, request.args.keys()))
-        if k not in ("page", "limit", "sort", "order", "view")
+        k.lower(): list(map(str.lower, request.args.getlist(k))) for k in sorted(request.args.keys())
+        if k.lower() not in ("page", "limit", "sort", "order", "view")
     }
 
     if params and request.path.startswith("/browse/"):
-        return redirect(url_for("search", table=table, **{k: request.args.getlist(k) for k in request.args}))
+        return redirect(url_for("serve_search", table=table, **{k: request.args.getlist(k) for k in request.args}))
 
     results: list[dict]
     columns_results: list[str]
     columns_list: list[str]
     column_id: str
-    limit: int = int(request.args.get("limit", 48))
     page: int = int(request.args.get("page", 1))
-    sort: str = request.args.get("sort", "").lower()
-    order: str = request.args.get("order", "").lower()
+    limit: int = int(request.args.get("limit", 48))
+    sort: str = request.args.get("sort", default_sort[table]).lower()
+    order: str = request.args.get("order", default_order[table]).lower()
     view: str = request.args.get("view", "").lower()
-    view = "grid" if view not in ("list", "grid") and table == "submissions" else view
-    view = "list" if table != "submissions" else view
+    view = "grid" if view not in ("list", "grid") and table == submissions_table else view
+    view = "list" if table != submissions_table else view
 
-    results, columns_table, columns_results, columns_list, column_id, sort, order = search_table(
+    results, columns_table, columns_results, columns_list, column_id, sort, order = load_search(
+        app.config["db_path"],
         table,
         sort,
         order,
         json_dumps(params),
         force=request.path.startswith("/browse/"),
-        _cache=m_time(db_path)
+        _cache=m_time(app.config["db_path"])
     )
 
     return render_template(
         "search.html",
         title=f"{app.name} · {table.title()} Search Results",
-        table=table,
+        table=table.lower(),
         params=params,
         sort=sort.lower(),
         order=order.lower(),
         view=view,
-        allow_view=table == "submissions",
-        thumbnails=table == "submissions",
+        allow_view=table == submissions_table,
+        thumbnails=table == submissions_table,
         columns_table=columns_table,
         columns_results=columns_results,
         columns_list=columns_list,
@@ -370,27 +236,28 @@ def search(table: str):
 
 
 @app.route("/journal/<int:id_>/")
-def journal(id_: int):
-    if (jrnl := load_item(journals_table, id_)) is None:
+def serve_journal(id_: int):
+    if (jrnl := load_journal(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
         return error(
             f"Journal not found.<br>{button(f'https://www.furaffinity.net/journal/{id_}', 'Open on Fur Affinity')}",
             404
         )
 
+    p, n = load_prev_next(app.config["db_path"], journals_table, id_, _cache=m_time(app.config["db_path"]))
     return render_template(
         "journal.html",
         title=f"{app.name} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
         journal=jrnl,
-        prev=(prev_next := load_prev_next(journals_table, id_))[0],
-        next=prev_next[1]
+        prev=p,
+        next=n
     )
 
 
 @lru_cache(maxsize=10)
 @app.route("/journal/<int:id_>/zip/")
 @app.route("/journal/<int:id_>/zip/<filename>")
-def journal_zip(id_: int, filename: str = None):
-    if (jrn := load_item(journals_table, id_)) is None:
+def serve_journal_zip(id_: int, filename: str = None):
+    if (jrn := load_journal(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
         return abort(404)
 
     f_obj: BytesIO = BytesIO()
@@ -405,37 +272,37 @@ def journal_zip(id_: int, filename: str = None):
 
 @app.route("/full/<int:id_>/")
 @app.route("/view/<int:id_>/")
-def submission_view(id_: int):
+def redirect_submission_view(id_: int):
     return redirect(f"/submission/{id_}")
 
 
 @app.route("/submission/<int:id_>/")
-def submission(id_: int):
-    if (sub := load_item(submissions_table, id_)) is None:
+def serve_submission(id_: int):
+    if (sub := load_submission(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
         return error(
             f"Submission not found.<br>{button(f'https://www.furaffinity.net/view/{id_}', 'Open on Fur Affinity')}",
             404
         )
 
+    p, n = load_prev_next(app.config["db_path"], submissions_table, id_, _cache=m_time(app.config["db_path"]))
     return render_template(
         "submission.html",
         title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
         submission=sub,
-        prev=(prev_next := load_prev_next(submissions_table, id_))[0],
-        next=prev_next[1]
+        prev=p,
+        next=n
     )
 
 
 @lru_cache(maxsize=10)
 @app.route("/submission/<int:id_>/file/")
 @app.route("/submission/<int:id_>/file/<filename>")
-def submission_file(id_: int, filename: str = None):
-    if not (sub_file := load_submission_file(id_)[2]):
+def serve_submission_file(id_: int, filename: str = None):
+    if (sub_file := load_submission_files(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))[0]) is None:
         return abort(404)
-    elif isfile(sub_file):
-        return send_file(sub_file, attachment_filename=filename)
-    else:
-        return abort(404)
+    with Image.open(f_obj := BytesIO(sub_file)) as img:
+        f_obj.seek(0)
+        return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{img.format.lower()}")
 
 
 @cache
@@ -445,24 +312,19 @@ def submission_file(id_: int, filename: str = None):
 @app.route("/submission/<int:id_>/thumbnail/<int:x>/<string:filename>")
 @app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/")
 @app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/<string:filename>")
-def submission_thumbnail(id_: int, x: int = None, y: int = None, filename: str = None):
-    sub_type, sub_filesaved, sub_file, sub_thumb = load_submission_file(id_)
-
-    if sub_type is None or sub_filesaved == 0:
-        return abort(404)
-    elif sub_filesaved % 10 == 1 and isfile(sub_thumb):
-        if not x:
-            return send_file(sub_thumb, attachment_filename=filename, mimetype="image/jpeg")
-
-        with Image.open(sub_thumb) as img:
-            img.thumbnail((x, y or x))
-            img.save(f_obj := BytesIO(), ext := img.format, quality=95)
+def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, filename: str = None):
+    sub_file, sub_thumb = load_submission_files(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))
+    if sub_thumb is not None:
+        with Image.open(f_obj := BytesIO(sub_thumb)) as img:
+            if x:
+                img.thumbnail((x, y or x))
+                img.save(f_obj, img.format, quality=95)
             f_obj.seek(0)
-            return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
-    elif sub_filesaved >= 10 and sub_type == "image" and isfile(sub_file):
-        with Image.open(sub_file) as img:
+            return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{img.format.lower()}")
+    elif sub_file is not None:
+        with Image.open(f_obj := BytesIO(sub_file)) as img:
             img.thumbnail((x or 400, y or x or 400))
-            img.save(f_obj := BytesIO(), ext := img.format, quality=95)
+            img.save(f_obj, ext := img.format, quality=95)
             f_obj.seek(0)
             return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
     else:
@@ -472,18 +334,16 @@ def submission_thumbnail(id_: int, x: int = None, y: int = None, filename: str =
 @lru_cache(maxsize=10)
 @app.route("/submission/<int:id_>/zip/")
 @app.route("/submission/<int:id_>/zip/<filename>")
-def submission_zip(id_: int, filename: str = None):
-    if (sub := load_item(submissions_table, id_, False)) is None:
+def serve_submission_zip(id_: int, filename: str = None):
+    if (sub := load_submission(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
         return abort(404)
 
-    _, sub_filesaved, sub_file, sub_thumb = load_submission_file(id_)
+    sub_file, sub_thumb = load_submission_files(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))
     f_obj: BytesIO = BytesIO()
 
     with ZipFile(f_obj, "w") as z:
-        if sub_filesaved >= 10 and isfile(sub_file):
-            z.writestr(basename(sub_file), open(sub_file, "rb").read())
-        if sub_filesaved % 10 == 1 and isfile(sub_thumb):
-            z.writestr(basename(sub_thumb), open(sub_thumb, "rb").read())
+        z.writestr("submission" + f".{(ext := sub['FILEEXT'])}" * bool(ext), sub_file) if sub_file else None
+        z.writestr("thumbnail.jpg", sub_thumb) if sub_thumb else None
         z.writestr("description.html", sub["DESCRIPTION"].encode())
         z.writestr("metadata.json", json_dumps({k: v for k, v in sub.items() if k != "DESCRIPTION"}).encode())
 
@@ -493,13 +353,10 @@ def submission_zip(id_: int, filename: str = None):
 
 @lru_cache(maxsize=10)
 @app.route("/static/<filename>")
-def static_files(filename: str):
+def serve_static_file(filename: str):
     return send_file(path) if isfile(path := join(app.static_folder, filename)) else abort(404)
 
 
 def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
-    global db_path
-
-    db_path = abspath(database_path)
-
+    app.config["db_path"] = abspath(database_path)
     app.run(host=host, port=port)
