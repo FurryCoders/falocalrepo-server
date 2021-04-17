@@ -334,7 +334,7 @@
     const $ = (id) => document.getElementById(id)
 
     const columns = ["any"]
-        .concat(Array.from($("sort_field").options.map((o) => o.value)))
+        .concat(Array.from($("sort_field").options).map((o) => o.value))
         .map((c) => [c, c.length > 2 ? c[0].toUpperCase() + c.substring(1) : c.toUpperCase()])
         .concat([["sql", "SQL"]])
     let view = $("view").value === "grid" ? $("results_table_grid") : $("results_table_list")
