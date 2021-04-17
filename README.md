@@ -6,6 +6,8 @@
 
 Web interface for [falocalrepo](https://pypi.org/project/falocalrepo/).
 
+_Favicon by Fur Affinity._
+
 ## Installation & Requirements
 
 To install the program it is sufficient to use Python pip and get the package `falocalrepo-server`.
