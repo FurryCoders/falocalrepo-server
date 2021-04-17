@@ -306,7 +306,7 @@
                                      style="max-width: 200px; max-height: 200px"
                                      src="/static/loading.gif"
                                      data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
-                                     onerror="this.parentElement.removeChild(this); loadImages()">
+                                     onerror="this.parentElement.removeChild(this)">
                             </a>
                             <br>
                         {% endif %}
@@ -411,7 +411,6 @@
             .forEach(([k, v]) => addSearchField(k).value = v)
         loadImages()
     }
-    window.onscroll = window.onresize = loadImages
 </script>
 </body>
 </html>
