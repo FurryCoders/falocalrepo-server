@@ -72,7 +72,7 @@ def response_minify(response):
 
 @app.route("/favicon.ico")
 def serve_favicon():
-    return redirect("https://www.furaffinity.net/favicon.ico")
+    return serve_static_file("favicon.ico")
 
 
 @app.route("/")
