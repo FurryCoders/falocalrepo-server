@@ -193,8 +193,14 @@
         <button type="submit" onclick="this.form.action='/submission/{{ next }}'" {{ "disabled" if not next }}>
             Next
         </button>
+        <button type="submit" onclick="this.form.action='/gallery/{{ submission["AUTHOR"] }}'">
+            Gallery
+        </button>
         <button type="submit" onclick="this.form.action='/submissions/{{ submission["AUTHOR"] }}'">
-            All Submissions
+            All
+        </button>
+        <button type="submit" onclick="this.form.action='/scraps/{{ submission["AUTHOR"] }}'">
+            Scraps
         </button>
         <button type="submit" onclick="this.form.action='/submission/{{ prev }}'" {{ "disabled" if not prev }}>
             Prev
