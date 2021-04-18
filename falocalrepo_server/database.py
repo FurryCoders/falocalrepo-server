@@ -4,6 +4,7 @@ from os import stat
 from re import sub
 from typing import Callable
 from typing import Optional
+from typing import Union
 
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
@@ -73,7 +74,7 @@ def load_prev_next(db_path: str, table: str, item_id: int, _cache=None) -> tuple
     with FADatabase(db_path) as db:
         item: Optional[dict] = db[table][item_id]
         return db[table].select(
-            {"AUTHOR": item["AUTHOR"]},
+            {"AUTHOR": item["AUTHOR"], **({"folder": item["FOLDER"]} if table == submissions_table else {})},
             ["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
             order=[f"ABS(ID - {item_id})"],
             limit=1
