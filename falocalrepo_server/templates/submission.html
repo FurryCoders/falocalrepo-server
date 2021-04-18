@@ -150,6 +150,12 @@
             </a></td>
         </tr>
         <tr>
+            <td>Folder</td>
+            <td class="overflow value"><a href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
+                {{ submission["FOLDER"] }}
+            </a></td>
+        </tr>
+        <tr>
             <td>Favorites</td>
             <td class="overflow value">
                 {% for user in submission["FAVORITE"] %}
