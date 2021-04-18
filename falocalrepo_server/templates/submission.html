@@ -73,16 +73,16 @@
 <body>
 <div style="text-align: center"><h2>{{ submission["TITLE"] }}</h2></div>
 <div id="submission_file">
-    {% if not submission["FILESAVED"] %}
+    {% if submission["FILESAVED"] < 10 %}
         Submission has no file
-    {% elif submission["FILEEXT"].lower() in ("jpg", "jpeg", "png", "gif") %}
+    {% elif submission["TYPE"].lower() == "image" %}
         <a href="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
             <img src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
                  alt=""
                  onerror="$('submission_file').innerText = 'File not found'"
                  onload="$('download_file').disabled = false">
         </a>
-    {% elif submission["FILEEXT"].lower() in ("mp3", "wav", "mid") %}
+    {% elif submission["TYPE"].lower() == "audio" %}
         <audio src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
                onload="$('download_file').disabled = false"
                controls>
