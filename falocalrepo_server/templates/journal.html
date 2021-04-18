@@ -93,7 +93,7 @@
         <button type="submit" onclick="this.form.action='/journal/{{ next }}'" {{ "disabled" if not next }}>
             Next
         </button>
-        <button type="submit" onclick="this.form.action='/journals/{{ journal["AUTHOR"] }}'">All Journals</button>
+        <button type="submit" onclick="this.form.action='/journals/{{ journal["AUTHOR"] }}'">All</button>
         <button type="submit" onclick="this.form.action='/journal/{{ prev }}'" {{ "disabled" if not prev }}>
             Prev
         </button>
