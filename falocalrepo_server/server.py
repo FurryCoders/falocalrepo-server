@@ -21,7 +21,8 @@ from flask import url_for
 from htmlmin.main import minify
 from werkzeug.exceptions import NotFound
 
-from .database import default_sort, default_order
+from .database import default_order
+from .database import default_sort
 from .database import journals_table
 from .database import load_info
 from .database import load_journal
@@ -116,7 +117,7 @@ def redirect_browse_default():
 
 @app.route("/browse/<string:table>/")
 def serve_browse(table: str):
-    return serve_search(table)
+    return serve_search(table, title_=f"Browse {table.title()}")
 
 
 @app.route("/search/")
@@ -127,79 +128,75 @@ def redirect_search_default():
 @app.route("/gallery/<username>")
 @app.route("/search/gallery/<username>/")
 def redirect_search_user_gallery(username: str):
-    return redirect(url_for(
-        "serve_search", table="submissions", **{
-            **{k: request.args.getlist(k) for k in request.args},
-            "author": username, "folder": "gallery"}))
+    return serve_search(table="submissions", title_=f"Gallery {username}",
+                        args={**{k: request.args.getlist(k) for k in request.args},
+                              "author": [username], "folder": ["gallery"]})
 
 
 @app.route("/scraps/<username>")
 @app.route("/search/scraps/<username>/")
 def redirect_search_user_scraps(username: str):
-    return redirect(url_for(
-        "serve_search", table="submissions", **{
-            **{k: request.args.getlist(k) for k in request.args},
-            "author": username, "folder": "scraps"}))
+    return serve_search(table="submissions", title_=f"Scraps {username}",
+                        args={**{k: request.args.getlist(k) for k in request.args},
+                              "author": [username], "folder": ["scraps"]})
 
 
 @app.route("/submissions/<username>/")
 @app.route("/search/submissions/<username>/")
 def redirect_search_user_submissions(username: str):
-    return redirect(url_for(
-        "serve_search", table="submissions", **{
-            **{k: request.args.getlist(k) for k in request.args},
-            "author": username}))
+    return serve_search(table="submissions", title_=f"Submissions {username}",
+                        args={**{k: request.args.getlist(k) for k in request.args},
+                              "author": [username]})
 
 
 @app.route("/journals/<username>/")
 @app.route("/search/journals/<username>/")
 def redirect_search_user_journals(username: str):
-    return redirect(url_for(
-        "serve_search", table="journals", **{
-            **{k: request.args.getlist(k) for k in request.args},
-            "author": username}))
+    return serve_search(table="journals", title_=f"Journals {username}",
+                        args={**{k: request.args.getlist(k) for k in request.args},
+                              "author": [username]})
 
 
 @app.route("/favorites/<username>")
 @app.route("/search/favorites/<username>/")
 def redirect_search_user_favorites(username: str):
-    return redirect(url_for(
-        "serve_search", table="submissions", **{
-            **{k: request.args.getlist(k) for k in request.args},
-            "favorite": f"%|{username}|%"}))
+    return serve_search(table="submissions", title_=f"Favorites {username}",
+                        args={**{k: request.args.getlist(k) for k in request.args},
+                              "favorite": [f"%|{username}|%"]})
 
 
 @app.route("/mentions/<username>")
 @app.route("/search/mentions/<username>/")
 def redirect_search_user_mentions(username: str):
-    return redirect(url_for(
-        "serve_search", table="submissions", **{
-            **{k: request.args.getlist(k) for k in request.args},
-            "mentions": f"%|{username}|%"}))
+    return serve_search(table="submissions", title_=f"Mentions {username}",
+                        args={**{k: request.args.getlist(k) for k in request.args},
+                              "mentions": [f"%|{username}|%"]})
 
 
 @app.route("/search/<string:table>/")
-def serve_search(table: str):
+def serve_search(table: str, title_: str = "", args: dict[str, list[str]] = None):
     if (table := table.upper()) not in (submissions_table, journals_table, users_table):
         return error(f"Table {table} not found.", 404)
 
+    args = {**{k.lower(): v for k, v in (args or {}).items()},
+            **{k.lower(): request.args.getlist(k) for k in request.args}}
     params: dict[str, list[str]] = {
-        k: request.args.getlist(k) for k in map(str.lower, request.args.keys())
+        k: v for k, v in args.items()
         if k not in ("page", "limit", "sort", "order", "view")
     }
 
     if params and request.path.startswith("/browse/"):
-        return redirect(url_for("serve_search", table=table, **{k: request.args.getlist(k) for k in request.args}))
+        return redirect(url_for("serve_search", table=table, **args))
 
     results: list[dict]
     columns_results: list[str]
     columns_list: list[str]
     column_id: str
-    page: int = int(request.args.get("page", 1))
-    limit: int = int(request.args.get("limit", 48))
-    sort: str = request.args.get("sort", default_sort[table]).lower()
-    order: str = request.args.get("order", default_order[table]).lower()
-    view: str = request.args.get("view", "").lower()
+    page: int = int(args.get("page", [1])[0])
+    limit: int = int(args.get("limit", [48])[0])
+    sort: str = args.get("sort", [default_sort[table]])[0].lower()
+    order: str = args.get("order", [default_order[table]])[0].lower()
+    view: str = args.get("view", [""])[0].lower()
     view = "grid" if view not in ("list", "grid") and table == submissions_table else view
     view = "list" if table != submissions_table else view
 
@@ -215,7 +212,7 @@ def serve_search(table: str):
 
     return render_template(
         "search.html",
-        title=f"{app.name} · {table.title()} Search Results",
+        title=f"{app.name} · " + (title_.strip() or f"{table.title()} Search Results"),
         table=table.lower(),
         params=params,
         sort=sort.lower(),
