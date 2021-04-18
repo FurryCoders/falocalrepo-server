@@ -18,6 +18,7 @@ from flask import render_template
 from flask import request
 from flask import send_file
 from flask import url_for
+from gevent.pywsgi import WSGIServer
 from htmlmin.main import minify
 from werkzeug.exceptions import NotFound
 
@@ -355,5 +356,13 @@ def serve_static_file(filename: str):
 
 
 def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
-    app.config["db_path"] = abspath(database_path)
-    app.run(host=host, port=port)
+    app.config["db_path"] = (database_path := abspath(database_path))
+    app_server: WSGIServer = WSGIServer((host, port), app)
+    print(f"Using database {database_path}")
+    print(f"Serving app on http://{app_server.server_host}:{app_server.server_port}")
+    try:
+        app_server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        app_server.stop()
