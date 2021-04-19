@@ -1,10 +1,12 @@
 from functools import cache
 from json import loads
+from os import PathLike
 from os import stat
 from pathlib import Path
 from re import sub
 from typing import Callable
 from typing import Optional
+from typing import Union
 
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
@@ -13,7 +15,7 @@ from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
 
-m_time: Callable[[str], float] = lambda f: int(stat(f).st_mtime)
+m_time: Callable[[Union[str, PathLike]], int] = lambda f: int(stat(f).st_mtime)
 default_sort: dict[str, str] = {submissions_table: "id", journals_table: "id", users_table: "username"}
 default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
 
