@@ -298,9 +298,8 @@ def serve_submission(id_: int):
 def serve_submission_file(id_: int, filename: str = None):
     if (sub_file := load_submission_files(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))[0]) is None:
         return abort(404)
-    with Image.open(f_obj := BytesIO(sub_file)) as img:
-        f_obj.seek(0)
-        return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{img.format.lower()}")
+    (f_obj := BytesIO(sub_file)).seek(0)
+    return send_file(f_obj, attachment_filename=filename)
 
 
 @cache
