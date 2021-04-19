@@ -1,6 +1,7 @@
 from functools import cache
 from json import loads
 from os import stat
+from pathlib import Path
 from re import sub
 from typing import Callable
 from typing import Optional
@@ -57,7 +58,7 @@ def load_submission(db_path: str, submission_id: int, _cache=None) -> Optional[E
 
 
 @cache
-def load_submission_files(db_path: str, submission_id: int, _cache=None) -> tuple[Optional[bytes], Optional[bytes]]:
+def load_submission_files(db_path: str, submission_id: int, _cache=None) -> tuple[Optional[Path], Optional[Path]]:
     with FADatabase(db_path) as db:
         return db.submissions.get_submission_files(submission_id)
 
@@ -136,7 +137,7 @@ def load_search(db_path: str, table: str, sort: str, order: str, params_: str = 
 
 
 @cache
-def load_files_folder(db_path: str, _cache=None) -> str:
+def load_files_folder(db_path: str, _cache=None) -> Path:
     with FADatabase(db_path) as db:
         return db.files_folder
 
