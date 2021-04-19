@@ -2,9 +2,11 @@ from functools import cache
 from functools import lru_cache
 from io import BytesIO
 from json import dumps as json_dumps
+from os import PathLike
 from pathlib import Path
 from re import sub as re_sub
 from typing import Optional
+from typing import Union
 from zipfile import ZipFile
 
 from PIL import Image
@@ -324,7 +326,7 @@ def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _filename
         try:
             with Image.open(sub_file) as img:
                 img.thumbnail((x or 400, y or x or 400))
-                img.save(f_obj := BytesIO(), ext := img.format, quality=95)
+                img.save(f_obj := BytesIO(), img.format, quality=95)
                 f_obj.seek(0)
                 return send_file(f_obj, attachment_filename=sub_file.name)
         except UnidentifiedImageError:
@@ -360,7 +362,7 @@ def serve_static_file(filename: str):
     return send_file(filepath, attachment_filename=filepath.name) if filepath.is_file() else abort(404)
 
 
-def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
+def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = 8080):
     app.config["db_path"] = Path(database_path).resolve()
     app_server: WSGIServer = WSGIServer((host, port), app)
     print(f"Using database {app.config['db_path']}")
