@@ -2,15 +2,13 @@ from functools import cache
 from functools import lru_cache
 from io import BytesIO
 from json import dumps as json_dumps
-from os.path import abspath
-from os.path import dirname
-from os.path import isfile
-from os.path import join
+from pathlib import Path
 from re import sub as re_sub
 from typing import Optional
 from zipfile import ZipFile
 
 from PIL import Image
+from PIL import UnidentifiedImageError
 from flask import Flask
 from flask import abort
 from flask import redirect
@@ -37,10 +35,11 @@ from .database import m_time
 from .database import submissions_table
 from .database import users_table
 
+module_path: Path = Path(__file__).resolve().parent
 app: Flask = Flask(
     "FurAffinity Local Repo",
-    template_folder=join(abspath(dirname(__file__)), "templates"),
-    static_folder=join(abspath(dirname(__file__)), "static")
+    template_folder=str(module_path / "templates"),
+    static_folder=str(module_path / "static")
 )
 
 
@@ -253,8 +252,8 @@ def serve_journal(id_: int):
 
 @lru_cache(maxsize=10)
 @app.route("/journal/<int:id_>/zip/")
-@app.route("/journal/<int:id_>/zip/<filename>")
-def serve_journal_zip(id_: int, filename: str = None):
+@app.route("/journal/<int:id_>/zip/<_filename>")
+def serve_journal_zip(id_: int, _filename=None):
     if (jrn := load_journal(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
         return abort(404)
 
@@ -265,7 +264,7 @@ def serve_journal_zip(id_: int, filename: str = None):
         z.writestr("metadata.json", json_dumps({k: v for k, v in jrn.items() if k != "CONTENT"}).encode())
 
     f_obj.seek(0)
-    return send_file(f_obj, mimetype="application/zip", attachment_filename=filename)
+    return send_file(f_obj, mimetype="application/zip")
 
 
 @app.route("/full/<int:id_>/")
@@ -294,44 +293,47 @@ def serve_submission(id_: int):
 
 @lru_cache(maxsize=10)
 @app.route("/submission/<int:id_>/file/")
-@app.route("/submission/<int:id_>/file/<filename>")
-def serve_submission_file(id_: int, filename: str = None):
+@app.route("/submission/<int:id_>/file/<_filename>")
+def serve_submission_file(id_: int, _filename=None):
     if (sub_file := load_submission_files(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))[0]) is None:
         return abort(404)
-    (f_obj := BytesIO(sub_file)).seek(0)
-    return send_file(f_obj, attachment_filename=filename)
+    return send_file(sub_file, attachment_filename=sub_file.name)
 
 
 @cache
 @app.route("/submission/<int:id_>/thumbnail/")
-@app.route("/submission/<int:id_>/thumbnail/<string:filename>")
+@app.route("/submission/<int:id_>/thumbnail/<_filename>")
 @app.route("/submission/<int:id_>/thumbnail/<int:x>/")
-@app.route("/submission/<int:id_>/thumbnail/<int:x>/<string:filename>")
+@app.route("/submission/<int:id_>/thumbnail/<int:x>/<_filename>")
 @app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/")
-@app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/<string:filename>")
-def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, filename: str = None):
+@app.route("/submission/<int:id_>/thumbnail/<int:x>x<int:y>/<_filename>")
+def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _filename=None):
     sub_file, sub_thumb = load_submission_files(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))
     if sub_thumb is not None:
-        with Image.open(f_obj := BytesIO(sub_thumb)) as img:
-            if x:
-                img.thumbnail((x, y or x))
-                img.save(f_obj, img.format, quality=95)
+        if not x:
+            return send_file(sub_thumb, attachment_filename=sub_thumb.name)
+        with Image.open(sub_thumb) as img:
+            img.thumbnail((x, y or x))
+            img.save(f_obj := BytesIO(), img.format, quality=95)
             f_obj.seek(0)
-            return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{img.format.lower()}")
+            return send_file(f_obj, attachment_filename=sub_thumb.name)
     elif sub_file is not None:
-        with Image.open(f_obj := BytesIO(sub_file)) as img:
-            img.thumbnail((x or 400, y or x or 400))
-            img.save(f_obj, ext := img.format, quality=95)
-            f_obj.seek(0)
-            return send_file(f_obj, attachment_filename=filename, mimetype=f"image/{ext.lower()}")
+        try:
+            with Image.open(sub_file) as img:
+                img.thumbnail((x or 400, y or x or 400))
+                img.save(f_obj := BytesIO(), ext := img.format, quality=95)
+                f_obj.seek(0)
+                return send_file(f_obj, attachment_filename=sub_file.name)
+        except UnidentifiedImageError:
+            return abort(404)
     else:
         return abort(404)
 
 
 @lru_cache(maxsize=10)
 @app.route("/submission/<int:id_>/zip/")
-@app.route("/submission/<int:id_>/zip/<filename>")
-def serve_submission_zip(id_: int, filename: str = None):
+@app.route("/submission/<int:id_>/zip/<_filename>")
+def serve_submission_zip(id_: int, _filename=None):
     if (sub := load_submission(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
         return abort(404)
 
@@ -339,25 +341,26 @@ def serve_submission_zip(id_: int, filename: str = None):
     f_obj: BytesIO = BytesIO()
 
     with ZipFile(f_obj, "w") as z:
-        z.writestr("submission" + f".{(ext := sub['FILEEXT'])}" * bool(ext), sub_file) if sub_file else None
-        z.writestr("thumbnail.jpg", sub_thumb) if sub_thumb else None
+        z.writestr(sub_file.name, sub_file.read_bytes()) if sub_file else None
+        z.writestr(sub_thumb.name, sub_thumb.read_bytes()) if sub_thumb else None
         z.writestr("description.html", sub["DESCRIPTION"].encode())
         z.writestr("metadata.json", json_dumps({k: v for k, v in sub.items() if k != "DESCRIPTION"}).encode())
 
     f_obj.seek(0)
-    return send_file(f_obj, mimetype="application/zip", attachment_filename=filename)
+    return send_file(f_obj, mimetype="application/zip")
 
 
 @lru_cache(maxsize=10)
-@app.route("/static/<filename>")
+@app.route("/static/<string:filename>")
 def serve_static_file(filename: str):
-    return send_file(path) if isfile(path := join(app.static_folder, filename)) else abort(404)
+    filepath = Path(app.static_folder, filename)
+    return send_file(filepath, attachment_filename=filepath.name) if filepath.is_file() else abort(404)
 
 
 def server(database_path: str, host: str = "0.0.0.0", port: int = 8080):
-    app.config["db_path"] = (database_path := abspath(database_path))
+    app.config["db_path"] = Path(database_path).resolve()
     app_server: WSGIServer = WSGIServer((host, port), app)
-    print(f"Using database {database_path}")
+    print(f"Using database {app.config['db_path']}")
     print(f"Serving app on http://{app_server.server_host}:{app_server.server_port}")
     try:
         app_server.serve_forever()
