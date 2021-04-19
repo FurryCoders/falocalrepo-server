@@ -255,7 +255,10 @@ def serve_journal(id_: int):
 @app.route("/journal/<int:id_>/zip/<_filename>")
 def serve_journal_zip(id_: int, _filename=None):
     if (jrn := load_journal(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
-        return abort(404)
+        return error(
+            f"Journal not found.<br>{button(f'https://www.furaffinity.net/journal/{id_}', 'Open on Fur Affinity')}",
+            404
+        )
 
     f_obj: BytesIO = BytesIO()
 
