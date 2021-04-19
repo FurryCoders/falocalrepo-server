@@ -4,7 +4,6 @@ from os import stat
 from re import sub
 from typing import Callable
 from typing import Optional
-from typing import Union
 
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
