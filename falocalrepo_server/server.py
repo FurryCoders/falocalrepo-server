@@ -22,6 +22,7 @@ from gevent.pywsgi import WSGIServer
 from htmlmin.main import minify
 from werkzeug.exceptions import NotFound
 
+from .__version__ import __version__
 from .database import default_order
 from .database import default_sort
 from .database import journals_table
@@ -88,6 +89,7 @@ def serve_info():
         journals_total=jrn_n,
         users_total=usr_n,
         version_db=version,
+        version=__version__
     )
 
 
