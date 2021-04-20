@@ -134,7 +134,7 @@ def redirect_search_default():
 def redirect_search_user_gallery(username: str):
     return serve_search(table="submissions", title_=f"Gallery {username}",
                         args={**{k: request.args.getlist(k) for k in request.args},
-                              "author": [username], "folder": ["gallery"]})
+                              "author": [clean_username(username)], "folder": ["gallery"]})
 
 
 @app.route("/scraps/<username>")
@@ -142,7 +142,7 @@ def redirect_search_user_gallery(username: str):
 def redirect_search_user_scraps(username: str):
     return serve_search(table="submissions", title_=f"Scraps {username}",
                         args={**{k: request.args.getlist(k) for k in request.args},
-                              "author": [username], "folder": ["scraps"]})
+                              "author": [clean_username(username)], "folder": ["scraps"]})
 
 
 @app.route("/submissions/<username>/")
@@ -150,7 +150,7 @@ def redirect_search_user_scraps(username: str):
 def redirect_search_user_submissions(username: str):
     return serve_search(table="submissions", title_=f"Submissions {username}",
                         args={**{k: request.args.getlist(k) for k in request.args},
-                              "author": [username]})
+                              "author": [clean_username(username)]})
 
 
 @app.route("/journals/<username>/")
@@ -158,7 +158,7 @@ def redirect_search_user_submissions(username: str):
 def redirect_search_user_journals(username: str):
     return serve_search(table="journals", title_=f"Journals {username}",
                         args={**{k: request.args.getlist(k) for k in request.args},
-                              "author": [username]})
+                              "author": [clean_username(username)]})
 
 
 @app.route("/favorites/<username>")
@@ -166,7 +166,7 @@ def redirect_search_user_journals(username: str):
 def redirect_search_user_favorites(username: str):
     return serve_search(table="submissions", title_=f"Favorites {username}",
                         args={**{k: request.args.getlist(k) for k in request.args},
-                              "favorite": [f"%|{username}|%"]})
+                              "favorite": [f"%|{clean_username(username)}|%"]})
 
 
 @app.route("/mentions/<username>")
@@ -174,7 +174,7 @@ def redirect_search_user_favorites(username: str):
 def redirect_search_user_mentions(username: str):
     return serve_search(table="submissions", title_=f"Mentions {username}",
                         args={**{k: request.args.getlist(k) for k in request.args},
-                              "mentions": [f"%|{username}|%"]})
+                              "mentions": [f"%|{clean_username(username)}|%"]})
 
 
 @app.route("/search/<string:table>/")
