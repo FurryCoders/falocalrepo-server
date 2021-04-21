@@ -83,7 +83,7 @@ def serve_favicon():
 def serve_info():
     usr_n, sub_n, jrn_n, version = load_info(app.config["db_path"], _cache=m_time(app.config["db_path"]))
     return render_template(
-        "root.html",
+        "info.html",
         title=app.name,
         submissions_total=sub_n,
         journals_total=jrn_n,
