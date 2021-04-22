@@ -10,10 +10,11 @@ from typing import Union
 
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
-from falocalrepo_database.database import Entry
+from falocalrepo_database.selector import Selector
 from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
+from falocalrepo_database.types import Entry
 
 m_time: Callable[[Union[str, PathLike]], int] = lambda f: int(stat(f).st_mtime)
 default_sort: dict[str, str] = {submissions_table: "id", journals_table: "id", users_table: "username"}
@@ -36,19 +37,21 @@ def load_user_stats(db_path: str, user: str, _cache=None) -> dict[str, int]:
     with FADatabase(db_path) as db:
         stats: dict[str, int] = {
             "gallery": db.submissions.select(
-                {"replace(lower(author), '_', '')": user, "folder": "gallery"}, ["count(ID)"]
+                {"$and": [{"$eq": {"replace(lower(author), '_', '')": user}}, {"$eq": {"folder": "gallery"}}]},
+                columns=["count(ID)"]
             ).cursor.fetchone()[0],
             "scraps": db.submissions.select(
-                {"replace(lower(author), '_', '')": user, "folder": "scraps"}, ["count(ID)"]
+                {"$and": [{"$eq": {"replace(lower(author), '_', '')": user}}, {"$eq": {"folder": "scraps"}}]},
+                columns=["count(ID)"]
             ).cursor.fetchone()[0],
             "favorites": db.submissions.select(
-                {"favorite": f"%|{user}|%"}, ["count(ID)"], like=True
+                {"$like": {"favorite": f"%|{user}|%"}}, columns=["count(ID)"]
             ).cursor.fetchone()[0],
             "mentions": db.submissions.select(
-                {"mentions": f"%|{user}|%"}, ["count(ID)"], like=True
+                {"$like": {"mentions": f"%|{user}|%"}}, columns=["count(ID)"]
             ).cursor.fetchone()[0],
             "journals": db.journals.select(
-                {"replace(lower(author), '_', '')": user}, ["count(ID)"]
+                {"$eq": {"replace(lower(author), '_', '')": user}}, columns=["count(ID)"]
             ).cursor.fetchone()[0]}
         return stats
 
@@ -75,9 +78,11 @@ def load_journal(db_path: str, journal_id: int, _cache=None) -> Optional[Entry]:
 def load_prev_next(db_path: str, table: str, item_id: int, _cache=None) -> tuple[int, int]:
     with FADatabase(db_path) as db:
         item: Optional[dict] = db[table][item_id]
+        query: Selector = {"$eq": {"AUTHOR": item["AUTHOR"]}}
+        query = {"$and": [query, {"$eq": {"folder": item["FOLDER"]}}]} if table == submissions_table else query
         return db[table].select(
-            {"AUTHOR": item["AUTHOR"], **({"folder": item["FOLDER"]} if table == submissions_table else {})},
-            ["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
+            query,
+            columns=["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
             order=[f"ABS(ID - {item_id})"],
             limit=1
         ).cursor.fetchone() if item else (0, 0)
@@ -128,7 +133,9 @@ def load_search(db_path: str, table: str, sort: str, order: str, params_: str = 
             del params["any"]
 
         return (
-            list(db_table.select(params, cols_results, like=True, order=[f"{sort} {order}"])),
+            list(db_table.select(
+                {"$and": [{"$or": [{"$like": {k: v}} for v in params[k]]} for k in params]} if params else {},
+                columns=cols_results, order=[f"{sort} {order}"])),
             cols_table,
             cols_results,
             cols_list,
