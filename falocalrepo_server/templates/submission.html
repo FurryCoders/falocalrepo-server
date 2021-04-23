@@ -113,7 +113,7 @@
         </tr>
         <tr>
             <td>Date</td>
-            <td class="overflow value">{{ submission["DATE"] }}</td>
+            <td class="overflow value">{{ submission["DATE"]|replace("T", " ") }}</td>
         </tr>
         <tr>
             <td>Tags</td>

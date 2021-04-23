@@ -69,7 +69,7 @@
         </tr>
         <tr>
             <td>Date</td>
-            <td class="overflow value">{{ journal["DATE"] }}</td>
+            <td class="overflow value">{{ journal["DATE"]|replace("T", " ") }}</td>
         </tr>
         <tr>
             <td>Mentions</td>
