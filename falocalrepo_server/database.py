@@ -27,6 +27,7 @@ class FADatabaseWrapper(FADatabase):
             raise FileNotFoundError(database_path)
         super().__init__(database_path, make=False)
         self.check_version(patch=False)
+        self.check_connection()
 
 
 @cache
