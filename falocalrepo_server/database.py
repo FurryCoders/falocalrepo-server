@@ -17,17 +17,17 @@ from falocalrepo_database.types import Entry
 m_time: Callable[[Path], float] = lambda f: f.stat().st_mtime
 default_sort: dict[str, str] = {submissions_table: "id", journals_table: "id", users_table: "username"}
 default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
-checked: dict[Any, bool] = {}
+checked_cache: Any = None
 
 
 class FADatabaseWrapper(FADatabase):
     def __init__(self, database_path: Path, _cache=None):
-        global checked
+        global checked_cache
         super().__init__(database_path, make=False)
-        if not _cache or not checked.get(_cache, None):
+        if not _cache or _cache != checked_cache:
             self.check_version(patch=False)
             self.check_connection()
-            checked[_cache] = True
+            checked_cache = _cache
 
 
 @cache
