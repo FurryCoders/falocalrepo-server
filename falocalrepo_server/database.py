@@ -1,13 +1,10 @@
 from functools import cache
 from json import loads
-from os import PathLike
-from os import stat
 from pathlib import Path
 from re import sub
 from typing import Any
 from typing import Callable
 from typing import Optional
-from typing import Union
 
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
@@ -20,13 +17,17 @@ from falocalrepo_database.types import Entry
 m_time: Callable[[Path], int] = lambda f: int(f.stat().st_mtime)
 default_sort: dict[str, str] = {submissions_table: "id", journals_table: "id", users_table: "username"}
 default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
+checked: dict[Any, bool] = {}
 
 
 class FADatabaseWrapper(FADatabase):
     def __init__(self, database_path: Path, _cache=None):
+        global checked
         super().__init__(database_path, make=False)
-        self.check_version(patch=False)
-        self.check_connection()
+        if not _cache or not checked.get(_cache, None):
+            self.check_version(patch=False)
+            self.check_connection()
+            checked[_cache] = True
 
 
 @cache
@@ -36,13 +37,13 @@ def clean_username(username: str, exclude: str = "") -> str:
 
 @cache
 def load_user(db_path: Path, user: str, _cache=None) -> Optional[Entry]:
-    with FADatabaseWrapper(db_path) as db:
+    with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.users[user]
 
 
 @cache
 def load_user_stats(db_path: Path, user: str, _cache=None) -> dict[str, int]:
-    with FADatabaseWrapper(db_path) as db:
+    with FADatabaseWrapper(db_path, _cache=_cache) as db:
         stats: dict[str, int] = {
             "gallery": db.submissions.select(
                 {"$and": [{"$eq": {"replace(lower(author), '_', '')": user}}, {"$eq": {"folder": "gallery"}}]},
@@ -66,25 +67,25 @@ def load_user_stats(db_path: Path, user: str, _cache=None) -> dict[str, int]:
 
 @cache
 def load_submission(db_path: Path, submission_id: int, _cache=None) -> Optional[Entry]:
-    with FADatabaseWrapper(db_path) as db:
+    with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.submissions[submission_id]
 
 
 @cache
 def load_submission_files(db_path: Path, submission_id: int, _cache=None) -> tuple[Optional[Path], Optional[Path]]:
-    with FADatabaseWrapper(db_path) as db:
+    with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.submissions.get_submission_files(submission_id)
 
 
 @cache
 def load_journal(db_path: Path, journal_id: int, _cache=None) -> Optional[Entry]:
-    with FADatabaseWrapper(db_path) as db:
+    with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.journals[journal_id]
 
 
 @cache
 def load_prev_next(db_path: Path, table: str, item_id: int, _cache=None) -> tuple[int, int]:
-    with FADatabaseWrapper(db_path) as db:
+    with FADatabaseWrapper(db_path, _cache=_cache) as db:
         item: Optional[dict] = db[table][item_id]
         query: Selector = {"$eq": {"AUTHOR": item["AUTHOR"]}}
         query = {"$and": [query, {"$eq": {"folder": item["FOLDER"]}}]} if table == submissions_table else query
@@ -108,7 +109,7 @@ def load_search(db_path: Path, table: str, sort: str, order: str, params_: str =
     elif table == users_table:
         cols_results = ["USERNAME", "FOLDERS"]
 
-    with FADatabaseWrapper(db_path) as db:
+    with FADatabaseWrapper(db_path, _cache=_cache) as db:
         db_table: FADatabaseTable = db[table]
         cols_table: list[str] = db_table.columns
         cols_list: list[str] = db_table.list_columns
@@ -155,11 +156,11 @@ def load_search(db_path: Path, table: str, sort: str, order: str, params_: str =
 
 @cache
 def load_files_folder(db_path: Path, _cache=None) -> Path:
-    with FADatabaseWrapper(db_path) as db:
+    with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.files_folder
 
 
 @cache
 def load_info(db_path: Path, _cache=None) -> tuple[int, int, int, str]:
-    with FADatabaseWrapper(db_path) as db:
+    with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return len(db.users), len(db.submissions), len(db.journals), db.version
