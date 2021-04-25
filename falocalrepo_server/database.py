@@ -22,7 +22,7 @@ default_order: dict[str, str] = {submissions_table: "desc", journals_table: "des
 
 
 class FADatabaseWrapper(FADatabase):
-    def __init__(self, database_path: Union[str, PathLike]):
+    def __init__(self, database_path: Path):
         if not (database_path := Path(database_path)).is_file():
             raise FileNotFoundError(database_path)
         super().__init__(database_path, make=False)
@@ -36,13 +36,13 @@ def clean_username(username: str, exclude: str = "") -> str:
 
 
 @cache
-def load_user(db_path: str, user: str, _cache=None) -> Optional[Entry]:
+def load_user(db_path: Path, user: str, _cache=None) -> Optional[Entry]:
     with FADatabaseWrapper(db_path) as db:
         return db.users[user]
 
 
 @cache
-def load_user_stats(db_path: str, user: str, _cache=None) -> dict[str, int]:
+def load_user_stats(db_path: Path, user: str, _cache=None) -> dict[str, int]:
     with FADatabaseWrapper(db_path) as db:
         stats: dict[str, int] = {
             "gallery": db.submissions.select(
@@ -66,25 +66,25 @@ def load_user_stats(db_path: str, user: str, _cache=None) -> dict[str, int]:
 
 
 @cache
-def load_submission(db_path: str, submission_id: int, _cache=None) -> Optional[Entry]:
+def load_submission(db_path: Path, submission_id: int, _cache=None) -> Optional[Entry]:
     with FADatabaseWrapper(db_path) as db:
         return db.submissions[submission_id]
 
 
 @cache
-def load_submission_files(db_path: str, submission_id: int, _cache=None) -> tuple[Optional[Path], Optional[Path]]:
+def load_submission_files(db_path: Path, submission_id: int, _cache=None) -> tuple[Optional[Path], Optional[Path]]:
     with FADatabaseWrapper(db_path) as db:
         return db.submissions.get_submission_files(submission_id)
 
 
 @cache
-def load_journal(db_path: str, journal_id: int, _cache=None) -> Optional[Entry]:
+def load_journal(db_path: Path, journal_id: int, _cache=None) -> Optional[Entry]:
     with FADatabaseWrapper(db_path) as db:
         return db.journals[journal_id]
 
 
 @cache
-def load_prev_next(db_path: str, table: str, item_id: int, _cache=None) -> tuple[int, int]:
+def load_prev_next(db_path: Path, table: str, item_id: int, _cache=None) -> tuple[int, int]:
     with FADatabaseWrapper(db_path) as db:
         item: Optional[dict] = db[table][item_id]
         query: Selector = {"$eq": {"AUTHOR": item["AUTHOR"]}}
@@ -98,7 +98,7 @@ def load_prev_next(db_path: str, table: str, item_id: int, _cache=None) -> tuple
 
 
 @cache
-def load_search(db_path: str, table: str, sort: str, order: str, params_: str = "{}", force: bool = False, _cache=None):
+def load_search(db_path: Path, table: str, sort: str, order: str, params_: str = "{}", force: bool = False, _cache=None):
     cols_results: list[str] = []
     params: dict[str, list[str]] = loads(params_)
     order = order or default_order[table]
@@ -155,12 +155,12 @@ def load_search(db_path: str, table: str, sort: str, order: str, params_: str = 
 
 
 @cache
-def load_files_folder(db_path: str, _cache=None) -> Path:
+def load_files_folder(db_path: Path, _cache=None) -> Path:
     with FADatabaseWrapper(db_path) as db:
         return db.files_folder
 
 
 @cache
-def load_info(db_path: str, _cache=None) -> tuple[int, int, int, str]:
+def load_info(db_path: Path, _cache=None) -> tuple[int, int, int, str]:
     with FADatabaseWrapper(db_path) as db:
         return len(db.users), len(db.submissions), len(db.journals), db.version
