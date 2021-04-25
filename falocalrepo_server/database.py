@@ -26,6 +26,7 @@ class FADatabaseWrapper(FADatabase):
         if not (database_path := Path(database_path)).is_file():
             raise FileNotFoundError(database_path)
         super().__init__(database_path, make=False)
+        self.check_version(patch=False)
 
 
 @cache
