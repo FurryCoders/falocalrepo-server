@@ -21,6 +21,13 @@ default_sort: dict[str, str] = {submissions_table: "id", journals_table: "id", u
 default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
 
 
+class FADatabaseWrapper(FADatabase):
+    def __init__(self, database_path: Union[str, PathLike]):
+        if not (database_path := Path(database_path)).is_file():
+            raise FileNotFoundError(database_path)
+        super().__init__(database_path, make=False)
+
+
 @cache
 def clean_username(username: str, exclude: str = "") -> str:
     return sub(rf"[^a-zA-Z0-9\-.~{exclude}]", "", username.lower().strip())
@@ -28,13 +35,13 @@ def clean_username(username: str, exclude: str = "") -> str:
 
 @cache
 def load_user(db_path: str, user: str, _cache=None) -> Optional[Entry]:
-    with FADatabase(db_path) as db:
+    with FADatabaseWrapper(db_path) as db:
         return db.users[user]
 
 
 @cache
 def load_user_stats(db_path: str, user: str, _cache=None) -> dict[str, int]:
-    with FADatabase(db_path) as db:
+    with FADatabaseWrapper(db_path) as db:
         stats: dict[str, int] = {
             "gallery": db.submissions.select(
                 {"$and": [{"$eq": {"replace(lower(author), '_', '')": user}}, {"$eq": {"folder": "gallery"}}]},
@@ -58,25 +65,25 @@ def load_user_stats(db_path: str, user: str, _cache=None) -> dict[str, int]:
 
 @cache
 def load_submission(db_path: str, submission_id: int, _cache=None) -> Optional[Entry]:
-    with FADatabase(db_path) as db:
+    with FADatabaseWrapper(db_path) as db:
         return db.submissions[submission_id]
 
 
 @cache
 def load_submission_files(db_path: str, submission_id: int, _cache=None) -> tuple[Optional[Path], Optional[Path]]:
-    with FADatabase(db_path) as db:
+    with FADatabaseWrapper(db_path) as db:
         return db.submissions.get_submission_files(submission_id)
 
 
 @cache
 def load_journal(db_path: str, journal_id: int, _cache=None) -> Optional[Entry]:
-    with FADatabase(db_path) as db:
+    with FADatabaseWrapper(db_path) as db:
         return db.journals[journal_id]
 
 
 @cache
 def load_prev_next(db_path: str, table: str, item_id: int, _cache=None) -> tuple[int, int]:
-    with FADatabase(db_path) as db:
+    with FADatabaseWrapper(db_path) as db:
         item: Optional[dict] = db[table][item_id]
         query: Selector = {"$eq": {"AUTHOR": item["AUTHOR"]}}
         query = {"$and": [query, {"$eq": {"folder": item["FOLDER"]}}]} if table == submissions_table else query
@@ -100,7 +107,7 @@ def load_search(db_path: str, table: str, sort: str, order: str, params_: str = 
     elif table == users_table:
         cols_results = ["USERNAME", "FOLDERS"]
 
-    with FADatabase(db_path) as db:
+    with FADatabaseWrapper(db_path) as db:
         db_table: FADatabaseTable = db[table]
         cols_table: list[str] = db_table.columns
         cols_list: list[str] = db_table.list_columns
@@ -147,11 +154,11 @@ def load_search(db_path: str, table: str, sort: str, order: str, params_: str = 
 
 @cache
 def load_files_folder(db_path: str, _cache=None) -> Path:
-    with FADatabase(db_path) as db:
+    with FADatabaseWrapper(db_path) as db:
         return db.files_folder
 
 
 @cache
 def load_info(db_path: str, _cache=None) -> tuple[int, int, int, str]:
-    with FADatabase(db_path) as db:
+    with FADatabaseWrapper(db_path) as db:
         return len(db.users), len(db.submissions), len(db.journals), db.version
