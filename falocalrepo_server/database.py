@@ -14,7 +14,7 @@ from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
 from falocalrepo_database.types import Entry
 
-m_time: Callable[[Path], int] = lambda f: int(f.stat().st_mtime)
+m_time: Callable[[Path], float] = lambda f: f.stat().st_mtime
 default_sort: dict[str, str] = {submissions_table: "id", journals_table: "id", users_table: "username"}
 default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
 checked: dict[Any, bool] = {}
