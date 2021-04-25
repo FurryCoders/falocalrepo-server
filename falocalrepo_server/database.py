@@ -4,6 +4,7 @@ from os import PathLike
 from os import stat
 from pathlib import Path
 from re import sub
+from typing import Any
 from typing import Callable
 from typing import Optional
 from typing import Union
@@ -22,9 +23,7 @@ default_order: dict[str, str] = {submissions_table: "desc", journals_table: "des
 
 
 class FADatabaseWrapper(FADatabase):
-    def __init__(self, database_path: Path):
-        if not (database_path := Path(database_path)).is_file():
-            raise FileNotFoundError(database_path)
+    def __init__(self, database_path: Path, _cache=None):
         super().__init__(database_path, make=False)
         self.check_version(patch=False)
         self.check_connection()
