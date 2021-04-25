@@ -20,7 +20,7 @@ falocalrepo-server = "falocalrepo_server.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-falocalrepo-database = "~4.18.0"
+falocalrepo-database = "~4.18.2"
 flask = "^1.1.2"
 Pillow = "^8.1.0"
 htmlmin = "^0.1.0"
