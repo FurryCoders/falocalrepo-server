@@ -343,7 +343,7 @@
         .concat([["sql", "SQL"]])
     let view = $("view").value === "grid" ? $("results_table_grid") : $("results_table_list")
 
-    const addSearchField = (fieldType = null) => {
+    const addSearchField = (fieldType = "") => {
         let table = $("search_fields")
 
         let row = table.insertRow(table.rows.length - 5)
@@ -356,11 +356,11 @@
         col3.classList.add("col3")
 
         let fieldSelect = col1.appendChild(document.createElement("select"))
-        columns.forEach(([c, C]) => {
+        columns.forEach(([c, C], i) => {
             let o = document.createElement("option")
             o.name = c
             o.text = C
-            if (fieldType === o.name) o.selected = true
+            if (fieldType === o.name || (!fieldType && i === 0)) o.selected = true
             fieldSelect.options.add(o)
         })
 
