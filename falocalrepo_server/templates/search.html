@@ -3,17 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/styles/style.css">
     <style>
-        :root {
-            --table_border_color: darkgray;
-            --table_background_color_odd: white;
-            --table_background_color_even: lightgrey;
-        }
-
-        body > h2 {
-            text-align: center;
-        }
-
         #search_form {
             width: 95%;
             top: 20px;
@@ -35,67 +26,30 @@
             text-align: center
         }
 
-        td.col1 {
+        #search_form td.col1 {
             width: 90px;
         }
 
-        td.col2 {
+        #search_form td.col2 {
             width: available;
         }
 
-        td.col3 {
+        #search_form td.col3 {
             width: 25px;
             text-align: center;
         }
 
-        td a.celllink {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        a.nocolor {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        td img {
-            display: block;
-            margin: auto;
-            object-fit: contain;
-        }
-
-        .clickable {
-            cursor: pointer;
-        }
-
-        .hover_highlight:hover {
-            background-blend-mode: multiply;
-            background-color: cyan;
-        }
-
-        .hover_underline:hover {
-            text-decoration: underline;
-        }
-
         #search_results table.results_list {
-            border-collapse: collapse;
-            border: 1px solid var(--table_border_color);
             width: 95%;
             max-width: 95% !important;
             top: 20px;
             margin: auto;
         }
 
-        #search_results table.results_list td {
-            border: 1px solid var(--table_border_color);
-        {% if table == "submissions" %}
+        #search_results.submissions table.results_list td {
             height: 50px;
             min-height: 50px;
             max-height: 50px;
-        {% endif %}
-            text-align: center;
-            vertical-align: center;
         }
 
         #search_results table.results_list td span {
@@ -104,9 +58,6 @@
 
         #search_results table.results_list th {
             padding: 2px;
-            border: 2px solid var(--table_border_color);
-            text-align: center;
-            vertical-align: center;
         }
 
         #search_results table.results_list td.id {
@@ -138,23 +89,17 @@
             max-width: 300px;
         }
 
-        #search_results table.results_list th.thumbnail {
-            background: var(--table_background_color_odd);
-            border: none;
-        }
-
-        #search_results table.results_list td.thumbnail {
+        #search_results table.results_list .thumbnail {
             width: 100px;
             min-width: 100px;
             max-width: 100px;
         }
 
-        #search_results table.results_list tr.odd {
-            background-image: linear-gradient(0deg, var(--table_background_color_odd), var(--table_background_color_odd));
-        }
-
-        #search_results table.results_list tr.even {
-            background-image: linear-gradient(0deg, var(--table_background_color_even), var(--table_background_color_even));
+        #search_results table.results_list .thumbnail img {
+            max-width: 100px;
+            max-height: 50px;
+            object-fit: contain;
+            margin: auto;
         }
 
         #search_results div.results_grid {
@@ -184,7 +129,7 @@
 </head>
 <body>
 {% set table_short %}{{ table[:-1] }}{% endset %}
-<h2>{{ title }}</h2>
+<h2 style="text-align: center;">{{ title }}</h2>
 <form id="search_form" action="">
     <table id="search_fields">
         <tr>
@@ -255,41 +200,41 @@
 </div>
 {% endif %}
 {% if results %}
-    <div id="search_results" style="text-align: center">
+    <div id="search_results" class="{{ table.lower() }}" style="text-align: center">
         <table id="results_table_list"
-               class="results_list" {{ "" if view == "list" or not allow_view else "style=\"display: none\""|safe }}>
+               class="border results_list"
+                {{ "" if view == "list" or not allow_view else "style=\"display: none\""|safe }}>
             <tr class="even">
                 {% for column in columns_results %}
-                    <th class="{{ column.lower() }}">{{ column }}</th>
+                    <th class="border-thick {{ column.lower() }}">{{ column }}</th>
                 {% endfor %}
                 {% if thumbnails %}
-                    <th class="thumbnail"></th>
+                    <th class="border-thick thumbnail"></th>
                 {% endif %}
             </tr>
             {% for item in results %}
                 <tr class="hover_highlight clickable {{ loop.cycle('odd', 'even') }}">
                     {% for column in columns_results %}
-                        <td class="{{ column.lower() }} {{ 'hover_underline' if column == "AUTHOR" }}">
+                        <td class="border {{ column.lower() }} {{ 'hover_underline' if column == "AUTHOR" }}">
                             {% if column == "AUTHOR" %}
-                                <a class="celllink" href="/user/{{ item[column] }}">
+                                <a class="cell-link" href="/user/{{ item[column] }}">
                                     <span>{{ item[column] }}</span>
                                 </a>
                             {% elif column == "DATE" %}
-                                <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
+                                <a class="cell-link" href="/{{ table_short }}/{{ item[column_id] }}">
                                     <span>{{ item[column]|replace("T", " ") }}</span>
                                 </a>
                             {% else %}
-                                <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
+                                <a class="cell-link" href="/{{ table_short }}/{{ item[column_id] }}">
                                     <span>{{ " ".join(item[column]) if column in columns_list else item[column] }}</span>
                                 </a>
                             {% endif %}
                         </td>
                     {% endfor %}
                     {% if thumbnails %}
-                        <td class="thumbnail">
-                            <a class="celllink" href="/{{ table_short }}/{{ item[column_id] }}">
+                        <td class="border thumbnail">
+                            <a class="cell-link" href="/{{ table_short }}/{{ item[column_id] }}">
                                 <img class="lazy"
-                                     style="max-width: 100px; max-height: 50px"
                                      src="/static/loading.gif"
                                      data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/" alt=""
                                      onerror="this.parentNode.removeChild(this)">

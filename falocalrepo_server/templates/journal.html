@@ -3,12 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/styles/style.css">
     <style>
-        :root {
-            --table_border_color: darkgray;
-            --table_background_color_even: lightgrey;
-        }
-
         #journal_metadata {
             width: 95%;
             max-width: 95%;
@@ -25,31 +21,14 @@
             text-align: justify;
         }
 
-        table {
-            border-collapse: collapse;
-            border: 1px solid var(--table_border_color);
-        }
-
-        table th {
-            padding: 2px;
-            border: 2px solid var(--table_border_color);
-            text-align: center;
-        }
-
-        table td {
-            padding: 2px;
-            border: 1px solid var(--table_border_color);
-        }
-
-        .overflow {
-            overflow: hidden;
-            white-space: normal;
-        }
-
         #journal_metadata table {
             width: 300px;
             max-width: 300px;
             margin: auto;
+        }
+
+        #journal_metadata table td {
+            padding: 2px;
         }
 
         #journal_metadata .value {
@@ -60,20 +39,20 @@
 <body>
 <div id="journal_metadata">
     <h2>{{ journal["TITLE"] }}</h2>
-    <table style="max-width: 300px">
+    <table class="border" style="max-width: 300px">
         <tr>
-            <td>Author</td>
-            <td class="overflow value"><a href="/user/{{ journal["AUTHOR"] }}">
+            <td class="border">Author</td>
+            <td class="overflow value border"><a href="/user/{{ journal["AUTHOR"] }}">
                 {{ journal["AUTHOR"] }}
             </a></td>
         </tr>
         <tr>
-            <td>Date</td>
-            <td class="overflow value">{{ journal["DATE"]|replace("T", " ") }}</td>
+            <td class="border">Date</td>
+            <td class="overflow value border">{{ journal["DATE"]|replace("T", " ") }}</td>
         </tr>
         <tr>
-            <td>Mentions</td>
-            <td class="overflow value">
+            <td class="border">Mentions</td>
+            <td class="overflow value border">
                 {% for user in journal["MENTIONS"] %}
                     {% if user != "" %}
                         <a href="/user/{{ user }}">{{ user }}</a>

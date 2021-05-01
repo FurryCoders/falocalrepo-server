@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/styles/style.css">
     <style>
-        :root {
-            --table_border_color: darkgray;
-            --table_background_color_even: lightgrey;
-        }
-
         #submission_file {
             width: 95%;
             max-width: 95%;
             top: 20px;
             margin: auto;
             text-align: center
+        }
+
+        #submission_file img {
+            max-width: 90vw;
+            max-height: 90vh;
         }
 
         #submission_metadata {
@@ -33,36 +34,14 @@
             text-align: justify;
         }
 
-        img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        table {
-            border-collapse: collapse;
-            border: 1px solid var(--table_border_color);
-        }
-
-        table th {
-            padding: 2px;
-            border: 2px solid var(--table_border_color);
-            text-align: center;
-        }
-
-        table td {
-            padding: 2px;
-            border: 1px solid var(--table_border_color);
-        }
-
-        .overflow {
-            overflow: hidden;
-            white-space: normal;
-        }
-
         #submission_metadata table {
             width: 300px;
             max-width: 300px;
             margin: auto;
+        }
+
+        #submission_metadata table td {
+            padding: 2px;
         }
 
         #submission_metadata .value {
@@ -71,7 +50,6 @@
     </style>
 </head>
 <body>
-<div style="text-align: center"><h2>{{ submission["TITLE"] }}</h2></div>
 <div id="submission_file">
     {% if submission["FILESAVED"] < 10 %}
         Submission has no file
@@ -103,21 +81,23 @@
     {% endif %}
 </div>
 <br>
+<div style="text-align: center"><h2>{{ submission["TITLE"] }}</h2></div>
+<br>
 <div id="submission_metadata">
-    <table style="max-width: 300px">
+    <table class="border" style="max-width: 300px">
         <tr>
-            <td>Author</td>
-            <td class="overflow value"><a href="/user/{{ submission["AUTHOR"] }}">
+            <td class="border">Author</td>
+            <td class="border overflow value"><a href="/user/{{ submission["AUTHOR"] }}">
                 {{ submission["AUTHOR"] }}
             </a></td>
         </tr>
         <tr>
-            <td>Date</td>
-            <td class="overflow value">{{ submission["DATE"]|replace("T", " ") }}</td>
+            <td class="border">Date</td>
+            <td class="border overflow value">{{ submission["DATE"]|replace("T", " ") }}</td>
         </tr>
         <tr>
-            <td>Tags</td>
-            <td class="overflow value">
+            <td class="border">Tags</td>
+            <td class="border overflow value">
                 {% for tag in submission["TAGS"] %}
                     {% if tag != "" %}
                         <a href='/search/submissions/?tags=%25%7C{{ tag }}%7C%25'>{{ tag }}</a>
@@ -126,38 +106,38 @@
             </td>
         </tr>
         <tr>
-            <td>Category</td>
-            <td class="overflow value"><a href="/search/submissions/?category=%25{{ submission["CATEGORY"] }}%25">
+            <td class="border">Category</td>
+            <td class="border overflow value"><a href="/search/submissions/?category=%25{{ submission["CATEGORY"] }}%25">
                 {{ submission["CATEGORY"] }}
             </a></td>
         </tr>
         <tr>
-            <td>Species</td>
-            <td class="overflow value"><a href="/search/submissions/?species=%25{{ submission["SPECIES"] }}%25">
+            <td class="border">Species</td>
+            <td class="border overflow value"><a href="/search/submissions/?species=%25{{ submission["SPECIES"] }}%25">
                 {{ submission["SPECIES"] }}
             </a></td>
         </tr>
         <tr>
-            <td>Gender</td>
-            <td class="overflow value"><a href="/search/submissions/?gender=%25{{ submission["GENDER"] }}%25">
+            <td class="border">Gender</td>
+            <td class="border overflow value"><a href="/search/submissions/?gender=%25{{ submission["GENDER"] }}%25">
                 {{ submission["GENDER"] }}
             </a></td>
         </tr>
         <tr>
-            <td>Rating</td>
-            <td class="overflow value"><a href="/search/submissions/?rating=%25{{ submission["RATING"] }}%25">
+            <td class="border">Rating</td>
+            <td class="border overflow value"><a href="/search/submissions/?rating=%25{{ submission["RATING"] }}%25">
                 {{ submission["RATING"] }}
             </a></td>
         </tr>
         <tr>
-            <td>Folder</td>
-            <td class="overflow value"><a href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
+            <td class="border">Folder</td>
+            <td class="border overflow value"><a href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
                 {{ submission["FOLDER"] }}
             </a></td>
         </tr>
         <tr>
-            <td>Favorites</td>
-            <td class="overflow value">
+            <td class="border">Favorites</td>
+            <td class="border overflow value">
                 {% for user in submission["FAVORITE"] %}
                     {% if user != "" %}
                         <a href="/search/favorites/{{ user }}">{{ user }}</a>
@@ -166,8 +146,8 @@
             </td>
         </tr>
         <tr>
-            <td>Mentions</td>
-            <td class="overflow value">
+            <td class="border">Mentions</td>
+            <td class="border overflow value">
                 {% for user in submission["MENTIONS"] %}
                     {% if user != "" %}
                         <a href="/user/{{ user }}">{{ user }}</a>

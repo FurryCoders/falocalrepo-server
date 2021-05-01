@@ -3,16 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/styles/style.css">
     <style>
-        :root {
-            --table_border_color: darkgray;
-            --table_background_color_even: lightgrey;
-        }
-
-        body > h2 {
-            text-align: center;
-        }
-
         #database_info {
             width: 95%;
             max-width: 95%;
@@ -29,75 +21,42 @@
             text-align: center
         }
 
-        table {
-            border-collapse: collapse;
-            border: 1px solid var(--table_border_color);
-        }
-
-        table th {
-            padding: 2px;
-            border: 2px solid var(--table_border_color);
-            text-align: center;
-        }
-
-        table td {
-            padding: 2px;
-            border: 1px solid var(--table_border_color);
-        }
-
-        table td a.celllink {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .clickable {
-            cursor: pointer;
-        }
-
-        .hover_highlight:hover {
-            background-blend-mode: multiply;
-            background-color: cyan;
-        }
-
         #database_info table {
             width: 300px;
             max-width: 300px;
             margin: auto;
         }
 
+        #database_info table td {
+            padding: 2px;
+        }
+
         #search_menu button {
             width: 90px;
             max-width: 90px;
         }
-
-        td a.celllink {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-        }
     </style>
 </head>
 <body>
-<h2>{{ title }}</h2>
+<h2 style="text-align: center;">{{ title }}</h2>
 <div id="database_info">
     <h3>Database Information</h3>
-    <table>
+    <table class="border">
         <tr class="clickable hover_highlight">
-            <td><a class="celllink" href='/browse/submissions/'>Submissions</a></td>
-            <td><a class="celllink" href='/browse/submissions/'>{{ submissions_total }}</a></td>
+            <td class="border"><a class="cell-link nocolor" href='/browse/submissions/'>Submissions</a></td>
+            <td class="border"><a class="cell-link nocolor" href='/browse/submissions/'>{{ submissions_total }}</a></td>
         </tr>
         <tr class="clickable hover_highlight">
-            <td><a class="celllink" href='/browse/journals/'>Journals</a></td>
-            <td><a class="celllink" href='/browse/journals/'>{{ journals_total }}</a></td>
+            <td class="border"><a class="cell-link nocolor" href='/browse/journals/'>Journals</a></td>
+            <td class="border"><a class="cell-link nocolor" href='/browse/journals/'>{{ journals_total }}</a></td>
         </tr>
         <tr class="clickable hover_highlight">
-            <td><a class="celllink" href='/browse/users/'>Users</a></td>
-            <td><a class="celllink" href='/browse/users/'>{{ users_total }}</a></td>
+            <td class="border"><a class="cell-link nocolor" href='/browse/users/'>Users</a></td>
+            <td class="border"><a class="cell-link nocolor" href='/browse/users/'>{{ users_total }}</a></td>
         </tr>
         <tr>
-            <td>Version</td>
-            <td>{{ version_db }}</td>
+            <td class="border">Version</td>
+            <td class="border">{{ version_db }}</td>
         </tr>
     </table>
 </div>
