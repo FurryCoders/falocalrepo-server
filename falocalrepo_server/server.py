@@ -358,9 +358,9 @@ def serve_submission_zip(id_: int, _filename=None):
 
 
 @lru_cache(maxsize=10)
-@app.route("/static/<string:filename>")
-def serve_static_file(filename: str):
-    filepath = Path(app.static_folder, filename)
+@app.route("/static/<path:filename>")
+def serve_static_file(filename: Union[str, PathLike]):
+    filepath: Path = Path(app.static_folder, filename)
     return send_file(filepath, attachment_filename=filepath.name) if filepath.is_file() else abort(404)
 
 
