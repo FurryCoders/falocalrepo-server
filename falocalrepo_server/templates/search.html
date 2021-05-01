@@ -120,6 +120,11 @@
             text-align: center;
         }
 
+        #search_results div.results_grid div.grid_item .thumbnail img {
+            max-width: 200px;
+            max-height: 200px;
+        }
+
         #header button, #footer button {
             position: relative;
             top: 10px;
@@ -163,8 +168,7 @@
         </tr>
         <tr {{ "hidden" if not allow_view else "" }}>
             <td class="col1"><label for="view">View</label></td>
-            <td class="col2"><select id="view" name="view" style="width: 100%;"
-                                     onchange="changeView(this.value); loadImages()">
+            <td class="col2"><select id="view" name="view" style="width: 100%;" onchange="changeView(this.value)">
                 <option {{ "selected" if view == "list" or not allow_view or not view }} value="list">List</option>
                 <option {{ "selected" if view == "grid" and allow_view }} value="grid">Grid</option>
             </select></td>
@@ -234,10 +238,10 @@
                     {% if thumbnails %}
                         <td class="border thumbnail">
                             <a class="cell-link" href="/{{ table_short }}/{{ item[column_id] }}">
-                                <img class="lazy"
-                                     src="/static/loading.gif"
-                                     data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/" alt=""
-                                     onerror="this.parentNode.removeChild(this)">
+                                <img src="/static/loading.gif"
+                                     data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
+                                     onload="this.src = this.dataset.src; this.onload = null;"
+                                     onerror="this.parentNode.removeChild(this)" alt="">
                             </a>
                         </td>
                     {% endif %}
@@ -250,12 +254,11 @@
                 {% for item in results %}
                     <div class="grid_item">
                         {% if thumbnails %}
-                            <a class="nocolor" href="/{{ table_short }}/{{ item[column_id] }}">
-                                <img class="lazy" alt="" id="{{ item[column_id] }}"
-                                     style="max-width: 200px; max-height: 200px"
-                                     src="/static/loading.gif"
+                            <a class="nocolor thumbnail" href="/{{ table_short }}/{{ item[column_id] }}">
+                                <img src="/static/loading.gif"
                                      data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
-                                     onerror="this.parentElement.removeChild(this)">
+                                     onload="this.src = this.dataset.src; this.onload = null;"
+                                     onerror="this.parentElement.removeChild(this)" alt="">
                             </a>
                             <br>
                         {% endif %}
@@ -338,27 +341,12 @@
         url.searchParams.set("view", view_)
         window.history.replaceState({}, document.title, url.href)
     }
-    const isInView = (element) => {
-        const bounding = element.getBoundingClientRect()
-        return (bounding.top >= 0 && bounding.top <= (window.innerHeight || document.documentElement.clientHeight)) ||
-            (bounding.bottom >= 0 && bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight))
-    }
-    const loadImages = async () => {
-        Array.from(view.querySelectorAll("img.lazy"))
-            .map((img) => [img, isInView(img.parentElement.parentElement)])
-            .sort(([_, v1], [__, v2]) => v1 === v2 ? 0 : v1 ? -1 : 1)
-            .map(async ([img, _]) => {
-                img.classList.remove("lazy")
-                img.src = img.dataset.src
-            })
-    }
 
     window.onload = () => {
         Array.from((new URL(window.location.href)).searchParams.entries())
             .map(([k, v]) => [k.toLowerCase(), v])
             .filter(([k, _]) => columns.find(([c, _]) => c === k))
             .forEach(([k, v]) => addSearchField(k).value = v)
-        loadImages()
     }
 </script>
 </body>
