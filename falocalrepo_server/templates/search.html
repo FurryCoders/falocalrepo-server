@@ -26,15 +26,19 @@
             text-align: center
         }
 
-        #search_form td.col1 {
+        #search_form td.colField {
             width: 90px;
         }
 
-        #search_form td.col2 {
+        #search_form td.colInput {
             width: available;
         }
 
-        #search_form td.col3 {
+        #search_form td.colInput input {
+            width: 90%;
+        }
+
+        #search_form td.colRemove {
             width: 25px;
             text-align: center;
         }
@@ -148,31 +152,31 @@
             </td>
         </tr>
         <tr>
-            <td class="col1"><label for="sort_field">Sort by</label></td>
-            <td class="col2"><select id="sort_field" name="sort" style="width: 100%;">
+            <td class="colField"><label for="sort_field">Sort by</label></td>
+            <td class="colInput"><select id="sort_field" name="sort" style="width: 100%;">
                 {% for col in columns_table %}
                     <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">
                         {{ col.title() if col|length > 2 else col.upper() }}
                     </option>
                 {% endfor %}
             </select></td>
-            <td class="col3"></td>
+            <td class="colRemove"></td>
         </tr>
         <tr>
-            <td class="col1"><label for="order_field">Order</label></td>
-            <td class="col2"><select id="order_field" name="order" style="width: 100%;">
+            <td class="colField"><label for="order_field">Order</label></td>
+            <td class="colInput"><select id="order_field" name="order" style="width: 100%;">
                 <option {{ "selected" if order == "asc" }} value="asc">Ascending</option>
                 <option {{ "selected" if order == "desc" }} value="desc">Descending</option>
             </select></td>
-            <td class="col3"></td>
+            <td class="colRemove"></td>
         </tr>
         <tr {{ "hidden" if not allow_view else "" }}>
-            <td class="col1"><label for="view">View</label></td>
-            <td class="col2"><select id="view" name="view" style="width: 100%;" onchange="changeView(this.value)">
+            <td class="colField"><label for="view">View</label></td>
+            <td class="colInput"><select id="view" name="view" style="width: 100%;" onchange="changeView(this.value)">
                 <option {{ "selected" if view == "list" or not allow_view or not view }} value="list">List</option>
                 <option {{ "selected" if view == "grid" and allow_view }} value="grid">Grid</option>
             </select></td>
-            <td class="col3"></td>
+            <td class="colRemove"></td>
         </tr>
     </table>
     <br>
@@ -299,9 +303,9 @@
         let col2 = row.insertCell(1)
         let col3 = row.insertCell(2)
 
-        col1.classList.add("col1")
-        col2.classList.add("col2")
-        col3.classList.add("col3")
+        col1.classList.add("colField")
+        col2.classList.add("colInput")
+        col3.classList.add("colRemove")
 
         let fieldSelect = col1.appendChild(document.createElement("select"))
         columns.forEach(([c, C], i) => {
@@ -316,7 +320,6 @@
         fieldInput.type = "text"
         fieldInput.name = fieldSelect.options[fieldSelect.selectedIndex].name
         fieldInput.classList.add("search_field")
-        fieldInput.style.width = "100%"
 
         let fieldRemove = col3.appendChild(document.createElement("button"))
         fieldRemove.textContent = "-"
