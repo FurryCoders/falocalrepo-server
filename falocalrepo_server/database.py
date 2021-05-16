@@ -52,7 +52,7 @@ def query_to_sql(query: str, likes: list[str] = None, aliases: dict[str, str] = 
     field, prev = "any", ""
     for elem in filter(lambda e: bool(e.strip()), split(r'((?<!\\)(?:"|!")(?:[^"]|(?<=\\)")*"|[()]| +)', query)):
         if m := match(r"^@([a-z]+)$", elem):
-            field = m.group(1)
+            field = m.group(1).lower()
             continue
         elif elem == "&":
             sql_elements.append("and")
@@ -154,7 +154,7 @@ def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *,
             return [], cols_table, cols_results, cols_list, col_id, sort, order
 
         sql, values = query_to_sql(query,
-                                   list({*cols_table, "any"} - {"ID", "AUTHOR", "USERNAME"}),
+                                   [*map(str.lower, {*cols_table, "any"} - {"ID", "AUTHOR", "USERNAME"})],
                                    {"author": "replace(author, '_', '')",
                                     "username": "replace(username, '_', '')",
                                     "any": f"({'||'.join(cols_table)})"}) if query else ("", [])
