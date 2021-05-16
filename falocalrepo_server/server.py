@@ -4,7 +4,6 @@ from io import BytesIO
 from json import dumps as json_dumps
 from os import PathLike
 from pathlib import Path
-from re import sub as re_sub
 from typing import Optional
 from typing import Union
 from zipfile import ZipFile
@@ -23,6 +22,7 @@ from htmlmin.main import minify
 from werkzeug.exceptions import NotFound
 
 from .__version__ import __version__
+from .database import clean_username
 from .database import default_order
 from .database import default_sort
 from .database import journals_table
@@ -44,10 +44,6 @@ app: Flask = Flask(
     template_folder=str(module_path / "templates"),
     static_folder=str(module_path / "static")
 )
-
-
-def clean_username(username: str, exclude: str = "") -> str:
-    return str(re_sub(rf"[^a-zA-Z0-9\-.~{exclude}]", "", username.lower().strip()))
 
 
 def button(href: str, text: str) -> str:
