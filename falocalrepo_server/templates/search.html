@@ -19,26 +19,34 @@
             text-align: left
         }
 
-        #header, #footer {
+        #header {
             width: 95%;
             top: 20px;
             margin: auto;
             text-align: center
         }
 
-        #search_form td.colField {
+        #footer {
+            width: 95%;
+            bottom: 20px;
+            margin: auto;
+            text-align: center
+        }
+
+        #search_form td.colLabel {
             width: 90px;
         }
 
         #search_form td.colInput {
             width: available;
+            text-align: left;
         }
 
         #search_form td.colInput input {
-            width: 90%;
+            width: 98%;
         }
 
-        #search_form td.colRemove {
+        #search_form td.colButton {
             width: 25px;
             text-align: center;
         }
@@ -142,41 +150,52 @@
 <form id="search_form" action="">
     <table id="search_fields">
         <tr>
-            <td colspan="3" style="text-align: center">
-                <button type="button" onclick="addSearchField()">Add Field</button>
+            <td class="colLabel"><label for="query">Search</label></td>
+            <td class="colInput"><input type="text" name="query" id="query"></td>
+            <td class="colButton">
+                <label for="queryAdd"></label>
+                <select name="" id="queryAdd" style="width: 80px;"
+                        oninput="addToInput($('query'), '@' + this.value); this.options[0].selected = true;">
+                    <option selected disabled style="display: none">Add Field</option>
+                    <option value="any">Any</option>
+                    {% for col in columns_table %}
+                        <option value="{{ col.lower() }}">{{ col.title() if col|length > 2 else col.upper() }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td class="colButton">
+                <button type="button" onclick="$('query').value = ''">-</button>
             </td>
         </tr>
         <tr>
-            <td colspan="3">
+            <td colspan="4">
                 <hr style="width: 100%">
             </td>
         </tr>
         <tr>
-            <td class="colField"><label for="sort_field">Sort by</label></td>
-            <td class="colInput"><select id="sort_field" name="sort" style="width: 100%;">
+            <td class="colLabel"><label for="sort_field">Sort by</label></td>
+            <td class="colInput" colspan="3"><select id="sort_field" name="sort" style="width: 100%;">
                 {% for col in columns_table %}
                     <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">
                         {{ col.title() if col|length > 2 else col.upper() }}
                     </option>
                 {% endfor %}
             </select></td>
-            <td class="colRemove"></td>
         </tr>
         <tr>
-            <td class="colField"><label for="order_field">Order</label></td>
-            <td class="colInput"><select id="order_field" name="order" style="width: 100%;">
+            <td class="colLabel"><label for="order_field">Order</label></td>
+            <td class="colInput" colspan="3"><select id="order_field" name="order" style="width: 100%;">
                 <option {{ "selected" if order == "asc" }} value="asc">Ascending</option>
                 <option {{ "selected" if order == "desc" }} value="desc">Descending</option>
             </select></td>
-            <td class="colRemove"></td>
         </tr>
         <tr {{ "hidden" if not allow_view else "" }}>
-            <td class="colField"><label for="view">View</label></td>
-            <td class="colInput"><select id="view" name="view" style="width: 100%;" onchange="changeView(this.value)">
+            <td class="colLabel"><label for="view">View</label></td>
+            <td class="colInput" colspan="3"><select id="view" name="view" style="width: 100%;"
+                                                     onchange="changeView(this.value)">
                 <option {{ "selected" if view == "list" or not allow_view or not view }} value="list">List</option>
                 <option {{ "selected" if view == "grid" and allow_view }} value="grid">Grid</option>
             </select></td>
-            <td class="colRemove"></td>
         </tr>
     </table>
     <br>
@@ -211,7 +230,7 @@
     <div id="search_results" class="{{ table.lower() }}" style="text-align: center">
         <table id="results_table_list"
                class="border results_list"
-                {{ "" if view == "list" or not allow_view else "style=\"display: none\""|safe }}>
+                {{ "" if view == "list" or not allow_view else 'style="display: none"'|safe }}>
             <tr class="even">
                 {% for column in columns_results %}
                     <th class="border-thick {{ column.lower() }}">{{ column }}</th>
@@ -288,48 +307,16 @@
 {% endif %}
 <script async>
     const $ = (id) => document.getElementById(id)
-
-    const columns = ["any"]
-        .concat(Array.from($("sort_field").options).map((o) => o.value))
-        .map((c) => [c, c.length > 2 ? c[0].toUpperCase() + c.substring(1) : c.toUpperCase()])
-        .concat([["sql", "SQL"]])
     let view = $("view").value === "grid" ? $("results_table_grid") : $("results_table_list")
 
-    const addSearchField = (fieldType = "") => {
-        let table = $("search_fields")
-
-        let row = table.insertRow(table.rows.length - 5)
-        let col1 = row.insertCell(0)
-        let col2 = row.insertCell(1)
-        let col3 = row.insertCell(2)
-
-        col1.classList.add("colField")
-        col2.classList.add("colInput")
-        col3.classList.add("colRemove")
-
-        let fieldSelect = col1.appendChild(document.createElement("select"))
-        columns.forEach(([c, C], i) => {
-            let o = document.createElement("option")
-            o.name = c
-            o.text = C
-            if (fieldType === o.name || (!fieldType && i === 0)) o.selected = true
-            fieldSelect.options.add(o)
-        })
-
-        let fieldInput = col2.appendChild(document.createElement("input"))
-        fieldInput.type = "text"
-        fieldInput.name = fieldSelect.options[fieldSelect.selectedIndex].name
-        fieldInput.classList.add("search_field")
-
-        let fieldRemove = col3.appendChild(document.createElement("button"))
-        fieldRemove.textContent = "-"
-        fieldRemove.type = "button"
-        fieldRemove.onclick = () => table.deleteRow(row.rowIndex)
-
-        fieldSelect.onchange = () => fieldInput.name = fieldSelect.options[fieldSelect.selectedIndex].name
-
-        return fieldInput
+    const addToInput = (input, value) => {
+        if (input.selectionStart === input.selectionEnd) {
+            input.value = input.value.substr(0, input.selectionStart) + value + input.value.substr(input.selectionEnd)
+        } else {
+            input.value = input.value.substr(0, input.selectionStart) + `(${value} ${input.value.substring(input.selectionStart, input.selectionEnd)})` + input.value.substr(input.selectionEnd)
+        }
     }
+
     const changeView = (view_) => {
         if (view_ === "list") {
             view = $("results_table_list")
@@ -346,10 +333,7 @@
     }
 
     window.onload = () => {
-        Array.from((new URL(window.location.href)).searchParams.entries())
-            .map(([k, v]) => [k.toLowerCase(), v])
-            .filter(([k, _]) => columns.find(([c, _]) => c === k))
-            .forEach(([k, v]) => addSearchField(k).value = v)
+        $("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
     }
 </script>
 </body>

@@ -1,6 +1,7 @@
 from functools import cache
-from json import loads
 from pathlib import Path
+from re import match
+from re import split
 from re import sub
 from typing import Any
 from typing import Callable
@@ -33,6 +34,41 @@ class FADatabaseWrapper(FADatabase):
 @cache
 def clean_username(username: str, exclude: str = "") -> str:
     return sub(rf"[^a-zA-Z0-9\-.~{exclude}]", "", username.lower().strip())
+
+
+def format_value(value: str, *, like: bool = False) -> str:
+    value = sub(r"(?<!\\)([%_])", r"\\\1", literal.group(1)) if (literal := match(r'^"(.*)"$', value)) else value
+    return f"%{value}%" if like else value
+
+
+def query_to_sql(query: str, likes: list[str] = None, aliases: dict[str, str] = None) -> tuple[str, list[str]]:
+    likes, aliases = likes or [], aliases or {}
+    sql_elements: list[str] = []
+    values: list[str] = []
+
+    query = sub(r"(^[&| ]+|((?<!\\)[&|]| )+$)", "", query)
+    query = sub(r"( *[&|])+(?= *[&|] *[@()])", "", query)
+
+    field, prev = "any", ""
+    for elem in filter(lambda e: bool(e.strip()), split(r'((?<!\\)(?:"|!")(?:[^"]|(?<=\\)")*"|[()]| +)', query)):
+        if m := match(r"^@([a-z]+)$", elem):
+            field = m.group(1)
+            continue
+        elif elem == "&":
+            sql_elements.append("and")
+        elif elem == "|":
+            sql_elements.append("or")
+        elif elem in ("(", ")"):
+            and_ = elem == "(" and prev not in ("", "&", "|", "(")
+            sql_elements.append(f"and {elem}" if and_ else elem)
+        elif elem:
+            and_ = prev not in ("", "&", "|", "(")
+            not_, elem = match(r"(!)?(.+)", elem).groups()
+            sql_elements.append(f"{'and ' * and_}{aliases.get(field, field)}{' not' * bool(not_)} like ?")
+            values.append(format_value(elem, like=field in likes))
+        prev = elem
+
+    return " ".join(sql_elements), values
 
 
 @cache
@@ -98,11 +134,10 @@ def load_prev_next(db_path: Path, table: str, item_id: int, _cache=None) -> tupl
 
 
 @cache
-def load_search(db_path: Path, table: str, sort: str, order: str, params_: str = "{}", force: bool = False, _cache=None):
+def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *, force: bool = False, _cache=None):
     cols_results: list[str] = []
-    params: dict[str, list[str]] = loads(params_)
-    order = order or default_order[table]
     sort = sort or default_sort[table]
+    order = order or default_order[table]
 
     if table in (submissions_table, journals_table):
         cols_results = ["ID", "AUTHOR", "DATE", "TITLE"]
@@ -115,36 +150,17 @@ def load_search(db_path: Path, table: str, sort: str, order: str, params_: str =
         cols_list: list[str] = db_table.list_columns
         col_id: str = db_table.column_id
 
-        if not params and not force:
+        if not query and not force:
             return [], cols_table, cols_results, cols_list, col_id, sort, order
 
-        params = {k: vs for k, vs in params.items() if k in map(str.lower, cols_table + ["any", "sql"])}
-
-        if "sql" in params:
-            query: str = " or ".join(map(lambda p: f"({p})", params["sql"]))
-            query = sub(r"any(?= +(!?=|(not +)?(like|glob)|[<>]=?))", f"({'||'.join(cols_table)})", query)
-            return (
-                list(db_table.select_sql(query, columns=cols_results, order=[f"{sort} {order}"])),
-                cols_table,
-                cols_results,
-                cols_list,
-                col_id,
-                sort,
-                order
-            )
-        if "author" in params:
-            params["replace(author, '_', '')"] = list(map(lambda u: clean_username(u, "%_"), params["author"]))
-            del params["author"]
-        if "username" in params:
-            params["username"] = list(map(lambda u: clean_username(u, "%_"), params["username"]))
-        if "any" in params:
-            params[f"({'||'.join(cols_table)})"] = params["any"]
-            del params["any"]
+        sql, values = query_to_sql(query,
+                                   list({*cols_table, "any"} - {"ID", "AUTHOR", "USERNAME"}),
+                                   {"author": "replace(author, '_', '')",
+                                    "username": "replace(username, '_', '')",
+                                    "any": f"({'||'.join(cols_table)})"}) if query else ("", [])
 
         return (
-            list(db_table.select(
-                {"$and": [{"$or": [{"$like": {k: v}} for v in params[k]]} for k in params]} if params else {},
-                columns=cols_results, order=[f"{sort} {order}"])),
+            list(db_table.select_sql(sql, values, columns=cols_results, order=[f"{sort} {order}"])),
             cols_table,
             cols_results,
             cols_list,

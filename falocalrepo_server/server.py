@@ -133,77 +133,77 @@ def redirect_search_default():
 @app.route("/search/gallery/<username>/")
 def redirect_search_user_gallery(username: str):
     return serve_search(table="submissions", title_=f"Gallery {username}",
-                        args={"author": [clean_username(username)], "folder": ["gallery"]})
+                        args={"query": f'@author "{clean_username(username)}" @folder "gallery"'})
 
 
 @app.route("/scraps/<username>")
 @app.route("/search/scraps/<username>/")
 def redirect_search_user_scraps(username: str):
     return serve_search(table="submissions", title_=f"Scraps {username}",
-                        args={"author": [clean_username(username)], "folder": ["scraps"]})
+                        args={"query": f'@author "{clean_username(username)}" @folder "scraps"'})
 
 
 @app.route("/submissions/<username>/")
 @app.route("/search/submissions/<username>/")
 def redirect_search_user_submissions(username: str):
     return serve_search(table="submissions", title_=f"Submissions {username}",
-                        args={"author": [clean_username(username)]})
+                        args={"query": f'@author "{clean_username(username)}"'})
 
 
 @app.route("/journals/<username>/")
 @app.route("/search/journals/<username>/")
 def redirect_search_user_journals(username: str):
     return serve_search(table="journals", title_=f"Journals {username}",
-                        args={"author": [clean_username(username)]})
+                        args={"query": f'@author "{clean_username(username)}"'})
 
 
 @app.route("/favorites/<username>")
 @app.route("/search/favorites/<username>/")
 def redirect_search_user_favorites(username: str):
     return serve_search(table="submissions", title_=f"Favorites {username}",
-                        args={"favorite": [f"%|{clean_username(username)}|%"]})
+                        args={"query": f'@favorite "%|{clean_username(username)}|%"'})
 
 
 @app.route("/mentions/<username>")
 @app.route("/search/mentions/<username>/")
 def redirect_search_user_mentions(username: str):
     return serve_search(table="submissions", title_=f"Mentions {username}",
-                        args={"mentions": [f"%|{clean_username(username)}|%"]})
+                        args={"query": f'@mentions "%|{clean_username(username)}|%"'})
 
 
 @app.route("/search/<string:table>/")
-def serve_search(table: str, title_: str = "", args: dict[str, list[str]] = None):
+def serve_search(table: str, title_: str = "", args: dict[str, str] = None):
     if (table := table.upper()) not in (submissions_table, journals_table, users_table):
-        return error(f"Table {table} not found.", 404)
+        return error(f"Table {table.lower()} not found.", 404)
 
-    args = {**{k.lower(): v for k, v in (args or {}).items()},
-            **{k.lower(): request.args.getlist(k) for k in request.args}}
-    params: dict[str, list[str]] = {
-        k: v for k, v in args.items()
-        if k not in ("page", "limit", "sort", "order", "view")
-    }
+    args = {k.lower(): v for k, v in (args or {}).items()}
+    args_req = {k.lower(): v for k, v in request.args.items()}
+    query: str = " & ".join([f"({q})" for args_ in (args_req, args) if (q := args_.get("query", None))])
+    args |= args_req
 
-    if params and request.path.startswith("/browse/"):
-        return redirect(url_for("serve_search", table=table, **args))
+    if query and request.path.startswith("/browse/"):
+        return redirect(url_for("serve_search", table=table.lower(), **args))
+
+    page: int = int(args.get("page", 1))
+    limit: int = int(args.get("limit", 48))
+    sort: str = args.get("sort", default_sort[table]).lower()
+    order: str = args.get("order", default_order[table]).lower()
+    view: str = args.get("view", "").lower()
+    view = "grid" if view not in ("list", "grid") and table == submissions_table else view
+    view = "list" if table != submissions_table else view
 
     results: list[dict]
+    columns_table: list[str]
     columns_results: list[str]
     columns_list: list[str]
     column_id: str
-    page: int = int(args.get("page", [1])[0])
-    limit: int = int(args.get("limit", [48])[0])
-    sort: str = args.get("sort", [default_sort[table]])[0].lower()
-    order: str = args.get("order", [default_order[table]])[0].lower()
-    view: str = args.get("view", [""])[0].lower()
-    view = "grid" if view not in ("list", "grid") and table == submissions_table else view
-    view = "list" if table != submissions_table else view
 
     results, columns_table, columns_results, columns_list, column_id, sort, order = load_search(
         app.config["db_path"],
         table,
+        query.lower().strip(),
         sort,
         order,
-        json_dumps({k: list(map(str.lower, params[k])) for k in sorted(params.keys())}),
         force=request.path.startswith("/browse/"),
         _cache=m_time(app.config["db_path"])
     )
@@ -212,9 +212,9 @@ def serve_search(table: str, title_: str = "", args: dict[str, list[str]] = None
         "search.html",
         title=f"{app.name} · " + (title_.strip() or f"{table.title()} Search Results"),
         table=table.lower(),
-        params=params,
-        sort=sort.lower(),
-        order=order.lower(),
+        query=query,
+        sort=sort,
+        order=order,
         view=view,
         allow_view=table == submissions_table,
         thumbnails=table == submissions_table,
