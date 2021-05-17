@@ -37,8 +37,10 @@ def clean_username(username: str, exclude: str = "") -> str:
 
 
 def format_value(value: str, *, like: bool = False) -> str:
-    value = sub(r"(?<!\\)((?:\\\\)+)?([%_])", r"\1\\\2", m.group(1)) if (m := match(r'^"(.*)"$', value)) else value
-    return f"%{value}%" if like else value
+    value = sub(r"(?<!\\)((?:\\\\)+)?([%_^$])", r"\1\\\2", m.group(1)) if (m := match(r'^"(.*)"$', value)) else value
+    value = value.lstrip("^") if match(r"^[%^].*", value) else "%" + value if like else value
+    value = value.rstrip("$") if match(r".*(?<!\\)((?:\\\\)+)?[%$]$", value) else value + "%" if like else value
+    return value
 
 
 def query_to_sql(query: str, likes: list[str] = None, aliases: dict[str, str] = None) -> tuple[str, list[str]]:
