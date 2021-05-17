@@ -100,40 +100,50 @@
             <td class="border overflow value">
                 {% for tag in submission["TAGS"] %}
                     {% if tag != "" %}
-                        <a href='/search/submissions/?tags=%25%7C{{ tag }}%7C%25'>{{ tag }}</a>
+                        <a href='/search/submissions/?query=%40tags%20%22%7C{{ tag }}%7C%22'>{{ tag }}</a>
                     {% endif %}
                 {% endfor %}
             </td>
         </tr>
         <tr>
             <td class="border">Category</td>
-            <td class="border overflow value"><a href="/search/submissions/?category=%25{{ submission["CATEGORY"] }}%25">
-                {{ submission["CATEGORY"] }}
-            </a></td>
+            <td class="border overflow value">
+                <a href="/search/submissions/?query=%40category%20%22{{ submission["CATEGORY"] }}%22">
+                    {{ submission["CATEGORY"] }}
+                </a>
+            </td>
         </tr>
         <tr>
             <td class="border">Species</td>
-            <td class="border overflow value"><a href="/search/submissions/?species=%25{{ submission["SPECIES"] }}%25">
-                {{ submission["SPECIES"] }}
-            </a></td>
+            <td class="border overflow value">
+                <a href="/search/submissions/?query=%40species%20%22{{ submission["SPECIES"] }}%22">
+                    {{ submission["SPECIES"] }}
+                </a>
+            </td>
         </tr>
         <tr>
             <td class="border">Gender</td>
-            <td class="border overflow value"><a href="/search/submissions/?gender=%25{{ submission["GENDER"] }}%25">
-                {{ submission["GENDER"] }}
-            </a></td>
+            <td class="border overflow value">
+                <a href="/search/submissions/?query=%40gender%20%22{{ submission["GENDER"] }}%22">
+                    {{ submission["GENDER"] }}
+                </a>
+            </td>
         </tr>
         <tr>
             <td class="border">Rating</td>
-            <td class="border overflow value"><a href="/search/submissions/?rating=%25{{ submission["RATING"] }}%25">
-                {{ submission["RATING"] }}
-            </a></td>
+            <td class="border overflow value">
+                <a href="/search/submissions/?query=%40rating%20%22{{ submission["RATING"] }}%22">
+                    {{ submission["RATING"] }}
+                </a>
+            </td>
         </tr>
         <tr>
             <td class="border">Folder</td>
-            <td class="border overflow value"><a href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
-                {{ submission["FOLDER"] }}
-            </a></td>
+            <td class="border overflow value">
+                <a href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
+                    {{ submission["FOLDER"] }}
+                </a>
+            </td>
         </tr>
         <tr>
             <td class="border">Favorites</td>
