@@ -61,14 +61,14 @@ def query_to_sql(query: str, likes: list[str] = None, aliases: dict[str, str] = 
         elif elem == "|":
             sql_elements.append("or")
         elif elem in ("(", ")"):
-            and_ = elem == "(" and prev not in ("", "&", "|", "(")
-            sql_elements.append(f"and {elem}" if and_ else elem)
+            sql_elements.append("and") if elem == "(" and prev not in ("", "&", "|", "(") else None
+            sql_elements.append(elem)
         elif elem:
-            and_ = prev not in ("", "&", "|", "(")
             not_, elem = match(r"^(!)?(.*)$", elem).groups()
             if not elem:
                 continue
-            sql_elements.append(f"{'and ' * and_}{aliases.get(field, field)}{' not' * bool(not_)} like ? escape '\\'")
+            sql_elements.append("and") if prev not in ("", "&", "|", "(") else None
+            sql_elements.append(f"{aliases.get(field, field)}{' not' * bool(not_)} like ? escape '\\'")
             values.append(format_value(elem, like=field in likes))
         prev = elem
 
