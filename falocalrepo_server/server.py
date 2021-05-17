@@ -157,14 +157,14 @@ def redirect_search_user_journals(username: str):
 @app.route("/search/favorites/<username>/")
 def redirect_search_user_favorites(username: str):
     return serve_search(table="submissions", title_=f"Favorites {username}",
-                        args={"query": f'@favorite "%|{clean_username(username)}|%"'})
+                        args={"query": f'@favorite "|{clean_username(username)}|"'})
 
 
 @app.route("/mentions/<username>")
 @app.route("/search/mentions/<username>/")
 def redirect_search_user_mentions(username: str):
     return serve_search(table="submissions", title_=f"Mentions {username}",
-                        args={"query": f'@mentions "%|{clean_username(username)}|%"'})
+                        args={"query": f'@mentions "|{clean_username(username)}|"'})
 
 
 @app.route("/search/<string:table>/")
