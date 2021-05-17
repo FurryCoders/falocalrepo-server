@@ -195,6 +195,15 @@
 </div>
 <script>
     const $ = (id) => document.getElementById(id)
+
+    document.querySelectorAll("#submission_description a.iconusername > img")
+        .forEach((icon) => {
+            const user = icon.title
+            const link = icon.parentElement
+            link.removeChild(icon)
+            link.innerText = `@${user}`
+        })
+
     window.onload = () => {
         const dpi = Number(window.devicePixelRatio || 1)
         if (dpi <= 1) return
