@@ -37,7 +37,8 @@ def clean_username(username: str, exclude: str = "") -> str:
 
 
 def format_value(value: str, *, like: bool = False) -> str:
-    value = sub(r"(?<!\\)([%_])", r"\\\1", literal.group(1)) if (literal := match(r'^"(.*)"$', value)) else value
+    if m := match(r'^"(.*)"$', value):
+        value = sub(r"(?<!\\)((?:\\\\)+)?([%_])", r"\1\\\2", m.group(1))
     return f"%{value}%" if like else value
 
 
