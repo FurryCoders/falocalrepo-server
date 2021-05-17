@@ -94,7 +94,7 @@
         })
 
     document.querySelectorAll("#journal_content a")
-        .forEach((a) => a.href = a.href.replace(/^https?:\/\/www.furaffinity.net\//, "/"))
+        .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
 
     window.onload = () => {
         const dpi = Number(window.devicePixelRatio || 1)
