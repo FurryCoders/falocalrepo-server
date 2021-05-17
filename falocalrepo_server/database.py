@@ -66,7 +66,7 @@ def query_to_sql(query: str, likes: list[str] = None, aliases: dict[str, str] = 
             not_, elem = match(r"^(!)?(.*)$", elem).groups()
             if not elem:
                 continue
-            sql_elements.append(f"{'and ' * and_}{aliases.get(field, field)}{' not' * bool(not_)} like ?")
+            sql_elements.append(f"{'and ' * and_}{aliases.get(field, field)}{' not' * bool(not_)} like ? escape '\\'")
             values.append(format_value(elem, like=field in likes))
         prev = elem
 
