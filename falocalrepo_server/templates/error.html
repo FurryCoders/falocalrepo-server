@@ -7,9 +7,12 @@
 <body>
 <br><br><br>
 <div style="text-align: center">
-    {% autoescape false %}
-    {{ message }}
-    {% endautoescape %}
+    <p>Error {{ code }}</p>
+    <p>
+        {% autoescape false %}
+        {{ message }}
+        {% endautoescape %}
+    </p>
 </div>
 </body>
 </html>

@@ -55,7 +55,8 @@ def error(message: str, code: int):
     return render_template(
         "error.html",
         title=f"{app.name} · Content not Found",
-        message=f"{code} {message}"
+        code=code,
+        message=message
     ), code
 
 
