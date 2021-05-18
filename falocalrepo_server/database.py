@@ -9,7 +9,8 @@ from typing import Optional
 
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
-from falocalrepo_database.selector import Selector, SelectorBuilder as S
+from falocalrepo_database.selector import Selector
+from falocalrepo_database.selector import SelectorBuilder as S
 from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
@@ -44,6 +45,8 @@ def format_value(value: str, *, like: bool = False) -> str:
 
 
 def query_to_sql(query: str, likes: list[str] = None, aliases: dict[str, str] = None) -> tuple[str, list[str]]:
+    if not query:
+        return "", []
     likes, aliases = likes or [], aliases or {}
     sql_elements: list[str] = []
     values: list[str] = []
@@ -84,7 +87,7 @@ def load_user(db_path: Path, user: str, _cache=None) -> Optional[Entry]:
 @cache
 def load_user_stats(db_path: Path, user: str, _cache=None) -> dict[str, int]:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
-        stats: dict[str, int] = {
+        return {
             "gallery": db.submissions.select(
                 S() & [S("replace(lower(author), '_', '')").__eq__(user), S("folder").__eq__("gallery")],
                 columns=["count(ID)"]
@@ -101,8 +104,8 @@ def load_user_stats(db_path: Path, user: str, _cache=None) -> dict[str, int]:
             ).cursor.fetchone()[0],
             "journals": db.journals.select(
                 S("replace(lower(author), '_', '')").__eq__(user), columns=["count(ID)"]
-            ).cursor.fetchone()[0]}
-        return stats
+            ).cursor.fetchone()[0]
+        }
 
 
 @cache
@@ -161,7 +164,7 @@ def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *,
                                    [*map(str.lower, {*cols_table, "any"} - {"ID", "AUTHOR", "USERNAME"})],
                                    {"author": "replace(author, '_', '')",
                                     "username": "replace(username, '_', '')",
-                                    "any": f"({'||'.join(cols_table)})"}) if query else ("", [])
+                                    "any": f"({'||'.join(cols_table)})"})
 
         return (
             list(db_table.select_sql(sql, values, columns=cols_results, order=[f"{sort} {order}"])),
