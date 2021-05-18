@@ -85,11 +85,7 @@ Underneath the information table are buttons that open new search pages for subm
 The browse and search pages allow to explore the submissions/journals contained in the database. The controls at the top
 of the page allow to query the database and control the visualisation of the results.
 
-<div style="text-align: center">
-
 ![browse controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/browse.png)
-
-</div>
 
 The _Search_ input allows to query the database using a simple syntax in the form `@field term [[| &] term ...]` which
 allows logic operators, parentheses and start/end of field matching. For more details
@@ -218,11 +214,7 @@ display errors caused by expired icon links.
 Under the metadata table are a number of buttons that allow to access the submission file, open its Fur Affinity
 counterpart, and navigate the other submissions from the author.
 
-<div style="text-align: center">
-
 ![submission controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/submission.png)
-
-</div>
 
 The _Download File_ button opens the submission file in the current browser tab.
 
@@ -246,11 +238,7 @@ mentioned users.
 Under the metadata table are a number of buttons that allow to download the journal, open its Fur Affinity counterpart,
 and navigate the other journals from the same user.
 
-<div style="text-align: center">
-
 ![journal controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/journal.png)
-
-</div>
 
 The _Download Journal as ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON
 format.
