@@ -213,7 +213,6 @@
     <button type="submit" form="search_form" name="page" value="{{ page - 1 }}" {{ 'disabled' if page == 1 }}>
         Prev
     </button>
-    <button type="button" onclick="window.location = '/search/{{ table }}'">New Search</button>
     <button type="submit" form="search_form" name="page"
             value="{{ page + 1 }}" {{ 'disabled' if offset + limit >= results_total }}>
         Next
