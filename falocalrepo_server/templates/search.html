@@ -199,7 +199,8 @@
         </tr>
     </table>
     <br>
-    <button type="submit" onclick="this.form.action = window.location.pathname">Search</button>
+    <button type="submit" onclick="this.form.action = window.location.pathname">Search</button><br>
+    <button type="button" onclick="window.location = '/search/{{ table }}'">New Search</button>
 </form>
 <br>
 {% if results or params %}
