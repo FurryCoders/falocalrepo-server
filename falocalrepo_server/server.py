@@ -39,11 +39,11 @@ from .database import m_time
 from .database import submissions_table
 from .database import users_table
 
-module_path: Path = Path(__file__).resolve().parent
+root: Path = Path(__file__).resolve().parent
 app: Flask = Flask(
     "FurAffinity Local Repo",
-    template_folder=str(module_path / "templates"),
-    static_folder=str(module_path / "static")
+    template_folder=str(root / "templates"),
+    static_folder=str(root / "static")
 )
 
 
