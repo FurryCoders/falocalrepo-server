@@ -12,6 +12,7 @@ from PIL import Image
 from PIL import UnidentifiedImageError
 from falocalrepo_database.exceptions import DatabaseError
 from flask import Flask
+from flask import Response
 from flask import abort
 from flask import redirect
 from flask import render_template
@@ -71,7 +72,7 @@ def error_database(err: DatabaseError):
 
 
 @app.after_request
-def response_minify(response):
+def response_minify(response: Response):
     if response.content_type == u'text/html; charset=utf-8':
         response.set_data(minify(response.get_data(as_text=True)))
     return response
