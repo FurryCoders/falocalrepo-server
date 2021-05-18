@@ -39,54 +39,224 @@ _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 The root folder `/` displays basic information on the database and has links to perform submissions and journal
 searches.
 
-### Users
+## Routes
 
-The `/user/<username>` path displays basic statistics of a user stored in the database. Clicking on gallery/scraps or
-journals counters opens submissions and journals by the user respectively.
+|Route                                    |Destination|
+|-----------------------------------------|---|
+|`/`                                      | Show home page with general information regarding the database|
+|`/browse/`                               | Redirects to `/browse/submissions/`|
+|`/browse/submissions/`                   | Browse submissions|
+|`/browse/journals/`                      | Browse journals|
+|`/browse/users/`                         | Browse users|
+|`/search/`                               | Redirects to `/search/submissions/`|
+|`/search/submissions/`                   | Search submissions|
+|`/search/journals/`                      | Search journals|
+|`/search/users/`                         | Search users|
+|`/user/<username>/`                      | Show information regarding a specific user|
+|`/gallery/<username>/`                   | Browse a user's gallery submissions|
+|`/scraps/<username>/`                    | Browse a user's scraps submissions|
+|`/submissions/<username>/`               | Browse a user's gallery & scraps submissions| 
+|`/favorites/<username>/`                 | Browse a user's favorite submissions|
+|`/mentions/<username>/`                  | Browse the submissions where the user is mentioned|
+|`/journals/<username>/`                  | Browse a user's journals|
+|`/full/<submission id>/`                 | Redirect to `/submission/<submission id>/`|
+|`/view/<submission id>/`                 | Redirect to `/submission/<submission id>/`|
+|`/submission/<submission id>/`           | View a submission|
+|`/submission/<submission id>/file/`      | Open a submission file|
+|`/submission/<submission id>/thumbnail/` | Open a submission thumbnail (generated for image if no thumbnail is stored)|
+|`/submission/<submission id>/zip/`       | Download a submission's file, description, and metadata as a ZIP archive|
+|`/journal/<journal id>/`                 | View a journal|
+|`/journal/<journal id>/zip/`             | Download a journal's content and metadata as a ZIP archive|
 
-The `/submissions/<username>` and `/journals/<username>` paths open submissions and journals by the user respectively.
+## Pages
 
-### Search
+### Home
 
-The server search interface allows to search submissions, journals, and users. Respectively, these can be reached
-at `/search/submissions`, `/search/journals`, and `/search/users`. The `/search/` path defaults to submissions search.
+The home page displays general information about the database and contains links to browse and search pages for the
+various tables.
 
-The interface supports searching all columns of the three tables. In addition to those, the `Any` option will match to
-any field, and the advanced `SQL` option allows to use
-SQLite [`WHERE`](https://www.sqlite.org/lang_select.html#whereclause) queries.
+The information table displays the total number of submissions, journals, and users together with the version of the
+database. Clicking on any of the counters open the relevant browse page.
 
-To add a field, click on the `Add Field`, then select the search field in the drop-down menu beside the newly created
-input box.
+Underneath the information table are buttons that open new search pages for submissions, journals, and users.
 
-Fields can be added multiple times and will act as OR options. The `SQL` option will override other fields.
+### Browse & Search
 
-Fields are matched using the SQLite [`like`](https://sqlite.org/lang_expr.html#like) expression which allows for limited
-pattern matching. See [`database` command](https://gitlab.com/MatteoCampinoti94/FALocalRepo#database) for more details.
+The browse and search pages allow to explore the submissions/journals contained in the database. The controls at the top
+of the page allow to query the database and control the visualisation of the results.
 
-The `Sort By` and `Order` selections allow to sort and order results using any field.
+<div style="text-align: center">
 
-The `View` option allows to switch from a list view to a grid view of the search results. The view selector and grid
-view are only supported for submission searches, all others will default to the list view.
+![browse controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/browse.png)
 
-The `/submissions/<username>/`, `/gallery/<username>/`, `/scraps/<username>/`, `/favorites/<username>/`
-, `/mentions/<username>/`, and `/journals/<username>/` paths allow to quickly open a search for submissions, favorites,
-and journals associated to `<username>`. `/search/submissions/<username>/`, `/search/gallery/<username>/`, etc. are
-valid aliases.
+</div>
 
-### Browse
+The _Search_ input allows to query the database using a simple syntax in the form `@field term [[| &] term ...]` which
+allows logic operators, parentheses and start/end of field matching. For more details
+see [Query Language](#query-language).
 
-The `/browse/submissions`, `/browse/journals`, and `/browse/users` paths allow to open a list of all entries in a
-specific table. From there the results can be refined using the search interface.
+The _Add Field_ menu allows to insert a specific search field using a simple dropdown menu. Unmarked search terms
+default to the `any` field.
 
-### Submissions & Journals
+The _-_ button clears the search input field.
 
-Submissions and journals can be accessed respectively at `/submission/<id>` and `/journal/<id>`. All the metadata,
-content and files that are recorded in the database are displayed in these pages.
+The _Sort By_ and _Order_ menus change the sorting field and order of the search results. Submissions and journals
+default to descending ID, while users default to ascending username.
 
-Submission files can be accessed at `/submission/<id>/file` or by using the `Download File`
-or `Download Submission as ZIP` buttons.
+The _View_ menu is only visible for submissions and allows changing between the (default) grid view to the list view
+used for journals and users. Submission thumbnails are visualised in both cases.
 
-For both submissions and journals it is possible to download a ZIP containing the metadata in a JSON-formatted file and
-the submission description/journal content in HTML format. For submissions, the ZIP file also contains the submission
-file. The ZIP of a submission/journal can be accessed directly using the `/submission/<id>/zip` and `/journal/<id>/zip`
-paths.
+The _Search_ button submits the search request using the current query and sorting settings.
+
+Under the search controls are the number of results and current page.
+
+Under the results numbers are the page controls. _First_ leads to page 1, _Prev_ leads to the previous page, _Next_
+leads to the next page, and _Last_ leads to the last page. These controls are also available at the bottom of the page.
+
+#### Query Language
+
+The query language used for this server is based on and improves the search syntax currently used by the Fur Affinity
+website. Its basic elements are:
+
+* `@<field>` field specifier (e.g. `@title`), all database columns are available as search fields.
+  See [falocalrepo-database](https://pypi.org/project/falocalrepo-database/) for details on the available columns.
+* `()` parentheses, they can be used for better logic operations
+* `&` _AND_ logic operator
+* `|` _OR_ logic operator
+* `!` _NOT_ logic operator
+* `""` quotes, allow searching for literal strings without needing to escape
+* `%` match 0 or more characters
+* `_` match exactly 1 character
+* `^` start of field, when used at the start of a search term, it matches the beginning of the field
+* `$` end of field, when used at the end of a search term, it matches the end of the field
+
+All other strings are considered search terms.
+
+The search uses the `@any` field by default, allowing to do general searches without specifying a field.
+
+Search terms that are not separated by a logic operator are considered _AND_ terms (i.e. `a b c` -> `a & b & c`).
+
+##### Examples
+
+Search for journals/submissions containing water and either otter, lutrine, or mustelid, or water and either cat or
+feline:
+
+`water ((otter | lutrine | mustelid) | (cat | feline))`
+
+`@any water & ((otter | lutrine | mustelid) | (cat | feline))`
+
+Search for journals/submissions containing "cat" or "feline" but neither mouse nor rodent:
+
+`(cat | feline) !mouse !rodent`
+
+Search for general-rated submissions uploaded by a user whose name starts with "tom" that contain either "volleyball"
+or "volley" and "ball" separated by one character (e.g. "volley-ball") in any field:
+
+`@rating general @author tom% @any (volleyball | volley_ball)`
+
+`(volleyball | volley_ball) @rating general @author tom%`
+
+Search for journals/submissions uploaded in 2020 except for March:
+
+`@date ^2020 !^2020-03`
+
+Search for submissions uploaded in March 2021 (meaning the date has to start with `2021-03`) whose tags contain the
+exact tag "ball":
+
+`@date ^2021-03 @tags "|ball|"`
+
+`@date ^2021-03 @tags \|ball\|`
+
+Search for journals/submissions where a specific user named "tom" is mentioned:
+
+`@mentions "|tom|"`
+
+`@mentions \|tom\|`
+
+Search for submissions whose only favorite is a user named "alex":
+
+`@favorite ^\|alex\|$`
+
+Search for users whose names contain "mark":
+
+`@username %mark%`
+
+Search for journals/submissions whose title ends with "100%":
+
+`@title 100\%$`
+
+Search for journals/submissions whose title is exactly "cat":
+
+`@title ^cat$`
+
+Search for text submissions with PDF files:
+
+`@type text @fileext pdf`
+
+### User
+
+The user page shows information about submissions and journals related to a user (gallery, scraps, favorites, mentions,
+and journals) and what folders have been set for download. See [falocalrepo](https://pypi.org/project/falocalrepo/) for
+more details on this.
+
+Clicking on any of the counters opens the relevant results via the search interface, allowing to refine the search
+further.
+
+### Submission
+
+The submission page shows the submission file (if present), the submission metadata, and the description.
+
+Image, audio, and plain text submission files are displayed directly in the page, others (e.g. PDF files) will display a
+link to open them. For images, clicking on the images opens its file.
+
+The metadata table contains clickable links to the user's page (see [User](#user) for details), tags, category, species,
+gender, rating, folder (gallery/scraps), and to user pages of favouring and mentioned users.
+
+The description is displayed as-is except for user icons, which are replaced by `@username` styled links to avoid
+display errors caused by expired icon links.
+
+Under the metadata table are a number of buttons that allow to access the submission file, open its Fur Affinity
+counterpart, and navigate the other submissions from the author.
+
+<div style="text-align: center">
+
+![submission controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/submission.png)
+
+</div>
+
+The _Download File_ button opens the submission file in the current browser tab.
+
+The _Download Submission as ZIP_ button generates a ZIP file containing the submission file, submission thumbnail,
+description HTML, and metadata in JSON format.
+
+The _Open on Fur Affinity_ button opens the submission on Fur Affinity
+
+The _Next_ and _Prev_ buttons lead to the next more recent and the previous less recent submissions respectively.
+
+The _Gallery_, _All_, and _Scraps_ buttons open a search page with the user's gallery submissions, scraps and gallery
+submissions together, and scraps submissions respectively.
+
+### Journal
+
+The journal page shows the journal metadata and content.
+
+The metadata table contains clickable links to the user's page (see [User](#user) for details) and to user pages of
+mentioned users.
+
+Under the metadata table are a number of buttons that allow to download the journal, open its Fur Affinity counterpart,
+and navigate the other journals from the same user.
+
+<div style="text-align: center">
+
+![journal controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/journal.png)
+
+</div>
+
+The _Download Journal as ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON
+format.
+
+The _Open on Fur Affinity_ button opens the journal on Fur Affinity
+
+The _Next_ and _Prev_ buttons lead to the next more recent, and the previous less recent journals respectively.
+
+The _All_ button opens a search page with all the user's journals.
