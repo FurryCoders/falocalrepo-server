@@ -67,7 +67,7 @@ def error_not_found(err: NotFound):
 
 @app.errorhandler(DatabaseError)
 def error_database(err: DatabaseError):
-    return serve_error("Database error" + f": {(msg := ''.join(err.args[:1]))}" * bool(msg), 500)
+    return serve_error(f"Database error: {err.__class__.__name__} {err.args[0] if err.args else ''}".strip(), 500)
 
 
 @app.after_request
