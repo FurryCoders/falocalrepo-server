@@ -283,6 +283,8 @@ def serve_submission(id_: int):
         "submission.html",
         title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
         submission=sub,
+        filename=f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
+        filename_id=f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         prev=p,
         next=n
     )

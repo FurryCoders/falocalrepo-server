@@ -54,29 +54,29 @@
     {% if submission["FILESAVED"] < 10 %}
         Submission has no file
     {% elif submission["TYPE"].lower() == "image" %}
-        <a href="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}">
-            <img src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
+        <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+            <img src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
                  alt=""
                  onerror="$('submission_file').innerText = 'File not found'"
                  onload="$('download_file').disabled = false">
         </a>
     {% elif submission["TYPE"].lower() == "audio" %}
-        <audio src="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
+        <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
                onload="$('download_file').disabled = false"
                controls>
             File not found
         </audio>
     {% elif submission["FILEEXT"].lower() == "txt" %}
-        <object data="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
+        <object data="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
                 type=""
                 style="width: 100%; max-width: 600px; text-align: justify; height: 300px; border: 1px solid black"
                 onload="$('download_file').disabled = false">
             File not found
         </object>
     {% else %}
-        <a href="/submission/{{ submission["ID"] }}/file/{{ submission["ID"] }}.{{ submission["FILEEXT"] }}"
+        <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
            style="border: 1px solid black; padding: 3px">
-            Submission.{{ submission["FILEEXT"] }}
+            {{ filename|title }}
         </a>
     {% endif %}
 </div>
@@ -167,9 +167,8 @@
         </tr>
     </table>
     <br>
-    <form action="/submission/{{ submission["ID"] }}/file/
-            {{ submission["ID"] }}{{ ("." + submission["FILEEXT"]) if submission["FILEEXT"] }}">
-        <button id="download_file" type="submit" {{ "disabled" if not submission["FILESAVED"] }}>
+    <form action="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+        <button id="download_file" type="submit" {{ "disabled" if submission["FILESAVED"] < 10 }}>
             Download File
         </button>
     </form>
