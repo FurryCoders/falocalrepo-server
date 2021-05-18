@@ -52,7 +52,7 @@ def query_to_sql(query: str, likes: list[str] = None, aliases: dict[str, str] = 
     query = sub(r"( *[&|])+(?= *[&|] *[@()])", "", query)
 
     field, prev = "any", ""
-    for elem in filter(lambda e: bool(e.strip()), split(r'((?<!\\)(?:"|!")(?:[^"]|(?<=\\)")*"|[()]| +)', query)):
+    for elem in filter(bool, map(str.strip, split(r'((?<!\\)(?:"|!")(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|]| +)', query))):
         if m := match(r"^@(\w+)$", elem):
             field = m.group(1).lower()
             continue
