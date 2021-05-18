@@ -51,7 +51,7 @@ def button(href: str, text: str) -> str:
     return f'<button onclick="window.location = \'{href}\'">{text}</button>'
 
 
-def error(message: str, code: int):
+def serve_error(message: str, code: int):
     return render_template(
         "error.html",
         title=f"{app.name} · Content not Found",
@@ -61,13 +61,13 @@ def error(message: str, code: int):
 
 
 @app.errorhandler(404)
-def not_found(err: NotFound):
-    return error(err.description, 404)
+def error_not_found(err: NotFound):
+    return serve_error(err.description, 404)
 
 
 @app.errorhandler(DatabaseError)
 def error_database(err: DatabaseError):
-    return error("Database error" + f": {(msg := ''.join(err.args[:1]))}" * bool(msg), 500)
+    return serve_error("Database error" + f": {(msg := ''.join(err.args[:1]))}" * bool(msg), 500)
 
 
 @app.after_request
@@ -177,7 +177,7 @@ def redirect_search_user_mentions(username: str):
 @app.route("/search/<string:table>/")
 def serve_search(table: str, title_: str = "", args: dict[str, str] = None):
     if (table := table.upper()) not in (submissions_table, journals_table, users_table):
-        return error(f"Table {table.lower()} not found.", 404)
+        return serve_error(f"Table {table.lower()} not found.", 404)
 
     args = {k.lower(): v for k, v in (args or {}).items()}
     args_req = {k.lower(): v for k, v in request.args.items()}
@@ -236,10 +236,9 @@ def serve_search(table: str, title_: str = "", args: dict[str, str] = None):
 @app.route("/journal/<int:id_>/")
 def serve_journal(id_: int):
     if (jrnl := load_journal(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
-        return error(
+        return serve_error(
             f"Journal not found.<br>{button(f'https://www.furaffinity.net/journal/{id_}', 'Open on Fur Affinity')}",
-            404
-        )
+            404)
 
     p, n = load_prev_next(app.config["db_path"], journals_table, id_, _cache=m_time(app.config["db_path"]))
     return render_template(
@@ -256,10 +255,9 @@ def serve_journal(id_: int):
 @app.route("/journal/<int:id_>/zip/<_filename>")
 def serve_journal_zip(id_: int, _filename=None):
     if (jrn := load_journal(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
-        return error(
+        return serve_error(
             f"Journal not found.<br>{button(f'https://www.furaffinity.net/journal/{id_}', 'Open on Fur Affinity')}",
-            404
-        )
+            404)
 
     f_obj: BytesIO = BytesIO()
 
@@ -280,10 +278,9 @@ def redirect_submission_view(id_: int):
 @app.route("/submission/<int:id_>/")
 def serve_submission(id_: int):
     if (sub := load_submission(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
-        return error(
+        return serve_error(
             f"Submission not found.<br>{button(f'https://www.furaffinity.net/view/{id_}', 'Open on Fur Affinity')}",
-            404
-        )
+            404)
 
     p, n = load_prev_next(app.config["db_path"], submissions_table, id_, _cache=m_time(app.config["db_path"]))
     return render_template(
