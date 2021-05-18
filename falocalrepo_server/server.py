@@ -10,7 +10,7 @@ from zipfile import ZipFile
 
 from PIL import Image
 from PIL import UnidentifiedImageError
-from falocalrepo_database.exceptions import VersionMismatch
+from falocalrepo_database.exceptions import DatabaseError
 from flask import Flask
 from flask import abort
 from flask import redirect
@@ -65,9 +65,9 @@ def not_found(err: NotFound):
     return error(err.description, 404)
 
 
-@app.errorhandler(VersionMismatch)
-def error_version(err: VersionMismatch):
-    return error("Database version error" + f": {(msg := ''.join(err.args[:1]))}" * bool(msg), 500)
+@app.errorhandler(DatabaseError)
+def error_database(err: DatabaseError):
+    return error("Database error" + f": {(msg := ''.join(err.args[:1]))}" * bool(msg), 500)
 
 
 @app.after_request
