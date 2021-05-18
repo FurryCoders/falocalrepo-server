@@ -18,6 +18,14 @@
             max-height: 90vh;
         }
 
+        #submission_file object.txt {
+            width: 100%;
+            max-width: 600px;
+            text-align: justify;
+            height: 300px;
+            border: 1px solid black;
+        }
+
         #submission_metadata {
             width: 95%;
             max-width: 95%;
@@ -68,8 +76,8 @@
         </audio>
     {% elif submission["FILEEXT"].lower() == "txt" %}
         <object data="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
+                class="txt"
                 type=""
-                style="width: 100%; max-width: 600px; text-align: justify; height: 300px; border: 1px solid black"
                 onload="$('download_file').disabled = false">
             File not found
         </object>
