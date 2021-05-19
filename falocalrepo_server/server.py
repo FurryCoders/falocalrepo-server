@@ -236,12 +236,12 @@ def serve_search(table: str, title_: str = "", args: dict[str, str] = None):
 
 @app.route("/journal/<int:id_>/")
 def serve_journal(id_: int):
-    if (jrnl := load_journal(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
+    if (jrnl := load_journal(app.config["db_path"], id_, _cache=(_cache := m_time(app.config["db_path"])))) is None:
         return serve_error(
             f"Journal not found.<br>{button(f'https://www.furaffinity.net/journal/{id_}', 'Open on Fur Affinity')}",
             404)
 
-    p, n = load_prev_next(app.config["db_path"], journals_table, id_, _cache=m_time(app.config["db_path"]))
+    p, n = load_prev_next(app.config["db_path"], journals_table, id_, _cache=_cache)
     return render_template(
         "journal.html",
         title=f"{app.name} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
@@ -278,12 +278,12 @@ def redirect_submission_view(id_: int):
 
 @app.route("/submission/<int:id_>/")
 def serve_submission(id_: int):
-    if (sub := load_submission(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
+    if (sub := load_submission(app.config["db_path"], id_, _cache=(_cache := m_time(app.config["db_path"])))) is None:
         return serve_error(
             f"Submission not found.<br>{button(f'https://www.furaffinity.net/view/{id_}', 'Open on Fur Affinity')}",
             404)
 
-    p, n = load_prev_next(app.config["db_path"], submissions_table, id_, _cache=m_time(app.config["db_path"]))
+    p, n = load_prev_next(app.config["db_path"], submissions_table, id_, _cache=_cache)
     return render_template(
         "submission.html",
         title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
@@ -338,10 +338,10 @@ def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _filename
 @app.route("/submission/<int:id_>/zip/")
 @app.route("/submission/<int:id_>/zip/<_filename>")
 def serve_submission_zip(id_: int, _filename=None):
-    if (sub := load_submission(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))) is None:
+    if (sub := load_submission(app.config["db_path"], id_, _cache=(_cache := m_time(app.config["db_path"])))) is None:
         return abort(404)
 
-    sub_file, sub_thumb = load_submission_files(app.config["db_path"], id_, _cache=m_time(app.config["db_path"]))
+    sub_file, sub_thumb = load_submission_files(app.config["db_path"], id_, _cache=_cache)
     f_obj: BytesIO = BytesIO()
 
     with ZipFile(f_obj, "w") as z:
