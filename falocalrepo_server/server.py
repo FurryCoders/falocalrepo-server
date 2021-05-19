@@ -283,11 +283,15 @@ def serve_submission(id_: int):
             f"Submission not found.<br>{button(f'https://www.furaffinity.net/view/{id_}', 'Open on Fur Affinity')}",
             404)
 
+    f: Optional[Path] = None
+    if sub["FILEEXT"] == "txt" and sub["FILESAVED"] >= 10:
+        f = load_submission_files(app.config["db_path"], id_, _cache=_cache)[0]
     p, n = load_prev_next(app.config["db_path"], submissions_table, id_, _cache=_cache)
     return render_template(
         "submission.html",
         title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
         submission=sub,
+        file_text=f.read_text() if f else None,
         filename=f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         filename_id=f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         prev=p,

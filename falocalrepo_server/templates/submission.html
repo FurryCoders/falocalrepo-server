@@ -18,12 +18,13 @@
             max-height: 90vh;
         }
 
-        #submission_file object.txt {
-            width: 100%;
+        #submission_file pre {
+            width: 600px;
             max-width: 600px;
+            margin: auto;
             text-align: justify;
-            height: 300px;
-            border: 1px solid black;
+            white-space: pre-wrap;
+            padding: 5px;
         }
 
         #submission_metadata {
@@ -74,13 +75,8 @@
                controls>
             File not found
         </audio>
-    {% elif submission["FILEEXT"].lower() == "txt" %}
-        <object data="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
-                class="txt"
-                type=""
-                onload="$('download_file').disabled = false">
-            File not found
-        </object>
+    {% elif file_text is not none %}
+        <pre class="border">{{ file_text }}</pre>
     {% else %}
         <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
            style="border: 1px solid black; padding: 3px">
