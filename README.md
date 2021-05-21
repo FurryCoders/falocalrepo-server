@@ -82,17 +82,20 @@ Underneath the information table are buttons that open new search pages for subm
 
 ### Browse & Search
 
-The browse and search pages allow to explore the submissions/journals contained in the database. The controls at the top
-of the page allow to query the database and control the visualisation of the results.
+The browse and search pages allow to explore the submissions/journals contained in the database. Searches are performed
+case-insensitively using a simple syntax in the form `@field term [[| &] term ...]` which allows logic operators,
+parentheses and start/end of field matching, see [Query Language](#query-language) for details.
+
+Search terms for submissions and journals default to the `any` field if none is used, while the `username` field is used
+for users searches.
+
+The controls at the top of the page allow to query the database and control the visualisation of the results.
 
 ![browse controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/browse.png)
 
-The _Search_ input allows to query the database using a simple syntax in the form `@field term [[| &] term ...]` which
-allows logic operators, parentheses and start/end of field matching. For more details
-see [Query Language](#query-language).
+The _Search_ input allows to insert the search query.
 
-The _Add Field_ menu allows to insert a specific search field using a simple dropdown menu. Unmarked search terms
-default to the `any` field.
+The _Add Field_ menu allows to insert a specific search field using a simple dropdown menu.
 
 The _-_ button clears the search input field.
 
