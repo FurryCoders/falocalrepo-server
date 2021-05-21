@@ -120,9 +120,9 @@ website. Its basic elements are:
 * `@<field>` field specifier (e.g. `@title`), all database columns are available as search fields.
   See [falocalrepo-database](https://pypi.org/project/falocalrepo-database/) for details on the available columns.
 * `()` parentheses, they can be used for better logic operations
-* `&` _AND_ logic operator
-* `|` _OR_ logic operator
-* `!` _NOT_ logic operator
+* `&` _AND_ logic operator, used between search terms
+* `|` _OR_ logic operator, used between search terms
+* `!` _NOT_ logic operator, used as prefix of search terms
 * `""` quotes, allow searching for literal strings without needing to escape
 * `%` match 0 or more characters
 * `_` match exactly 1 character
@@ -153,7 +153,7 @@ feline:
 
 `@any water & ((otter | lutrine | mustelid) | (cat | feline))`
 
-Search for journals/submissions containing "cat" or "feline" but neither mouse nor rodent:
+Search for journals/submissions containing "cat" or "feline" but neither "mouse" nor "rodent":
 
 `(cat | feline) !mouse !rodent`
 
