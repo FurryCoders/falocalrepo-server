@@ -166,7 +166,6 @@ def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *,
                                    default_field,
                                    [*map(str.lower, {*cols_table, "any"} - {"ID", "AUTHOR", "USERNAME"})],
                                    {"author": "replace(author, '_', '')",
-                                    "username": "replace(username, '_', '')",
                                     "any": f"({'||'.join(cols_table)})"})
 
         return (
