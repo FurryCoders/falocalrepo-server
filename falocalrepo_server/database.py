@@ -44,7 +44,7 @@ def format_value(value: str, *, like: bool = False) -> str:
     return value
 
 
-def query_to_sql(query: str, likes: list[str] = None, aliases: dict[str, str] = None) -> tuple[str, list[str]]:
+def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliases: dict[str, str] = None) -> tuple[str, list[str]]:
     if not query:
         return "", []
     likes, aliases = likes or [], aliases or {}
@@ -54,7 +54,7 @@ def query_to_sql(query: str, likes: list[str] = None, aliases: dict[str, str] = 
     query = sub(r"(^[&| ]+|((?<!\\)[&|]| )+$)", "", query)
     query = sub(r"( *[&|])+(?= *[&|] *[@()])", "", query)
 
-    field, prev = "any", ""
+    field, prev = default_field, ""
     for elem in filter(bool, map(str.strip, split(r'((?<!\\)(?:"|!")(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|]| +)', query))):
         if m := match(r"^@(\w+)$", elem):
             field = m.group(1).lower()
@@ -143,6 +143,7 @@ def load_prev_next(db_path: Path, table: str, item_id: int, _cache=None) -> tupl
 @cache
 def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *, force: bool = False, _cache=None):
     cols_results: list[str] = []
+    default_field: str = "any"
     sort = sort or default_sort[table]
     order = order or default_order[table]
 
@@ -150,6 +151,7 @@ def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *,
         cols_results = ["ID", "AUTHOR", "DATE", "TITLE"]
     elif table == users_table:
         cols_results = ["USERNAME", "FOLDERS"]
+        default_field = "username"
 
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         db_table: FADatabaseTable = db[table]
@@ -161,6 +163,7 @@ def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *,
             return [], cols_table, cols_results, cols_list, col_id, sort, order
 
         sql, values = query_to_sql(query,
+                                   default_field,
                                    [*map(str.lower, {*cols_table, "any"} - {"ID", "AUTHOR", "USERNAME"})],
                                    {"author": "replace(author, '_', '')",
                                     "username": "replace(username, '_', '')",
