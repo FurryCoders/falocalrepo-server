@@ -173,13 +173,8 @@
         </tr>
         <tr id="query_help" hidden>
             <td colspan="5" style="text-align: justify">
-                <p>Search terms for <code>ID</code>, <code>AUTHOR</code>, and <code>USERNAME</code> are matched
-                    exactly as they are: i.e. <code>@author tom</code> will match only
-                    items whose author field is exactly equal to "tom", to match items that contain "tom" the
-                    <code>%</code>,
-                    <code>_</code>, <code>^</code>, and <code>$</code>
-                    operators need to be used (e.g. <code>@author %tom%</code>).</p>
-
+                <p>The query language used for this server is based on and improves the search syntax currently used by
+                    the Fur Affinity website. Its basic elements are:</p>
                 <ul>
                     <li>
                         <code>@&lt;field&gt;</code> field specifier (e.g. <code>@title</code>), all database columns
@@ -218,7 +213,6 @@
                         the field
                     </li>
                 </ul>
-
                 <p>All other strings are considered search terms.</p>
                 <p>The search uses the <code>@any</code> field by default, allowing to do general searches without
                     specifying a field.</p>
@@ -237,7 +231,6 @@
                     <code>%</code>,
                     <code>_</code>, <code>^</code>, and <code>$</code>
                     operators need to be used (e.g. <code>@author %tom%</code>).</p>
-
             </td>
         </tr>
         <tr>
