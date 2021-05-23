@@ -120,7 +120,8 @@ def serve_user(username: str):
 
 @app.route("/browse/")
 def redirect_browse_default():
-    return redirect(url_for("serve_browse", table="submissions", **{k: request.args.getlist(k) for k in request.args}))
+    return redirect(url_for(serve_browse.__name__, table="submissions",
+                            **{k: request.args.getlist(k) for k in request.args}))
 
 
 @app.route("/browse/<string:table>/")
@@ -130,7 +131,8 @@ def serve_browse(table: str):
 
 @app.route("/search/")
 def redirect_search_default():
-    return redirect(url_for("serve_search", table="submissions", **{k: request.args.getlist(k) for k in request.args}))
+    return redirect(url_for(serve_search.__name__, table="submissions",
+                            **{k: request.args.getlist(k) for k in request.args}))
 
 
 @app.route("/gallery/<username>")
@@ -186,7 +188,7 @@ def serve_search(table: str, title_: str = "", args: dict[str, str] = None):
     args |= args_req
 
     if query and request.path.startswith("/browse/"):
-        return redirect(url_for("serve_search", table=table.lower(), **args))
+        return redirect(url_for(serve_search.__name__, table=table.lower(), **args))
 
     page: int = int(args.get("page", 1))
     limit: int = int(args.get("limit", 48))
