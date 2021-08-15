@@ -25,11 +25,13 @@ checked_cache: Any = None
 class FADatabaseWrapper(FADatabase):
     def __init__(self, database_path: Path, _cache=None):
         global checked_cache
-        super().__init__(database_path, make=False)
         if not _cache or _cache != checked_cache:
+            FADatabase.check_connection(database_path)
+            super().__init__(database_path, make=False)
             self.check_version(patch=False)
-            self.check_connection()
             checked_cache = _cache
+        else:
+            super().__init__(database_path, make=False)
 
 
 @cache
