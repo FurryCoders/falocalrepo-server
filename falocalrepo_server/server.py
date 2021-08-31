@@ -10,6 +10,7 @@ from zipfile import ZipFile
 
 from PIL import Image
 from PIL import UnidentifiedImageError
+from chardet import detect as detect_encoding
 from falocalrepo_database.exceptions import DatabaseError
 from flask import Flask
 from flask import Response
@@ -293,7 +294,7 @@ def serve_submission(id_: int):
         "submission.html",
         title=f"{app.name} · {sub['TITLE']} by {sub['AUTHOR']}",
         submission=sub,
-        file_text=f.read_text() if f else None,
+        file_text=f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"]) if f else None,
         filename=f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         filename_id=f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         prev=p,
