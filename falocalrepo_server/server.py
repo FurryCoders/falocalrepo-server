@@ -79,6 +79,8 @@ def response_minify(response: Response):
     return response
 
 
+@app.route("/apple-touch-icon-precomposed.png")
+@app.route("/apple-touch-icon.png")
 @app.route("/favicon.ico")
 def serve_favicon():
     return serve_static_file("favicon.ico")
