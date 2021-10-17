@@ -25,21 +25,51 @@ For the program to run, a properly formatted database created by falocalrepo nee
 ## Usage
 
 ```
-falocalrepo-server <database> [<host>:<port>]
+falocalrepo-server <database> [--host] [--port] [--ssl-cert] [--ssl-key]
 ```
 
 The server needs one argument pointing at the location of a valid [falocalrepo](https://pypi.org/project/falocalrepo/)
-database and accepts an optional argument to manually set host and port. By default, the server is run on 0.0.0.0:8080.
+database and accepts optional arguments to manually set host, port, and an SSL certificate with key. By default, the
+server is run on 0.0.0.0:80 for HTTP (without certificate) and 0.0.0.0:443 for HTTPS (with certificate).
 
-Once the server is running - it will display status messages in the terminal - the web app can be accessed
-at http://0.0.0.0:8080/, or any manually set host/port combination.
+Once the server is running the web app can be accessed at the address shown in the terminal.
 
-_Note:_ All the following paths are meant as paths from `<host>:<port>`.
+### Arguments
 
-The root folder `/` displays basic information on the database and has links to perform submissions and journal
-searches.
+|Argument|Default|
+|---|---|
+|database|None, mandatory argument|
+|host|0.0.0.0|
+|port|80 if no certificate is given, 443 otherwise|
+|ssl-cert|None|
+|ssl-key|None|
+
+### Examples
+
+```shell
+# Launch an HTTP server reachable from other machines using the server's hostname/IP
+falocalrepo-server ~/FA.db
+```
+
+```shell
+# Launch a localhost-only server on port 8080
+falocalrepo-server ~/FA.db --host 127.0.0.1 --port 8080
+```
+
+```shell
+# Launch an HTTPS server reachable from other machines using the server's hostname/IP
+falocalrepo-server ~/FA.db --ssl-cert ~/FA.certificates/certificate.crt --ssl-key ~/FA.certificates/private.key 
+```
+
+```shell
+# Launch a localhost-only HTTPS server on port 8443
+falocalrepo-server ~/FA.db --host 127.0.0.1 --port 8443 --ssl-cert ~/FA.certificates/certificate.crt --ssl-key ~/FA.certificates/private.key 
+```
+
 
 ## Routes
+
+_Note:_ All the following paths are meant as paths from `<host>:<port>`.
 
 |Route                                    |Destination|
 |-----------------------------------------|---|
