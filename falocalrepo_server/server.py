@@ -370,11 +370,20 @@ def serve_static_file(filename: Union[str, PathLike]):
     return send_file(filepath, attachment_filename=filepath.name) if filepath.is_file() else abort(404)
 
 
-def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = 8080):
+def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = None,
+           ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None):
     app.config["db_path"] = Path(database_path).resolve()
-    app_server: WSGIServer = WSGIServer((host, port), app)
-    print(f"Using database {app.config['db_path']}")
-    print(f"Serving app on http://{app_server.server_host}:{app_server.server_port}")
+    print("Using database", app.config['db_path'])
+    if ssl := ssl_cert and ssl_key:
+        port = port or 443
+        ssl_cert, ssl_key = Path(ssl_cert), Path(ssl_key)
+        print("Using SSL certificate", ssl_cert)
+        print("Using SSL key", ssl_key)
+    else:
+        port = port or 80
+        ssl_cert = ssl_key = None
+    app_server: WSGIServer = WSGIServer((host, port), app, certfile=ssl_cert, keyfile=ssl_key)
+    print(f"Serving app on {'https' if ssl else 'http'}://{app_server.server_host}:{app_server.server_port}")
     try:
         app_server.serve_forever()
     except KeyboardInterrupt:
