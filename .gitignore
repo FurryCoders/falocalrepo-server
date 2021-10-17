@@ -113,3 +113,6 @@ FA.*
 
 # system files
 .DS_Store
+
+# certificates
+cert/
