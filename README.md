@@ -66,7 +66,6 @@ falocalrepo-server ~/FA.db --ssl-cert ~/FA.certificates/certificate.crt --ssl-ke
 falocalrepo-server ~/FA.db --host 127.0.0.1 --port 8443 --ssl-cert ~/FA.certificates/certificate.crt --ssl-key ~/FA.certificates/private.key 
 ```
 
-
 ## Routes
 
 _Note:_ All the following paths are meant as paths from `<host>:<port>`.
