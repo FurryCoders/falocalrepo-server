@@ -1,15 +1,23 @@
-from os.path import isfile
-from sys import argv
+from argparse import ArgumentParser
+from pathlib import Path
 
 from .server import server
 
 
 def main():
-    if not isfile(argv[1]):
-        raise FileNotFoundError(argv[1])
+    argparser: ArgumentParser = ArgumentParser(description="Web interface for https://pypi.org/project/falocalrepo/.")
+    argparser.add_argument("database", type=Path)
+    argparser.add_argument("--host", type=str, default="0.0.0.0")
+    argparser.add_argument("--port", type=int, default=None)
+    argparser.add_argument("--ssl-cert", dest="ssl_cert", type=Path, default=None)
+    argparser.add_argument("--ssl-key", dest="ssl_key", type=Path, default=None)
 
-    host, port = argv[2].split(":") if argv[2:] else ("0.0.0.0", 8080)
-    server(argv[1], host=host, port=int(port))
+    args = argparser.parse_args()
+
+    if not args.database.is_file():
+        raise FileNotFoundError(args.database)
+
+    server(args.database, host=args.host, port=args.port, ssl_cert=args.ssl_cert, ssl_key=args.ssl_key)
 
 
 if __name__ == '__main__':
