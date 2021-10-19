@@ -18,6 +18,9 @@ def main():
                                                      help="path to SSL certificate file for HTTPS")
     ssl_key_action: Action = argparser.add_argument("--ssl-key", dest="ssl_key", type=Path, default=None,
                                                     help="path to SSL key file for HTTPS")
+    # noinspection HttpUrlsUsage
+    argparser.add_argument("--redirect-http", dest="redirect_http", action="store_true", default=False,
+                           help="redirect all traffic from http://HOST:80 to https://HOST:PORT")
 
     args = argparser.parse_args()
 
@@ -28,7 +31,7 @@ def main():
     elif args.ssl_key and not args.ssl_cert:
         raise ArgumentError(ssl_cert_action, "SSL key must be accompanied by a certificate")
 
-    server(args.database, host=args.host, port=args.port, ssl_cert=args.ssl_cert, ssl_key=args.ssl_key)
+    server(args.database, args.host, args.port, args.ssl_cert, args.ssl_key, args.redirect_http)
 
 
 if __name__ == '__main__':
