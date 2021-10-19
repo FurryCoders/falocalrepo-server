@@ -49,6 +49,17 @@ app: Flask = Flask(
 )
 
 
+# noinspection HttpUrlsUsage
+def redirect_http_server(host: str = "0.0.0.0", port: int = 80) -> WSGIServer:
+    app_redirect: Flask = Flask("Redirect HTTP")
+    app_redirect.before_request(
+        lambda: redirect(request.url.replace("http://", "https://", 1), 301) if not request.is_secure else None)
+    app_redirect_server: WSGIServer = WSGIServer((host, port), app_redirect)
+    print(f"Redirecting from http://{host}:{port}")
+    app_redirect_server.start()
+    return app_redirect_server
+
+
 def button(href: str, text: str) -> str:
     return f'<button onclick="window.location = \'{href}\'">{text}</button>'
 
@@ -371,7 +382,7 @@ def serve_static_file(filename: Union[str, PathLike]):
 
 
 def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = None,
-           ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None):
+           ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None, redirect_http: bool = False):
     app.config["db_path"] = Path(database_path).resolve()
     print("Using database", app.config['db_path'])
     if ssl := ssl_cert and ssl_key:
@@ -383,10 +394,14 @@ def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int
         port = port or 80
         ssl_cert = ssl_key = None
     app_server: WSGIServer = WSGIServer((host, port), app, certfile=ssl_cert, keyfile=ssl_key)
+    redirect_server: Optional[WSGIServer] = None
     print(f"Serving app on {'https' if ssl else 'http'}://{app_server.server_host}:{app_server.server_port}")
     try:
+        redirect_server = redirect_http_server(host) if redirect_http and ssl else None
         app_server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
+        if redirect_server is not None:
+            redirect_server.stop()
         app_server.stop()
