@@ -393,7 +393,7 @@ def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int
         port = port or 80
         ssl_cert = ssl_key = None
     app_server: WSGIServer = WSGIServer((host, port), app, certfile=ssl_cert, keyfile=ssl_key)
-    redirect_server: Optional[WSGIServer] = redirect_http_server(host, 80) if redirect_http and ssl else None
+    redirect_server: Optional[WSGIServer] = redirect_http_server(host, 80) if redirect_http and ssl and port != 80 else None
     print(f"Serving app on {'https' if ssl else 'http'}://{app_server.server_host}:{app_server.server_port}")
     if redirect_server:
         print(f"Redirecting from http://{redirect_server.server_host}:{redirect_server.server_port}")
