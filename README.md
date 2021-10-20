@@ -25,12 +25,14 @@ For the program to run, a properly formatted database created by falocalrepo nee
 ## Usage
 
 ```
-falocalrepo-server <database> [--host] [--port] [--ssl-cert] [--ssl-key]
+falocalrepo-server <database> [--host HOST] [--port PORT] [--ssl-cert SSL_CERT] [--ssl-key SSL_KEY] [--redirect-http]
 ```
 
 The server needs one argument pointing at the location of a valid [falocalrepo](https://pypi.org/project/falocalrepo/)
 database and accepts optional arguments to manually set host, port, and an SSL certificate with key. By default, the
 server is run on 0.0.0.0:80 for HTTP (without certificate) and 0.0.0.0:443 for HTTPS (with certificate).
+
+The optional `--redirect-http` enables HTTP to HTTPS redirection from port 80 to the port selected to serve HTTPS.
 
 Once the server is running the web app can be accessed at the address shown in the terminal.
 
@@ -38,11 +40,12 @@ Once the server is running the web app can be accessed at the address shown in t
 
 |Argument|Default|
 |---|---|
-|database|None, mandatory argument|
-|host|0.0.0.0|
-|port|80 if no certificate is given, 443 otherwise|
-|ssl-cert|None|
-|ssl-key|None|
+|`database`|None, mandatory argument|
+|`--host`|0.0.0.0|
+|`--port`|80 if no SSL certificate is given, 443 otherwise|
+|`--ssl-cert`|None|
+|`--ssl-key`|None|
+|`--redirect-http`|redirect all traffic from http://HOST:80 to https://HOST:PORT|
 
 ### Examples
 
