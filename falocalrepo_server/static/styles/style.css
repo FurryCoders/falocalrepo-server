@@ -37,6 +37,10 @@ body {
     color: var(--color_primary);
 }
 
+input {
+  box-sizing: border-box;
+}
+
 .border {
     border-collapse: collapse;
     border: 1px solid var(--border_color);
