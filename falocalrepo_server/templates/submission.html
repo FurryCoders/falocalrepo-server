@@ -7,13 +7,15 @@
     <style>
         #submission_file {
             width: 100%;
-            top: 20px;
             margin: auto;
             text-align: center
         }
 
         #submission_file img {
-            width: 100%;
+            max-width: 100%;
+            max-height: 100vh;
+            margin: auto;
+            object-fit: contain;
         }
 
         #submission_file pre {
@@ -68,6 +70,13 @@
                  onload="$('download_file').disabled = false">
         </a>
     {% elif submission["TYPE"].lower() == "audio" %}
+        <div id="submission_thumbnail">
+            <br>
+            <img src="/submission/{{ submission["ID"] }}/thumbnail"
+                 alt=""
+                 onerror="$('submission_thumbnail').remove()">
+        </div>
+        <br>
         <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
                onload="$('download_file').disabled = false"
                controls>
@@ -76,6 +85,13 @@
     {% elif file_text is not none %}
         <pre class="border">{{ file_text }}</pre>
     {% else %}
+        <div id="submission_thumbnail">
+            <br>
+            <img src="/submission/{{ submission["ID"] }}/thumbnail"
+                 alt=""
+                 onerror="$('submission_thumbnail').remove()">
+        </div>
+        <br>
         <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
            style="border: 1px solid black; padding: 3px">
             {{ filename|title }}
