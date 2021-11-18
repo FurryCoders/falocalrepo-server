@@ -69,7 +69,7 @@
                  onerror="$('submission_file').innerText = 'File not found'"
                  onload="$('download_file').disabled = false">
         </a>
-    {% elif submission["TYPE"].lower() == "audio" %}
+    {% elif submission["TYPE"].lower() == "music" %}
         <div id="submission_thumbnail">
             <br>
             <img src="/submission/{{ submission["ID"] }}/thumbnail"
