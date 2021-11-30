@@ -3,6 +3,7 @@
     --color_primary: black;
     --color_secondary: #8A8A8E;
     --color_tertiary: #C4C4C6;
+    --color-link: blue;
     --border_color: var(--color_primary);
     --background_color_odd: var(--background_color);
     --background_color_even: var(--color_tertiary);
@@ -14,6 +15,7 @@
         --color_primary: black;
         --color_secondary: #8A8A8E;
         --color_tertiary: #C4C4C6;
+        --color-link: blue;
         --border_color: var(--color_primary);
         --background_color_odd: var(--background_color);
         --background_color_even: var(--color_tertiary);
@@ -26,6 +28,7 @@
         --color_primary: white;
         --color_secondary: #989899;
         --color_tertiary: #5A5A5E;
+        --color-link: royalblue;
         --border_color: var(--color_primary);
         --background_color_odd: var(--background_color);
         --background_color_even: var(--color_tertiary);
@@ -79,6 +82,10 @@ input {
 
 .hover_underline:hover {
     text-decoration: underline;
+}
+
+a:link, a:visited {
+    color: var(--color-link);
 }
 
 a.cell-link {
