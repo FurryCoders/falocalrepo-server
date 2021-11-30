@@ -273,7 +273,7 @@
 {% if results or params %}
 <div id="header">
     {% set navigation %}
-    Results: {{ offset }}-{{ offset + results|length }} of {{ results_total }} · Page {{ page }}
+    Results: {{ offset + (results_total > 0) }}-{{ offset + results|length }} of {{ results_total }} · Page {{ page }}
     <br>
     <button type="submit" form="search_form" name="page" value="1" {{ 'disabled' if page == 1 }}>
         First
