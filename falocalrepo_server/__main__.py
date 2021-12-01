@@ -19,21 +19,21 @@ def main():
     ssl_key_action: Action = argparser.add_argument("--ssl-key", dest="ssl_key", type=Path, default=None,
                                                     help="path to SSL key file for HTTPS")
     # noinspection HttpUrlsUsage
-    redirect_action: Action = argparser.add_argument("--redirect-http", type=int, default=False,
+    redirect_action: Action = argparser.add_argument("--redirect-http", type=int, default=False, dest="redirect_port",
                                                      help="redirect all traffic from http://HOST to https://HOST")
 
     args = argparser.parse_args()
 
-    if not args.redirect_http and not args.database.is_file():
+    if not args.redirect_port and not args.database.is_file():
         raise FileNotFoundError(args.database)
     elif args.ssl_cert and not args.ssl_key:
         raise ArgumentError(ssl_key_action, "SSL certificate must be accompanied by a key")
     elif args.ssl_key and not args.ssl_cert:
         raise ArgumentError(ssl_cert_action, "SSL key must be accompanied by a certificate")
-    elif args.redirect_http and args.redirect_http == args.port:
+    elif args.redirect_port and args.redirect_port == args.port:
         raise ArgumentError(redirect_action, "PORT and redirect port cannot be identical")
 
-    server(args.database, args.host, args.port, args.ssl_cert, args.ssl_key, args.redirect_http)
+    server(args.database, args.host, args.port, args.ssl_cert, args.ssl_key, args.redirect_port)
 
 
 if __name__ == '__main__':

@@ -368,10 +368,10 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
 
 # noinspection HttpUrlsUsage
 def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = None,
-           ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None, redirect_http: int = None):
-    if redirect_http:
-        print(f"Redirecting http://{host}:{port} to https://{host}:{redirect_http}")
-        return run_redirect(host, port, redirect_http)
+           ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None, redirect_port: int = None):
+    if redirect_port:
+        print(f"Redirecting http://{host}:{port} to https://{host}:{redirect_port}")
+        return run_redirect(host, port, redirect_port)
     settings.database_path = Path(database_path).resolve()
     run_args: dict[str, Any]
     print("Using database", settings.database_path)
