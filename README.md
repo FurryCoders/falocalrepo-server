@@ -38,14 +38,14 @@ Once the server is running the web app can be accessed at the address shown in t
 
 ### Arguments
 
-|Argument|Default|
-|---|---|
-|`database`|None, mandatory argument|
-|`--host`|0.0.0.0|
-|`--port`|80 if no SSL certificate is given, 443 otherwise|
-|`--ssl-cert`|None|
-|`--ssl-key`|None|
-|`--redirect-http`|redirect all traffic from http://HOST:80 to https://HOST:PORT|
+| Argument          | Default                                                       |
+|-------------------|---------------------------------------------------------------|
+| `database`        | None, mandatory argument                                      |
+| `--host`          | 0.0.0.0                                                       |
+| `--port`          | 80 if no SSL certificate is given, 443 otherwise              |
+| `--ssl-cert`      | None                                                          |
+| `--ssl-key`       | None                                                          |
+| `--redirect-http` | redirect all traffic from http://HOST:80 to https://HOST:PORT |
 
 ### Examples
 
@@ -73,32 +73,32 @@ falocalrepo-server ~/FA.db --host 127.0.0.1 --port 8443 --ssl-cert ~/FA.certific
 
 _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 
-|Route                                    |Destination|
-|-----------------------------------------|---|
-|`/`                                      | Show home page with general information regarding the database|
-|`/browse/`                               | Redirects to `/browse/submissions/`|
-|`/browse/submissions/`                   | Browse submissions|
-|`/browse/journals/`                      | Browse journals|
-|`/browse/users/`                         | Browse users|
-|`/search/`                               | Redirects to `/search/submissions/`|
-|`/search/submissions/`                   | Search submissions|
-|`/search/journals/`                      | Search journals|
-|`/search/users/`                         | Search users|
-|`/user/<username>/`                      | Show information regarding a specific user|
-|`/gallery/<username>/`                   | Browse a user's gallery submissions|
-|`/scraps/<username>/`                    | Browse a user's scraps submissions|
-|`/submissions/<username>/`               | Browse a user's gallery & scraps submissions| 
-|`/favorites/<username>/`                 | Browse a user's favorite submissions|
-|`/mentions/<username>/`                  | Browse the submissions where the user is mentioned|
-|`/journals/<username>/`                  | Browse a user's journals|
-|`/full/<submission id>/`                 | Redirect to `/submission/<submission id>/`|
-|`/view/<submission id>/`                 | Redirect to `/submission/<submission id>/`|
-|`/submission/<submission id>/`           | View a submission|
-|`/submission/<submission id>/file/`      | Open a submission file|
-|`/submission/<submission id>/thumbnail/` | Open a submission thumbnail (generated for image if no thumbnail is stored)|
-|`/submission/<submission id>/zip/`       | Download a submission's file, description, and metadata as a ZIP archive|
-|`/journal/<journal id>/`                 | View a journal|
-|`/journal/<journal id>/zip/`             | Download a journal's content and metadata as a ZIP archive|
+| Route                                    | Destination                                                                 |
+|------------------------------------------|-----------------------------------------------------------------------------|
+| `/`                                      | Show home page with general information regarding the database              |
+| `/browse/`                               | Redirects to `/browse/submissions/`                                         |
+| `/browse/submissions/`                   | Browse submissions                                                          |
+| `/browse/journals/`                      | Browse journals                                                             |
+| `/browse/users/`                         | Browse users                                                                |
+| `/search/`                               | Redirects to `/search/submissions/`                                         |
+| `/search/submissions/`                   | Search submissions                                                          |
+| `/search/journals/`                      | Search journals                                                             |
+| `/search/users/`                         | Search users                                                                |
+| `/user/<username>/`                      | Show information regarding a specific user                                  |
+| `/gallery/<username>/`                   | Browse a user's gallery submissions                                         |
+| `/scraps/<username>/`                    | Browse a user's scraps submissions                                          |
+| `/submissions/<username>/`               | Browse a user's gallery & scraps submissions                                | 
+| `/favorites/<username>/`                 | Browse a user's favorite submissions                                        |
+| `/mentions/<username>/`                  | Browse the submissions where the user is mentioned                          |
+| `/journals/<username>/`                  | Browse a user's journals                                                    |
+| `/full/<submission id>/`                 | Redirect to `/submission/<submission id>/`                                  |
+| `/view/<submission id>/`                 | Redirect to `/submission/<submission id>/`                                  |
+| `/submission/<submission id>/`           | View a submission                                                           |
+| `/submission/<submission id>/file/`      | Open a submission file                                                      |
+| `/submission/<submission id>/thumbnail/` | Open a submission thumbnail (generated for image if no thumbnail is stored) |
+| `/submission/<submission id>/zip/`       | Download a submission's file, description, and metadata as a ZIP archive    |
+| `/journal/<journal id>/`                 | View a journal                                                              |
+| `/journal/<journal id>/zip/`             | Download a journal's content and metadata as a ZIP archive                  |
 
 ## Pages
 
