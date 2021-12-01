@@ -286,7 +286,7 @@ async def serve_submission_thumbnail(_request: Request, id_: int, x: int = None,
                 f_obj.seek(0)
                 return StreamingResponse(f_obj, media_type=img.format)
         except UnidentifiedImageError:
-            raise HTTPException(404, )
+            raise HTTPException(404)
     else:
         raise HTTPException(404)
 
