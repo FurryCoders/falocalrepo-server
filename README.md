@@ -67,7 +67,7 @@ falocalrepo-server ~/FA.db --host 127.0.0.1 --port 8080
 ```
 
 ```shell
-# Launch a redirect server that listens to port 80 and redirects to port 444 on host 0.0.0.0
+# Launch a redirect server that listens to port 80 and redirects to port 443 on host 0.0.0.0
 falocalrepo-server . --host 0.0.0.0 --port 80 --redirect-htpp 443
 ```
 
