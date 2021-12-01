@@ -22,10 +22,7 @@ falocalrepo-server = "falocalrepo_server.__main__:main"
 python = "^3.9"
 falocalrepo-database = "~4.19.3"
 chardet = "^4.0.0"
-flask = "^1.1.2"
 Pillow = "^8.1.0"
-htmlmin = "^0.1.0"
-gevent = "^21.1.2"
 
 [tool.poetry.dev-dependencies]
 
