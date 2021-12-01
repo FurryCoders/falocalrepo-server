@@ -24,7 +24,7 @@ def main():
 
     args = argparser.parse_args()
 
-    if not args.database.is_file():
+    if not args.redirect_http and not args.database.is_file():
         raise FileNotFoundError(args.database)
     elif args.ssl_cert and not args.ssl_key:
         raise ArgumentError(ssl_key_action, "SSL certificate must be accompanied by a key")
