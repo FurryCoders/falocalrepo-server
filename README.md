@@ -25,27 +25,34 @@ For the program to run, a properly formatted database created by falocalrepo nee
 ## Usage
 
 ```
-falocalrepo-server <database> [--host HOST] [--port PORT] [--ssl-cert SSL_CERT] [--ssl-key SSL_KEY] [--redirect-http]
+falocalrepo-server <database> [--host HOST] [--port PORT] [--ssl-cert SSL_CERT] [--ssl-key SSL_KEY] [--redirect-http REDIRECT_PORT]
 ```
 
 The server needs one argument pointing at the location of a valid [falocalrepo](https://pypi.org/project/falocalrepo/)
 database and accepts optional arguments to manually set host, port, and an SSL certificate with key. By default, the
 server is run on 0.0.0.0:80 for HTTP (without certificate) and 0.0.0.0:443 for HTTPS (with certificate).
 
-The optional `--redirect-http` enables HTTP to HTTPS redirection from port 80 to the port selected to serve HTTPS.
+### Redirect Mode
+
+The optional `--redirect-http` argument changes the app mode to redirection. In this mode the app runs a tiny server
+that redirects all HTTP requests it receives on `http://HOST:PORT` to `https://HOST:REDIRECT_PORT`.
+
+_Note:_ In redirect mode the `database` argument is not checked, so a simple `.` is sufficient.
+_Note:_ In redirect mode the app does not operate the database portion of the server. To run in redirect and server
+mode, two separate instances of the program are needed.
 
 Once the server is running the web app can be accessed at the address shown in the terminal.
 
 ### Arguments
 
-| Argument          | Default                                                       |
-|-------------------|---------------------------------------------------------------|
-| `database`        | None, mandatory argument                                      |
-| `--host`          | 0.0.0.0                                                       |
-| `--port`          | 80 if no SSL certificate is given, 443 otherwise              |
-| `--ssl-cert`      | None                                                          |
-| `--ssl-key`       | None                                                          |
-| `--redirect-http` | redirect all traffic from http://HOST:80 to https://HOST:PORT |
+| Argument          | Default                                          |
+|-------------------|--------------------------------------------------|
+| `database`        | None, mandatory argument                         |
+| `--host`          | 0.0.0.0                                          |
+| `--port`          | 80 if no SSL certificate is given, 443 otherwise |
+| `--ssl-cert`      | None                                             |
+| `--ssl-key`       | None                                             |
+| `--redirect-http` | None                                             |
 
 ### Examples
 
@@ -57,6 +64,11 @@ falocalrepo-server ~/FA.db
 ```shell
 # Launch a localhost-only server on port 8080
 falocalrepo-server ~/FA.db --host 127.0.0.1 --port 8080
+```
+
+```shell
+# Launch a redirect server that listens to port 80 and redirects to port 444 on host 0.0.0.0
+falocalrepo-server . --host 0.0.0.0 --port 80 --redirect-htpp 443
 ```
 
 ```shell
