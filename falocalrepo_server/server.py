@@ -380,7 +380,7 @@ async def serve_static_file(_request: Request, file: Path):
 
 def run_redirect(host: str, port_listen: int, port_redirect: int):
     redirect_app: FastAPI = FastAPI()
-    redirect_app.add_event_handler("startup", lambda: logger.info(f"Redirecting to https://{host}:{port_redirect}"))
+    redirect_app.add_event_handler("startup", lambda: logger.info(f"Redirecting target https://{host}:{port_redirect}"))
     redirect_app.add_route(
         "/{__:path}",
         lambda r, *_: RedirectResponse(f"https://{r.url.hostname}:{port_redirect}{r.url.path}?{r.url.query}"),
