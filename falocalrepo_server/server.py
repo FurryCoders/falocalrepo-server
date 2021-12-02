@@ -2,6 +2,8 @@ from functools import cache
 from functools import lru_cache
 from io import BytesIO
 from json import dumps
+from logging import Logger
+from logging import getLogger
 from os import PathLike
 from pathlib import Path
 from sqlite3 import DatabaseError
@@ -17,6 +19,7 @@ from chardet import detect as detect_encoding
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.exceptions import HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse
 from fastapi.responses import HTMLResponse
 from fastapi.responses import RedirectResponse
@@ -46,8 +49,11 @@ from .database import users_table
 class Settings(BaseSettings):
     database_path: Path = None
     static_folder: Path = None
+    ssl_cert: Path = None
+    ssl_key: Path = None
 
 
+logger: Logger = getLogger("uvicorn")
 fa_base_url: str = "https://www.furaffinity.net"
 root: Path = Path(__file__).resolve().parent
 app: FastAPI = FastAPI(title="FurAffinity Local Repo", openapi_url=None)
@@ -68,14 +74,35 @@ def serve_error(request: Request, message: str, code: int):
     )
 
 
+@app.on_event("startup")
+def log_settings():
+    logger.info(f"Using database: {settings.database_path}")
+    logger.info(f"Using SSL certificate: {settings.ssl_cert}") if settings.ssl_cert else None
+    logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
+
+
+@app.exception_handler(HTTPException)
+async def error_unknown(request: Request, err: HTTPException):
+    logger.error(repr(err))
+    return serve_error(request, err.detail or err.__class__.__name__, err.status_code)
+
+
 @app.exception_handler(404)
 async def error_not_found(request: Request, err: HTTPException):
-    return serve_error(request, err.detail or request.url.path + " not found", 404)
+    return serve_error(request, err.detail or "Not found", err.status_code)
+
+
+@app.exception_handler(422)
+@app.exception_handler(RequestValidationError)
+async def error_not_found(request: Request, err: RequestValidationError):
+    logger.error(f"{err.__class__.__name__} {err.errors()}")
+    return serve_error(request, err.errors()[0].get("msg", None) or err.__class__.__name__, 422)
 
 
 @app.exception_handler(DatabaseError)
 async def error_database(request: Request, err: DatabaseError):
-    return serve_error(request, f"{err.__class__.__name__} {err.args[0] if err.args else ''}".strip(), 500)
+    logger.error(repr(err))
+    return serve_error(request, err.__class__.__name__, 500)
 
 
 @app.get("/view/{id_}", response_class=HTMLResponse)
@@ -353,6 +380,7 @@ async def serve_static_file(_request: Request, file: Path):
 
 def run_redirect(host: str, port_listen: int, port_redirect: int):
     redirect_app: FastAPI = FastAPI()
+    redirect_app.add_event_handler("startup", lambda: logger.info(f"Redirecting to https://{host}:{port_redirect}"))
     redirect_app.add_route(
         "/{__:path}",
         lambda r, *_: RedirectResponse(f"https://{r.url.hostname}:{port_redirect}{r.url.path}?{r.url.query}"),
@@ -370,22 +398,16 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
 def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = None,
            ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None, redirect_port: int = None):
     if redirect_port:
-        print(f"Redirecting http://{host}:{port} to https://{host}:{redirect_port}")
         return run_redirect(host, port, redirect_port)
     settings.database_path = Path(database_path).resolve()
-    run_args: dict[str, Any]
-    print("Using database", settings.database_path)
+    run_args: dict[str, Any] = {"host": host, "port": port or 443}
     if ssl_cert and ssl_key:
-        ssl_cert, ssl_key = Path(ssl_cert), Path(ssl_key)
-        if not ssl_cert.is_file():
-            raise FileNotFoundError(f"SSL certificate {ssl_cert}")
-        elif not ssl_key.is_file():
-            raise FileNotFoundError(f"SSL private key {ssl_key}")
-        run_args = {"host": host, "port": port or 443, "ssl_certfile": ssl_cert, "ssl_keyfile": ssl_key}
-        print("Using SSL certificate", ssl_cert)
-        print("Using SSL key", ssl_key)
-    else:
-        run_args = {"host": host, "port": port or 443}
+        settings.ssl_cert, settings.ssl_key = Path(ssl_cert), Path(ssl_key)
+        if not settings.ssl_cert.is_file():
+            raise FileNotFoundError(f"SSL certificate {settings.ssl_cert}")
+        elif not settings.ssl_key.is_file():
+            raise FileNotFoundError(f"SSL private key {settings.ssl_key}")
+        run_args |= {"ssl_certfile": settings.ssl_cert, "ssl_keyfile": settings.ssl_key}
     try:
         # noinspection PyTypeChecker
         run(app, **run_args)
