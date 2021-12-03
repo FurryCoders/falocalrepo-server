@@ -46,7 +46,8 @@ def format_value(value: str, *, like: bool = False) -> str:
     return value
 
 
-def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliases: dict[str, str] = None) -> tuple[str, list[str]]:
+def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliases: dict[str, str] = None
+                 ) -> tuple[str, list[str]]:
     if not query:
         return "", []
     likes, aliases = likes or [], aliases or {}
@@ -81,13 +82,13 @@ def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliase
 
 
 @cache
-def load_user(db_path: Path, user: str, _cache=None) -> Optional[Entry]:
+def load_user_cached(db_path: Path, user: str, _cache=None) -> Optional[Entry]:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.users[user]
 
 
 @cache
-def load_user_stats(db_path: Path, user: str, _cache=None) -> dict[str, int]:
+def load_user_stats_cached(db_path: Path, user: str, _cache=None) -> dict[str, int]:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return {
             "gallery": db.submissions.select(
@@ -111,25 +112,26 @@ def load_user_stats(db_path: Path, user: str, _cache=None) -> dict[str, int]:
 
 
 @cache
-def load_submission(db_path: Path, submission_id: int, _cache=None) -> Optional[Entry]:
+def load_submission_cached(db_path: Path, submission_id: int, _cache=None) -> Optional[Entry]:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.submissions[submission_id]
 
 
 @cache
-def load_submission_files(db_path: Path, submission_id: int, _cache=None) -> tuple[Optional[Path], Optional[Path]]:
+def load_submission_files_cached(db_path: Path, submission_id: int, _cache=None
+                                 ) -> tuple[Optional[Path], Optional[Path]]:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.submissions.get_submission_files(submission_id)
 
 
 @cache
-def load_journal(db_path: Path, journal_id: int, _cache=None) -> Optional[Entry]:
+def load_journal_cached(db_path: Path, journal_id: int, _cache=None) -> Optional[Entry]:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.journals[journal_id]
 
 
 @cache
-def load_prev_next(db_path: Path, table: str, item_id: int, _cache=None) -> tuple[int, int]:
+def load_prev_next_cached(db_path: Path, table: str, item_id: int, _cache=None) -> tuple[int, int]:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         item: Optional[dict] = db[table][item_id]
         query: Selector = S("AUTHOR").__eq__(item["AUTHOR"])
@@ -143,7 +145,8 @@ def load_prev_next(db_path: Path, table: str, item_id: int, _cache=None) -> tupl
 
 
 @cache
-def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *, force: bool = False, _cache=None):
+def load_search_cached(db_path: Path, table: str, query: str, sort: str, order: str, *, force: bool = False,
+                       _cache=None):
     cols_results: list[str] = []
     default_field: str = "any"
     sort = sort or default_sort[table]
@@ -182,12 +185,48 @@ def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *,
 
 
 @cache
-def load_files_folder(db_path: Path, _cache=None) -> Path:
+def load_files_folder_cached(db_path: Path, _cache=None) -> Path:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return db.files_folder
 
 
 @cache
-def load_info(db_path: Path, _cache=None) -> tuple[int, int, int, str]:
+def load_info_cached(db_path: Path, _cache=None) -> tuple[int, int, int, str]:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return len(db.users), len(db.submissions), len(db.journals), db.version
+
+
+def load_user(db_path: Path, user: str) -> Optional[Entry]:
+    return load_user_cached(db_path, user, _cache=m_time(db_path))
+
+
+def load_user_stats(db_path: Path, user: str) -> dict[str, int]:
+    return load_user_stats_cached(db_path, user, _cache=m_time(db_path))
+
+
+def load_submission(db_path: Path, submission_id: int) -> Optional[Entry]:
+    return load_submission_cached(db_path, submission_id, _cache=m_time(db_path))
+
+
+def load_submission_files(db_path: Path, submission_id: int) -> tuple[Optional[Path], Optional[Path]]:
+    return load_submission_files_cached(db_path, submission_id, _cache=m_time(db_path))
+
+
+def load_journal(db_path: Path, journal_id: int) -> Optional[Entry]:
+    return load_journal_cached(db_path, journal_id, _cache=m_time(db_path))
+
+
+def load_prev_next(db_path: Path, table: str, item_id: int) -> tuple[int, int]:
+    return load_prev_next_cached(db_path, table, item_id, _cache=m_time(db_path))
+
+
+def load_search(db_path: Path, table: str, query: str, sort: str, order: str, *, force: bool = False):
+    return load_search_cached(db_path, table, query, sort, order, force=force, _cache=m_time(db_path))
+
+
+def load_files_folder(db_path: Path) -> Path:
+    return load_files_folder_cached(db_path, _cache=m_time(db_path))
+
+
+def load_info(db_path: Path) -> tuple[int, int, int, str]:
+    return load_info_cached(db_path, _cache=m_time(db_path))
