@@ -113,8 +113,8 @@ async def serve_favicon(request: Request):
 @app.get("/touch-icon.png", response_class=FileResponse)
 @app.get("/apple-touch-icon.png", response_class=FileResponse)
 @app.get("/apple-touch-icon-precomposed.png", response_class=FileResponse)
-async def serve_touch_icon(request: Request):
-    return await serve_static_file(request, Path("touch-icon.png"))
+async def serve_touch_icon():
+    return await serve_static_file(Path("touch-icon.png"))
 
 
 @app.exception_handler(422)
@@ -132,7 +132,7 @@ async def error_database(request: Request, err: DatabaseError):
 
 @app.get("/view/{id_}", response_class=HTMLResponse)
 @app.get("/full/{id_}", response_class=HTMLResponse)
-async def redirect_submission(_request: Request, id_: int):
+async def redirect_submission(id_: int):
     return RedirectResponse(app.url_path_for(serve_submission.__name__, id_=str(id_)))
 
 
@@ -304,7 +304,7 @@ async def serve_submission(request: Request, id_: int):
 @lru_cache(maxsize=10)
 @app.get("/submission/{id_}/file/")
 @app.get("/submission/{id_}/file/{_filename}")
-async def serve_submission_file(_request: Request, id_: int, _filename=None):
+async def serve_submission_file(id_: int, _filename=None):
     if (f := load_submission_files(settings.database_path, id_, _cache=m_time(settings.database_path))[0]) is None:
         raise HTTPException(404)
     elif not f.is_file():
@@ -319,7 +319,7 @@ async def serve_submission_file(_request: Request, id_: int, _filename=None):
 @app.get("/submission/{id_}/thumbnail/{x}/{_filename}")
 @app.get("/submission/{id_}/thumbnail/{x}x{y}>/")
 @app.get("/submission/{id_}/thumbnail/{x}x{y}>/{_filename}")
-async def serve_submission_thumbnail(_request: Request, id_: int, x: int = None, y: int = None, _filename=None):
+async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _filename=None):
     f, t = load_submission_files(settings.database_path, id_, _cache=m_time(settings.database_path))
     if t is not None and t.is_file():
         if not x:
@@ -345,7 +345,7 @@ async def serve_submission_thumbnail(_request: Request, id_: int, x: int = None,
 @lru_cache(maxsize=10)
 @app.get("/submission/{id_}/zip/")
 @app.get("/submission/{id_}/zip/{_filename}")
-async def serve_submission_zip(_request: Request, id_: int, _filename=None):
+async def serve_submission_zip(id_: int, _filename=None):
     if (sub := load_submission(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))) is None:
         raise HTTPException(404)
 
@@ -382,7 +382,7 @@ async def serve_journal(request: Request, id_: int):
 @lru_cache(maxsize=10)
 @app.get("/journal/{id_}/zip/")
 @app.get("/journal/{id_}/zip/{filename}")
-async def serve_journal_zip(_request: Request, id_: int, _filename=None):
+async def serve_journal_zip(id_: int, _filename=None):
     if (jrnl := load_journal(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))) is None:
         raise HTTPException(404)
 
@@ -396,7 +396,7 @@ async def serve_journal_zip(_request: Request, id_: int, _filename=None):
 
 @cache
 @app.get("/static/{file:path}", response_class=FileResponse)
-async def serve_static_file(_request: Request, file: Path):
+async def serve_static_file(file: Path):
     if not (file := settings.static_folder / file).is_file():
         raise HTTPException(404, "File not found")
     return FileResponse(file, filename=file.name)
@@ -438,19 +438,19 @@ async def serve_search_json(request: Request, table: str, query_data: SearchQuer
 
 @app.get("/json/submission/{id_}/", response_class=JSONResponse)
 @app.post("/json/submission/{id_}/", response_class=JSONResponse)
-async def serve_submission_json(_request: Request, id_: int):
+async def serve_submission_json(id_: int):
     return load_submission(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
 
 
 @app.get("/json/journal/{id_}/", response_class=JSONResponse)
 @app.post("/json/journal/{id_}/", response_class=JSONResponse)
-async def serve_journal_json(_request: Request, id_: int):
+async def serve_journal_json(id_: int):
     return load_journal(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
 
 
 @app.get("/json/user/{username}", response_class=JSONResponse)
 @app.post("/json/user/{username}", response_class=JSONResponse)
-async def serve_user_json(_request: Request, username: str):
+async def serve_user_json(username: str):
     username = clean_username(username)
     user_entry: Optional[dict] = load_user(settings.database_path, username, _cache=m_time(settings.database_path))
     user_stats: dict[str, int] = load_user_stats(settings.database_path, username,
