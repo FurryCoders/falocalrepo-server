@@ -22,6 +22,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse
 from fastapi.responses import HTMLResponse
+from fastapi.responses import JSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
@@ -352,6 +353,12 @@ async def serve_submission_zip(_request: Request, id_: int, _filename=None):
     return StreamingResponse(f_obj, media_type="application/zip")
 
 
+@lru_cache(maxsize=10)
+@app.get("/submission/{id_}/json/", response_class=JSONResponse)
+async def serve_submission_json(_request: Request, id_: int):
+    return load_submission(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
+
+
 @app.get("/journal/{id_}/", response_class=HTMLResponse)
 async def serve_journal(request: Request, id_: int):
     if (jrnl := load_journal(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))) is None:
@@ -383,6 +390,12 @@ async def serve_journal_zip(_request: Request, id_: int, _filename=None):
 
     f_obj.seek(0)
     return StreamingResponse(f_obj, media_type="application/zip")
+
+
+@lru_cache(maxsize=10)
+@app.get("/journal/{id_}/json/", response_class=JSONResponse)
+async def serve_journal_json(_request: Request, id_: int):
+    return load_journal(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
 
 
 @cache
