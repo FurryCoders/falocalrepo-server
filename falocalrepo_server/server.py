@@ -92,6 +92,19 @@ async def error_not_found(request: Request, err: HTTPException):
     return serve_error(request, err.detail or "Not found", err.status_code)
 
 
+@app.get("/favicon.ico", response_class=FileResponse)
+async def serve_favicon(request: Request):
+    return await serve_static_file(request, Path("favicon.ico"))
+
+
+@app.get("/icon.png", response_class=FileResponse)
+@app.get("/touch-icon.png", response_class=FileResponse)
+@app.get("/apple-touch-icon.png", response_class=FileResponse)
+@app.get("/apple-touch-icon-precomposed.png", response_class=FileResponse)
+async def serve_touch_icon(request: Request):
+    return await serve_static_file(request, Path("touch-icon.png"))
+
+
 @app.exception_handler(422)
 @app.exception_handler(RequestValidationError)
 async def error_not_found(request: Request, err: RequestValidationError):
