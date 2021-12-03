@@ -207,7 +207,6 @@ async def serve_user(request: Request, username: str):
     )
 
 
-# noinspection DuplicatedCode
 @app.get("/browse/{table}/", response_class=HTMLResponse)
 @app.get("/search/{table}/", response_class=HTMLResponse)  # Keep /search as last option for url_path_for
 async def serve_search(request: Request, table: str, title: str = None, args: dict[str, str] = None):
