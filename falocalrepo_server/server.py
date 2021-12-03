@@ -439,13 +439,19 @@ async def serve_search_json(request: Request, table: str, query_data: SearchQuer
 @app.get("/json/submission/{id_}/", response_class=JSONResponse)
 @app.post("/json/submission/{id_}/", response_class=JSONResponse)
 async def serve_submission_json(id_: int):
-    return load_submission(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
+    if not (s := load_submission(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))):
+        raise HTTPException(404)
+    else:
+        return s
 
 
 @app.get("/json/journal/{id_}/", response_class=JSONResponse)
 @app.post("/json/journal/{id_}/", response_class=JSONResponse)
 async def serve_journal_json(id_: int):
-    return load_journal(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
+    if not (j := load_journal(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))):
+        raise HTTPException(404)
+    else:
+        return j
 
 
 @app.get("/json/user/{username}", response_class=JSONResponse)
