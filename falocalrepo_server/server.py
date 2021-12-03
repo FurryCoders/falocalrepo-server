@@ -26,6 +26,7 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from pydantic import BaseSettings
 from uvicorn import run
 
@@ -52,6 +53,14 @@ class Settings(BaseSettings):
     static_folder: Path = None
     ssl_cert: Path = None
     ssl_key: Path = None
+
+
+class SearchQuery(BaseModel):
+    query: str = ""
+    limit: int = 48
+    offset: int = 0
+    sort: str = ""
+    order: str = ""
 
 
 logger: Logger = getLogger("uvicorn")
@@ -352,12 +361,6 @@ async def serve_submission_zip(_request: Request, id_: int, _filename=None):
     return StreamingResponse(f_obj, media_type="application/zip")
 
 
-@lru_cache(maxsize=10)
-@app.get("/submission/{id_}/json/", response_class=JSONResponse)
-async def serve_submission_json(_request: Request, id_: int):
-    return load_submission(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
-
-
 @app.get("/journal/{id_}/", response_class=HTMLResponse)
 async def serve_journal(request: Request, id_: int):
     if (jrnl := load_journal(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))) is None:
@@ -391,18 +394,77 @@ async def serve_journal_zip(_request: Request, id_: int, _filename=None):
     return StreamingResponse(f_obj, media_type="application/zip")
 
 
-@lru_cache(maxsize=10)
-@app.get("/journal/{id_}/json/", response_class=JSONResponse)
-async def serve_journal_json(_request: Request, id_: int):
-    return load_journal(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
-
-
 @cache
 @app.get("/static/{file:path}", response_class=FileResponse)
 async def serve_static_file(_request: Request, file: Path):
     if not (file := settings.static_folder / file).is_file():
         raise HTTPException(404, "File not found")
     return FileResponse(file, filename=file.name)
+
+
+@app.get("/json/search/{table}/", response_class=JSONResponse)
+@app.post("/json/search/{table}/", response_class=JSONResponse)
+async def serve_search_json(request: Request, table: str, query_data: SearchQuery = None):
+    if query_data is None:
+        query_data = SearchQuery()
+        query_data.query = request.query_params.get("query", query_data.query)
+        query_data.offset = int(request.query_params.get("offset", query_data.offset))
+        query_data.limit = int(request.query_params.get("limit", query_data.limit))
+        query_data.sort = request.query_params.get("sort", query_data.sort)
+        query_data.order = request.query_params.get("order", query_data.order)
+
+    results, columns_table, columns_results, columns_list, column_id, sort, order = load_search(
+        settings.database_path,
+        table := table.upper(),
+        query_data.query.lower().strip(),
+        query_data.sort,
+        query_data.order,
+        force=True,
+        _cache=m_time(settings.database_path)
+    )
+
+    return {"table": table.lower(),
+            "query": query_data.query,
+            "sort": query_data.sort,
+            "order": query_data.order,
+            "columns_table": columns_table,
+            "columns_results": columns_results,
+            "column_id": column_id,
+            "limit": query_data.limit,
+            "offset": query_data.offset,
+            "results": results[query_data.offset:query_data.offset + query_data.limit],
+            "results_total": len(results)}
+
+
+@app.get("/json/submission/{id_}/", response_class=JSONResponse)
+@app.post("/json/submission/{id_}/", response_class=JSONResponse)
+async def serve_submission_json(_request: Request, id_: int):
+    return load_submission(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
+
+
+@app.get("/json/journal/{id_}/", response_class=JSONResponse)
+@app.post("/json/journal/{id_}/", response_class=JSONResponse)
+async def serve_journal_json(_request: Request, id_: int):
+    return load_journal(settings.database_path, id_, _cache=(_cache := m_time(settings.database_path)))
+
+
+@app.get("/json/user/{username}", response_class=JSONResponse)
+@app.post("/json/user/{username}", response_class=JSONResponse)
+async def serve_user_json(_request: Request, username: str):
+    username = clean_username(username)
+    user_entry: Optional[dict] = load_user(settings.database_path, username, _cache=m_time(settings.database_path))
+    user_stats: dict[str, int] = load_user_stats(settings.database_path, username,
+                                                 _cache=m_time(settings.database_path))
+
+    return {"user": username,
+            "folders": user_entry["FOLDERS"] if user_entry else [],
+            "length": {
+                "gallery": user_stats["gallery"],
+                "scraps": user_stats["scraps"],
+                "favorites": user_stats["favorites"],
+                "mentions": user_stats["mentions"],
+                "journals": user_stats["journals"]
+            }}
 
 
 def run_redirect(host: str, port_listen: int, port_redirect: int):
