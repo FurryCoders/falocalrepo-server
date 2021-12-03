@@ -112,6 +112,18 @@ _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 | `/journal/<journal id>/`                 | View a journal                                                              |
 | `/journal/<journal id>/zip/`             | Download a journal's content and metadata as a ZIP archive                  |
 
+### JSON API Routes
+
+The following routes return information as JSON responses. They can be reached with `GET` and `POST` requests, the
+former supports sending body fields as URL parameters.
+
+| Route                              | Destination                                                                                                                                                     | Body                                                                                 |
+|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| `/json/search/<table>/`            | Perform a search on the database. The query field in the body uses the same [syntax](#query-language) as the query field in the [search page](#browse--search). | `{query?: str, offset?: int, limit?: int, sort?: str, order?: Union["asc", "desc"]}` |
+| `/json/user/<username>`            | Get user metadata and total submissions/journals                                                                                                                | None                                                                                 |
+| `/json/submission/<submission id>` | Get submission metadata                                                                                                                                         | None                                                                                 |
+| `/json/journal/<journal id>`       | Get journal metadata                                                                                                                                            | None                                                                                 |
+
 ## Pages
 
 ### Home
