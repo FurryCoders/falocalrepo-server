@@ -10,7 +10,7 @@ from typing import Optional
 from falocalrepo_database import FADatabase
 from falocalrepo_database import FADatabaseTable
 from falocalrepo_database.selector import Selector
-from falocalrepo_database.selector import SelectorBuilder as S
+from falocalrepo_database.selector import SelectorBuilder as Sb
 from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
@@ -92,21 +92,21 @@ def load_user_stats_cached(db_path: Path, user: str, _cache=None) -> dict[str, i
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         return {
             "gallery": db.submissions.select(
-                S() & [S("replace(lower(author), '_', '')").__eq__(user), S("folder").__eq__("gallery")],
+                Sb() & [Sb("replace(lower(author), '_', '')").__eq__(user), Sb("folder").__eq__("gallery")],
                 columns=["count(ID)"]
             ).cursor.fetchone()[0],
             "scraps": db.submissions.select(
-                S() & [S("replace(lower(author), '_', '')").__eq__(user), S("folder").__eq__("scraps")],
+                Sb() & [Sb("replace(lower(author), '_', '')").__eq__(user), Sb("folder").__eq__("scraps")],
                 columns=["count(ID)"]
             ).cursor.fetchone()[0],
             "favorites": db.submissions.select(
-                S("favorite") % f"%|{user}|%", columns=["count(ID)"]
+                Sb("favorite") % f"%|{user}|%", columns=["count(ID)"]
             ).cursor.fetchone()[0],
             "mentions": db.submissions.select(
-                S("mentions") % f"%|{user}|%", columns=["count(ID)"]
+                Sb("mentions") % f"%|{user}|%", columns=["count(ID)"]
             ).cursor.fetchone()[0],
             "journals": db.journals.select(
-                S("replace(lower(author), '_', '')").__eq__(user), columns=["count(ID)"]
+                Sb("replace(lower(author), '_', '')").__eq__(user), columns=["count(ID)"]
             ).cursor.fetchone()[0]
         }
 
@@ -134,8 +134,8 @@ def load_journal_cached(db_path: Path, journal_id: int, _cache=None) -> Optional
 def load_prev_next_cached(db_path: Path, table: str, item_id: int, _cache=None) -> tuple[int, int]:
     with FADatabaseWrapper(db_path, _cache=_cache) as db:
         item: Optional[dict] = db[table][item_id]
-        query: Selector = S("AUTHOR").__eq__(item["AUTHOR"])
-        query = S() & [query, S("FOLDER").__eq__(item["FOLDER"])] if table == submissions_table else query
+        query: Selector = Sb("AUTHOR").__eq__(item["AUTHOR"])
+        query = Sb() & [query, Sb("FOLDER").__eq__(item["FOLDER"])] if table == submissions_table else query
         return db[table].select(
             query,
             columns=["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
