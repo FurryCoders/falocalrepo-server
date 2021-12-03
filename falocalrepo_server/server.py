@@ -383,7 +383,7 @@ async def serve_journal_zip(_request: Request, id_: int, _filename=None):
     return StreamingResponse(f_obj, media_type="application/zip")
 
 
-@lru_cache(maxsize=10)
+@cache
 @app.get("/static/{file:path}", response_class=FileResponse)
 async def serve_static_file(_request: Request, file: Path):
     if not (file := settings.static_folder / file).is_file():
