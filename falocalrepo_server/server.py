@@ -319,14 +319,14 @@ async def serve_submission_thumbnail(_request: Request, id_: int, x: int = None,
             img.thumbnail((x, y or x))
             img.save(f_obj := BytesIO(), img.format, quality=95)
             f_obj.seek(0)
-            return StreamingResponse(f_obj, media_type="image/jpeg")
+            return StreamingResponse(f_obj, media_type=f"image/{img.format}".lower())
     elif f is not None and f.is_file():
         try:
             with Image.open(f) as img:
                 img.thumbnail((x or 400, y or x or 400))
                 img.save(f_obj := BytesIO(), img.format, quality=95)
                 f_obj.seek(0)
-                return StreamingResponse(f_obj, media_type=img.format)
+                return StreamingResponse(f_obj, media_type=f"image/{img.format}".lower())
         except UnidentifiedImageError:
             raise HTTPException(404)
     else:
