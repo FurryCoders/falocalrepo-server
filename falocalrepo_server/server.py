@@ -91,17 +91,6 @@ def log_settings():
     logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
 
 
-@app.exception_handler(HTTPException)
-async def error_unknown(request: Request, err: HTTPException):
-    logger.error(repr(err))
-    return serve_error(request, err.detail or err.__class__.__name__, err.status_code)
-
-
-@app.exception_handler(404)
-async def error_not_found(request: Request, err: HTTPException):
-    return serve_error(request, err.detail or "Not found", err.status_code)
-
-
 @cache
 @app.get("/favicon.ico", response_class=FileResponse)
 async def serve_favicon(request: Request):
@@ -115,6 +104,17 @@ async def serve_favicon(request: Request):
 @app.get("/apple-touch-icon-precomposed.png", response_class=FileResponse)
 async def serve_touch_icon():
     return await serve_static_file(Path("touch-icon.png"))
+
+
+@app.exception_handler(HTTPException)
+async def error_unknown(request: Request, err: HTTPException):
+    logger.error(repr(err))
+    return serve_error(request, err.detail or err.__class__.__name__, err.status_code)
+
+
+@app.exception_handler(404)
+async def error_not_found(request: Request, err: HTTPException):
+    return serve_error(request, err.detail or "Not found", err.status_code)
 
 
 @app.exception_handler(422)
