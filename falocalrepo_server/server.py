@@ -109,11 +109,15 @@ async def serve_touch_icon():
 @app.exception_handler(HTTPException)
 async def error_unknown(request: Request, err: HTTPException):
     logger.error(repr(err))
+    if request.method == "POST":
+        return JSONResponse({"errors": [{err.__class__.__name__: err.detail}]}, err.status_code)
     return serve_error(request, err.detail or err.__class__.__name__, err.status_code)
 
 
 @app.exception_handler(404)
 async def error_not_found(request: Request, err: HTTPException):
+    if request.method == "POST":
+        return JSONResponse({"errors": [{err.__class__.__name__: err.detail}]}, err.status_code)
     return serve_error(request, err.detail or "Not found", err.status_code)
 
 
@@ -121,12 +125,16 @@ async def error_not_found(request: Request, err: HTTPException):
 @app.exception_handler(RequestValidationError)
 async def error_not_found(request: Request, err: RequestValidationError):
     logger.error(f"{err.__class__.__name__} {err.errors()}")
+    if request.method == "POST":
+        return JSONResponse({"errors": err.errors()}, 422)
     return serve_error(request, err.errors()[0].get("msg", None) or err.__class__.__name__, 422)
 
 
 @app.exception_handler(DatabaseError)
 async def error_database(request: Request, err: DatabaseError):
     logger.error(repr(err))
+    if request.method == "POST":
+        return JSONResponse({"errors": [{err.__class__.__name__: err.args}]}, 500)
     return serve_error(request, err.__class__.__name__, 500)
 
 
