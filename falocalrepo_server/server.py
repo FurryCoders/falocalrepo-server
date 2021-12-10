@@ -490,16 +490,17 @@ def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int
     if redirect_port:
         return run_redirect(host, port, redirect_port)
     settings.database = Database(Path(database_path).resolve())
-    run_args: dict[str, Any] = {"host": host, "port": port or 443}
+    run_args: dict[str, Any] = {}
     if ssl_cert and ssl_key:
         settings.ssl_cert, settings.ssl_key = Path(ssl_cert), Path(ssl_key)
         if not settings.ssl_cert.is_file():
             raise FileNotFoundError(f"SSL certificate {settings.ssl_cert}")
         elif not settings.ssl_key.is_file():
             raise FileNotFoundError(f"SSL private key {settings.ssl_key}")
-        run_args |= {"ssl_certfile": settings.ssl_cert, "ssl_keyfile": settings.ssl_key}
+        run_args |= {"port": port or 443, "ssl_certfile": settings.ssl_cert, "ssl_keyfile": settings.ssl_key}
+    run_args |= {"port": run_args.get("port", port) or 80}
     try:
         # noinspection PyTypeChecker
-        run(app, **run_args)
+        run(app, host=host, **run_args)
     except KeyboardInterrupt:
         pass
