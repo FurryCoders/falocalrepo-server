@@ -86,7 +86,7 @@ def log_settings():
 @cache
 @app.get("/favicon.ico", response_class=FileResponse)
 async def serve_favicon(request: Request):
-    return await serve_static_file(request, Path("favicon.ico"))
+    return await serve_static_file(Path("favicon.ico"))
 
 
 @cache
