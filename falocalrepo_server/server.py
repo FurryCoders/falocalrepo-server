@@ -7,7 +7,6 @@ from logging import getLogger
 from os import PathLike
 from pathlib import Path
 from sqlite3 import DatabaseError
-from time import time
 from typing import Any
 from typing import Callable
 from typing import Optional
@@ -32,29 +31,17 @@ from pydantic import BaseSettings
 from uvicorn import run
 
 from .__version__ import __version__
+from .database import Database
 from .database import clean_username
 from .database import default_order
 from .database import default_sort
 from .database import journals_table
-from .database import load_info
-from .database import load_journal
-from .database import load_journal_cached
-from .database import load_prev_next
-from .database import load_search
-from .database import load_search_cached
-from .database import load_submission
-from .database import load_submission_cached
-from .database import load_submission_files
-from .database import load_user
-from .database import load_user_cached
-from .database import load_user_stats
-from .database import load_user_stats_cached
 from .database import submissions_table
 from .database import users_table
 
 
 class Settings(BaseSettings):
-    database_path: Path = None
+    database: Database = None
     static_folder: Path = None
     ssl_cert: Path = None
     ssl_key: Path = None
@@ -91,7 +78,7 @@ def serve_error(request: Request, message: str, code: int):
 
 @app.on_event("startup")
 def log_settings():
-    logger.info(f"Using database: {settings.database_path}")
+    logger.info(f"Using database: {settings.database.database_path}")
     logger.info(f"Using SSL certificate: {settings.ssl_cert}") if settings.ssl_cert else None
     logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
 
@@ -193,7 +180,7 @@ async def serve_user_mentions(request: Request, username: str):
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_home(request: Request):
-    usr_n, sub_n, jrn_n, version = load_info(settings.database_path)
+    usr_n, sub_n, jrn_n, version = settings.database.load_info()
     return templates.TemplateResponse(
         "info.html",
         {"title": app.title,
@@ -211,8 +198,8 @@ async def serve_user(request: Request, username: str):
     if username != (username_clean := clean_username(username)):
         return RedirectResponse(app.url_path_for(serve_user.__name__, username=username_clean))
 
-    user_entry: Optional[dict] = load_user(settings.database_path, username)
-    user_stats: dict[str, int] = load_user_stats(settings.database_path, username)
+    user_entry: Optional[dict] = settings.database.load_user(username)
+    user_stats: dict[str, int] = settings.database.load_user_stats(username)
 
     return templates.TemplateResponse(
         "user.html",
@@ -256,8 +243,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
     columns_list: list[str]
     column_id: str
 
-    results, columns_table, columns_results, columns_list, column_id, sort, order = load_search(
-        settings.database_path,
+    results, columns_table, columns_results, columns_list, column_id, sort, order = settings.database.load_search(
         table,
         query.lower().strip(),
         sort,
@@ -290,15 +276,15 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
 
 @app.get("/submission/{id_}/", response_class=HTMLResponse)
 async def serve_submission(request: Request, id_: int):
-    if (sub := load_submission(settings.database_path, id_)) is None:
+    if (sub := settings.database.load_submission(id_)) is None:
         raise HTTPException(
             404,
             f"Submission not found.<br>{button(f'{fa_base_url}/view/{id_}', 'Open on Fur Affinity')}", )
 
     f: Optional[Path] = None
     if sub["FILEEXT"] == "txt" and sub["FILESAVED"] >= 10:
-        f, _ = load_submission_files(settings.database_path, id_)
-    p, n = load_prev_next(settings.database_path, submissions_table, id_)
+        f, _ = settings.database.load_submission_files(id_)
+    p, n = settings.database.load_prev_next(submissions_table, id_)
     return templates.TemplateResponse(
         "submission.html",
         {"title": f"{app.title} · {sub['TITLE']} by {sub['AUTHOR']}",
@@ -316,7 +302,7 @@ async def serve_submission(request: Request, id_: int):
 @app.get("/submission/{id_}/file/")
 @app.get("/submission/{id_}/file/{_filename}")
 async def serve_submission_file(id_: int, _filename=None):
-    if (f := load_submission_files(settings.database_path, id_)[0]) is None:
+    if (f := settings.database.load_submission_files(id_)[0]) is None:
         raise HTTPException(404)
     elif not f.is_file():
         raise HTTPException(404)
@@ -331,7 +317,7 @@ async def serve_submission_file(id_: int, _filename=None):
 @app.get("/submission/{id_}/thumbnail/{x}x{y}>/")
 @app.get("/submission/{id_}/thumbnail/{x}x{y}>/{_filename}")
 async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _filename=None):
-    f, t = load_submission_files(settings.database_path, id_)
+    f, t = settings.database.load_submission_files(id_)
     if t is not None and t.is_file():
         if not x:
             return FileResponse(t, filename=t.name)
@@ -357,10 +343,10 @@ async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _fi
 @app.get("/submission/{id_}/zip/")
 @app.get("/submission/{id_}/zip/{_filename}")
 async def serve_submission_zip(id_: int, _filename=None):
-    if (sub := load_submission(settings.database_path, id_)) is None:
+    if (sub := settings.database.load_submission(id_)) is None:
         raise HTTPException(404)
 
-    sub_file, sub_thumb = load_submission_files(settings.database_path, id_)
+    sub_file, sub_thumb = settings.database.load_submission_files(id_)
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
         z.writestr(sub_file.name, sub_file.read_bytes()) if sub_file else None
@@ -374,12 +360,12 @@ async def serve_submission_zip(id_: int, _filename=None):
 
 @app.get("/journal/{id_}/", response_class=HTMLResponse)
 async def serve_journal(request: Request, id_: int):
-    if (jrnl := load_journal(settings.database_path, id_)) is None:
+    if (jrnl := settings.database.load_journal(id_)) is None:
         raise HTTPException(
             404,
             f"Journal not found.<br>{button(f'{fa_base_url}/journal/{id_}', 'Open on Fur Affinity')}")
 
-    p, n = load_prev_next(settings.database_path, journals_table, id_)
+    p, n = settings.database.load_prev_next(journals_table, id_)
     return templates.TemplateResponse(
         "journal.html",
         {"title": f"{app.title} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
@@ -394,7 +380,7 @@ async def serve_journal(request: Request, id_: int):
 @app.get("/journal/{id_}/zip/")
 @app.get("/journal/{id_}/zip/{filename}")
 async def serve_journal_zip(id_: int, _filename=None):
-    if (jrnl := load_journal(settings.database_path, id_)) is None:
+    if (jrnl := settings.database.load_journal(id_)) is None:
         raise HTTPException(404)
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
@@ -424,23 +410,22 @@ async def serve_search_json(request: Request, table: str, query_data: SearchQuer
         query_data.sort = request.query_params.get("sort", query_data.sort)
         query_data.order = request.query_params.get("order", query_data.order)
 
-    results, columns_table, columns_results, columns_list, column_id, sort, order = load_search_cached(
-        settings.database_path,
+    results, cols_table, cols_results, cols_list, col_id, sort, order = settings.database.load_search_uncached(
         table := table.upper(),
         query_data.query.lower().strip(),
         query_data.sort,
         query_data.order,
-        force=True,
-        _cache=time()
+        force=True
     )
 
     return {"table": table.lower(),
             "query": query_data.query,
             "sort": query_data.sort,
             "order": query_data.order,
-            "columns_table": columns_table,
-            "columns_results": columns_results,
-            "column_id": column_id,
+            "columns_table": cols_table,
+            "columns_results": cols_results,
+            "columns_list": cols_list,
+            "column_id": col_id,
             "limit": query_data.limit,
             "offset": query_data.offset,
             "results": results[query_data.offset:query_data.offset + query_data.limit],
@@ -450,7 +435,7 @@ async def serve_search_json(request: Request, table: str, query_data: SearchQuer
 @app.get("/json/submission/{id_}/", response_class=JSONResponse)
 @app.post("/json/submission/{id_}/", response_class=JSONResponse)
 async def serve_submission_json(id_: int):
-    if not (s := load_submission_cached(settings.database_path, id_, _cache=time())):
+    if not (s := settings.database.load_submission_uncached(id_)):
         raise HTTPException(404)
     else:
         return s
@@ -459,7 +444,7 @@ async def serve_submission_json(id_: int):
 @app.get("/json/journal/{id_}/", response_class=JSONResponse)
 @app.post("/json/journal/{id_}/", response_class=JSONResponse)
 async def serve_journal_json(id_: int):
-    if not (j := load_journal_cached(settings.database_path, id_, _cache=time())):
+    if not (j := settings.database.load_journal_uncached(id_)):
         raise HTTPException(404)
     else:
         return j
@@ -469,8 +454,8 @@ async def serve_journal_json(id_: int):
 @app.post("/json/user/{username}", response_class=JSONResponse)
 async def serve_user_json(username: str):
     username = clean_username(username)
-    user_entry: Optional[dict] = load_user_cached(settings.database_path, username, _cache=time())
-    user_stats: dict[str, int] = load_user_stats_cached(settings.database_path, username, _cache=time())
+    user_entry: Optional[dict] = settings.database.load_user_uncached(username)
+    user_stats: dict[str, int] = settings.database.load_user_stats_uncached(username)
 
     return {"user": username,
             "folders": user_entry["FOLDERS"] if user_entry else [],
@@ -504,7 +489,7 @@ def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int
            ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None, redirect_port: int = None):
     if redirect_port:
         return run_redirect(host, port, redirect_port)
-    settings.database_path = Path(database_path).resolve()
+    settings.database = Database(Path(database_path).resolve())
     run_args: dict[str, Any] = {"host": host, "port": port or 443}
     if ssl_cert and ssl_key:
         settings.ssl_cert, settings.ssl_key = Path(ssl_cert), Path(ssl_key)

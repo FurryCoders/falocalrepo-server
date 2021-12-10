@@ -380,6 +380,8 @@
     const $ = (id) => document.getElementById(id)
     let view = $("view").value === "grid" ? $("results_table_grid") : $("results_table_list")
 
+    $("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
+
     const addToInput = (input, value) => {
         if (input.selectionStart === input.selectionEnd) {
             input.value = input.value.substr(0, input.selectionStart) + value + input.value.substr(input.selectionEnd)
@@ -401,10 +403,6 @@
         const url = new URL(window.location.href)
         url.searchParams.set("view", view_)
         window.history.replaceState({}, document.title, url.href)
-    }
-
-    window.onload = () => {
-        $("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
     }
 </script>
 </body>
