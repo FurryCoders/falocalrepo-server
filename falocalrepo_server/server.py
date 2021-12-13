@@ -219,7 +219,6 @@ async def serve_user(request: Request, username: str):
     )
 
 
-@app.get("/browse/{table}/", response_class=HTMLResponse)
 @app.get("/search/{table}/", response_class=HTMLResponse)
 async def serve_search(request: Request, table: str, title: str = None, args: dict[str, str] = None):
     if (table := table.upper()) not in (submissions_table, journals_table, users_table):
