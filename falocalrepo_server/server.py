@@ -85,6 +85,10 @@ def log_settings():
     logger.info(f"Using database: {settings.database.database_path}")
     logger.info(f"Using SSL certificate: {settings.ssl_cert}") if settings.ssl_cert else None
     logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
+    for table in (settings.database.users, settings.database.submissions, settings.database.journals):
+        for order in ("asc", "desc"):
+            logger.info(f"Caching {table.table.upper()}:{(sort := default_sort[table.table]).upper()}:{order.upper()}")
+            settings.database.load_search(table.table, "", sort, order)
 
 
 @cache
