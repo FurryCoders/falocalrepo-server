@@ -29,6 +29,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from pydantic import BaseSettings
 from uvicorn import run
+from uvicorn.config import LOGGING_CONFIG
 
 from .__version__ import __version__
 from .database import Database
@@ -56,6 +57,9 @@ class SearchQuery(BaseModel):
 
 
 logger: Logger = getLogger("uvicorn")
+LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
+    '%(levelprefix)s %(asctime)s %(client_addr)s - "%(request_line)s" %(status_code)s %(msecs).0fms'
+
 fa_base_url: str = "https://www.furaffinity.net"
 root: Path = Path(__file__).resolve().parent
 app: FastAPI = FastAPI(title="FurAffinity Local Repo", openapi_url=None)
