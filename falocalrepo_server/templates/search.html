@@ -269,9 +269,9 @@
         </tr>
     </table>
     <br>
-    <button type="submit" onclick="this.form.action = window.location.pathname">Search</button>
+    <button type="submit">Search</button>
     <button type="submit"
-            onclick="this.form.action =  window.location.pathname.match(/^\/search\/[^\/]+\/$/) ? '/browse/{{ table }}' : window.location.pathname; $('query').value = ''">
+            onclick="this.form.action =  window.location.pathname.match(/^\/search\/[^\/]+\/?$/) ? '/browse/{{ table }}' : window.location.pathname; $('query').value = ''">
         Browse
     </button>
 </form>
@@ -383,6 +383,7 @@
     let view = $("view").value === "grid" ? $("results_table_grid") : $("results_table_list")
 
     $("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
+    $("search_form").action = window.location.pathname
 
     const addToInput = (input, value) => {
         if (input.selectionStart === input.selectionEnd) {
