@@ -270,8 +270,10 @@
     </table>
     <br>
     <button type="submit" onclick="this.form.action = window.location.pathname">Search</button>
-    <br>
-    <button type="button" onclick="window.location = '/search/{{ table }}'">New Search</button>
+    <button type="submit"
+            onclick="this.form.action =  window.location.pathname.match(/^\/search\/[^\/]+\/$/) ? '/browse/{{ table }}' : window.location.pathname; $('query').value = ''">
+        Browse
+    </button>
 </form>
 <br>
 {% if results or params %}
