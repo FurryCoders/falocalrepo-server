@@ -230,8 +230,8 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
     query: str = " & ".join([f"({q})" for args_ in (args_req, args) if (q := args_.get("query", None))])
     args |= args_req
 
-    page: int = int(args.get("page", 1))
-    limit: int = int(args.get("limit", 48))
+    page: int = p if (p := int(args.get("page", 1))) > 0 else 1
+    limit: int = l if (l := int(args.get("limit", 48))) > 0 else 48
     sort: str = args.get("sort", default_sort[table]).lower()
     order: str = args.get("order", default_order[table]).lower()
     view: str = args.get("view", "").lower()
@@ -266,7 +266,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
          "columns_list": columns_list,
          "column_id": column_id,
          "limit": limit,
-         "page": (page := (len(results) // limit) + (1 * bool(len(results) % limit)) if page == -1 else page),
+         "page": page,
          "offset": (offset := (page - 1) * limit),
          "results": results[offset:offset + limit],
          "results_total": len(results),

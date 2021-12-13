@@ -288,7 +288,7 @@
             value="{{ page + 1 }}" {{ 'disabled' if offset + limit >= results_total }}>
         Next
     </button>
-    <button type="submit" form="search_form" name="page" value="-1" {{ 'disabled' if offset + limit >= results_total }}>
+    <button type="submit" form="search_form" name="page" value="{{ (results_total // limit) + 1 }}" {{ 'disabled' if offset + limit >= results_total }}>
         Last
     </button>
     {% endset %}
