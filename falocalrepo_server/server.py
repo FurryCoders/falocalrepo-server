@@ -1,3 +1,4 @@
+import os
 from functools import cache
 from functools import lru_cache
 from io import BytesIO
@@ -7,6 +8,7 @@ from logging import getLogger
 from os import PathLike
 from pathlib import Path
 from sqlite3 import DatabaseError
+from sys import stderr
 from typing import Any
 from typing import Callable
 from typing import Optional
@@ -501,8 +503,5 @@ def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int
             raise FileNotFoundError(f"SSL private key {settings.ssl_key}")
         run_args |= {"port": port or 443, "ssl_certfile": settings.ssl_cert, "ssl_keyfile": settings.ssl_key}
     run_args |= {"port": run_args.get("port", port) or 80}
-    try:
-        # noinspection PyTypeChecker
-        run(app, host=host, **run_args)
-    except KeyboardInterrupt:
-        pass
+    # noinspection PyTypeChecker
+    run(app, host=host, **run_args)
