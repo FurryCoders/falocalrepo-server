@@ -197,28 +197,28 @@ class Database(FADatabase):
         return self._load_info_cached(_cache=self.m_time)
 
     def load_user_uncached(self, user: str) -> Optional[Entry]:
-        return self._load_user_cached.__wrapped__(user)
+        return self._load_user_cached.__wrapped__(self, user)
 
     def load_user_stats_uncached(self, user: str) -> dict[str, int]:
-        return self._load_user_stats_cached.__wrapped__(user)
+        return self._load_user_stats_cached.__wrapped__(self, user)
 
     def load_submission_uncached(self, submission_id: int) -> Optional[Entry]:
-        return self._load_submission_cached.__wrapped__(submission_id)
+        return self._load_submission_cached.__wrapped__(self, submission_id)
 
     def load_submission_files_uncached(self, submission_id: int) -> tuple[Optional[Path], Optional[Path]]:
-        return self._load_submission_files_cached.__wrapped__(submission_id)
+        return self._load_submission_files_cached.__wrapped__(self, submission_id)
 
     def load_journal_uncached(self, journal_id: int) -> Optional[Entry]:
-        return self._load_journal_cached.__wrapped__(journal_id)
+        return self._load_journal_cached.__wrapped__(self, journal_id)
 
     def load_prev_next_uncached(self, table: str, item_id: int) -> tuple[int, int]:
-        return self._load_prev_next_cached.__wrapped__(table, item_id)
+        return self._load_prev_next_cached.__wrapped__(self, table, item_id)
 
     def load_search_uncached(self, table: str, query: str, sort: str, order: str):
-        return self._load_search_cached.__wrapped__(table, query, sort, order)
+        return self._load_search_cached.__wrapped__(self, table, query, sort, order)
 
     def load_files_folder_uncached(self) -> Path:
-        return self._load_files_folder_cached.__wrapped__()
+        return self._load_files_folder_cached.__wrapped__(self, )
 
     def load_info_uncached(self) -> tuple[int, int, int, str]:
-        return self._load_info_cached.__wrapped__()
+        return self._load_info_cached.__wrapped__(self, )
