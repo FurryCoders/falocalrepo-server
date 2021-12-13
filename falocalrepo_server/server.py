@@ -410,8 +410,7 @@ async def serve_search_json(request: Request, table: str, query_data: SearchQuer
         table := table.upper(),
         query_data.query.lower().strip(),
         query_data.sort,
-        query_data.order,
-        force=True
+        query_data.order
     )
 
     return {"table": table.lower(),

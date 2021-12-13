@@ -127,7 +127,7 @@ class Database(FADatabase):
         ).cursor.fetchone() if item else (0, 0)
 
     @cache
-    def _load_search_cached(self, table: str, query: str, sort: str, order: str, *, force: bool = False, _cache=None):
+    def _load_search_cached(self, table: str, query: str, sort: str, order: str, *, _cache=None):
         cols_results: list[str] = []
         default_field: str = "any"
         sort = sort or default_sort[table]
@@ -143,9 +143,6 @@ class Database(FADatabase):
         cols_table: list[str] = db_table.columns
         cols_list: list[str] = db_table.list_columns
         col_id: str = db_table.column_id
-
-        if not query and not force:
-            return [], cols_table, cols_results, cols_list, col_id, sort, order
 
         sql, values = query_to_sql(query,
                                    default_field,
@@ -190,8 +187,8 @@ class Database(FADatabase):
     def load_prev_next(self, table: str, item_id: int) -> tuple[int, int]:
         return self._load_prev_next_cached(table, item_id, _cache=self.m_time)
 
-    def load_search(self, table: str, query: str, sort: str, order: str, *, force: bool = False):
-        return self._load_search_cached(table, query, sort, order, force=force, _cache=self.m_time)
+    def load_search(self, table: str, query: str, sort: str, order: str):
+        return self._load_search_cached(table, query, sort, order, _cache=self.m_time)
 
     def load_files_folder(self) -> Path:
         return self._load_files_folder_cached(_cache=self.m_time)
@@ -217,8 +214,8 @@ class Database(FADatabase):
     def load_prev_next_uncached(self, table: str, item_id: int) -> tuple[int, int]:
         return self._load_prev_next_cached.__wrapped__(table, item_id)
 
-    def load_search_uncached(self, table: str, query: str, sort: str, order: str, *, force: bool = False):
-        return self._load_search_cached.__wrapped__(table, query, sort, order, force=force)
+    def load_search_uncached(self, table: str, query: str, sort: str, order: str):
+        return self._load_search_cached.__wrapped__(table, query, sort, order)
 
     def load_files_folder_uncached(self) -> Path:
         return self._load_files_folder_cached.__wrapped__()
