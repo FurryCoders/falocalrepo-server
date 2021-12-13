@@ -88,21 +88,17 @@ _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 | Route                                    | Destination                                                                 |
 |------------------------------------------|-----------------------------------------------------------------------------|
 | `/`                                      | Show home page with general information regarding the database              |
-| `/browse/`                               | Redirects to `/browse/submissions/`                                         |
-| `/browse/submissions/`                   | Browse submissions                                                          |
-| `/browse/journals/`                      | Browse journals                                                             |
-| `/browse/users/`                         | Browse users                                                                |
 | `/search/`                               | Redirects to `/search/submissions/`                                         |
-| `/search/submissions/`                   | Search submissions                                                          |
-| `/search/journals/`                      | Search journals                                                             |
-| `/search/users/`                         | Search users                                                                |
+| `/search/submissions/`                   | Search & browse submissions                                                 |
+| `/search/journals/`                      | Search & browse journals                                                    |
+| `/search/users/`                         | Search & browse users                                                       |
 | `/user/<username>/`                      | Show information regarding a specific user                                  |
-| `/gallery/<username>/`                   | Browse a user's gallery submissions                                         |
-| `/scraps/<username>/`                    | Browse a user's scraps submissions                                          |
-| `/submissions/<username>/`               | Browse a user's gallery & scraps submissions                                | 
-| `/favorites/<username>/`                 | Browse a user's favorite submissions                                        |
-| `/mentions/<username>/`                  | Browse the submissions where the user is mentioned                          |
-| `/journals/<username>/`                  | Browse a user's journals                                                    |
+| `/gallery/<username>/`                   | Browse & search a user's gallery submissions                                |
+| `/scraps/<username>/`                    | Browse & search a user's scraps submissions                                 |
+| `/submissions/<username>/`               | Browse & search a user's gallery & scraps submissions                       | 
+| `/favorites/<username>/`                 | Browse & search a user's favorite submissions                               |
+| `/mentions/<username>/`                  | Browse & search the submissions where the user is mentioned                 |
+| `/journals/<username>/`                  | Browse & search a user's journals                                           |
 | `/full/<submission id>/`                 | Redirect to `/submission/<submission id>/`                                  |
 | `/view/<submission id>/`                 | Redirect to `/submission/<submission id>/`                                  |
 | `/submission/<submission id>/`           | View a submission                                                           |
@@ -132,9 +128,7 @@ The home page displays general information about the database and contains links
 various tables.
 
 The information table displays the total number of submissions, journals, and users together with the version of the
-database. Clicking on any of the counters open the relevant browse page.
-
-Underneath the information table are buttons that open new search pages for submissions, journals, and users.
+database. Clicking on any of the counters open the relevant search & browse page.
 
 ### Browse & Search
 
