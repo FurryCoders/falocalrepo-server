@@ -216,7 +216,7 @@ async def serve_user(request: Request, username: str):
 
 
 @app.get("/browse/{table}/", response_class=HTMLResponse)
-@app.get("/search/{table}/", response_class=HTMLResponse)  # Keep /search as last option for url_path_for
+@app.get("/search/{table}/", response_class=HTMLResponse)
 async def serve_search(request: Request, table: str, title: str = None, args: dict[str, str] = None):
     if (table := table.upper()) not in (submissions_table, journals_table, users_table):
         raise HTTPException(404, f"Table {table.lower()} not found.")
@@ -225,9 +225,6 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
     args_req = {k.lower(): v for k, v in request.query_params.items()}
     query: str = " & ".join([f"({q})" for args_ in (args_req, args) if (q := args_.get("query", None))])
     args |= args_req
-
-    if query and request.url.path.startswith("/browse/"):
-        return RedirectResponse(app.url_path_for(serve_search.__name__, table=table.lower()) + "?" + request.url.query)
 
     page: int = int(args.get("page", 1))
     limit: int = int(args.get("limit", 48))
@@ -247,8 +244,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
         table,
         query.lower().strip(),
         sort,
-        order,
-        force=request.url.path.startswith("/browse/")
+        order
     )
 
     return templates.TemplateResponse(
