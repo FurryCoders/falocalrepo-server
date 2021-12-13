@@ -66,21 +66,23 @@
         </tr>
     </table>
     <br>
-    <form action="/journal/{{ journal["ID"] }}/zip/journal-{{ "{0:010}".format(journal["ID"]) }}.zip">
-        <button type="submit">Download Journal as ZIP</button>
-    </form>
-    <form action="https://www.furaffinity.net/journal/{{ journal["ID"] }}">
-        <button type="submit">Open on Fur Affinity</button>
-    </form>
-    <form id="prevNext" action="">
-        <button type="submit" onclick="this.form.action='/journal/{{ next }}'" {{ "disabled" if not next }}>
-            Next
-        </button>
-        <button type="submit" onclick="this.form.action='/journals/{{ journal["AUTHOR"] }}'">All</button>
-        <button type="submit" onclick="this.form.action='/journal/{{ prev }}'" {{ "disabled" if not prev }}>
-            Prev
-        </button>
-    </form>
+    <a class="nocolor" href="/journal/{{ journal["ID"] }}/zip/journal-{{ "{0:010}".format(journal["ID"]) }}.zip">
+        <button>Download Journal as ZIP</button>
+    </a>
+    <br>
+    <a class="nocolor" href="https://www.furaffinity.net/journal/{{ journal["ID"] }}">
+        <button>Open on Fur Affinity</button>
+    </a>
+    <br>
+    <a class="nocolor" href="/journal/{{ next }}" {{ "disabled" if not next }}>
+        <button {{ "disabled" if not next }}>Next</button>
+    </a>
+    <a class="nocolor" href="/journals/{{ journal["AUTHOR"] }}">
+        <button>All</button>
+    </a>
+    <a class="nocolor" href="/journal/{{ prev }}" {{ "disabled" if not prev }}>
+        <button {{ "disabled" if not prev }}>Prev</button>
+    </a>
 </div>
 <br><br>
 <div id="journal_content">

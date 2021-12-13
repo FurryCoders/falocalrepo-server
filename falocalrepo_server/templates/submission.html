@@ -189,34 +189,34 @@
         </tr>
     </table>
     <br>
-    <form action="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
-        <button id="download_file" type="submit" {{ "disabled" if submission["FILESAVED"] < 10 }}>
-            Download File
-        </button>
-    </form>
-    <form action="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
-        <button type="submit">Download Submission as ZIP</button>
-    </form>
-    <form action="https://www.furaffinity.net/view/{{ submission["ID"] }}">
-        <button type="submit">Open on Fur Affinity</button>
-    </form>
-    <form id="prevNext" action="">
-        <button type="submit" onclick="this.form.action='/submission/{{ next }}'" {{ "disabled" if not next }}>
-            Next
-        </button>
-        <button type="submit" onclick="this.form.action='/gallery/{{ submission["AUTHOR"] }}'">
-            Gallery
-        </button>
-        <button type="submit" onclick="this.form.action='/submissions/{{ submission["AUTHOR"] }}'">
-            All
-        </button>
-        <button type="submit" onclick="this.form.action='/scraps/{{ submission["AUTHOR"] }}'">
-            Scraps
-        </button>
-        <button type="submit" onclick="this.form.action='/submission/{{ prev }}'" {{ "disabled" if not prev }}>
-            Prev
-        </button>
-    </form>
+    <a class="nocolor"
+       href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" {{ "disabled" if submission["FILESAVED"] < 10 }}>
+        <button {{ "disabled" if submission["FILESAVED"] < 10 }}>Download File</button>
+    </a>
+    <a class="nocolor"
+       href="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
+        <button>Download Submission as ZIP</button>
+    </a>
+    <br>
+    <a class="nocolor" href="https://www.furaffinity.net/view/{{ submission["ID"] }}">
+        <button>Open on Fur Affinity</button>
+    </a>
+    <br>
+    <a class="nocolor" href="/submission/{{ next }}" {{ "disabled" if not next }}>
+        <button {{ "disabled" if not next }}>Next</button>
+    </a>
+    <a class="nocolor" href="/gallery/{{ submission["AUTHOR"] }}">
+        <button>Gallery</button>
+    </a>
+    <a class="nocolor" href="/submissions/{{ submission["AUTHOR"] }}">
+        <button>All</button>
+    </a>
+    <a class="nocolor" href="/scraps/{{ submission["AUTHOR"] }}">
+        <button>Scraps</button>
+    </a>
+    <a class="nocolor" href="/submission/{{ prev }}" {{ "disabled" if not prev }}>
+        <button {{ "disabled" if not prev }}>Prev</button>
+    </a>
 </div>
 <br><br>
 <div id="submission_description">
