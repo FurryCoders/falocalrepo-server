@@ -25,6 +25,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from pydantic import BaseSettings
@@ -68,6 +69,8 @@ settings: Settings = Settings(static_folder=root / "static")
 
 button: Callable[[str, str], str] = lambda h, t: f'<a href="{h}"><button>{t}</button></a>'
 
+app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
+
 
 def serve_error(request: Request, message: str, code: int):
     return templates.TemplateResponse(
@@ -94,7 +97,7 @@ def log_settings():
 @cache
 @app.get("/favicon.ico", response_class=FileResponse)
 async def serve_favicon():
-    return await serve_static_file(Path("favicon.ico"))
+    return RedirectResponse("/static/favicon.ico", 301)
 
 
 @cache
@@ -103,7 +106,7 @@ async def serve_favicon():
 @app.get("/apple-touch-icon.png", response_class=FileResponse)
 @app.get("/apple-touch-icon-precomposed.png", response_class=FileResponse)
 async def serve_touch_icon():
-    return await serve_static_file(Path("touch-icon.png"))
+    return RedirectResponse("/static/touch-icon-png", 301)
 
 
 @app.exception_handler(HTTPException)
@@ -392,14 +395,6 @@ async def serve_journal_zip(id_: int, _filename=None):
 
     f_obj.seek(0)
     return StreamingResponse(f_obj, media_type="application/zip")
-
-
-@cache
-@app.get("/static/{file:path}", response_class=FileResponse)
-async def serve_static_file(file: Path):
-    if not (file := settings.static_folder / file).is_file():
-        raise HTTPException(404, "File not found")
-    return FileResponse(file, filename=file.name)
 
 
 @app.get("/json/search/{table}/", response_class=JSONResponse)
