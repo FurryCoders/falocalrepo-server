@@ -106,7 +106,7 @@ async def serve_favicon():
 @app.get("/apple-touch-icon.png", response_class=FileResponse)
 @app.get("/apple-touch-icon-precomposed.png", response_class=FileResponse)
 async def serve_touch_icon():
-    return RedirectResponse("/static/touch-icon-png", 301)
+    return RedirectResponse("/static/touch-icon.png", 301)
 
 
 @app.exception_handler(HTTPException)
