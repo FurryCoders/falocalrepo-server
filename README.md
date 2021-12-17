@@ -1,10 +1,16 @@
+<div align="center">
+
+<img alt="logo" width="400" src="https://gitlab.com/uploads/-/system/project/avatar/21246427/logo.png">
+
 # FALocalRepo-Server
+
+Web interface for [falocalrepo](https://pypi.org/project/falocalrepo/).
 
 [![version_pypi](https://img.shields.io/pypi/v/falocalrepo-server?logo=pypi)](https://pypi.org/project/falocalrepo-server/)
 [![version_gitlab](https://img.shields.io/badge/dynamic/json?logo=gitlab&color=orange&label=gitlab&query=%24%5B%3A1%5D.name&url=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2Fmatteocampinoti94%252Ffalocalrepo-server%2Frepository%2Ftags)](https://gitlab.com/MatteoCampinoti94/falocalrepo-server)
 [![version_python](https://img.shields.io/pypi/pyversions/falocalrepo-server?logo=Python)](https://www.python.org)
 
-Web interface for [falocalrepo](https://pypi.org/project/falocalrepo/).
+</div>
 
 ## Installation & Requirements
 
