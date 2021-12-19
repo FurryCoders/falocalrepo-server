@@ -2,6 +2,7 @@ from argparse import Action
 from argparse import ArgumentError
 from argparse import ArgumentParser
 from pathlib import Path
+from sys import argv
 
 from .server import server
 
@@ -23,6 +24,10 @@ def main():
                                                      help="redirect all traffic from http://HOST to https://HOST")
     argparser.add_argument("--precache", action="store_true", default=False,
                            help="Cache tables on startup")
+
+    if not argv[1:]:
+        argparser.print_help()
+        return
 
     args = argparser.parse_args()
 
