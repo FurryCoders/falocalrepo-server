@@ -21,6 +21,8 @@ def main():
     # noinspection HttpUrlsUsage
     redirect_action: Action = argparser.add_argument("--redirect-http", type=int, default=False, dest="redirect_port",
                                                      help="redirect all traffic from http://HOST to https://HOST")
+    argparser.add_argument("--precache", action="store_true", default=False,
+                           help="Cache tables on startup")
 
     args = argparser.parse_args()
 
@@ -33,7 +35,7 @@ def main():
     elif args.redirect_port and args.redirect_port == args.port:
         raise ArgumentError(redirect_action, "PORT and redirect port cannot be identical")
 
-    server(args.database, args.host, args.port, args.ssl_cert, args.ssl_key, args.redirect_port)
+    server(args.database, args.host, args.port, args.ssl_cert, args.ssl_key, args.redirect_port, args.precache)
 
 
 if __name__ == '__main__':

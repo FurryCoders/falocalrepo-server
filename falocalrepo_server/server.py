@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     static_folder: Path = None
     ssl_cert: Path = None
     ssl_key: Path = None
+    precache: bool = False
 
 
 class SearchQuery(BaseModel):
@@ -88,10 +89,12 @@ def log_settings():
     logger.info(f"Using database: {settings.database.database_path}")
     logger.info(f"Using SSL certificate: {settings.ssl_cert}") if settings.ssl_cert else None
     logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
-    for table in (settings.database.users, settings.database.submissions, settings.database.journals):
-        for order in ("asc", "desc"):
-            logger.info(f"Caching {table.table.upper()}:{(sort := default_sort[table.table]).upper()}:{order.upper()}")
-            settings.database.load_search(table.table, "", sort, order)
+    if settings.precache:
+        for table in (settings.database.users, settings.database.submissions, settings.database.journals):
+            for order in ("asc", "desc"):
+                logger.info(
+                    f"Caching {table.table.upper()}:{(sort := default_sort[table.table]).upper()}:{order.upper()}")
+                settings.database.load_search(table.table, "", sort, order)
 
 
 @cache
@@ -483,10 +486,12 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
 
 # noinspection HttpUrlsUsage
 def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = None,
-           ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None, redirect_port: int = None):
+           ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None,
+           redirect_port: int = None, precache: bool = False):
     if redirect_port:
         return run_redirect(host, port, redirect_port)
     settings.database = Database(Path(database_path).resolve())
+    settings.precache = precache
     run_args: dict[str, Any] = {}
     if ssl_cert and ssl_key:
         settings.ssl_cert, settings.ssl_key = Path(ssl_cert), Path(ssl_key)
