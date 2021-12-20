@@ -18,6 +18,7 @@ from PIL import UnidentifiedImageError
 from chardet import detect as detect_encoding
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse
@@ -147,7 +148,8 @@ async def error_database(request: Request, err: DatabaseError):
 @app.get("/view/{id_}", response_class=HTMLResponse)
 @app.get("/full/{id_}", response_class=HTMLResponse)
 async def redirect_submission(id_: int):
-    return RedirectResponse(app.url_path_for(serve_submission.__name__, id_=str(id_)))
+    return RedirectResponse(app.url_path_for(serve_submission.__name__, id_=str(id_)),
+                            status.HTTP_301_MOVED_PERMANENTLY)
 
 
 @app.get("/gallery/{username}", response_class=HTMLResponse)
