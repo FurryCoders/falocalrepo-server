@@ -211,7 +211,7 @@
                 <option {{ "selected" if order == "desc" }} value="desc">Descending</option>
             </select></td>
         </tr>
-        <tr id="viewRow" {{ "hidden" if not allow_view else "" }} {{ "data-enabled=true" if not allow_view else "" }}>
+        <tr id="viewRow" {{ "hidden" if not allow_view else "" }}>
             <td class="colLabel"><label for="view">View</label></td>
             <td class="colInput" colspan="4"><select id="view" name="view" style="width: 100%;"
                                                      onchange="changeView(this.value)">
