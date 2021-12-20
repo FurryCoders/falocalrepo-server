@@ -263,6 +263,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
     return templates.TemplateResponse(
         "search.html",
         {"title": f"{app.title} · " + (title or f"{request.url.path.split('/')[1].title()} {table.title()}"),
+         "action": request.url.path,
          "table": table.lower(),
          "query": query,
          "sort": sort,

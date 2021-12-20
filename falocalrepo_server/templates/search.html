@@ -171,7 +171,7 @@
 <body>
 {% set table_short %}{{ table[:-1] }}{% endset %}
 <h2 style="text-align: center;">{{ title }}</h2>
-<form id="search_form" action="">
+<form id="search_form" action="{{ action }}">
     <table id="search_params">
         <tr>
             <td class="colLabel"><label for="query">Search</label></td>
@@ -392,7 +392,6 @@
     let view = $("view").value === "grid" ? $("results_table_grid") : $("results_table_list")
 
     $("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
-    $("search_form").action = window.location.pathname
 
     const addToInput = (input, value) => {
         if (input.selectionStart === input.selectionEnd) {
