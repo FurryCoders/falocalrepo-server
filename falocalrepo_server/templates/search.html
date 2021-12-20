@@ -206,12 +206,12 @@
                 <option {{ "selected" if order == "desc" }} value="desc">Descending</option>
             </select></td>
         </tr>
-        <tr {{ "hidden" if not allow_view else "" }}>
+        <tr id="viewRow" {{ "hidden" if not allow_view else "" }}>
             <td class="colLabel"><label for="view">View</label></td>
             <td class="colInput" colspan="4"><select id="view" name="view" style="width: 100%;"
                                                      onchange="changeView(this.value)">
-                <option {{ "selected" if view == "list" or not allow_view or not view }} value="list">List</option>
-                <option {{ "selected" if view == "grid" and allow_view }} value="grid">Grid</option>
+                <option {{ "selected" if view == "list" or not allow_view or not view }} id="viewList" value="list">List</option>
+                <option {{ "selected" if view == "grid" and allow_view }} id="viewGrid" value="grid">Grid</option>
             </select></td>
         </tr>
     </table>
@@ -413,7 +413,7 @@
     }
 
     window.onresize = () => {
-        if (window.innerWidth <= 630) {
+        if (window.innerWidth <= 630 && !$("viewRow").hidden) {
             $("viewGrid").selected = true
             $("view").onchange(null)
         }
