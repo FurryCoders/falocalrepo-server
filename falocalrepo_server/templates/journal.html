@@ -11,15 +11,14 @@
     <link rel="stylesheet" href="/static/styles/style.css">
     <style>
         #journal_metadata {
-            width: 95%;
-            max-width: 95%;
+            width: 100%;
+            max-width: 100%;
             top: 20px;
             margin: auto;
             text-align: center
         }
 
         #journal_content {
-            width: 80%;
             max-width: 600px;
             top: 20px;
             margin: auto;
@@ -38,6 +37,20 @@
 
         #journal_metadata .value {
             max-width: 300px;
+        }
+
+        @media only screen and (max-width: 300px) {
+            #journal_metadata table, #journal_metadata .value {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media only screen and (max-width: 600px) {
+            #journal_content {
+                width: 100%;
+                max-width: 100vw;
+            }
         }
     </style>
 </head>
