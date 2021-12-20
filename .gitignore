@@ -115,4 +115,4 @@ FA.*
 .DS_Store
 
 # certificates
-cert/
+/cert
