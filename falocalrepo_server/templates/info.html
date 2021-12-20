@@ -10,9 +10,19 @@
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/style.css">
     <style>
+        #logo {
+            width: 100%;
+            text-align: center;
+        }
+
+        #logo img {
+            width: 90%;
+            max-width: 250px;
+            max-height: 90vh;
+        }
+
         #database_info {
-            width: 95%;
-            max-width: 95%;
+            width: 100%;
             top: 20px;
             margin: auto;
             text-align: center
@@ -23,12 +33,17 @@
         }
 
         #database_info table td {
-            padding: 2px;
+            padding: 5px;
         }
     </style>
 </head>
 <body>
 <h2 style="text-align: center;">{{ title }}</h2>
+<div id="logo">
+    <img src="/static/logo.png" alt="Stylized animal paw with an orange stylized server">
+    <br>
+    <a href="https://pypi.org/project/falocalrepo-server/">Version {{ version }}</a>
+</div>
 <div id="database_info">
     <h3>Database Information</h3>
     <table class="border">
@@ -50,6 +65,5 @@
         </tr>
     </table>
 </div>
-<span style="position: absolute; bottom: 5px; width: 100%; text-align: center">App Version: {{ version }}</span>
 </body>
 </html>
