@@ -206,7 +206,7 @@
     </table>
     <br>
     <a class="nocolor"
-       href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" {{ "disabled" if submission["FILESAVED"] < 10 }}>
+       href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" {{ "disabled" if submission["FILESAVED"] < 10 }} download>
         <button {{ "disabled" if submission["FILESAVED"] < 10 }}>Download File</button>
     </a>
     <a class="nocolor"
