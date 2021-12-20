@@ -35,15 +35,14 @@
         }
 
         #submission_metadata {
-            width: 95%;
-            max-width: 95%;
+            width: 100%;
+            max-width: 100%;
             top: 20px;
             margin: auto;
             text-align: center
         }
 
         #submission_description {
-            width: 80%;
             max-width: 600px;
             top: 20px;
             margin: auto;
@@ -62,6 +61,20 @@
 
         #submission_metadata .value {
             max-width: 300px;
+        }
+
+        @media only screen and (max-width: 300px) {
+            #submission_metadata table, #submission_metadata .value {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media only screen and (max-width: 600px) {
+            #submission_description {
+                width: 100%;
+                max-width: 100vw;
+            }
         }
     </style>
 </head>
