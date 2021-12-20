@@ -128,7 +128,7 @@
         }
 
         #search_results div.results_grid {
-            width: 95%;
+            width: 100%;
             top: 20px;
             margin: auto;
             display: flex;
@@ -143,11 +143,15 @@
             padding: 15px;
             max-width: 250px;
             text-align: center;
+            font-size: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #search_results div.results_grid div.grid_item .thumbnail img {
             max-width: 200px;
             max-height: 200px;
+            object-fit: contain;
         }
 
         #header button, #footer button {
@@ -158,7 +162,8 @@
 
         @media only screen and (max-width: 600px) {
             #search_results div.results_grid div.grid_item, #search_results div.results_grid div.grid_item .thumbnail img {
-                max-width: 100px;
+                min-width: 100px;
+                width: 33vw;
             }
         }
     </style>
