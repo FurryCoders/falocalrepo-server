@@ -316,7 +316,7 @@ async def serve_submission_file(id_: int, _filename=None):
         raise HTTPException(404)
     elif not f.is_file():
         raise HTTPException(404)
-    return FileResponse(f, filename=f.name)
+    return FileResponse(f)
 
 
 @cache
@@ -330,7 +330,7 @@ async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _fi
     f, t = settings.database.load_submission_files(id_)
     if t is not None and t.is_file():
         if not x:
-            return FileResponse(t, filename=t.name)
+            return FileResponse(t)
         with Image.open(t) as img:
             img.thumbnail((x, y or x))
             img.save(f_obj := BytesIO(), img.format, quality=95)
