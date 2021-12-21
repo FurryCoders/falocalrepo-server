@@ -238,7 +238,7 @@
             icon.parentElement.innerText = `@${icon.title}`
         })
 
-    document.querySelectorAll("#submission_description a")
+    document.querySelectorAll("#submission_description a, #submission_file pre a")
         .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
 
     window.onload = () => {
