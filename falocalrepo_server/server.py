@@ -1,5 +1,3 @@
-from functools import cache
-from functools import lru_cache
 from io import BytesIO
 from json import dumps
 from logging import Logger
@@ -121,13 +119,11 @@ def log_settings():
                 settings.database.load_search(table.table, "", sort, order)
 
 
-@cache
 @app.get("/favicon.ico", response_class=FileResponse)
 async def serve_favicon():
     return RedirectResponse("/static/favicon.ico", 301)
 
 
-@cache
 @app.get("/icon.png", response_class=FileResponse)
 @app.get("/touch-icon.png", response_class=FileResponse)
 @app.get("/apple-touch-icon.png", response_class=FileResponse)
@@ -333,7 +329,6 @@ async def serve_submission(request: Request, id_: int):
     )
 
 
-@lru_cache(maxsize=10)
 @app.get("/submission/{id_}/file/")
 @app.get("/submission/{id_}/file/{_filename}")
 async def serve_submission_file(id_: int, _filename=None):
@@ -344,7 +339,6 @@ async def serve_submission_file(id_: int, _filename=None):
     return FileResponse(f)
 
 
-@cache
 @app.get("/submission/{id_}/thumbnail/")
 @app.get("/submission/{id_}/thumbnail/{_filename}")
 @app.get("/submission/{id_}/thumbnail/{x}/")
@@ -374,7 +368,6 @@ async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _fi
         raise HTTPException(404)
 
 
-@lru_cache(maxsize=10)
 @app.get("/submission/{id_}/zip/")
 @app.get("/submission/{id_}/zip/{_filename}")
 async def serve_submission_zip(id_: int, _filename=None):
@@ -411,7 +404,6 @@ async def serve_journal(request: Request, id_: int):
     )
 
 
-@lru_cache(maxsize=10)
 @app.get("/journal/{id_}/zip/")
 @app.get("/journal/{id_}/zip/{filename}")
 async def serve_journal_zip(id_: int, _filename=None):
