@@ -116,12 +116,6 @@
 
     document.querySelectorAll("#journal_content a")
         .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
-
-    window.onload = () => {
-        const dpi = Number(window.devicePixelRatio || 1)
-        if (dpi <= 1) return
-        document.getElementById("journal_content").style.maxWidth = `${600 * (dpi / Math.floor(dpi))}px`
-    }
 </script>
 </body>
 </html>
