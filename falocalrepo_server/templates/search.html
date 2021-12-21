@@ -349,8 +349,9 @@
                             <a class="cell-link" href="/{{ table_short }}/{{ item[column_id] }}">
                                 <img src="/static/loading.gif"
                                      data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
-                                     onload="this.src = this.dataset.src; this.onload = null;"
-                                     onerror="this.parentNode.removeChild(this)" alt="">
+                                     data-src-error="/static/not-found.png"
+                                     onload="this.onload = null; this.src = this.dataset.src;"
+                                     onerror="this.onload = null; this.src = this.dataset.srcError;" alt="">
                             </a>
                         </td>
                     {% endif %}
@@ -366,8 +367,9 @@
                             <a class="nocolor thumbnail" href="/{{ table_short }}/{{ item[column_id] }}">
                                 <img src="/static/loading.gif"
                                      data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
-                                     onload="this.src = this.dataset.src; this.onload = null;"
-                                     onerror="this.parentElement.removeChild(this)" alt="">
+                                     data-src-error="/static/not-found.png"
+                                     onload="this.onload = null; this.src = this.dataset.src;"
+                                     onerror="this.onload = null; this.src = this.dataset.srcError;" alt="">
                             </a>
                             <br>
                         {% endif %}

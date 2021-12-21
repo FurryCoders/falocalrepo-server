@@ -85,7 +85,7 @@
         <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
             <img src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
                  alt=""
-                 onerror="$('submission_file').innerText = 'File not found'"
+                 onerror="this.onload = null; this.src = '/static/not-found.png'"
                  onload="$('download_file').disabled = false">
         </a>
     {% elif submission["TYPE"].lower() == "music" %}
@@ -93,7 +93,7 @@
             <br>
             <img src="/submission/{{ submission["ID"] }}/thumbnail"
                  alt=""
-                 onerror="$('submission_thumbnail').remove()">
+                 onerror="this.src = '/static/not-found.png'">
         </div>
         <br>
         <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
@@ -108,7 +108,7 @@
             <br>
             <img src="/submission/{{ submission["ID"] }}/thumbnail"
                  alt=""
-                 onerror="$('submission_thumbnail').remove()">
+                 onerror="this.src = '/static/not-found.png'">
         </div>
         <br>
         <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
