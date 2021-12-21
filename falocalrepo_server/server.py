@@ -492,12 +492,8 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
         lambda r, *_: RedirectResponse(f"https://{r.url.hostname}:{port_redirect}{r.url.path}?{r.url.query}"),
         ["GET"]
     )
-
-    try:
-        # noinspection PyTypeChecker
-        run(redirect_app, host=host, port=port_listen)
-    except KeyboardInterrupt:
-        pass
+    # noinspection PyTypeChecker
+    run(redirect_app, host=host, port=port_listen)
 
 
 def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = None,
