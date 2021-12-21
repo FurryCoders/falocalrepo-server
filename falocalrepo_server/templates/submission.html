@@ -91,7 +91,7 @@
             File not found
         </audio>
     {% elif file_text is not none %}
-        <pre class="border">{{ file_text }}</pre>
+        <pre class="border">{% autoescape false %}{{ file_text }}{% endautoescape %}</pre>
     {% else %}
         <div id="submission_thumbnail">
             <br>
@@ -194,7 +194,8 @@
     </table>
     <br>
     <a class="nocolor"
-       href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" {{ "disabled" if submission["FILESAVED"] < 10 }} download>
+       href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" {{ "disabled" if submission["FILESAVED"] < 10 }}
+       download>
         <button {{ "disabled" if submission["FILESAVED"] < 10 }}>Download File</button>
     </a>
     <a class="nocolor"

@@ -6,6 +6,8 @@ from logging import Logger
 from logging import getLogger
 from os import PathLike
 from pathlib import Path
+from re import Pattern
+from re import compile as re_compile
 from sqlite3 import DatabaseError
 from typing import Any
 from typing import Callable
@@ -69,9 +71,29 @@ app: FastAPI = FastAPI(title="FurAffinity Local Repo", openapi_url=None)
 templates: Jinja2Templates = Jinja2Templates(str(root / "templates"))
 settings: Settings = Settings(static_folder=root / "static")
 
+tags_expressions: list[tuple[Pattern, str]] = [
+    (re_compile(r"\[(/?)([bius]|sup|sub|h\d)]"), r"<\1\2>",),
+    (re_compile(r"\[color=([^]]+)]"), r'<span style="color: \1">,'),
+    (re_compile(r"\[/color]"), "</span>",),
+    (re_compile(r"\[(left|center|right)]"), r'<p style="text-align: \1">',),
+    (re_compile(r"\[/(left|center|right)]"), "</p>",),
+    (re_compile(r"\[quote=([^]]+)]"), r'<blockquote cite="\1">'),
+    (re_compile(r"\[quote]"), "<blockquote>"),
+    (re_compile(r"\[/quote]"), "</blockquote>"),
+    (re_compile(r"\[url=([^]]+)]"), r'<a href="\1">'),
+    (re_compile(r"\[/url]"), "</a>"),
+    (re_compile(r"\[yt]((?:.(?!\[yt]))+)\[/yt]"), r'</a href="\1">\1</a>'),
+]
+
 button: Callable[[str, str], str] = lambda h, t: f'<a href="{h}"><button>{t}</button></a>'
 
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
+
+
+def tags_to_html(text: str) -> str:
+    for exp, sub in tags_expressions:
+        text = exp.sub(sub, text)
+    return text
 
 
 def serve_error(request: Request, message: str, code: int):
@@ -301,7 +323,7 @@ async def serve_submission(request: Request, id_: int):
         "submission.html",
         {"title": f"{app.title} · {sub['TITLE']} by {sub['AUTHOR']}",
          "submission": sub,
-         "file_text": f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"]) if f else None,
+         "file_text": tags_to_html(f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"])) if f else None,
          "filename": f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
          "filename_id": f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
          "prev": p,
