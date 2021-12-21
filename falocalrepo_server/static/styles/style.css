@@ -41,6 +41,7 @@
 body {
     background: var(--background_color);
     color: var(--color_primary);
+    font-family: -apple-system, Roboto, sans-serif;
 }
 
 input {
