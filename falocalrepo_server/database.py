@@ -3,6 +3,8 @@ from pathlib import Path
 from re import match
 from re import split
 from re import sub
+from sqlite3 import Connection
+from sqlite3 import connect
 from typing import Optional
 
 from falocalrepo_database import FADatabase
@@ -69,6 +71,8 @@ class Database(FADatabase):
     def __init__(self, database_path: Path):
         FADatabase.check_connection(database_path)
         super(Database, self).__init__(database_path, make=False)
+        self.connection.close()
+        self.connection = connect(f"{self.database_path.as_uri()}?mode=ro", uri=True)
 
     @property
     def m_time(self):
