@@ -3,7 +3,6 @@ from pathlib import Path
 from re import match
 from re import split
 from re import sub
-from sqlite3 import Connection
 from sqlite3 import connect
 from typing import Optional
 
