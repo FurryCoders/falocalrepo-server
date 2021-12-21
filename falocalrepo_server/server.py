@@ -83,6 +83,7 @@ tags_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"\[url=([^]]+)]"), r'<a href="\1">'),
     (re_compile(r"\[/url]"), "</a>"),
     (re_compile(r"\[yt]((?:.(?!\[yt]))+)\[/yt]"), r'</a href="\1">\1</a>'),
+    (re_compile(r"(:icon([^:]+):|:([^:]+)icon:)"), r'<a href="/user/\2\3">@\2\3</a>'),
 ]
 
 button: Callable[[str, str], str] = lambda h, t: f'<a href="{h}"><button>{t}</button></a>'
