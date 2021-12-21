@@ -19,6 +19,7 @@ from PIL import UnidentifiedImageError
 from chardet import detect as detect_encoding
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi import Response
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.exceptions import RequestValidationError
@@ -331,10 +332,8 @@ async def serve_submission(request: Request, id_: int):
 @app.get("/submission/{id_}/file/")
 @app.get("/submission/{id_}/file/{_filename}")
 async def serve_submission_file(id_: int, _filename=None):
-    if (f := settings.database.load_submission_files(id_)[0]) is None:
-        raise HTTPException(404)
-    elif not f.is_file():
-        raise HTTPException(404)
+    if (f := settings.database.load_submission_files(id_)[0]) is None or not f.is_file():
+        return Response(status_code=404)
     return FileResponse(f)
 
 
