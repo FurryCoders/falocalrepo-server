@@ -1,3 +1,4 @@
+from functools import reduce
 from io import BytesIO
 from json import dumps
 from logging import Logger
@@ -90,9 +91,7 @@ app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
 
 def tags_to_html(text: str) -> str:
-    for exp, sub in tags_expressions:
-        text = exp.sub(sub, text)
-    return text
+    return reduce(lambda t, es: es[0].sub(es[1], t), tags_expressions, text)
 
 
 def serve_error(request: Request, message: str, code: int):
