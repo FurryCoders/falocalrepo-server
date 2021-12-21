@@ -443,12 +443,12 @@
 
     {% if allow_view %}
         window.onresize = () => {
+            const view = $("view")
             if (window.innerWidth <= 630) {
-                const view = $("view")
                 $("viewGrid").selected = true
                 view.onchange(null)
                 view.disabled = true
-            }
+            } else view.disabled = false
         }
         window.onresize(null)
     {% endif %}
