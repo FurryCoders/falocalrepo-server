@@ -285,6 +285,7 @@
     <br>
     <button type="submit">Search</button>
     <button type="submit" onclick="$('query').value = ''">Browse</button>
+    <button type="submit" onclick="convertToFAQuery(this.form)">Search on Fur Affinity</button>
 </form>
 <br>
 {% if results or params %}
@@ -420,6 +421,24 @@
         const url = new URL(window.location.href)
         url.searchParams.set("view", view_)
         window.history.replaceState({}, document.title, url.href)
+    }
+
+    const convertToFAQuery = (form) => {
+        const query = $("query")
+        query.name = "q"
+        query.value = query.value
+            .replace(/@(?!(tags|author|description|fileurl|fileext|title))[^ ]+ ?/ig, "")
+            .replace(/@tags/ig, "@keywords")
+            .replace(/@author/ig, "@lower")
+            .replace(/@description/ig, "@message")
+            .replace(/@(fileurl|fileext)/ig, "@filename")
+        const sort = $("sort_field")
+        if (sort.value.match(/date|id/i)) {
+            sort.name = "order-by"
+            sort.value = "date"
+        } else sort.remove()
+        $("order_field").name = "order-direction"
+        form.action = "https://furaffinity.net/search/"
     }
 
     {% if allow_view %}
