@@ -285,7 +285,7 @@
     <br>
     <button type="submit">Search</button>
     <button type="submit" onclick="$('query').value = ''">Browse</button>
-    <button type="submit" onclick="convertToFAQuery(this.form)">Search on Fur Affinity</button>
+    <button type="button" onclick="convertToFAQuery(this.form)">Search on Fur Affinity</button>
 </form>
 <br>
 {% if results or params %}
@@ -424,21 +424,18 @@
     }
 
     const convertToFAQuery = (form) => {
-        const query = $("query")
-        query.name = "q"
-        query.value = query.value
-            .replace(/@(?!(tags|author|description|fileurl|fileext|title))[^ ]+ ?/ig, "")
+        const url = new URL("https://furaffinity.net/search/")
+        const query = $("query").value
+            .replace(/@(?!(tags|author|description|fileurl|fileext|title))[^@]+ ?/ig, "")
             .replace(/@tags/ig, "@keywords")
             .replace(/@author/ig, "@lower")
             .replace(/@description/ig, "@message")
             .replace(/@(fileurl|fileext)/ig, "@filename")
-        const sort = $("sort_field")
-        if (sort.value.match(/date|id/i)) {
-            sort.name = "order-by"
-            sort.value = "date"
-        } else sort.remove()
-        $("order_field").name = "order-direction"
-        form.action = "https://furaffinity.net/search/"
+            .trim()
+        url.searchParams.set("query", query)
+        if ($("sort_field").value.match(/date|id/i)) url.searchParams.set("order-by", "date")
+        url.searchParams.set("order-direction", $("order_field").value)
+        window.location = url.href
     }
 
     {% if allow_view %}
