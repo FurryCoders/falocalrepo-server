@@ -285,7 +285,7 @@
     <br>
     <button type="submit">Search</button>
     <button type="submit" onclick="$('query').value = ''">Browse</button>
-    <button type="button" onclick="convertToFAQuery(this.form)">Search on Fur Affinity</button>
+    <button type="button" onclick="convertToFAQuery()">Search on Fur Affinity</button>
 </form>
 <br>
 {% if results or params %}
@@ -423,7 +423,7 @@
         window.history.replaceState({}, document.title, url.href)
     }
 
-    const convertToFAQuery = (form) => {
+    const convertToFAQuery = () => {
         const url = new URL("https://furaffinity.net/search/")
         const query = $("query").value
             .replace(/@(?!(tags|author|description|fileurl|fileext|title))[^@]+ ?/ig, "")
