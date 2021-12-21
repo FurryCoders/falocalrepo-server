@@ -500,7 +500,6 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
         pass
 
 
-# noinspection HttpUrlsUsage
 def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = None,
            ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None,
            redirect_port: int = None, precache: bool = False):
