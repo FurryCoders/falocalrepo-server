@@ -420,14 +420,13 @@
     $("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
 
     const addToInput = (input, value) => {
-        const a = input.value.substr(0, input.selectionStart).replace(/ +$/, "")
-        const b = input.value.substr(input.selectionEnd).replace(/^ +/, "")
-        if (input.selectionStart === input.selectionEnd) {
-            input.value = a + ` ${value} ` + b
-        } else {
-            input.value = a + ` (${value} ${input.value.substring(input.selectionStart, input.selectionEnd)}) ` + b
-        }
+        const selectStart = input.selectionStart, selectEnd = input.selectionEnd
+        const a = input.value.substr(0, selectStart).replace(/ +$/, "")
+        const b = input.value.substr(selectEnd).replace(/^ +/, "")
+        const addition =  selectStart === selectEnd ? ` ${value} ` : ` (${value} ${input.value.substring(selectStart, selectEnd)}) `
+        input.value = a + addition + b
         input.focus()
+        input.setSelectionRange(selectStart + addition.length - 1, selectStart + addition.length - 1)
     }
 
     const changeView = (view) => {
