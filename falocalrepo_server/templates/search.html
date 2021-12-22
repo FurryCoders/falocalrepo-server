@@ -80,38 +80,42 @@
         }
 
         #search_results table.results_list td.id {
-            width: 80px;
-            min-width: 80px;
-            max-width: 80px;
+            width: 11ch;
+            min-width: 11ch;
+            max-width: 11ch;
         }
 
         #search_results table.results_list td.author, #search_results table.results_list td.username {
-            width: 190px;
-            min-width: 190px;
-            max-width: 190px;
+            width: 20ch;
+            min-width: 20ch;
+            max-width: 20ch;
         }
 
         #search_results table.results_list td.date {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
+            width: 16ch;
+            min-width: 16ch;
+            max-width: 16ch;
         }
 
         #search_results table.results_list td.title {
-            min-width: 50px;
+            min-width: 10ch;
             max-width: available;
-            text-overflow: clip;
             text-align: left;
-        }
-
-        #search_results table.results_list td.folders {
-            max-width: 300px;
         }
 
         #search_results table.results_list .thumbnail {
             width: 100px;
             min-width: 100px;
-            max-width: 100px;
+            max-width: 200px;
+            max-height: 50px;
+        }
+
+        #search_results table.results_list .thumbnail:hover * {
+            width: 200px;
+            height: 200px;
+            min-width: 200px;
+            max-width: 200px;
+            max-height: 200px;
         }
 
         #search_results table.results_list .thumbnail img {
@@ -437,7 +441,7 @@
     {% if allow_view %}
         window.onresize = () => {
             const view = $("view")
-            if (window.innerWidth <= 630) {
+            if (window.innerWidth <= 730) {
                 $("viewGrid").selected = true
                 view.onchange(null)
                 view.disabled = true
