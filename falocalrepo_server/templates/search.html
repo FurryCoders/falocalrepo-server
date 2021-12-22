@@ -466,8 +466,8 @@
             if (window.innerWidth <= 755) {
                 $("viewGrid").selected = true
                 view.onchange(null)
-                view.disabled = true
-            } else view.disabled = false
+                $("viewRow").hidden = view.disabled = true
+            } else $("viewRow").hidden = view.disabled = false
         }
         window.onresize(null)
     {% endif %}
