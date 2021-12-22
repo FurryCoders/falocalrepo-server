@@ -117,12 +117,14 @@
             max-height: 50px;
         }
 
-        #search_results table.results_list .thumbnail:not(.notfound):hover * {
-            width: 200px;
-            height: 200px;
-            min-width: 200px;
-            max-width: 200px;
-            max-height: 200px;
+        @media (pointer: fine) {
+            #search_results table.results_list .thumbnail:not(.notfound):hover * {
+                width: 200px;
+                height: 200px;
+                min-width: 200px;
+                max-width: 200px;
+                max-height: 200px;
+            }
         }
 
         #search_results table.results_list .thumbnail img {
