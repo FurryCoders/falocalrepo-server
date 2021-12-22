@@ -161,7 +161,7 @@ async def error_database(request: Request, err: DatabaseError):
     logger.error(repr(err))
     if request.method == "POST":
         return JSONResponse({"errors": [{err.__class__.__name__: err.args}]}, 500)
-    return serve_error(request, err.__class__.__name__, 500)
+    return serve_error(request, err.__class__.__name__ + "<br/>" + "<br/>".join(err.args or []), 500)
 
 
 @app.get("/view/{id_}", response_class=HTMLResponse)
