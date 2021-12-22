@@ -316,7 +316,9 @@
     <br>
     <button type="submit">Search</button>
     <button type="submit" onclick="$('query').value = ''">Browse</button>
-    <button type="button" onclick="convertToFAQuery()">Search on Fur Affinity</button>
+    {% if table == "submissions" %}
+        <button type="button" onclick="convertToFAQuery()">Search on Fur Affinity</button>
+    {% endif %}
 </form>
 <br>
 {% if results or params %}
@@ -437,7 +439,7 @@
         const selectStart = input.selectionStart, selectEnd = input.selectionEnd
         const a = input.value.substr(0, selectStart).replace(/ +$/, "")
         const b = input.value.substr(selectEnd).replace(/^ +/, "")
-        const addition =  selectStart === selectEnd ? ` ${value} ` : ` (${value} ${input.value.substring(selectStart, selectEnd)}) `
+        const addition = selectStart === selectEnd ? ` ${value} ` : ` (${value} ${input.value.substring(selectStart, selectEnd)}) `
         input.value = a + addition + b
         input.focus()
         input.setSelectionRange(selectStart + addition.length - 1, selectStart + addition.length - 1)
@@ -456,22 +458,24 @@
         window.history.replaceState({}, document.title, url.href)
     }
 
-    const convertToFAQuery = () => {
-        const url = new URL("https://furaffinity.net/search/")
-        const query = $("query").value
-            .replace(/@(?!(tags|author|description|fileurl|fileext|title))[^@]+ ?/ig, "")
-            .replace(/@tags/ig, "@keywords")
-            .replace(/@author/ig, "@lower")
-            .replace(/@description/ig, "@message")
-            .replace(/@(fileurl|fileext)/ig, "@filename")
-            .trim()
-        url.searchParams.set("q", query)
-        if ($("sort_field").value.match(/date|id/i)) {
-            url.searchParams.set("order-by", "date")
-            url.searchParams.set("order-direction", $("order_field").value)
+    {% if table == "submissions" %}
+        const convertToFAQuery = () => {
+            const url = new URL("https://furaffinity.net/search/")
+            const query = $("query").value
+                .replace(/@(?!(tags|author|description|fileurl|fileext|title))[^@]+ ?/ig, "")
+                .replace(/@tags/ig, "@keywords")
+                .replace(/@author/ig, "@lower")
+                .replace(/@description/ig, "@message")
+                .replace(/@(fileurl|fileext)/ig, "@filename")
+                .trim()
+            url.searchParams.set("q", query)
+            if ($("sort_field").value.match(/date|id/i)) {
+                url.searchParams.set("order-by", "date")
+                url.searchParams.set("order-direction", $("order_field").value)
+            }
+            window.location = url.href
         }
-        window.location = url.href
-    }
+    {% endif %}
 
     {% if allow_view %}
         window.onresize = () => {
