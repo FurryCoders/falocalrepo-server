@@ -430,18 +430,16 @@
         input.focus()
     }
 
-    const changeView = (view_) => {
-        if (view_ === "list") {
-            view = $("results_table_list")
-            view.style.display = ""
+    const changeView = (view) => {
+        if (view === "list") {
+            $("results_table_list").style.display = ""
             $("results_table_grid").style.display = "none"
-        } else if (view_ === "grid") {
-            view = $("results_table_grid")
+        } else if (view === "grid") {
             $("results_table_list").style.display = "none"
-            view.style.display = "flex"
+            $("results_table_grid").style.display = "flex"
         }
         const url = new URL(window.location.href)
-        url.searchParams.set("view", view_)
+        url.searchParams.set("view", view)
         window.history.replaceState({}, document.title, url.href)
     }
 
