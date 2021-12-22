@@ -452,8 +452,10 @@
             .replace(/@(fileurl|fileext)/ig, "@filename")
             .trim()
         url.searchParams.set("q", query)
-        if ($("sort_field").value.match(/date|id/i)) url.searchParams.set("order-by", "date")
-        url.searchParams.set("order-direction", $("order_field").value)
+        if ($("sort_field").value.match(/date|id/i)) {
+            url.searchParams.set("order-by", "date")
+            url.searchParams.set("order-direction", $("order_field").value)
+        }
         window.location = url.href
     }
 
