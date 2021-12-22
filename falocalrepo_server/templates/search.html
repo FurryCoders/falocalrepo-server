@@ -105,6 +105,11 @@
             text-align: left;
         }
 
+        #search_results table.results_list td.relevance {
+            width: 9ch;
+            max-width: 9ch;
+        }
+
         #search_results table.results_list .thumbnail {
             width: 100px;
             min-width: 100px;
@@ -160,27 +165,36 @@
             bottom: 10px;
         }
 
-        @media only screen and (max-width: 600px) {
-            #search_results div.results_grid div.grid_item, #search_results div.results_grid div.grid_item .thumbnail img {
-                min-width: 100px;
-                width: 33vw;
-            }
-
-            #search_results table.results_list .id, #search_results table.results_list td.date .date_time {
+        @media only screen and (max-width: {{ "850px" if table == "submissions" else "670px"}}) {
+            #search_results table.results_list .id, #search_results table.results_list .relevance {
                 visibility: hidden;
                 display: none;
             }
+        }
 
+        @media only screen and (max-width: {{ "655px" if table == "submissions" else "600px"}}) {
             #search_results table.results_list td.date {
                 width: 10ch;
                 min-width: 10ch;
                 max-width: 10ch;
             }
 
+            #search_results table.results_list .date_time {
+                visibility: hidden;
+                display: none;
+            }
+
             #search_results table.results_list td.author {
                 width: 10ch;
                 min-width: 10ch;
                 max-width: 10ch;
+            }
+        }
+
+        @media only screen and (max-width: 600px) {
+            #search_results div.results_grid div.grid_item, #search_results div.results_grid div.grid_item .thumbnail img {
+                min-width: 100px;
+                width: 33vw;
             }
         }
     </style>
@@ -462,7 +476,7 @@
     {% if allow_view %}
         window.onresize = () => {
             const view = $("view")
-            if (window.innerWidth <= 755) {
+            if (window.innerWidth < 505) {
                 $("viewGrid").selected = true
                 view.onchange(null)
                 $("viewRow").hidden = view.disabled = true

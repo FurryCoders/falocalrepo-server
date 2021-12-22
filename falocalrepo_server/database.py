@@ -31,8 +31,8 @@ def format_value(value: str, *, like: bool = False) -> str:
     return value
 
 
-def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliases: dict[str, str] = None
-                 ) -> tuple[str, list[str]]:
+def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliases: dict[str, str] = None,
+                 score: bool = False) -> tuple[str, list[str]]:
     if not query:
         return "", []
     likes, aliases = likes or [], aliases or {}
@@ -48,9 +48,9 @@ def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliase
             field = m.group(1).lower()
             continue
         elif elem == "&":
-            sql_elements.append("and")
+            sql_elements.append("and" if not score else "*")
         elif elem == "|":
-            sql_elements.append("or")
+            sql_elements.append("or" if not score else "+")
         elif elem in ("(", ")"):
             sql_elements.append("and") if elem == "(" and prev not in ("", "&", "|", "(") else None
             sql_elements.append(elem)
@@ -58,8 +58,8 @@ def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliase
             not_, elem = match(r"^(!)?(.*)$", elem).groups()
             if not elem:
                 continue
-            sql_elements.append("and") if prev not in ("", "&", "|", "(") else None
-            sql_elements.append(f"{aliases.get(field, field)}{' not' * bool(not_)} like ? escape '\\'")
+            sql_elements.append("and" if not score else "*") if prev not in ("", "&", "|", "(") else None
+            sql_elements.append(f"({aliases.get(field, field)}{' not' * bool(not_)} like ? escape '\\')")
             values.append(format_value(elem, like=field in likes))
         prev = elem
 
@@ -151,12 +151,22 @@ class Database(FADatabase):
                                    default_field,
                                    [*map(str.lower, {*cols_table, "any"} - {"ID", "AUTHOR", "USERNAME"})],
                                    {"author": "replace(author, '_', '')",
-                                    "any": f"({'||'.join(cols_table)})"})
+                                    "any": f"({'||'.join(cols_table)})"},
+                                   score=sort == "relevance")
 
+        results: list[Entry]
+        if sort == "relevance":
+            results = [
+                dict(zip(cols_results + ["RELEVANCE"], s)) for s in
+                db_table.select_sql(f"RELEVANCE > 0", values,
+                                    columns=[*cols_results, f"({sql if sql else 1}) as RELEVANCE"],
+                                    order=[f"{sort} {order}", f"{default_sort[table]} {default_order[table]}"]).cursor]
+        else:
+            results = list(db_table.select_sql(sql, values, columns=cols_results, order=[f"{sort} {order}"]))
         return (
-            list(db_table.select_sql(sql, values, columns=cols_results, order=[f"{sort} {order}"])),
-            cols_table,
-            cols_results,
+            results,
+            cols_table + ["RELEVANCE"],
+            cols_results + (["RELEVANCE"] if sort == "relevance" else []),
             cols_list,
             col_id,
             sort,
