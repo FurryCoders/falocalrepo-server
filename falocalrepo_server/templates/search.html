@@ -350,7 +350,7 @@
                                      data-src-error="/static/not-found.png"
                                      onload="this.onload = null; this.src = this.dataset.src;"
                                      onerror="this.onload = null; this.parentNode.parentNode.classList.add('notfound'); this.src = this.dataset.srcError;"
-                                     alt="">
+                                     alt="{{ item["TITLE"] }}" title="{{ item["TITLE"] }}">
                             </a>
                         </td>
                     {% endif %}
@@ -368,7 +368,8 @@
                                      data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
                                      data-src-error="/static/not-found.png"
                                      onload="this.onload = null; this.src = this.dataset.src;"
-                                     onerror="this.onload = null; this.src = this.dataset.srcError;" alt="">
+                                     onerror="this.onload = null; this.src = this.dataset.srcError;"
+                                     alt="{{ item["TITLE"] }}" title="{{ item["TITLE"] }}">
                             </a>
                             <br>
                         {% endif %}
