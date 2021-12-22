@@ -165,6 +165,23 @@
                 min-width: 100px;
                 width: 33vw;
             }
+
+            #search_results table.results_list .id, #search_results table.results_list td.date .date_time {
+                visibility: hidden;
+                display: none;
+            }
+
+            #search_results table.results_list td.date {
+                width: 10ch;
+                min-width: 10ch;
+                max-width: 10ch;
+            }
+
+            #search_results table.results_list td.author {
+                width: 10ch;
+                min-width: 10ch;
+                max-width: 10ch;
+            }
         }
     </style>
 </head>
@@ -335,7 +352,8 @@
                                 </a>
                             {% elif column == "DATE" %}
                                 <a class="cell-link" href="/{{ table_short }}/{{ item[column_id] }}">
-                                    <span>{{ item[column]|replace("T", " ") }}</span>
+                                    <span class="date_date">{{ item[column].split("T")[0] }}</span>
+                                    <span class="date_time">{{ item[column].split("T")[1] }}</span>
                                 </a>
                             {% else %}
                                 <a class="cell-link" href="/{{ table_short }}/{{ item[column_id] }}">
