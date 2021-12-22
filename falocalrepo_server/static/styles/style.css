@@ -96,6 +96,9 @@ a.cell-link {
     display: block;
     text-decoration: none;
     color: inherit;
+    overflow: inherit;
+    text-overflow: inherit;
+    white-space: inherit;
 }
 
 a.nocolor {
