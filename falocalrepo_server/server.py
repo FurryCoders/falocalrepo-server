@@ -108,7 +108,8 @@ async def auth_middleware(request: Request, call_next: Callable[[Request], Corou
         if compare_digest(creds.username, settings.username) and compare_digest(creds.password, settings.password):
             return await call_next(request)
     except HTTPException as err:
-        logger.error(repr(err))
+        if err.status_code != status.HTTP_401_UNAUTHORIZED:
+            return serve_error(request, err.detail, err.status_code)
     return Response("Incorrect username or password", status.HTTP_401_UNAUTHORIZED, {"WWW-Authenticate": "Basic"})
 
 
