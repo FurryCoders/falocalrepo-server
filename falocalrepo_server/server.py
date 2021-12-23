@@ -55,8 +55,8 @@ class Settings(BaseSettings):
     ssl_cert: Path = None
     ssl_key: Path = None
     precache: bool = False
-    username: str = "abc"
-    password: str = ""
+    username: str = None
+    password: str = None
 
 
 class SearchQuery(BaseModel):
