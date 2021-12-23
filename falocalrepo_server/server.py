@@ -7,9 +7,11 @@ from os import PathLike
 from pathlib import Path
 from re import Pattern
 from re import compile as re_compile
+from secrets import compare_digest
 from sqlite3 import DatabaseError
 from typing import Any
 from typing import Callable
+from typing import Coroutine
 from typing import Optional
 from typing import Union
 from zipfile import ZipFile
@@ -28,6 +30,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.responses import StreamingResponse
+from fastapi.security import HTTPBasic
+from fastapi.security import HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -51,6 +55,8 @@ class Settings(BaseSettings):
     ssl_cert: Path = None
     ssl_key: Path = None
     precache: bool = False
+    username: str = "abc"
+    password: str = ""
 
 
 class SearchQuery(BaseModel):
@@ -70,6 +76,7 @@ root: Path = Path(__file__).resolve().parent
 app: FastAPI = FastAPI(title="FurAffinity Local Repo", openapi_url=None)
 templates: Jinja2Templates = Jinja2Templates(str(root / "templates"))
 settings: Settings = Settings(static_folder=root / "static")
+security: HTTPBasic = HTTPBasic()
 
 tags_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"\[(/?)([bius]|sup|sub|h\d)]"), r"<\1\2>",),
@@ -93,6 +100,16 @@ app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
 def tags_to_html(text: str) -> str:
     return reduce(lambda t, es: es[0].sub(es[1], t), tags_expressions, text)
+
+
+async def auth_middleware(request: Request, call_next: Callable[[Request], Coroutine[Any, Any, Response]]) -> Response:
+    try:
+        creds: HTTPBasicCredentials = await security(request)
+        if compare_digest(creds.username, settings.username) and compare_digest(creds.password, settings.password):
+            return await call_next(request)
+    except HTTPException as err:
+        logger.error(repr(err))
+    return Response("Incorrect username or password", status.HTTP_401_UNAUTHORIZED, {"WWW-Authenticate": "Basic"})
 
 
 def serve_error(request: Request, message: str, code: int):
