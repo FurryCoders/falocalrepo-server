@@ -515,11 +515,15 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
 
 def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = None,
            ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None,
-           redirect_port: int = None, precache: bool = False):
+           redirect_port: int = None, precache: bool = False, authentication: str = None):
     if redirect_port:
         return run_redirect(host, port, redirect_port)
     settings.database = Database(Path(database_path).resolve())
     settings.precache = precache
+    if authentication:
+        settings.username = authentication.split(":")[0]
+        settings.password = authentication.split(":", 1)[1] if ":" in authentication else ""
+        app.middleware("http")(auth_middleware)
     run_args: dict[str, Any] = {}
     if ssl_cert and ssl_key:
         settings.ssl_cert, settings.ssl_key = Path(ssl_cert), Path(ssl_key)
