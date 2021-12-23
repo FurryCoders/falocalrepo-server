@@ -128,6 +128,7 @@ def log_settings():
     logger.info(f"Using database: {settings.database.database_path}")
     logger.info(f"Using SSL certificate: {settings.ssl_cert}") if settings.ssl_cert else None
     logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
+    logger.info(f"Using HTTP Basic authentication") if settings.username or settings.password else None
     if settings.precache:
         for table in (settings.database.users, settings.database.submissions, settings.database.journals):
             for order in ("asc", "desc"):
