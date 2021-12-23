@@ -137,6 +137,12 @@ def log_settings():
                 settings.database.load_search(table.table, "", sort, order)
 
 
+@app.on_event("shutdown")
+def close_database():
+    if settings.database.is_open():
+        settings.database.close()
+
+
 @app.get("/favicon.ico", response_class=FileResponse)
 async def serve_favicon():
     return RedirectResponse("/static/favicon.ico", 301)
@@ -519,7 +525,6 @@ def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int
            redirect_port: int = None, precache: bool = False, authentication: str = None):
     if redirect_port:
         return run_redirect(host, port, redirect_port)
-    settings.database = Database(Path(database_path).resolve())
     settings.precache = precache
     if authentication:
         settings.username = authentication.split(":")[0]
@@ -534,5 +539,6 @@ def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int
             raise FileNotFoundError(f"SSL private key {settings.ssl_key}")
         run_args |= {"port": port or 443, "ssl_certfile": settings.ssl_cert, "ssl_keyfile": settings.ssl_key}
     run_args |= {"port": run_args.get("port", port) or 80}
-    # noinspection PyTypeChecker
-    run(app, host=host, **run_args)
+    with Database(Path(database_path).resolve()) as settings.database:
+        # noinspection PyTypeChecker
+        run(app, host=host, **run_args)
