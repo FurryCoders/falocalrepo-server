@@ -112,7 +112,7 @@ async def auth_middleware(request: Request, call_next: Callable[[Request], Corou
     return Response("Incorrect username or password", status.HTTP_401_UNAUTHORIZED, {"WWW-Authenticate": "Basic"})
 
 
-def serve_error(request: Request, message: str, code: int):
+def serve_error(request: Request, message: str, code: int) -> Response:
     return templates.TemplateResponse(
         "error.html",
         {"title": f"{app.title} · Error {code}",
