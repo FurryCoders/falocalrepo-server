@@ -72,6 +72,7 @@ class Database(FADatabase):
         super(Database, self).__init__(database_path, make=False)
         self.connection.close()
         self.connection = connect(f"{self.database_path.as_uri()}?mode=ro", uri=True)
+        self.check_version(patch=False)
 
     @property
     def m_time(self):
