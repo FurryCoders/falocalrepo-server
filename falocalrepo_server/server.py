@@ -126,7 +126,8 @@ def serve_error(request: Request, message: str, code: int) -> Response:
 
 @app.on_event("startup")
 def log_settings():
-    logger.info(f"Using database: {settings.database.database_path}")
+    logger.info(f"Version: {__version__}")
+    logger.info(f"Using database: {settings.database.database_path} ({settings.database.version})")
     logger.info(f"Using SSL certificate: {settings.ssl_cert}") if settings.ssl_cert else None
     logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
     logger.info(f"Using HTTP Basic authentication") if settings.username or settings.password else None
