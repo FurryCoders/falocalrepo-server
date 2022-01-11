@@ -20,7 +20,7 @@ To install the program it is sufficient to use Python pip and get the package `f
 python3 -m pip install falocalrepo-server
 ```
 
-Python 3.9 or above is needed to run this program, all other dependencies are handled by pip during installation. For
+Python 3.10 or above is needed to run this program, all other dependencies are handled by pip during installation. For
 information on how to install Python on your computer, refer to the official
 website [Python.org](https://www.python.org/).
 
@@ -29,12 +29,15 @@ For the program to run, a properly formatted database created by falocalrepo nee
 ## Usage
 
 ```
-falocalrepo-server <database> [--host HOST] [--port PORT] [--ssl-cert SSL_CERT] [--ssl-key SSL_KEY] [--redirect-http REDIRECT_PORT]
+falocalrepo-server <database> [--host HOST] [--port PORT] [--ssl-cert SSL_CERT] [--ssl-key SSL_KEY] 
+                   [--redirect-http REDIRECT_PORT] [--auth <username>:<password>] [--precache]
 ```
 
 The server needs one argument pointing at the location of a valid [falocalrepo](https://pypi.org/project/falocalrepo/)
 database and accepts optional arguments to manually set host, port, and an SSL certificate with key. By default, the
 server is run on 0.0.0.0:80 for HTTP (without certificate) and 0.0.0.0:443 for HTTPS (with certificate).
+
+The `--precache` options can be used to prepare an initial cache of results from the database to speed up searches.
 
 ### Redirect Mode
 
@@ -47,6 +50,11 @@ mode, two separate instances of the program are needed.
 
 Once the server is running the web app can be accessed at the address shown in the terminal.
 
+### Authentication
+
+The `--auth` option allows setting up a username and password to access the server using the HTTP Basic authentication
+protocol.
+
 ### Arguments
 
 | Argument          | Default                                          |
@@ -57,6 +65,8 @@ Once the server is running the web app can be accessed at the address shown in t
 | `--ssl-cert`      | None                                             |
 | `--ssl-key`       | None                                             |
 | `--redirect-http` | None                                             |
+| `--auth`          | None                                             |
+| `--precache`      | False                                            |
 
 ### Examples
 
@@ -73,6 +83,11 @@ falocalrepo-server ~/FA.db --host 127.0.0.1 --port 8080
 ```shell
 # Launch a redirect server that listens to port 80 and redirects to port 443 on host 0.0.0.0
 falocalrepo-server . --host 0.0.0.0 --port 80 --redirect-htpp 443
+```
+
+```shell
+# Launch a server with basic authentication using 'mickey' as username and 'mouse' as password
+falocalrepo-server ~/FA.db --auth mickey:mouse
 ```
 
 ```shell
@@ -145,11 +160,11 @@ for users searches.
 
 The controls at the top of the page allow to query the database and control the visualisation of the results.
 
-![browse controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/browse.png)
+![search controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/search.png)
 
 The _Search_ input allows to insert the search query.
 
-The _Add Field_ menu allows to insert a specific search field using a simple dropdown menu.
+The _Field_ menu allows to insert a specific search field using a simple dropdown menu.
 
 The _-_ button clears the search input field.
 
@@ -157,9 +172,17 @@ The _Sort By_ and _Order_ menus change the sorting field and order of the search
 default to descending ID, while users default to ascending username.
 
 The _View_ menu is only visible for submissions and allows changing between the (default) grid view to the list view
-used for journals and users. Submission thumbnails are visualised in both cases.
+used for journals and users. Submission thumbnails are visualised in both cases. The view setting is overridden and set
+to grid when the window width goes below a certain margin.
+
+_Note_: the view menu is not available available on all mobile devices when viewed in portrait orientation.
 
 The _Search_ button submits the search request using the current query and sorting settings.
+
+The _Browse_ button resets the current search query and reverts to browse mode (all entries).
+
+The _Search on Fur Affinity_ button opens the current search on Fur Affinity, translating the common search and sorting
+fields. Common search fields are tags, author, description, and fileurl/fileext.
 
 Under the search controls are the number of results and current page.
 
@@ -259,7 +282,7 @@ Search for text submissions with PDF files:
 
 The user page shows information about submissions and journals related to a user (gallery, scraps, favorites, mentions,
 and journals) and what folders have been set for download. See [falocalrepo](https://pypi.org/project/falocalrepo/) for
-more details on this.
+more details on this. The user's profile will be displayed if present in the databse.
 
 Clicking on any of the counters opens the relevant results via the search interface, allowing to refine the search
 further.
