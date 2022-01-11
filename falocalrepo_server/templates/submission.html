@@ -72,7 +72,7 @@
 </head>
 <body>
 <div id="submission_file">
-    {% if submission["FILESAVED"] < 10 %}
+    {% if submission["FILESAVED"] < 2 %}
         Submission has no file
     {% elif submission["TYPE"].lower() == "image" %}
         <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
