@@ -500,15 +500,7 @@ async def serve_user_json(username: str):
     user_entry: Optional[dict] = settings.database.load_user_uncached(username)
     user_stats: dict[str, int] = settings.database.load_user_stats_uncached(username)
 
-    return {"user": username,
-            "folders": user_entry["FOLDERS"] if user_entry else [],
-            "length": {
-                "gallery": user_stats["gallery"],
-                "scraps": user_stats["scraps"],
-                "favorites": user_stats["favorites"],
-                "mentions": user_stats["mentions"],
-                "journals": user_stats["journals"]
-            }}
+    return {"username": username, **{k.lower(): v for k, v in (user_entry or {}).items()}, "length": user_stats}
 
 
 def run_redirect(host: str, port_listen: int, port_redirect: int):
