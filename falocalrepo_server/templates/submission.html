@@ -123,7 +123,7 @@
         </tr>
         <tr>
             <td class="border">Date</td>
-            <td class="border overflow value">{{ submission["DATE"]|replace("T", " ") }}</td>
+            <td class="border overflow value">{{ submission["DATE"].strftime("%Y-%m-%d %H:%M") }}</td>
         </tr>
         <tr>
             <td class="border">Tags</td>

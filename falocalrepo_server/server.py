@@ -127,7 +127,7 @@ def serve_error(request: Request, message: str, code: int) -> Response:
 @app.on_event("startup")
 def log_settings():
     logger.info(f"Version: {__version__}")
-    logger.info(f"Using database: {settings.database.database_path} ({settings.database.version})")
+    logger.info(f"Using database: {settings.database.path} ({settings.database.version})")
     logger.info(f"Using SSL certificate: {settings.ssl_cert}") if settings.ssl_cert else None
     logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
     logger.info(f"Using HTTP Basic authentication") if settings.username or settings.password else None
@@ -135,13 +135,13 @@ def log_settings():
         for table in (settings.database.users, settings.database.submissions, settings.database.journals):
             for order in ("asc", "desc"):
                 logger.info(
-                    f"Caching {table.table.upper()}:{(sort := default_sort[table.table]).upper()}:{order.upper()}")
-                settings.database.load_search(table.table, "", sort, order)
+                    f"Caching {table.name.upper()}:{(sort := default_sort[table.name]).upper()}:{order.upper()}")
+                settings.database.load_search(table.name, "", sort, order)
 
 
 @app.on_event("shutdown")
 def close_database():
-    if settings.database.is_open():
+    if settings.database.is_open:
         settings.database.close()
 
 
@@ -272,6 +272,7 @@ async def serve_user(request: Request, username: str):
          "favorites_length": user_stats["favorites"],
          "mentions_length": user_stats["mentions"],
          "journals_length": user_stats["journals"],
+         "userpage": user_entry["USERPAGE"],
          "request": request}
     )
 
@@ -339,7 +340,7 @@ async def serve_submission(request: Request, id_: int):
             f"Submission not found.<br>{button(f'{fa_base_url}/view/{id_}', 'Open on Fur Affinity')}", )
 
     f: Optional[Path] = None
-    if sub["FILEEXT"] == "txt" and sub["FILESAVED"] >= 10:
+    if sub["FILEEXT"] == "txt" and sub["FILESAVED"] & 0b10:
         f, _ = settings.database.load_submission_files(id_)
     p, n = settings.database.load_prev_next(submissions_table, id_)
     return templates.TemplateResponse(

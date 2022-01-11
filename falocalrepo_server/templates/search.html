@@ -370,8 +370,8 @@
                                 </a>
                             {% elif column == "DATE" %}
                                 <a class="cell-link" href="/{{ table_short }}/{{ item[column_id] }}">
-                                    <span class="date_date">{{ item[column].split("T")[0] }}</span>
-                                    <span class="date_time">{{ item[column].split("T")[1] }}</span>
+                                    <span class="date_date">{{ item[column].strftime("%Y-%m-%d") }}</span>
+                                    <span class="date_time">{{ item[column].strftime("%H:%M") }}</span>
                                 </a>
                             {% else %}
                                 <a class="cell-link" href="/{{ table_short }}/{{ item[column_id] }}">

@@ -26,6 +26,15 @@
             min-width: 100px;
             text-align: center;
         }
+
+        #user_profile {
+            width: 100%;
+            max-width: 600px;
+            top: 20px;
+            margin: auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
@@ -67,5 +76,12 @@
         <button>Open on Fur Affinity</button>
     </a>
 </div>
+{% if userpage != "" %}
+<div id="user_profile">
+    {% autoescape false %}
+    {{ userpage }}
+    {% endautoescape %}
+</div>
+{% endif %}
 </body>
 </html>

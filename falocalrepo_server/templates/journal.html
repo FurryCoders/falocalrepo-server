@@ -69,7 +69,7 @@
         </tr>
         <tr>
             <td class="border">Date</td>
-            <td class="overflow value border">{{ journal["DATE"]|replace("T", " ") }}</td>
+            <td class="overflow value border">{{ journal["DATE"].strftime("%Y-%m-%d %H:%M") }}</td>
         </tr>
         <tr>
             <td class="border">Mentions</td>

@@ -3,17 +3,18 @@ from pathlib import Path
 from re import match
 from re import split
 from re import sub
-from sqlite3 import connect
 from typing import Optional
 
-from falocalrepo_database import FADatabase
-from falocalrepo_database import FADatabaseTable
+from falocalrepo_database import Column
+from falocalrepo_database import Database as _Database
+from falocalrepo_database import Table
 from falocalrepo_database.selector import Selector
 from falocalrepo_database.selector import SelectorBuilder as Sb
+from falocalrepo_database.tables import SubmissionsColumns
+from falocalrepo_database.tables import UsersColumns
 from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
-from falocalrepo_database.types import Entry
 
 default_sort: dict[str, str] = {submissions_table: "id", journals_table: "id", users_table: "username"}
 default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
@@ -66,20 +67,23 @@ def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliase
     return " ".join(sql_elements), values
 
 
-class Database(FADatabase):
+class Database(_Database):
     def __init__(self, database_path: Path):
-        FADatabase.check_connection(database_path)
-        super(Database, self).__init__(database_path, make=False)
-        self.connection.close()
-        self.connection = connect(f"{self.database_path.as_uri()}?mode=ro", uri=True)
-        self.check_version(patch=False)
+        _Database.check_connection(database_path)
+        super().__init__(database_path, init=False, read_only=True)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
     @property
     def m_time(self):
-        return self.database_path.stat().st_mtime
+        return self.path.stat().st_mtime
 
     @cache
-    def _load_user_cached(self, user: str, *, _cache=None) -> Optional[Entry]:
+    def _load_user_cached(self, user: str, *, _cache=None) -> Optional[dict]:
         return self.users[user]
 
     @cache
@@ -87,25 +91,25 @@ class Database(FADatabase):
         return {
             "gallery": self.submissions.select(
                 Sb() & [Sb("replace(lower(author), '_', '')").__eq__(user), Sb("folder").__eq__("gallery")],
-                columns=["count(ID)"]
+                columns=[Column("count(ID)", int)]
             ).cursor.fetchone()[0],
             "scraps": self.submissions.select(
                 Sb() & [Sb("replace(lower(author), '_', '')").__eq__(user), Sb("folder").__eq__("scraps")],
-                columns=["count(ID)"]
+                columns=[Column("count(ID)", int)]
             ).cursor.fetchone()[0],
             "favorites": self.submissions.select(
-                Sb("favorite") % f"%|{user}|%", columns=["count(ID)"]
+                Sb("favorite") % f"%|{user}|%", columns=[Column("count(ID)", int)]
             ).cursor.fetchone()[0],
             "mentions": self.submissions.select(
-                Sb("mentions") % f"%|{user}|%", columns=["count(ID)"]
+                Sb("mentions") % f"%|{user}|%", columns=[Column("count(ID)", int)]
             ).cursor.fetchone()[0],
             "journals": self.journals.select(
-                Sb("replace(lower(author), '_', '')").__eq__(user), columns=["count(ID)"]
+                Sb("replace(lower(author), '_', '')").__eq__(user), columns=[Column("count(ID)", int)]
             ).cursor.fetchone()[0]
         }
 
     @cache
-    def _load_submission_cached(self, submission_id: int, *, _cache=None) -> Optional[Entry]:
+    def _load_submission_cached(self, submission_id: int, *, _cache=None) -> Optional[dict]:
         return self.submissions[submission_id]
 
     @cache
@@ -114,39 +118,41 @@ class Database(FADatabase):
         return self.submissions.get_submission_files(submission_id)
 
     @cache
-    def _load_journal_cached(self, journal_id: int, *, _cache=None) -> Optional[Entry]:
+    def _load_journal_cached(self, journal_id: int, *, _cache=None) -> Optional[dict]:
         return self.journals[journal_id]
 
     @cache
     def _load_prev_next_cached(self, table: str, item_id: int, *, _cache=None) -> tuple[int, int]:
-        table: FADatabaseTable = self[table]
+        table: Table = self[table]
         item: Optional[dict] = table[item_id]
         query: Selector = Sb("AUTHOR").__eq__(item["AUTHOR"])
         query = Sb() & [query, Sb("FOLDER").__eq__(item["FOLDER"])] if table == submissions_table else query
         return table.select(
             query,
-            columns=["LAG(ID, 1, 0) over (order by ID)", "LEAD(ID, 1, 0) over (order by ID)"],
+            columns=[Column("LAG(ID, 1, 0) over (order by ID)", int), Column("LEAD(ID, 1, 0) over (order by ID)", int)],
             order=[f"ABS(ID - {item_id})"],
             limit=1
         ).cursor.fetchone() if item else (0, 0)
 
     @cache
     def _load_search_cached(self, table: str, query: str, sort: str, order: str, *, _cache=None):
-        cols_results: list[str] = []
+        cols_results: list[Column]
         default_field: str = "any"
         sort = sort or default_sort[table]
         order = order or default_order[table]
+        db_table: Table
 
         if table in (submissions_table, journals_table):
-            cols_results = ["ID", "AUTHOR", "DATE", "TITLE"]
-        elif table == users_table:
-            cols_results = ["USERNAME", "FOLDERS"]
-            default_field = "username"
+            cols_results = [SubmissionsColumns.ID.value, SubmissionsColumns.AUTHOR.value,
+                            SubmissionsColumns.DATE.value, SubmissionsColumns.TITLE.value]
+            db_table = self.submissions if table == submissions_table else self.journals
+        else:
+            cols_results = [UsersColumns.USERNAME.value, UsersColumns.FOLDERS.value]
+            db_table = self.users
 
-        db_table: FADatabaseTable = self[table]
-        cols_table: list[str] = db_table.columns
-        cols_list: list[str] = db_table.list_columns
-        col_id: str = db_table.column_id
+        cols_table: list[str] = [c.name for c in db_table.columns]
+        cols_list: list[str] = [c.name for c in db_table.columns if c.type in (list, set)]
+        col_id: Column = db_table.key
 
         sql, values = query_to_sql(query,
                                    default_field,
@@ -155,47 +161,47 @@ class Database(FADatabase):
                                     "any": f"({'||'.join(cols_table)})"},
                                    score=sort == "relevance")
 
-        results: list[Entry]
+        results: list[dict]
         if sort == "relevance":
             results = [
-                dict(zip(cols_results + ["RELEVANCE"], s)) for s in
+                dict(zip([c.name for c in cols_results] + ["RELEVANCE"], s)) for s in
                 db_table.select_sql(f"RELEVANCE > 0", values,
-                                    columns=[*cols_results, f"({sql if sql else 1}) as RELEVANCE"],
+                                    columns=[*cols_results, Column(f"({sql if sql else 1}) as RELEVANCE", int)],
                                     order=[f"{sort} {order}", f"{default_sort[table]} {default_order[table]}"]).cursor]
         else:
             results = list(db_table.select_sql(sql, values, columns=cols_results, order=[f"{sort} {order}"]))
         return (
             results,
             cols_table + ["RELEVANCE"],
-            cols_results + (["RELEVANCE"] if sort == "relevance" else []),
+            [c.name for c in cols_results] + (["RELEVANCE"] if sort == "relevance" else []),
             cols_list,
-            col_id,
+            col_id.name,
             sort,
             order
         )
 
     @cache
     def _load_files_folder_cached(self, *, _cache=None) -> Path:
-        return self.files_folder
+        return self.settings.files_folder.resolve()
 
     @cache
     def _load_info_cached(self, *, _cache=None) -> tuple[int, int, int, str]:
         return len(self.users), len(self.submissions), len(
             self.journals), self.version
 
-    def load_user(self, user: str) -> Optional[Entry]:
+    def load_user(self, user: str) -> Optional[dict]:
         return self._load_user_cached(user, _cache=self.m_time)
 
     def load_user_stats(self, user: str) -> dict[str, int]:
         return self._load_user_stats_cached(user, _cache=self.m_time)
 
-    def load_submission(self, submission_id: int) -> Optional[Entry]:
+    def load_submission(self, submission_id: int) -> Optional[dict]:
         return self._load_submission_cached(submission_id, _cache=self.m_time)
 
     def load_submission_files(self, submission_id: int) -> tuple[Optional[Path], Optional[Path]]:
         return self._load_submission_files_cached(submission_id, _cache=self.m_time)
 
-    def load_journal(self, journal_id: int) -> Optional[Entry]:
+    def load_journal(self, journal_id: int) -> Optional[dict]:
         return self._load_journal_cached(journal_id, _cache=self.m_time)
 
     def load_prev_next(self, table: str, item_id: int) -> tuple[int, int]:
@@ -210,19 +216,19 @@ class Database(FADatabase):
     def load_info(self) -> tuple[int, int, int, str]:
         return self._load_info_cached(_cache=self.m_time)
 
-    def load_user_uncached(self, user: str) -> Optional[Entry]:
+    def load_user_uncached(self, user: str) -> Optional[dict]:
         return self._load_user_cached.__wrapped__(self, user)
 
     def load_user_stats_uncached(self, user: str) -> dict[str, int]:
         return self._load_user_stats_cached.__wrapped__(self, user)
 
-    def load_submission_uncached(self, submission_id: int) -> Optional[Entry]:
+    def load_submission_uncached(self, submission_id: int) -> Optional[dict]:
         return self._load_submission_cached.__wrapped__(self, submission_id)
 
     def load_submission_files_uncached(self, submission_id: int) -> tuple[Optional[Path], Optional[Path]]:
         return self._load_submission_files_cached.__wrapped__(self, submission_id)
 
-    def load_journal_uncached(self, journal_id: int) -> Optional[Entry]:
+    def load_journal_uncached(self, journal_id: int) -> Optional[dict]:
         return self._load_journal_cached.__wrapped__(self, journal_id)
 
     def load_prev_next_uncached(self, table: str, item_id: int) -> tuple[int, int]:
