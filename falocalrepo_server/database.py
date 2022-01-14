@@ -3,6 +3,7 @@ from pathlib import Path
 from re import match
 from re import split
 from re import sub
+from sqlite3 import DatabaseError
 from typing import Optional
 
 from falocalrepo_database import Column
@@ -71,6 +72,8 @@ class Database(_Database):
     def __init__(self, database_path: Path):
         _Database.check_connection(database_path)
         super().__init__(database_path, read_only=True)
+        if not self.is_formatted:
+            raise DatabaseError("Database not formatted")
 
     def __enter__(self):
         return self
