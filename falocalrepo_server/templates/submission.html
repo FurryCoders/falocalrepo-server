@@ -198,9 +198,9 @@
     </table>
     <br>
     <a class="nocolor"
-       href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" {{ "disabled" if submission["FILESAVED"] < 10 }}
+       href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" {{ "disabled" if submission["FILESAVED"] < 2 }}
        download>
-        <button {{ "disabled" if submission["FILESAVED"] < 10 }}>Download File</button>
+        <button {{ "disabled" if submission["FILESAVED"] < 2 }}>Download File</button>
     </a>
     <a class="nocolor"
        href="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
