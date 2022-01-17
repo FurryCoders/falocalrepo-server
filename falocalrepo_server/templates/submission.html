@@ -50,9 +50,15 @@
             top: 20px;
             margin: auto;
             text-align: justify;
-            font-family: serif;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        #submission_description .bbcode_center {
+            width: 100%;
+            margin: auto;
+            text-align: center;
+            font-family: inherit;
         }
 
         #submission_metadata table {
@@ -244,6 +250,13 @@
 
     document.querySelectorAll("#submission_description a, #submission_file pre a")
         .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
+
+    document.querySelectorAll("#submission_description code").forEach((e) => {
+        const r = document.createElement("div")
+        r.innerHTML = e.innerHTML
+        r.classList = e.classList
+        e.parentNode.replaceChild(r, e)
+    })
 </script>
 </body>
 </html>

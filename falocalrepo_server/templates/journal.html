@@ -19,13 +19,20 @@
         }
 
         #journal_content {
+            width: 100%;
             max-width: 600px;
             top: 20px;
             margin: auto;
             text-align: justify;
-            font-family: serif;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        #journal_content .bbcode_center {
+            width: 100%;
+            margin: auto;
+            text-align: center;
+            font-family: inherit;
         }
 
         #journal_metadata table {
@@ -116,6 +123,13 @@
 
     document.querySelectorAll("#journal_content a")
         .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
+
+    document.querySelectorAll("#journal_content code").forEach((e) => {
+        const r = document.createElement("div")
+        r.innerHTML = e.innerHTML
+        r.classList = e.classList
+        e.parentNode.replaceChild(r, e)
+    })
 </script>
 </body>
 </html>
