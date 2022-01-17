@@ -5,7 +5,6 @@ publish:
   stage: Publish
   only:
     - tags
-    - master
   image: python:3.10
   before_script:
     - python --version
