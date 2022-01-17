@@ -307,7 +307,7 @@ counterpart, and navigate the other submissions from the author.
 
 The _Download File_ button opens the submission file in the current browser tab.
 
-The _Download Submission as ZIP_ button generates a ZIP file containing the submission file, submission thumbnail,
+The _Download as ZIP_ button generates a ZIP file containing the submission file, submission thumbnail,
 description HTML, and metadata in JSON format.
 
 The _Open on Fur Affinity_ button opens the submission on Fur Affinity
@@ -329,7 +329,7 @@ and navigate the other journals from the same user.
 
 ![journal controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/journal.png)
 
-The _Download Journal as ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON
+The _Download as ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON
 format.
 
 The _Open on Fur Affinity_ button opens the journal on Fur Affinity
