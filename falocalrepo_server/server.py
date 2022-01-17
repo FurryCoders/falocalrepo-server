@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import reduce
 from io import BytesIO
 from json import dumps
@@ -100,6 +101,10 @@ app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
 def tags_to_html(text: str) -> str:
     return reduce(lambda t, es: es[0].sub(es[1], t), tags_expressions, text)
+
+
+def serialise_entry(entry: dict) -> dict:
+    return {k: sorted(v) if isinstance(v, set) else str(v) if isinstance(v, datetime) else v for k, v in entry.items()}
 
 
 async def auth_middleware(request: Request, call_next: Callable[[Request], Coroutine[Any, Any, Response]]) -> Response:
@@ -405,7 +410,8 @@ async def serve_submission_zip(id_: int, _filename=None):
         z.writestr(sub_file.name, sub_file.read_bytes()) if sub_file else None
         z.writestr(sub_thumb.name, sub_thumb.read_bytes()) if sub_thumb else None
         z.writestr("description.html", sub["DESCRIPTION"].encode())
-        z.writestr("metadata.json", dumps({k: v for k, v in sub.items() if k != "DESCRIPTION"}).encode())
+        z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(sub).items()
+                                           if k != "DESCRIPTION"}).encode())
 
     f_obj.seek(0)
     return StreamingResponse(f_obj, media_type="application/zip")
@@ -437,7 +443,8 @@ async def serve_journal_zip(id_: int, _filename=None):
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
         z.writestr("content.html", jrnl["CONTENT"].encode())
-        z.writestr("metadata.json", dumps({k: v for k, v in jrnl.items() if k != "CONTENT"}).encode())
+        z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(jrnl).items()
+                                           if k != "CONTENT"}).encode())
 
     f_obj.seek(0)
     return StreamingResponse(f_obj, media_type="application/zip")
