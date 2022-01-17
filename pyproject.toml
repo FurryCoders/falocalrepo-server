@@ -20,11 +20,11 @@ falocalrepo-server = "falocalrepo_server.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-falocalrepo-database = "~5.0.4"
+falocalrepo-database = "~5.0.5"
 chardet = "^4.0.0"
 Pillow = "^8.1.0"
-fastapi = "^0.71.0"
-uvicorn = "^0.16.0"
+fastapi = "^0.72.0"
+uvicorn = "^0.17.0"
 Jinja2 = "^3.0.3"
 
 [tool.poetry.dev-dependencies]
