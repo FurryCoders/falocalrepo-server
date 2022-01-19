@@ -5,8 +5,8 @@ description = "Web interface for falocalrepo."
 authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
 license = "EUPL-1.2"
 readme = "README.md"
-homepage = "https://gitlab.com/MatteoCampinoti94/falocalrepo-server"
-repository = "https://gitlab.com/MatteoCampinoti94/falocalrepo-server"
+homepage = "https://github.com/FurryCoders/falocalrepo-server"
+repository = "https://github.com/FurryCoders/falocalrepo-server"
 classifiers = [
     "Programming Language :: Python :: 3.10",
     "Operating System :: OS Independent",
@@ -14,6 +14,10 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: End Users/Desktop",
 ]
+
+[tool.poetry.urls]
+"Source" = "https://github.com/FurryCoders/falocalrepo-server"
+"Download" = "https://pypi.org/project/falocalrepo-server/#files"
 
 [tool.poetry.scripts]
 falocalrepo-server = "falocalrepo_server.__main__:main"
