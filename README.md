@@ -7,7 +7,7 @@
 Web interface for [falocalrepo](https://pypi.org/project/falocalrepo/).
 
 [![](https://img.shields.io/pypi/v/falocalrepo-server?logo=pypi)](https://pypi.org/project/falocalrepo-server/)
-[![](https://img.shields.io/githab/v/tag/FurryCoders/falocalrepo-server?label=github&sort=date&logo=github&color=blue)](https://github.com/FurryCoders/falocalrepo-server)
+[![](https://img.shields.io/github/v/tag/FurryCoders/falocalrepo-server?label=github&sort=date&logo=github&color=blue)](https://github.com/FurryCoders/falocalrepo-server)
 [![](https://img.shields.io/pypi/pyversions/falocalrepo-server?logo=Python)](https://www.python.org)
 
 </div>
