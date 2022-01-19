@@ -11,9 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build and publish to pypi
-        uses: JRubics/poetry-publish@v1.9
+      - uses: actions/setup-python@v2
         with:
-          python_version: "3.10.1"
-          poetry_version: "1.1.12"
-          pypi_token: ${{ secrets.PYPI_API_TOKEN }}
+          python-version: "3.10.1"
+      - uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: "1.1.12"
+      - name: Build and publish
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install --no-root
+          poetry publish --build --username $USER --password $PASSWORD
