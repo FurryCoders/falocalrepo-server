@@ -86,7 +86,7 @@ class Database(_Database):
         return self.path.stat().st_mtime
 
     @cache
-    def _load_user_cached(self, user: str, *, _cache=None) -> Optional[dict]:
+    def _load_user_cached(self, user: str, *, _cache=None) -> dict | None:
         return self.users[user]
 
     @cache
@@ -112,22 +112,22 @@ class Database(_Database):
         }
 
     @cache
-    def _load_submission_cached(self, submission_id: int, *, _cache=None) -> Optional[dict]:
+    def _load_submission_cached(self, submission_id: int, *, _cache=None) -> dict | None:
         return self.submissions[submission_id]
 
     @cache
     def _load_submission_files_cached(self, submission_id: int, *, _cache=None
-                                      ) -> tuple[Optional[Path], Optional[Path]]:
+                                      ) -> tuple[Path | None, Path | None]:
         return self.submissions.get_submission_files(submission_id)
 
     @cache
-    def _load_journal_cached(self, journal_id: int, *, _cache=None) -> Optional[dict]:
+    def _load_journal_cached(self, journal_id: int, *, _cache=None) -> dict | None:
         return self.journals[journal_id]
 
     @cache
     def _load_prev_next_cached(self, table: str, item_id: int, *, _cache=None) -> tuple[int, int]:
         table: Table = self[table]
-        item: Optional[dict] = table[item_id]
+        item: dict | None = table[item_id]
         query: Selector = Sb("AUTHOR").__eq__(item["AUTHOR"])
         query = Sb() & [query, Sb("FOLDER").__eq__(item["FOLDER"])] if table == submissions_table else query
         return table.select(
@@ -192,19 +192,19 @@ class Database(_Database):
         return len(self.users), len(self.submissions), len(
             self.journals), self.version
 
-    def load_user(self, user: str) -> Optional[dict]:
+    def load_user(self, user: str) -> dict | None:
         return self._load_user_cached(user, _cache=self.m_time)
 
     def load_user_stats(self, user: str) -> dict[str, int]:
         return self._load_user_stats_cached(user, _cache=self.m_time)
 
-    def load_submission(self, submission_id: int) -> Optional[dict]:
+    def load_submission(self, submission_id: int) -> dict | None:
         return self._load_submission_cached(submission_id, _cache=self.m_time)
 
-    def load_submission_files(self, submission_id: int) -> tuple[Optional[Path], Optional[Path]]:
+    def load_submission_files(self, submission_id: int) -> tuple[Path | None, Path | None]:
         return self._load_submission_files_cached(submission_id, _cache=self.m_time)
 
-    def load_journal(self, journal_id: int) -> Optional[dict]:
+    def load_journal(self, journal_id: int) -> dict | None:
         return self._load_journal_cached(journal_id, _cache=self.m_time)
 
     def load_prev_next(self, table: str, item_id: int) -> tuple[int, int]:
@@ -219,19 +219,19 @@ class Database(_Database):
     def load_info(self) -> tuple[int, int, int, str]:
         return self._load_info_cached(_cache=self.m_time)
 
-    def load_user_uncached(self, user: str) -> Optional[dict]:
+    def load_user_uncached(self, user: str) -> dict | None:
         return self._load_user_cached.__wrapped__(self, user)
 
     def load_user_stats_uncached(self, user: str) -> dict[str, int]:
         return self._load_user_stats_cached.__wrapped__(self, user)
 
-    def load_submission_uncached(self, submission_id: int) -> Optional[dict]:
+    def load_submission_uncached(self, submission_id: int) -> dict | None:
         return self._load_submission_cached.__wrapped__(self, submission_id)
 
-    def load_submission_files_uncached(self, submission_id: int) -> tuple[Optional[Path], Optional[Path]]:
+    def load_submission_files_uncached(self, submission_id: int) -> tuple[Path | None, Path | None]:
         return self._load_submission_files_cached.__wrapped__(self, submission_id)
 
-    def load_journal_uncached(self, journal_id: int) -> Optional[dict]:
+    def load_journal_uncached(self, journal_id: int) -> dict | None:
         return self._load_journal_cached.__wrapped__(self, journal_id)
 
     def load_prev_next_uncached(self, table: str, item_id: int) -> tuple[int, int]:

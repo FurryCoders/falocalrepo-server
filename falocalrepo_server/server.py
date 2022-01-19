@@ -13,8 +13,6 @@ from sqlite3 import DatabaseError
 from typing import Any
 from typing import Callable
 from typing import Coroutine
-from typing import Optional
-from typing import Union
 from zipfile import ZipFile
 
 from PIL import Image
@@ -264,7 +262,7 @@ async def serve_user(request: Request, username: str):
     if username != (username_clean := clean_username(username)):
         return RedirectResponse(app.url_path_for(serve_user.__name__, username=username_clean))
 
-    user_entry: Optional[dict] = settings.database.load_user(username)
+    user_entry: dict | None = settings.database.load_user(username)
     user_stats: dict[str, int] = settings.database.load_user_stats(username)
 
     return templates.TemplateResponse(
@@ -344,7 +342,7 @@ async def serve_submission(request: Request, id_: int):
             404,
             f"Submission not found.<br>{button(f'{fa_base_url}/view/{id_}', 'Open on Fur Affinity')}", )
 
-    f: Optional[Path] = None
+    f: Path | None = None
     if sub["FILEEXT"] == "txt" and sub["FILESAVED"] & 0b10:
         f, _ = settings.database.load_submission_files(id_)
     p, n = settings.database.load_prev_next(submissions_table, id_)
@@ -504,7 +502,7 @@ async def serve_journal_json(id_: int):
 @app.post("/json/user/{username}", response_class=JSONResponse)
 async def serve_user_json(username: str):
     username = clean_username(username)
-    user_entry: Optional[dict] = settings.database.load_user_uncached(username)
+    user_entry: dict | None = settings.database.load_user_uncached(username)
     user_stats: dict[str, int] = settings.database.load_user_stats_uncached(username)
 
     return {"username": username, **{k.lower(): v for k, v in (user_entry or {}).items()}, "length": user_stats}
@@ -522,8 +520,8 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
     run(redirect_app, host=host, port=port_listen)
 
 
-def server(database_path: Union[str, PathLike], host: str = "0.0.0.0", port: int = None,
-           ssl_cert: Union[str, PathLike] = None, ssl_key: Union[str, PathLike] = None,
+def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = None,
+           ssl_cert: str | PathLike | None = None, ssl_key: str | PathLike | None = None,
            redirect_port: int = None, precache: bool = False, authentication: str = None):
     if redirect_port:
         return run_redirect(host, port, redirect_port)
