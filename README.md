@@ -1,6 +1,6 @@
 <div align="center">
 
-<img alt="logo" width="400" src="https://gitlab.com/uploads/-/system/project/avatar/21246427/logo.png">
+<img alt="logo" width="400" src="https://raw.githubusercontent.com/FurryCoders/Logos/main/logos/falocalrepo-server-transparent.png">
 
 # FALocalRepo-Server
 
