@@ -6,9 +6,9 @@
 
 Web interface for [falocalrepo](https://pypi.org/project/falocalrepo/).
 
-[![version_pypi](https://img.shields.io/pypi/v/falocalrepo-server?logo=pypi)](https://pypi.org/project/falocalrepo-server/)
-[![version_gitlab](https://img.shields.io/gitlab/v/tag/MatteoCampinoti94/falocalrepo-server?label=version&sort=date&logo=gitlab&color=FCA121)](https://gitlab.com/MatteoCampinoti94/falocalrepo-server)
-[![version_python](https://img.shields.io/pypi/pyversions/falocalrepo-server?logo=Python)](https://www.python.org)
+[![](https://img.shields.io/pypi/v/falocalrepo-server?logo=pypi)](https://pypi.org/project/falocalrepo-server/)
+[![](https://img.shields.io/githab/v/tag/FurryCoders/falocalrepo-server?label=github&sort=date&logo=github&color=blue)](https://github.com/FurryCoders/falocalrepo-server)
+[![](https://img.shields.io/pypi/pyversions/falocalrepo-server?logo=Python)](https://www.python.org)
 
 </div>
 
@@ -162,7 +162,7 @@ The controls at the top of the page allow to query the database and control the 
 
 <div align="center">
 
-![search controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/search.png)
+![search controls](https://github.com/FurryCoders/falocalrepo-server/-/raw/master/doc/search.png)
 
 </div>
 
@@ -309,7 +309,7 @@ counterpart, and navigate the other submissions from the author.
 
 <div align="center">
 
-![submission controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/submission.png)
+![submission controls](https://github.com/FurryCoders/falocalrepo-server/-/raw/master/doc/submission.png)
 
 </div>
 
@@ -337,7 +337,7 @@ and navigate the other journals from the same user.
 
 <div align="center">
 
-![journal controls](https://gitlab.com/MatteoCampinoti94/falocalrepo-server/-/raw/master/doc/journal.png)
+![journal controls](https://github.com/FurryCoders/falocalrepo-server/-/raw/master/doc/journal.png)
 
 </div>
 
