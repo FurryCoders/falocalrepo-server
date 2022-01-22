@@ -244,8 +244,8 @@
 
     document.querySelectorAll("#submission_description a.iconusername > img")
         .forEach((icon) => {
-            icon.hidden = true
             icon.parentElement.innerText = `@${icon.title}`
+            icon.remove()
         })
 
     document.querySelectorAll("#submission_description a, #submission_file pre a")

@@ -117,8 +117,8 @@
 <script>
     document.querySelectorAll("#journal_content a.iconusername > img")
         .forEach((icon) => {
-            icon.hidden = true
             icon.parentElement.innerText = `@${icon.title}`
+            icon.remove()
         })
 
     document.querySelectorAll("#journal_content a")
