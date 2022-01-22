@@ -84,8 +84,7 @@
         <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
             <img src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
                  alt=""
-                 onerror="this.onload = null; this.src = '/static/not-found.png'"
-                 onload="$('download_file').disabled = false">
+                 onerror="this.onload = null; this.src = '/static/not-found.png'">
         </a>
     {% elif submission["TYPE"].lower() == "music" %}
         <div id="submission_thumbnail">
@@ -95,9 +94,7 @@
                  onerror="this.src = '/static/not-found.png'">
         </div>
         <br>
-        <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
-               onload="$('download_file').disabled = false"
-               controls>
+        <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" controls>
             File not found
         </audio>
     {% elif file_text is not none %}
