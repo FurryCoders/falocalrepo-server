@@ -79,38 +79,38 @@
 <body>
 <div id="submission_file">
     {% if submission["FILESAVED"] < 2 %}
-        Submission has no file
+    Submission has no file
     {% elif submission["TYPE"].lower() == "image" %}
-        <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
-            <img src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
-                 alt=""
-                 onerror="this.onload = null; this.src = '/static/not-found.png'">
-        </a>
+    <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+        <img src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
+             alt=""
+             onerror="this.onload = null; this.src = '/static/not-found.png'">
+    </a>
     {% elif submission["TYPE"].lower() == "music" %}
-        <div id="submission_thumbnail">
-            <br>
-            <img src="/submission/{{ submission["ID"] }}/thumbnail"
-                 alt=""
-                 onerror="this.src = '/static/not-found.png'">
-        </div>
+    <div id="submission_thumbnail">
         <br>
-        <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" controls>
-            File not found
-        </audio>
+        <img src="/submission/{{ submission["ID"] }}/thumbnail"
+             alt=""
+             onerror="this.src = '/static/not-found.png'">
+    </div>
+    <br>
+    <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" controls>
+        File not found
+    </audio>
     {% elif file_text is not none %}
-        <pre class="border">{% autoescape false %}{{ file_text }}{% endautoescape %}</pre>
+    <pre class="border">{% autoescape false %}{{ file_text }}{% endautoescape %}</pre>
     {% else %}
-        <div id="submission_thumbnail">
-            <br>
-            <img src="/submission/{{ submission["ID"] }}/thumbnail"
-                 alt=""
-                 onerror="this.src = '/static/not-found.png'">
-        </div>
+    <div id="submission_thumbnail">
         <br>
-        <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
-           style="border: 1px solid black; padding: 3px">
-            {{ filename|title }}
-        </a>
+        <img src="/submission/{{ submission["ID"] }}/thumbnail"
+             alt=""
+             onerror="this.src = '/static/not-found.png'">
+    </div>
+    <br>
+    <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
+       style="border: 1px solid black; padding: 3px">
+        {{ filename|title }}
+    </a>
     {% endif %}
 </div>
 <br>
