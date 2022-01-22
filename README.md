@@ -286,7 +286,7 @@ Search for text submissions with PDF files:
 
 The user page shows information about submissions and journals related to a user (gallery, scraps, favorites, mentions,
 and journals) and what folders have been set for download. See [falocalrepo](https://pypi.org/project/falocalrepo/) for
-more details on this. The user's profile will be displayed if present in the databse.
+more details on this. The user's profile will be displayed if present in the database.
 
 Clicking on any of the counters opens the relevant results via the search interface, allowing to refine the search
 further.
