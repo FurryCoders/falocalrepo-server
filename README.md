@@ -17,7 +17,7 @@ Web interface for [falocalrepo](https://pypi.org/project/falocalrepo/).
 To install the program it is sufficient to use Python pip and get the package `falocalrepo-server`.
 
 ```shell
-python3 -m pip install falocalrepo-server
+pip install falocalrepo-server
 ```
 
 Python 3.10 or above is needed to run this program, all other dependencies are handled by pip during installation. For
