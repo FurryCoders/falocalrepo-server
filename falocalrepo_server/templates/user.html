@@ -88,6 +88,15 @@
     {% endautoescape %}
 </div>
 <script>
+    document.querySelectorAll("#user_profile a.iconusername > img")
+        .forEach((icon) => {
+            icon.parentElement.innerText = `@${icon.title}`
+            icon.remove()
+        })
+
+    document.querySelectorAll("#user_profile a")
+        .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
+
     document.querySelectorAll("#user_profile code").forEach((e) => {
         const r = document.createElement("div")
         r.innerHTML = e.innerHTML
