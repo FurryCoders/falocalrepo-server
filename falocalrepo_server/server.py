@@ -275,7 +275,7 @@ async def serve_user(request: Request, username: str):
          "favorites_length": user_stats["favorites"],
          "mentions_length": user_stats["mentions"],
          "journals_length": user_stats["journals"],
-         "userpage": user_entry["USERPAGE"],
+         "userpage": user_entry["USERPAGE"] if user_entry else "",
          "request": request}
     )
 
