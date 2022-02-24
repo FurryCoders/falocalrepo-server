@@ -116,3 +116,6 @@ FA.*
 
 # certificates
 /cert
+
+# static folder link
+/static
