@@ -33,6 +33,7 @@ from fastapi.security import HTTPBasic
 from fastapi.security import HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from htmlmin import minify
 from pydantic import BaseModel
 from pydantic import BaseSettings
 from uvicorn import run
@@ -245,16 +246,15 @@ async def serve_user_mentions(request: Request, username: str):
 @app.get("/", response_class=HTMLResponse)
 async def serve_home(request: Request):
     usr_n, sub_n, jrn_n, version = settings.database.load_info()
-    return templates.TemplateResponse(
-        "info.html",
-        {"title": app.title,
-         "submissions_total": sub_n,
-         "journals_total": jrn_n,
-         "users_total": usr_n,
-         "version_db": version,
-         "version": __version__,
-         "request": request}
-    )
+    return HTMLResponse(minify(templates.get_template("info.html").render({
+        "title": app.title,
+        "submissions_total": sub_n,
+        "journals_total": jrn_n,
+        "users_total": usr_n,
+        "version_db": version,
+        "version": __version__,
+        "request": request}),
+        remove_comments=True))
 
 
 @app.get("/user/{username}", response_class=HTMLResponse)
@@ -265,19 +265,18 @@ async def serve_user(request: Request, username: str):
     user_entry: dict | None = settings.database.load_user(username)
     user_stats: dict[str, int] = settings.database.load_user_stats(username)
 
-    return templates.TemplateResponse(
-        "user.html",
-        {"title": f"{app.title} · {username}",
-         "user": username,
-         "folders": user_entry["FOLDERS"] if user_entry else [],
-         "gallery_length": user_stats["gallery"],
-         "scraps_length": user_stats["scraps"],
-         "favorites_length": user_stats["favorites"],
-         "mentions_length": user_stats["mentions"],
-         "journals_length": user_stats["journals"],
-         "userpage": user_entry["USERPAGE"] if user_entry else "",
-         "request": request}
-    )
+    return HTMLResponse(minify(templates.get_template("user.html").render({
+        "title": f"{app.title} · {username}",
+        "user": username,
+        "folders": user_entry["FOLDERS"] if user_entry else [],
+        "gallery_length": user_stats["gallery"],
+        "scraps_length": user_stats["scraps"],
+        "favorites_length": user_stats["favorites"],
+        "mentions_length": user_stats["mentions"],
+        "journals_length": user_stats["journals"],
+        "userpage": user_entry["USERPAGE"] if user_entry else "",
+        "request": request}),
+        remove_comments=True))
 
 
 @app.get("/search/{table}/", response_class=HTMLResponse)
@@ -311,28 +310,27 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
         order
     )
 
-    return templates.TemplateResponse(
-        "search.html",
-        {"title": f"{app.title} · " + (title or f"{request.url.path.split('/')[1].title()} {table.title()}"),
-         "action": request.url.path,
-         "table": table.lower(),
-         "query": query,
-         "sort": sort,
-         "order": order,
-         "view": view,
-         "allow_view": table == submissions_table,
-         "thumbnails": table == submissions_table,
-         "columns_table": columns_table,
-         "columns_results": columns_results,
-         "columns_list": columns_list,
-         "column_id": column_id,
-         "limit": limit,
-         "page": page,
-         "offset": (offset := (page - 1) * limit),
-         "results": results[offset:offset + limit],
-         "results_total": len(results),
-         "request": request}
-    )
+    return HTMLResponse(minify(templates.get_template("search.html").render({
+        "title": f"{app.title} · " + (title or f"{request.url.path.split('/')[1].title()} {table.title()}"),
+        "action": request.url.path,
+        "table": table.lower(),
+        "query": query,
+        "sort": sort,
+        "order": order,
+        "view": view,
+        "allow_view": table == submissions_table,
+        "thumbnails": table == submissions_table,
+        "columns_table": columns_table,
+        "columns_results": columns_results,
+        "columns_list": columns_list,
+        "column_id": column_id,
+        "limit": limit,
+        "page": page,
+        "offset": (offset := (page - 1) * limit),
+        "results": results[offset:offset + limit],
+        "results_total": len(results),
+        "request": request}),
+        remove_comments=True))
 
 
 @app.get("/submission/{id_}/", response_class=HTMLResponse)
@@ -346,17 +344,16 @@ async def serve_submission(request: Request, id_: int):
     if sub["FILEEXT"] == "txt" and sub["FILESAVED"] & 0b10:
         f, _ = settings.database.load_submission_files(id_)
     p, n = settings.database.load_prev_next(submissions_table, id_)
-    return templates.TemplateResponse(
-        "submission.html",
-        {"title": f"{app.title} · {sub['TITLE']} by {sub['AUTHOR']}",
-         "submission": sub,
-         "file_text": tags_to_html(f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"])) if f else None,
-         "filename": f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
-         "filename_id": f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
-         "prev": p,
-         "next": n,
-         "request": request}
-    )
+    return HTMLResponse(minify(templates.get_template("submission.html").render({
+        "title": f"{app.title} · {sub['TITLE']} by {sub['AUTHOR']}",
+        "submission": sub,
+        "file_text": tags_to_html(f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"])) if f else None,
+        "filename": f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
+        "filename_id": f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
+        "prev": p,
+        "next": n,
+        "request": request}),
+        remove_comments=True))
 
 
 @app.get("/submission/{id_}/file/")
@@ -423,14 +420,13 @@ async def serve_journal(request: Request, id_: int):
             f"Journal not found.<br>{button(f'{fa_base_url}/journal/{id_}', 'Open on Fur Affinity')}")
 
     p, n = settings.database.load_prev_next(journals_table, id_)
-    return templates.TemplateResponse(
-        "journal.html",
-        {"title": f"{app.title} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
-         "journal": jrnl,
-         "prev": p,
-         "next": n,
-         "request": request}
-    )
+    return HTMLResponse(minify(templates.get_template("journal.html").render({
+        "title": f"{app.title} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
+        "journal": jrnl,
+        "prev": p,
+        "next": n,
+        "request": request}),
+        remove_comments=True))
 
 
 @app.get("/journal/{id_}/zip/")
