@@ -126,11 +126,11 @@ class Database(_Database):
 
     @cache
     def _load_prev_next_cached(self, table: str, item_id: int, *, _cache=None) -> tuple[int, int]:
-        table: Table = self[table]
-        item: dict | None = table[item_id]
+        db_table: Table = self[table]
+        item: dict | None = db_table[item_id]
         query: Selector = Sb("AUTHOR").__eq__(item["AUTHOR"])
-        query = Sb() & [query, Sb("FOLDER").__eq__(item["FOLDER"])] if table == submissions_table else query
-        return table.select(
+        query = Sb() & [query, Sb("FOLDER").__eq__(item["FOLDER"])] if table.upper() == submissions_table else query
+        return db_table.select(
             query,
             columns=[Column("LAG(ID, 1, 0) over (order by ID)", int), Column("LEAD(ID, 1, 0) over (order by ID)", int)],
             order=[f"ABS(ID - {item_id})"],
