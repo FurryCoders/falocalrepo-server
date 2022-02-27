@@ -1,54 +1,19 @@
 <!DOCTYPE html>
+<!--suppress HtmlDeprecatedAttribute, HtmlUnknownTarget, CssUnusedSymbol -->
 <html lang="en">
 <head>
     <title>{{ title }}</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="icon" href="/touch-icon.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="icon" href="/static/touch-icon.png">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" href="/static/apple-touch-icon-precomposed.png">
+    <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles/style.css">
     <style>
-        #submission_file {
-            width: 100%;
-            margin: auto;
-            text-align: center
-        }
-
-        #submission_file img {
-            height: available;
-            max-width: 100%;
-            max-height: 90vh;
-            margin: auto;
-            object-fit: contain;
-        }
-
-        #submission_file pre {
-            width: 90vw;
-            max-width: 750px;
-            margin: auto;
-            text-align: justify;
-            white-space: pre-wrap;
-            padding: 5px;
-            font-family: -moz-fixed, monospace;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        #submission_metadata {
-            width: 100%;
-            max-width: 100%;
-            top: 20px;
-            margin: auto;
-            text-align: center
-        }
-
         #submission_description {
-            width: 100%;
-            max-width: 600px;
-            top: 20px;
-            margin: auto;
             text-align: justify;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -60,192 +25,248 @@
             text-align: center;
             font-family: inherit;
         }
-
-        #submission_metadata table {
-            width: 100%;
-            max-width: 300px;
-            margin: auto;
-        }
-
-        #submission_metadata table td {
-            padding: 2px;
-        }
-
-        #submission_metadata .value {
-            max-width: 300px;
-        }
     </style>
 </head>
-<body>
-<div id="submission_file">
-    {% if submission["FILESAVED"] < 2 %}
-    Submission has no file
-    {% elif submission["TYPE"].lower() == "image" %}
-    <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
-        <img src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
-             alt=""
-             onerror="this.onload = null; this.src = '/static/not-found.png'">
-    </a>
-    {% elif submission["TYPE"].lower() == "music" %}
-    <div id="submission_thumbnail">
-        <br>
-        <img src="/submission/{{ submission["ID"] }}/thumbnail"
-             alt=""
-             onerror="this.src = '/static/not-found.png'">
+<body class="mt-4 mb-4">
+
+<div class="container">
+    <div class="row align-middle">
+        {% if submission["FILESAVED"] < 2 %}
+        <div class="col-8 d-none d-lg-block align-middle text-center mt-5 pt-5" id="submission_file">
+            <p class="badge bg-danger"><b>Submission has no file</b></p>
+        </div>
+        {% elif submission["TYPE"].lower() == "image" %}
+        <div class="col-8 d-none d-lg-block text-center" id="submission_file">
+            <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+                <img class="img-fluid rounded mx-auto fit-height"
+                     src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
+                     onerror="this.onload = null; this.src = '/static/not-found.png'">
+            </a>
+        </div>
+        {% elif submission["TYPE"].lower() == "music" %}
+        <div class="col-8 d-none d-lg-block align-middle text-center mt-5 pt-5" id="submission_file">
+            <img class="rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+                 onerror="this.src = '/static/not-found.png'">
+            <br>
+            <audio class="mt-1" src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" controls>
+                File not found
+            </audio>
+        </div>
+        {% elif file_text is not none %}
+        <div class="col-8 d-none d-lg-block text-center submission-text">
+            <div class="border rounded p-2 text-start font-monospace small overflow-scroll text-wrap fit-height">
+                {% autoescape false %}{{ file_text.strip() }}{% endautoescape %}
+            </div>
+        </div>
+        {% else %}
+        <div class="col-8 d-none d-lg-block align-middle text-center mt-5 pt-5" id="submission_file">
+            <img class="rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+                 onerror="this.src = '/static/not-found.png'">
+            <br>
+            <a class="mt-1 btn btn-sm btn-primary" href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+                {{ filename|title }}
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="col-12 col-lg-4 mx-auto" id="submission_metadata">
+            <div class="card h-100">
+                <h2 class="card-header">{{ submission["TITLE"] }}</h2>
+                <div class="d-lg-none border-bottom text-center">
+                    {% if submission["FILESAVED"] < 2 %}
+                    <div class="mt-1 ms-1 me-1">
+                        <span class="badge bg-danger overflow-hidden w-100">Submission has no file</span>
+                    </div>
+                    {% elif submission["TYPE"].lower() == "image" %}
+                    <div class="card-img-top">
+                        <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+                            <img class="img-fluid mx-auto fit-height"
+                                 src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
+                                 onerror="this.onload = null; this.src = '/static/not-found.png'">
+                        </a>
+                    </div>
+                    {% elif submission["TYPE"].lower() == "music" %}
+                    <div class="m-1">
+                        <img class="rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+                             onerror="this.src = '/static/not-found.png'">
+                        <br>
+                        <audio class="mt-1" src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" controls>
+                            File not found
+                        </audio>
+                    </div>
+                    {% elif file_text is not none %}
+                    <div class="p-2 text-start font-monospace small overflow-scroll text-wrap fit-height submission-text">
+                        {% autoescape false %}{{ file_text.strip() }}{% endautoescape %}
+                    </div>
+                    {% else %}
+                    <div class="m-1">
+                        <img class="rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+                             onerror="this.src = '/static/not-found.png'">
+                        <br>
+                        <a class="mt-1 btn btn-sm btn-primary"
+                           href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+                            {{ filename|title }}
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <h6 class="col-4 card-title">Author</h6>
+                        <div class="col-8 card-text">
+                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                               href="/user/{{ submission["AUTHOR"] }}">{{ submission["AUTHOR"] }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-4 card-title">Date</h6>
+                        <div class="col-8 card-text">
+                            <span class="badge bg-secondary w-100 overflow-hidden text-decoration-none disabled">
+                                {{ submission["DATE"].strftime("%Y-%m-%d %H:%M") }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-4 card-title">Folder</h6>
+                        <div class="col-8 card-text">
+                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                               href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
+                                {{ submission["FOLDER"] }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-4 card-title">Category</h6>
+                        <div class="col-8 card-text">
+                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                               href="/search/submissions/?query=%40category%20%22{{ submission["CATEGORY"] }}%22">
+                                {{ submission["CATEGORY"] }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-4 card-title">Species</h6>
+                        <div class="col-8 card-text">
+                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                               href="/search/submissions/?query=%40species%20%22{{ submission["SPECIES"] }}%22">
+                                {{ submission["SPECIES"] }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-4 card-title">Gender</h6>
+                        <div class="col-8 card-text">
+                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                               href="/search/submissions/?query=%40gender%20%22{{ submission["GENDER"] }}%22">
+                                {{ submission["GENDER"] }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-4 card-title">Rating</h6>
+                        <div class="col-8 card-text">
+                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                               href="/search/submissions/?query=%40rating%20%22{{ submission["RATING"] }}%22">
+                                {{ submission["RATING"] }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-4 card-title">Tags</h6>
+                        <div class="col-8 card-text">
+                            {% for tag in submission["TAGS"] %}
+                                <a class="badge bg-primary bg-link overflow-hidden text-decoration-none"
+                                   href='/search/submissions/?query=%40tags%20%22%7C{{ tag }}%7C%22'>{{ tag }}</a>
+                            {% endfor %}
+                            {% if not submission["TAGS"] %}
+                                <span class="badge bg-danger w-100 overflow-hidden">No tags</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-4 card-title">Favorites</h6>
+                        <div class="col-8 card-text">
+                            {% for user in submission["FAVORITE"] %}
+                                <a class="badge bg-primary bg-link overflow-hidden text-decoration-none"
+                                   href="/user/{{ user }}">{{ user }}</a>
+                            {% endfor %}
+                            {% if not submission["FAVORITE"] %}
+                                <span class="badge bg-danger w-100 overflow-hidden">No favorites</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-4 card-title">Mentions</h6>
+                        <div class="col-8 card-text">
+                            {% for user in submission["MENTIONS"] %}
+                                <a class="badge bg-primary bg-link overflow-hidden text-decoration-none"
+                                   href="/user/{{ user }}">{{ user }}</a>
+                            {% endfor %}
+                            {% if not submission["MENTIONS"] %}
+                                <span class="badge bg-danger w-100 overflow-hidden">No mentions</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-sm btn-primary {{ "disabled" if submission["FILESAVED"] < 2 }}"
+                           href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" download>
+                            Download File
+                        </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary"
+                           href="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
+                            Download as ZIP
+                        </a>
+                    </div>
+                    <br>
+                    <a class="btn btn-sm btn-primary mt-1"
+                       href="https://www.furaffinity.net/view/{{ submission["ID"] }}">
+                        Open on Fur Affinity
+                    </a>
+                    <br>
+                    <div class="btn-group mt-1" role="group">
+                        <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
+                            Next
+                        </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
+                            Prev
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <br>
-    <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" controls>
-        File not found
-    </audio>
-    {% elif file_text is not none %}
-    <pre class="border">{% autoescape false %}{{ file_text }}{% endautoescape %}</pre>
-    {% else %}
-    <div id="submission_thumbnail">
-        <br>
-        <img src="/submission/{{ submission["ID"] }}/thumbnail"
-             alt=""
-             onerror="this.src = '/static/not-found.png'">
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body col-12 col-lg-8 mx-auto">
+                    <div class="card-text" id="submission_description">
+                        {% autoescape false %}{{ submission["DESCRIPTION"] }}{% endautoescape %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <br>
-    <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
-       style="border: 1px solid black; padding: 3px">
-        {{ filename|title }}
-    </a>
-    {% endif %}
-</div>
-<br>
-<div style="text-align: center"><h2>{{ submission["TITLE"] }}</h2></div>
-<br>
-<div id="submission_metadata">
-    <table class="border" style="max-width: 300px">
-        <tr>
-            <td class="border">Author</td>
-            <td class="border overflow value"><a href="/user/{{ submission["AUTHOR"] }}">
-                {{ submission["AUTHOR"] }}
-            </a></td>
-        </tr>
-        <tr>
-            <td class="border">Date</td>
-            <td class="border overflow value">{{ submission["DATE"].strftime("%Y-%m-%d %H:%M") }}</td>
-        </tr>
-        <tr>
-            <td class="border">Tags</td>
-            <td class="border overflow value">
-                {% for tag in submission["TAGS"] %}
-                    {% if tag != "" %}
-                        <a href='/search/submissions/?query=%40tags%20%22%7C{{ tag }}%7C%22'>{{ tag }}</a>
-                    {% endif %}
-                {% endfor %}
-            </td>
-        </tr>
-        <tr>
-            <td class="border">Category</td>
-            <td class="border overflow value">
-                <a href="/search/submissions/?query=%40category%20%22{{ submission["CATEGORY"] }}%22">
-                    {{ submission["CATEGORY"] }}
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <td class="border">Species</td>
-            <td class="border overflow value">
-                <a href="/search/submissions/?query=%40species%20%22{{ submission["SPECIES"] }}%22">
-                    {{ submission["SPECIES"] }}
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <td class="border">Gender</td>
-            <td class="border overflow value">
-                <a href="/search/submissions/?query=%40gender%20%22{{ submission["GENDER"] }}%22">
-                    {{ submission["GENDER"] }}
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <td class="border">Rating</td>
-            <td class="border overflow value">
-                <a href="/search/submissions/?query=%40rating%20%22{{ submission["RATING"] }}%22">
-                    {{ submission["RATING"] }}
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <td class="border">Folder</td>
-            <td class="border overflow value">
-                <a href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
-                    {{ submission["FOLDER"] }}
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <td class="border">Favorites</td>
-            <td class="border overflow value">
-                {% for user in submission["FAVORITE"] %}
-                    {% if user != "" %}
-                        <a href="/user/{{ user }}">{{ user }}</a>
-                    {% endif %}
-                {% endfor %}
-            </td>
-        </tr>
-        <tr>
-            <td class="border">Mentions</td>
-            <td class="border overflow value">
-                {% for user in submission["MENTIONS"] %}
-                    {% if user != "" %}
-                        <a href="/user/{{ user }}">{{ user }}</a>
-                    {% endif %}
-                {% endfor %}
-            </td>
-        </tr>
-    </table>
-    <br>
-    <a class="nocolor"
-       href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" {{ "disabled" if submission["FILESAVED"] < 2 }}
-       download>
-        <button {{ "disabled" if submission["FILESAVED"] < 2 }}>Download File</button>
-    </a>
-    <a class="nocolor"
-       href="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
-        <button>Download as ZIP</button>
-    </a>
-    <br>
-    <a class="nocolor" href="https://www.furaffinity.net/view/{{ submission["ID"] }}">
-        <button>Open on Fur Affinity</button>
-    </a>
-    <br>
-    <a class="nocolor" href="/submission/{{ next }}" {{ "disabled" if not next }}>
-        <button {{ "disabled" if not next }}>Next</button>
-    </a>
-    <a class="nocolor" href="/gallery/{{ submission["AUTHOR"] }}">
-        <button>Gallery</button>
-    </a>
-    <a class="nocolor" href="/submissions/{{ submission["AUTHOR"] }}">
-        <button>All</button>
-    </a>
-    <a class="nocolor" href="/scraps/{{ submission["AUTHOR"] }}">
-        <button>Scraps</button>
-    </a>
-    <a class="nocolor" href="/submission/{{ prev }}" {{ "disabled" if not prev }}>
-        <button {{ "disabled" if not prev }}>Prev</button>
-    </a>
-</div>
-<br><br>
-<div id="submission_description">
-    {% autoescape false %}
-    {{ submission["DESCRIPTION"] }}
-    {% endautoescape %}
 </div>
 <script>
-    const $ = (id) => document.getElementById(id)
-
     document.querySelectorAll("#submission_description a.iconusername > img")
         .forEach((icon) => {
             icon.parentElement.innerText = `@${icon.title}`
             icon.remove()
         })
 
-    document.querySelectorAll("#submission_description a, #submission_file pre a")
+    document.querySelectorAll("#submission_description a, .submission-text a")
         .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
 
     document.querySelectorAll("#submission_description code").forEach((e) => {

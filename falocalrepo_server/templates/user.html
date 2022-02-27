@@ -1,40 +1,22 @@
 <!DOCTYPE html>
+<!--suppress HtmlUnknownTarget, CssUnusedSymbol -->
 <html lang="en">
 <head>
     <title>{{ title }}</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="icon" href="/touch-icon.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/style.css">
     <style>
-        #user_metadata {
-            text-align: center;
-        }
-
-        #user_metadata table {
-            max-width: 90%;
-            top: 20px;
-            margin: auto;
-        }
-
-        #user_metadata table td {
-            padding: 2px;
-            width: fit-content;
-            min-width: 100px;
-            text-align: center;
-        }
-
-        #user_profile {
-            top: 20px;
-            margin: 20px;
-            overflow: hidden;
+        .user_profile {
             text-overflow: ellipsis;
         }
 
-        #user_profile .bbcode_center {
+        .user_profile .bbcode_center {
             width: 100%;
             margin: auto;
             text-align: center;
@@ -42,68 +24,128 @@
         }
     </style>
 </head>
-<body>
-<h2 style="text-align: center">{{ user }}</h2>
-<div id="user_metadata">
-    <table class="border">
-        <tr class="clickable hover_highlight">
-            <td class="border"><a class="cell-link" href="/submissions/{{ user }}">Submissions</a></td>
-            <td class="border"><a class="cell-link"
-                                  href="/submissions/{{ user }}">{{ gallery_length + scraps_length }}</a></td>
-        </tr>
-        <tr class="clickable hover_highlight">
-            <td class="border"><a class="cell-link" href="/gallery/{{ user }}">Gallery</a></td>
-            <td class="border"><a class="cell-link" href="/gallery/{{ user }}">{{ gallery_length }}</a></td>
-        </tr>
-        <tr class="clickable hover_highlight">
-            <td class="border"><a class="cell-link" href="/scraps/{{ user }}">Scraps</a></td>
-            <td class="border"><a class="cell-link" href="/scraps/{{ user }}">{{ scraps_length }}</a></td>
-        </tr>
-        <tr class="clickable hover_highlight">
-            <td class="border"><a class="cell-link" href="/favorites/{{ user }}">Favorites</a></td>
-            <td class="border"><a class="cell-link" href="/favorites/{{ user }}">{{ favorites_length }}</a></td>
-        </tr>
-        <tr class="clickable hover_highlight">
-            <td class="border"><a class="cell-link" href="/mentions/{{ user }}">Mentions</a></td>
-            <td class="border"><a class="cell-link" href="/mentions/{{ user }}">{{ mentions_length }}</a></td>
-        </tr>
-        <tr class="clickable hover_highlight">
-            <td class="border"><a class="cell-link" href="/journals/{{ user }}">Journals</a></td>
-            <td class="border"><a class="cell-link" href="/journals/{{ user }}">{{ journals_length }}</a></td>
-        </tr>
-        <tr class="">
-            <td class="border">Folders</td>
-            <td class="border">{{ " ".join(folders) }}</td>
-        </tr>
-    </table>
-    <br>
-    <a href="https://www.furaffinity.net/user/{{ user }}" class="nocolor">
-        <button>Open on Fur Affinity</button>
-    </a>
+<body class="mt-4 mb-4">
+<div class="container">
+    <div class="row align-middle">
+        {% if userpage != "" %}
+        <div class="col-8 d-none d-lg-block">
+            <div class="border rounded p-2 overflow-scroll text-wrap fit-height h-100 user_profile">
+                {% autoescape false %}{{ userpage }}{% endautoescape %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="col-12 col-lg-4 mx-auto">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h2>{{ user }}</h2>
+                    {% if not active %}
+                        <span class="badge bg-danger overflow-hidden w-100">Inactive</span>
+                    {% endif %}
+                </div>
+                {% if userpage != "" %}
+                <div class="col-12 d-lg-none border-bottom">
+                    <div class="p-2 overflow-scroll text-wrap fit-height user_profile">
+                        {% autoescape false %}{{ userpage }}{% endautoescape %}
+                    </div>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="row">
+                        <h6 class="col-5 col-xxl-4 card-title">Submissions</h6>
+                        <div class="col-7 col-xxl-8 card-text">
+                            <a href="/submissions/{{ user }}"
+                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                                {{ gallery_length + scraps_length }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-5 col-xxl-4 card-title">Gallery</h6>
+                        <div class="col-7 col-xxl-8 card-text">
+                            <a href="/gallery/{{ user }}"
+                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                                {{ gallery_length }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-5 col-xxl-4 card-title">Scraps</h6>
+                        <div class="col-7 col-xxl-8 card-text">
+                            <a href="/scraps/{{ user }}"
+                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                                {{ scraps_length }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-5 col-xxl-4 card-title">Favorites</h6>
+                        <div class="col-7 col-xxl-8 card-text">
+                            <a href="/favorites/{{ user }}"
+                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                                {{ favorites_length }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-5 col-xxl-4 card-title">Mentions</h6>
+                        <div class="col-7 col-xxl-8 card-text">
+                            <a href="/mentions/{{ user }}"
+                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                                {{ mentions_length }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-5 col-xxl-4 card-title">Journals</h6>
+                        <div class="col-7 col-xxl-8 card-text">
+                            <a href="/journals/{{ user }}"
+                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                                {{ journals_length }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <h6 class="col-5 col-xxl-4 card-title">Folders</h6>
+                        <div class="col-7 col-xxl-8 card-text">
+                            {% for folder in folders|sort %}
+                                <span class="badge bg-info overflow-hidden mw-100 overflow-hidden">{{ folder }}</span>
+                            {% endfor %}
+                            {% if not folders %}
+                                <span class="badge bg-danger w-100 overflow-hidden">No folders</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a class="btn btn-sm btn-primary"
+                       href="https://www.furaffinity.net/user/{{ user }}">
+                        Open on Fur Affinity
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 {% if userpage != "" %}
-<div id="user_profile">
-    {% autoescape false %}
-    {{ userpage }}
-    {% endautoescape %}
-</div>
-<script>
-    document.querySelectorAll("#user_profile a.iconusername > img")
-        .forEach((icon) => {
-            icon.parentElement.innerText = `@${icon.title}`
-            icon.remove()
+    <script>
+        document.querySelectorAll(".user_profile a.iconusername > img")
+            .forEach((icon) => {
+                icon.parentElement.innerText = `@${icon.title}`
+                icon.remove()
+            })
+
+        document.querySelectorAll(".user_profile a")
+            .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
+
+        document.querySelectorAll(".user_profile code").forEach((e) => {
+            const r = document.createElement("div")
+            r.innerHTML = e.innerHTML
+            r.classList = e.classList
+            e.parentNode.replaceChild(r, e)
         })
-
-    document.querySelectorAll("#user_profile a")
-        .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
-
-    document.querySelectorAll("#user_profile code").forEach((e) => {
-        const r = document.createElement("div")
-        r.innerHTML = e.innerHTML
-        r.classList = e.classList
-        e.parentNode.replaceChild(r, e)
-    })
-</script>
+    </script>
 {% endif %}
 </body>
 </html>

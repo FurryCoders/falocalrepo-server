@@ -94,8 +94,6 @@ tags_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"\n"), "<br/>")
 ]
 
-button: Callable[[str, str], str] = lambda h, t: f'<a href="{h}"><button>{t}</button></a>'
-
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
 
@@ -108,22 +106,30 @@ def serialise_entry(entry: dict) -> dict:
 
 
 async def auth_middleware(request: Request, call_next: Callable[[Request], Coroutine[Any, Any, Response]]) -> Response:
+    if request.url.path.startswith("/static"):
+        return await call_next(request)
+
     try:
         creds: HTTPBasicCredentials = await security(request)
         if compare_digest(creds.username, settings.username) and compare_digest(creds.password, settings.password):
             return await call_next(request)
     except HTTPException as err:
         if err.status_code != status.HTTP_401_UNAUTHORIZED:
-            return serve_error(request, err.detail, err.status_code)
-    return Response("Incorrect username or password", status.HTTP_401_UNAUTHORIZED, {"WWW-Authenticate": "Basic"})
+            return error_response(request, err.status_code, err.detail)
+
+    return Response(
+        error_response(request, status.HTTP_401_UNAUTHORIZED, "Incorrect username or password",
+                       [("Retry", str(request.url))]).body,
+        status.HTTP_401_UNAUTHORIZED, {"WWW-Authenticate": "Basic"})
 
 
-def serve_error(request: Request, message: str, code: int) -> Response:
+def error_response(request: Request, code: int, message: str = None, buttons: list[tuple[str, str]] = None) -> Response:
     return templates.TemplateResponse(
         "error.html",
         {"title": f"{app.title} · Error {code}",
          "code": code,
          "message": message,
+         "buttons": buttons,
          "request": request},
         code
     )
@@ -168,14 +174,14 @@ async def error_unknown(request: Request, err: HTTPException):
     logger.error(repr(err))
     if request.method == "POST":
         return JSONResponse({"errors": [{err.__class__.__name__: err.detail}]}, err.status_code)
-    return serve_error(request, err.detail or err.__class__.__name__, err.status_code)
+    return error_response(request, err.status_code, err.detail or None)
 
 
 @app.exception_handler(404)
 async def error_not_found(request: Request, err: HTTPException):
     if request.method == "POST":
         return JSONResponse({"errors": [{err.__class__.__name__: err.detail}]}, err.status_code)
-    return serve_error(request, err.detail or "Not found", err.status_code)
+    return error_response(request, err.status_code, err.detail or "Not found")
 
 
 @app.exception_handler(422)
@@ -184,7 +190,7 @@ async def error_not_found(request: Request, err: RequestValidationError):
     logger.error(f"{err.__class__.__name__} {err.errors()}")
     if request.method == "POST":
         return JSONResponse({"errors": err.errors()}, 422)
-    return serve_error(request, err.errors()[0].get("msg", None) or err.__class__.__name__, 422)
+    return error_response(request, 422, err.errors()[0].get("msg", None) or err.__class__.__name__)
 
 
 @app.exception_handler(DatabaseError)
@@ -192,7 +198,7 @@ async def error_database(request: Request, err: DatabaseError):
     logger.error(repr(err))
     if request.method == "POST":
         return JSONResponse({"errors": [{err.__class__.__name__: err.args}]}, 500)
-    return serve_error(request, err.__class__.__name__ + "<br/>" + "<br/>".join(err.args or []), 500)
+    return error_response(request, 500, err.__class__.__name__ + "<br/>" + "<br/>".join(err.args or []))
 
 
 @app.get("/view/{id_}", response_class=HTMLResponse)
@@ -270,6 +276,7 @@ async def serve_user(request: Request, username: str):
         "title": f"{app.title} · {username}",
         "user": username,
         "folders": user_entry["FOLDERS"] if user_entry else [],
+        "active": user_entry["ACTIVE"] if user_entry else True,
         "gallery_length": user_stats["gallery"],
         "scraps_length": user_stats["scraps"],
         "favorites_length": user_stats["favorites"],
@@ -294,9 +301,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
     limit: int = l if (l := int(args.get("limit", 48))) > 0 else 48
     sort: str = args.get("sort", default_sort[table]).lower()
     order: str = args.get("order", default_order[table]).lower()
-    view: str = args.get("view", "").lower()
-    view = "grid" if view not in ("list", "grid") and table == submissions_table else view
-    view = "list" if table != submissions_table else view
+    view: str = "grid" if (v := args.get("view", "").lower()) not in ("list", "grid") else v
 
     results: list[dict]
     columns_table: list[str]
@@ -337,9 +342,8 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
 @app.get("/submission/{id_}/", response_class=HTMLResponse)
 async def serve_submission(request: Request, id_: int):
     if (sub := settings.database.load_submission(id_)) is None:
-        raise HTTPException(
-            404,
-            f"Submission not found.<br>{button(f'{fa_base_url}/view/{id_}', 'Open on Fur Affinity')}", )
+        return error_response(request, 404, "Submission not found",
+                              [("Open on Fur Affinity", f"{fa_base_url}/view/{id_}")])
 
     f: Path | None = None
     if sub["FILEEXT"] == "txt" and sub["FILESAVED"] & 0b10:
@@ -416,9 +420,8 @@ async def serve_submission_zip(id_: int, _filename=None):
 @app.get("/journal/{id_}/", response_class=HTMLResponse)
 async def serve_journal(request: Request, id_: int):
     if (jrnl := settings.database.load_journal(id_)) is None:
-        raise HTTPException(
-            404,
-            f"Journal not found.<br>{button(f'{fa_base_url}/journal/{id_}', 'Open on Fur Affinity')}")
+        return error_response(request, 404, "Journal not found",
+                              [("Open on Fur Affinity", f"{fa_base_url}/journal/{id_}")])
 
     p, n = settings.database.load_prev_next(journals_table, id_)
     return HTMLResponse(minify(templates.get_template("journal.html").render({
