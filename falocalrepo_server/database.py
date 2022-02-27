@@ -4,7 +4,6 @@ from re import match
 from re import split
 from re import sub
 from sqlite3 import DatabaseError
-from typing import Optional
 
 from falocalrepo_database import Column
 from falocalrepo_database import Database as _Database
