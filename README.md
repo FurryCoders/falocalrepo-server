@@ -162,7 +162,9 @@ The controls at the top of the page allow to query the database and control the 
 
 <div align="center">
 
-![search controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search.png)
+![search controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-form.png)
+
+![search controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-nav.png)
 
 </div>
 
@@ -185,8 +187,8 @@ The _Search_ button submits the search request using the current query and sorti
 
 The _Browse_ button resets the current search query and reverts to browse mode (all entries).
 
-The _Search on Fur Affinity_ button opens the current search on Fur Affinity, translating the common search and sorting
-fields. Common search fields are tags, author, description, and fileurl/fileext.
+The _Search on FA_ button opens the current search on Fur Affinity, translating the shared search and sorting fields (
+tags, author, description, and fileurl/fileext). The button is only available when searching submissions.
 
 Under the search controls are the number of results and current page.
 
@@ -309,14 +311,14 @@ counterpart, and navigate the other submissions from the author.
 
 <div align="center">
 
-![submission controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/submission.png)
+![submission controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission.png)
 
 </div>
 
 The _Download File_ button opens the submission file in the current browser tab.
 
-The _Download as ZIP_ button generates a ZIP file containing the submission file, submission thumbnail,
-description HTML, and metadata in JSON format.
+The _Download as ZIP_ button generates a ZIP file containing the submission file, submission thumbnail, description
+HTML, and metadata in JSON format.
 
 The _Open on Fur Affinity_ button opens the submission on Fur Affinity
 
@@ -337,12 +339,11 @@ and navigate the other journals from the same user.
 
 <div align="center">
 
-![journal controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/journal.png)
+![journal controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-journal.png)
 
 </div>
 
-The _Download as ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON
-format.
+The _Download as ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON format.
 
 The _Open on Fur Affinity_ button opens the journal on Fur Affinity
 
