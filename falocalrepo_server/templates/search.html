@@ -233,10 +233,10 @@
                 <div class="card h-100">
                     <a href="/{{ table_short }}/{{ item[column_id] }}" class="text-decoration-none h-100">
                         {% if thumbnails %}
-                            <div class="text-center border-bottom w-100">
-                                <span class="spinner spinner-border spinner-border-sm mt-1" role="status"></span>
-                                <span class="error badge bg-danger text-wrap m-1" hidden>Thumbnail not found</span>
-                                <img class="card-img-top img-fluid"
+                            <div class="text-center border-bottom w-100 p-1">
+                                <span class="spinner spinner-border spinner-border-sm" role="status"></span>
+                                <span class="error badge bg-danger text-wrap mb-1" hidden>Thumbnail not found</span>
+                                <img class="card-img img-fluid"
                                      src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
                                      onload="this.hidden = false; this.parentNode.querySelector('.spinner').hidden = true"
                                      onerror="this.parentNode.querySelector('.spinner').hidden = true; this.parentNode.querySelector('.error').hidden = false"
