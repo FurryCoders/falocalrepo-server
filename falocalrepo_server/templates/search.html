@@ -234,12 +234,13 @@
                     <a href="/{{ table_short }}/{{ item[column_id] }}" class="text-decoration-none h-100">
                         {% if thumbnails %}
                             <div class="text-center border-bottom w-100">
-                                <span class="badge bg-danger text-wrap m-1" hidden>Thumbnail not found</span>
+                                <span class="spinner spinner-border spinner-border-sm mt-1" role="status"></span>
+                                <span class="error badge bg-danger text-wrap m-1" hidden>Thumbnail not found</span>
                                 <img class="card-img-top img-fluid"
                                      src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
-                                     onerror="this.hidden = true; this.parentNode.querySelector('span').hidden = false"
-                                     alt="{{ item["TITLE"] }}" title="{{ item["TITLE"] }}"
-                                     style="max-height: 150px; width: auto">
+                                     onload="this.hidden = false; this.parentNode.querySelector('.spinner').hidden = true"
+                                     onerror="this.parentNode.querySelector('.spinner').hidden = true; this.parentNode.querySelector('.error').hidden = false"
+                                     alt="" style="max-height: 150px; width: auto" hidden>
                             </div>
                         {% endif %}
                         {% if table in ("submissions", "journals") %}
