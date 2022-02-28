@@ -244,12 +244,12 @@
                             </div>
                         {% endif %}
                         {% if table in ("submissions", "journals") %}
-                            <div class="card-body overflow-hidden">
-                                <h6 class="card-title small my-auto" title="{{ item["TITLE"] }}">{{ item["TITLE"] }}</h6>
+                            <div class="card-body overflow-hidden p-1">
+                                <h6 class="card-title small m-0" title="{{ item["TITLE"] }}">{{ item["TITLE"] }}</h6>
                             </div>
                         {% elif table == "users" %}
                             <div class="card-body overflow-hidden text-center p-1">
-                                <h6 class="card-title small my-auto">{{ item["USERNAME"] }}</h6>
+                                <h6 class="card-title small mt-0 mb-0">{{ item["USERNAME"] }}</h6>
                                 {% if not item["ACTIVE"] %}
                                     <span class="badge bg-danger w-100">Inactive</span>
                                 {% endif %}
