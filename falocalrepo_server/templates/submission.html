@@ -38,7 +38,7 @@
         {% elif submission["TYPE"].lower() == "image" %}
         <div class="col-8 d-none d-lg-block text-center" id="submission_file">
             <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
-                <img class="img-fluid mx-auto fit-height"
+                <img class="img-fluid mx-auto"
                      src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
                      onerror="this.onload = null; this.src = '/static/not-found.png'">
             </a>
