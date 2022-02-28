@@ -126,7 +126,8 @@ async def auth_middleware(request: Request, call_next: Callable[[Request], Corou
 def error_response(request: Request, code: int, message: str = None, buttons: list[tuple[str, str]] = None) -> Response:
     return templates.TemplateResponse(
         "error.html",
-        {"title": f"{app.title} · Error {code}",
+        {"app": app.title,
+         "title": f"Error {code}",
          "code": code,
          "message": message,
          "buttons": buttons,
@@ -254,7 +255,8 @@ async def serve_user_mentions(request: Request, username: str):
 async def serve_home(request: Request):
     usr_n, sub_n, jrn_n, version = settings.database.load_info()
     return HTMLResponse(minify(templates.get_template("info.html").render({
-        "title": app.title,
+        "app": app.title,
+        "title": "",
         "submissions_total": sub_n,
         "journals_total": jrn_n,
         "users_total": usr_n,
@@ -273,7 +275,8 @@ async def serve_user(request: Request, username: str):
     user_stats: dict[str, int] = settings.database.load_user_stats(username)
 
     return HTMLResponse(minify(templates.get_template("user.html").render({
-        "title": f"{app.title} · {username}",
+        "app": app.title,
+        "title": username,
         "user": username,
         "folders": user_entry["FOLDERS"] if user_entry else [],
         "active": user_entry["ACTIVE"] if user_entry else True,
@@ -317,7 +320,8 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
     )
 
     return HTMLResponse(minify(templates.get_template("search.html").render({
-        "title": f"{app.title} · " + (title or f"{request.url.path.split('/')[1].title()} {table.title()}"),
+        "app": app.title,
+        "title": title or f"{request.url.path.split('/')[1].title()} {table.title()}",
         "action": request.url.path,
         "table": table.lower(),
         "query": query,
@@ -350,7 +354,8 @@ async def serve_submission(request: Request, id_: int):
         f, _ = settings.database.load_submission_files(id_)
     p, n = settings.database.load_prev_next(submissions_table, id_)
     return HTMLResponse(minify(templates.get_template("submission.html").render({
-        "title": f"{app.title} · {sub['TITLE']} by {sub['AUTHOR']}",
+        "app": app.title,
+        "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
         "submission": sub,
         "file_text": tags_to_html(f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"])) if f else None,
         "filename": f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
