@@ -233,19 +233,24 @@
                 <div class="card h-100">
                     <a href="/{{ table_short }}/{{ item[column_id] }}" class="text-decoration-none h-100">
                         {% if thumbnails %}
-                            <div class="text-center border-bottom w-100 p-1">
+                            <div class="card-header text-center p-0">
                                 <span class="spinner spinner-border spinner-border-sm" role="status"></span>
-                                <span class="error badge bg-danger text-wrap mb-1" hidden>Thumbnail not found</span>
-                                <img class="card-img img-fluid"
-                                     src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
-                                     onload="this.hidden = false; this.parentNode.querySelector('.spinner').hidden = true"
-                                     onerror="this.parentNode.querySelector('.spinner').hidden = true; this.parentNode.querySelector('.error').hidden = false"
-                                     alt="" style="max-height: 150px; width: auto" hidden>
+                                <span class="error fw-bold text-muted" style="font-size: .75rem" hidden>
+                                    Thumbnail not found
+                                </span>
+                                <div class="p-1" hidden>
+                                    <img class="card-img img-fluid"
+                                         src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
+                                         onload="this.parentNode.hidden = false; this.parentNode.parentNode.querySelector('.spinner').hidden = true"
+                                         onerror="const p = this.parentNode.parentNode; p.querySelector('.spinner').hidden = true; p.querySelector('.error').hidden = false"
+                                         alt="" style="max-height: 150px; width: auto">
+                                </div>
                             </div>
                         {% endif %}
                         {% if table in ("submissions", "journals") %}
-                            <div class="card-body overflow-hidden p-1">
-                                <h6 class="card-title small m-0" title="{{ item["TITLE"] }}">{{ item["TITLE"] }}</h6>
+                            <div class="card-body overflow-hidden text-center align-middle p-1">
+                                <span class="card-title fw-bold small m-0"
+                                      title="{{ item["TITLE"] }}">{{ item["TITLE"] }}</span>
                             </div>
                         {% elif table == "users" %}
                             <div class="card-body overflow-hidden text-center p-1">
