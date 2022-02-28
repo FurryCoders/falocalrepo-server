@@ -106,6 +106,19 @@ def serialise_entry(entry: dict) -> dict:
     return {k: sorted(v) if isinstance(v, set) else str(v) if isinstance(v, datetime) else v for k, v in entry.items()}
 
 
+def error_response(request: Request, code: int, message: str = None, buttons: list[tuple[str, str]] = None) -> Response:
+    return templates.TemplateResponse(
+        "error.html",
+        {"app": app.title,
+         "title": f"Error {code}",
+         "code": code,
+         "message": message,
+         "buttons": buttons,
+         "request": request},
+        code
+    )
+
+
 async def auth_middleware(request: Request, call_next: Callable[[Request], Coroutine[Any, Any, Response]]) -> Response:
     if request.url.path.startswith("/static"):
         return await call_next(request)
@@ -122,19 +135,6 @@ async def auth_middleware(request: Request, call_next: Callable[[Request], Corou
         error_response(request, status.HTTP_401_UNAUTHORIZED, "Incorrect username or password",
                        [("Retry", str(request.url))]).body,
         status.HTTP_401_UNAUTHORIZED, {"WWW-Authenticate": "Basic"})
-
-
-def error_response(request: Request, code: int, message: str = None, buttons: list[tuple[str, str]] = None) -> Response:
-    return templates.TemplateResponse(
-        "error.html",
-        {"app": app.title,
-         "title": f"Error {code}",
-         "code": code,
-         "message": message,
-         "buttons": buttons,
-         "request": request},
-        code
-    )
 
 
 @app.on_event("startup")
