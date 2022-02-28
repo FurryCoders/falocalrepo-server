@@ -10,6 +10,7 @@ from re import Pattern
 from re import compile as re_compile
 from secrets import compare_digest
 from sqlite3 import DatabaseError
+from sqlite3 import OperationalError
 from typing import Any
 from typing import Callable
 from typing import Coroutine
@@ -195,7 +196,8 @@ async def error_not_found(request: Request, err: RequestValidationError):
 
 
 @app.exception_handler(DatabaseError)
-async def error_database(request: Request, err: DatabaseError):
+@app.exception_handler(OperationalError)
+async def error_database(request: Request, err: DatabaseError | OperationalError):
     logger.error(repr(err))
     if request.method == "POST":
         return JSONResponse({"errors": [{err.__class__.__name__: err.args}]}, 500)
