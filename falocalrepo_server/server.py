@@ -199,7 +199,7 @@ async def error_database(request: Request, err: DatabaseError):
     logger.error(repr(err))
     if request.method == "POST":
         return JSONResponse({"errors": [{err.__class__.__name__: err.args}]}, 500)
-    return error_response(request, 500, err.__class__.__name__ + "<br/>" + "<br/>".join(err.args or []))
+    return error_response(request, 500,  "<br/>".join([err.__class__.__name__, *map(str, err.args)]))
 
 
 @app.exception_handler(FileNotFoundError)
