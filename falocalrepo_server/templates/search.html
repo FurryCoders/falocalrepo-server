@@ -239,11 +239,11 @@
                                     Thumbnail not found
                                 </span>
                                 <div class="p-1" hidden>
-                                    <img class="card-img"
+                                    <img class="card-img mw-100 w-auto"
                                          src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
                                          onload="this.parentNode.hidden = false; this.parentNode.parentNode.querySelector('.spinner').hidden = true"
                                          onerror="const p = this.parentNode.parentNode; p.querySelector('.spinner').hidden = true; p.querySelector('.error').hidden = false"
-                                         alt="" style="max-height: 150px; width: auto">
+                                         alt="" style="max-height: 150px">
                                 </div>
                             </div>
                         {% endif %}
