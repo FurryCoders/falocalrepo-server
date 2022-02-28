@@ -6,6 +6,7 @@ from logging import Logger
 from logging import getLogger
 from os import PathLike
 from pathlib import Path
+from re import IGNORECASE
 from re import Pattern
 from re import compile as re_compile
 from secrets import compare_digest
@@ -18,6 +19,8 @@ from zipfile import ZipFile
 
 from PIL import Image
 from PIL import UnidentifiedImageError
+from bs4 import BeautifulSoup
+from bs4.element import Tag
 from chardet import detect as detect_encoding
 from fastapi import FastAPI
 from fastapi import Request
@@ -95,11 +98,26 @@ tags_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"\n"), "<br/>")
 ]
 
+fa_link: Pattern = re_compile(r"(https?://)?(www.)?furaffinity.net", flags=IGNORECASE)
+
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
 
 def tags_to_html(text: str) -> str:
     return reduce(lambda t, es: es[0].sub(es[1], t), tags_expressions, text)
+
+
+def clean_html(html: str) -> str:
+    html_parsed: BeautifulSoup = BeautifulSoup(html, "lxml")
+    for icon in html_parsed.select("a.iconusername > img"):
+        parent: Tag = icon.parent
+        parent.clear()
+        parent.insert(0, f"@{icon.attrs['title']}")
+    for code in html_parsed.select("code"):
+        code.name = "div"
+    for link in html_parsed.select("a[href~='furaffinity.net']"):
+        link.attrs["href"] = "/" + fa_link.sub("", link.attrs["href"]).strip("/")
+    return str(html_parsed)
 
 
 def serialise_entry(entry: dict) -> dict:
@@ -201,7 +219,7 @@ async def error_database(request: Request, err: DatabaseError | OperationalError
     logger.error(repr(err))
     if request.method == "POST":
         return JSONResponse({"errors": [{err.__class__.__name__: err.args}]}, 500)
-    return error_response(request, 500,  "<br/>".join([err.__class__.__name__, *map(str, err.args)]))
+    return error_response(request, 500, "<br/>".join([err.__class__.__name__, *map(str, err.args)]))
 
 
 @app.exception_handler(FileNotFoundError)
@@ -295,7 +313,7 @@ async def serve_user(request: Request, username: str):
         "favorites_length": user_stats["favorites"],
         "mentions_length": user_stats["mentions"],
         "journals_length": user_stats["journals"],
-        "userpage": user_entry["USERPAGE"] if user_entry else "",
+        "userpage": clean_html(user_entry["USERPAGE"]) if user_entry else "",
         "request": request}),
         remove_comments=True))
 
@@ -366,7 +384,7 @@ async def serve_submission(request: Request, id_: int):
     return HTMLResponse(minify(templates.get_template("submission.html").render({
         "app": app.title,
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
-        "submission": sub,
+        "submission": sub | {"DESCRIPTION": clean_html(sub["DESCRIPTION"])},
         "file_text": tags_to_html(f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"])) if f else None,
         "filename": f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         "filename_id": f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
@@ -441,7 +459,7 @@ async def serve_journal(request: Request, id_: int):
     p, n = settings.database.load_prev_next(journals_table, id_)
     return HTMLResponse(minify(templates.get_template("journal.html").render({
         "title": f"{app.title} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
-        "journal": jrnl,
+        "journal": jrnl | {"CONTENT": clean_html(jrnl["CONTENT"])},
         "prev": p,
         "next": n,
         "request": request}),
