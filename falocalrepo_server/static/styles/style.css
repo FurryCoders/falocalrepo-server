@@ -67,6 +67,12 @@ body {
     max-height: 67vh;
 }
 
+@media (min-width: 992px) {
+    .fit-height {
+        max-height: 90vh;
+    }
+}
+
 .clickable {
     cursor: pointer;
 }
@@ -82,10 +88,4 @@ body {
 
 .hover_underline:hover {
     text-decoration: underline;
-}
-
-@media (min-width: 992px) {
-    .fit-height {
-        max-height: 85vh;
-    }
 }
