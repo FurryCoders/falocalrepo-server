@@ -78,13 +78,11 @@
                         <span class="badge bg-danger overflow-hidden w-100">Submission has no file</span>
                     </div>
                     {% elif submission["TYPE"].lower() == "image" %}
-                    <div class="card-img-top">
-                        <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
-                            <img class="img-fluid mx-auto fit-height"
-                                 src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
-                                 onerror="this.onload = null; this.src = '/static/not-found.png'">
-                        </a>
-                    </div>
+                    <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+                        <img class="img-fluid mx-auto fit-height"
+                             src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
+                             onerror="this.onload = null; this.src = '/static/not-found.png'">
+                    </a>
                     {% elif submission["TYPE"].lower() == "music" %}
                     <div class="m-1">
                         <img class="rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
