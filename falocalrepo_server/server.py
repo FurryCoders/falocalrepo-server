@@ -202,6 +202,14 @@ async def error_database(request: Request, err: DatabaseError):
     return error_response(request, 500, err.__class__.__name__ + "<br/>" + "<br/>".join(err.args or []))
 
 
+@app.exception_handler(FileNotFoundError)
+async def error_database_not_found(request: Request, err: FileNotFoundError):
+    logger.error(repr(err))
+    if request.method == "POST":
+        return JSONResponse({"errors": [{err.__class__.__name__: err.args}]}, status.HTTP_503_SERVICE_UNAVAILABLE)
+    return error_response(request, 500, "Database not found")
+
+
 @app.get("/view/{id_}", response_class=HTMLResponse)
 @app.get("/full/{id_}", response_class=HTMLResponse)
 async def redirect_submission(id_: int):
