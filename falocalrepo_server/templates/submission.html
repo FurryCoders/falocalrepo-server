@@ -257,22 +257,5 @@
         </div>
     </div>
 </div>
-<script>
-    document.querySelectorAll("#submission_description a.iconusername > img")
-        .forEach((icon) => {
-            icon.parentElement.innerText = `@${icon.title}`
-            icon.remove()
-        })
-
-    document.querySelectorAll("#submission_description a, .submission-text a")
-        .forEach((a) => a.href = a.href.replace(/^https?:\/\/(www\.)?furaffinity\.net\//, "/"))
-
-    document.querySelectorAll("#submission_description code").forEach((e) => {
-        const r = document.createElement("div")
-        r.innerHTML = e.innerHTML
-        r.classList = e.classList
-        e.parentNode.replaceChild(r, e)
-    })
-</script>
 </body>
 </html>
