@@ -245,7 +245,7 @@
                         {% endif %}
                         {% if table in ("submissions", "journals") %}
                             <div class="card-body overflow-hidden">
-                                <h6 class="card-title small my-auto">{{ item["TITLE"] }}</h6>
+                                <h6 class="card-title small my-auto" title="{{ item["TITLE"] }}">{{ item["TITLE"] }}</h6>
                             </div>
                         {% elif table == "users" %}
                             <div class="card-body overflow-hidden text-center p-1">
