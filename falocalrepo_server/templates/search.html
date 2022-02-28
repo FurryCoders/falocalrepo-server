@@ -3,7 +3,7 @@
 <!--suppress HtmlUnknownTarget, HtmlFormInputWithoutLabel, SpellCheckingInspection, HtmlDeprecatedAttribute, CssUnusedSymbol -->
 <html lang="en">
 <head>
-    <title>{{ app }} · {{ title }}</title>
+    <title>{{ title }} · {{ app }}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="/favicon.ico">
@@ -34,9 +34,9 @@
             <form action="{{ action }}" class="rounded border p-3" id="search_form">
                 <div class="row mb-2">
                     <div class="col-12">
-                    <span class="float-end btn btn-sm btn-outline-secondary badge"
-                          onclick="const h = document.getElementById('help'); h.hidden = !h.hidden;"
-                          style="color: var(--color-primary)">?
+                    <span class="float-end btn btn-sm btn-outline-secondary badge text-body"
+                          onclick="const h = document.getElementById('help'); h.hidden = !h.hidden;">
+                        ?
                     </span>
                         <h5>{{ title }}</h5>
                     </div>
@@ -347,7 +347,7 @@
             document.getElementById("grid_view").style.display = "none"
         } else if (view === "grid") {
             document.getElementById("list_view").style.display = "none"
-            document.getElementById("grid_view").style.display = "flex"
+            document.getElementById("grid_view").style.display = ""
         }
         const url = new URL(window.location.href)
         url.searchParams.set("view", view)
