@@ -25,6 +25,32 @@
         #list_view table td:nth-last-child, #list_view table th:nth-last-child {
             width: available !important;
         }
+
+        .table-follow-scheme {
+            --bs-table-bg: #f8f9fa;
+            --bs-table-striped-bg: #ecedee;
+            --bs-table-striped-color: #000;
+            --bs-table-active-bg: #dfe0e1;
+            --bs-table-active-color: #000;
+            --bs-table-hover-bg: #e5e6e7;
+            --bs-table-hover-color: #000;
+            color: #000;
+            border-color: #dfe0e1
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .table-follow-scheme {
+                --bs-table-bg: #212529;
+                --bs-table-striped-bg: #2c3034;
+                --bs-table-striped-color: #fff;
+                --bs-table-active-bg: #373b3e;
+                --bs-table-active-color: #fff;
+                --bs-table-hover-bg: #323539;
+                --bs-table-hover-color: #fff;
+                color: #fff;
+                border-color: #373b3e
+            }
+        }
     </style>
 </head>
 <body class="mt-4 mb-4">
@@ -45,7 +71,7 @@
                 <div class="row mb-2">
                     <div class="col-12">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="query" name="query">
+                            <input type="text" class="form-control" id="query" name="query" placeholder="Search">
                             <select class="form-select form-select-sm" id="queryAdd"
                                     oninput="addToInput(document.getElementById('query'), '@' + this.value); this.options[0].selected = true;"
                                     style="max-width: 5rem; background-color: #E9ECEF">
@@ -292,7 +318,7 @@
     <div class="row mt-3 mb-3">
         <div class="col-12">
             <div class="border rounded p-1 table-responsive">
-                <table class="w-100 table table-sm table-striped table-hover">
+                <table class="w-100 table table-sm table-striped table-hover table-follow-scheme">
                     <thead>
                     <tr>
                         {% for column in columns_results %}
