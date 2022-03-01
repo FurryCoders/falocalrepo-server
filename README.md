@@ -172,16 +172,10 @@ The _Search_ input allows to insert the search query.
 
 The _Field_ menu allows to insert a specific search field using a simple dropdown menu.
 
-The _-_ button clears the search input field.
-
-The _Sort By_ and _Order_ menus change the sorting field and order of the search results. Submissions and journals
+The _Sort_ and adjacent order menus change the sorting field and order of the search results. Submissions and journals
 default to descending ID, while users default to ascending username.
 
-The _View_ menu is only visible for submissions and allows changing between the (default) grid view to the list view
-used for journals and users. Submission thumbnails are visualised in both cases. The view setting is overridden and set
-to grid when the window width goes below a certain margin.
-
-_Note_: the view menu is not available available on all mobile devices when viewed in portrait orientation.
+The _View_ menu allows changing between the (default) grid view to a list (table) view
 
 The _Search_ button submits the search request using the current query and sorting settings.
 
@@ -315,12 +309,12 @@ counterpart, and navigate the other submissions from the author.
 
 </div>
 
-The _Download File_ button opens the submission file in the current browser tab.
+The download _File_ button opens the submission file in the current browser tab.
 
-The _Download as ZIP_ button generates a ZIP file containing the submission file, submission thumbnail, description
+The download _ZIP_ button generates a ZIP file containing the submission file, submission thumbnail, description
 HTML, and metadata in JSON format.
 
-The _Open on Fur Affinity_ button opens the submission on Fur Affinity
+The _FA_ button opens the submission on Fur Affinity
 
 The _Next_ and _Prev_ buttons lead to the next more recent and the previous less recent submissions respectively.
 
@@ -343,9 +337,9 @@ and navigate the other journals from the same user.
 
 </div>
 
-The _Download as ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON format.
+The download _ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON format.
 
-The _Open on Fur Affinity_ button opens the journal on Fur Affinity
+The _FA_ button opens the journal on Fur Affinity
 
 The _Next_ and _Prev_ buttons lead to the next more recent, and the previous less recent journals respectively.
 
