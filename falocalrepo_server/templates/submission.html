@@ -104,7 +104,7 @@
                     <div class="row">
                         <h6 class="col-4 card-title">Author</h6>
                         <div class="col-8 card-text">
-                            <a class="col-8 card-text btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                            <a class="col-8 card-text btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/user/{{ submission["AUTHOR"] }}">{{ submission["AUTHOR"] }}
                             </a>
                         </div>
@@ -112,7 +112,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Date</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge overflow-hidden text-decoration-none w-100"
+                            <a class="btn-sm btn-primary badge text-truncate text-decoration-none w-100"
                                href="/search/submissions/?query=%40date%20{{ submission["DATE"].strftime("%Y-%m-%d") }}">
                                 {{ submission["DATE"].strftime("%Y-%m-%d %H:%M") }}
                             </a>
@@ -121,7 +121,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Folder</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
                                 {{ submission["FOLDER"] }}
                             </a>
@@ -130,7 +130,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Type</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40type%20%22{{ submission["TYPE"] }}%22">
                                 {{ submission["TYPE"] }}
                             </a>
@@ -139,7 +139,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Category</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40category%20%22{{ submission["CATEGORY"] }}%22">
                                 {{ submission["CATEGORY"] }}
                             </a>
@@ -148,7 +148,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Species</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40species%20%22{{ submission["SPECIES"] }}%22">
                                 {{ submission["SPECIES"] }}
                             </a>
@@ -157,7 +157,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Gender</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40gender%20%22{{ submission["GENDER"] }}%22">
                                 {{ submission["GENDER"] }}
                             </a>
@@ -166,7 +166,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Rating</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40rating%20%22{{ submission["RATING"] }}%22">
                                 {{ submission["RATING"] }}
                             </a>
@@ -176,11 +176,11 @@
                         <h6 class="col-4 card-title">Tags</h6>
                         <div class="col-8 card-text">
                             {% for tag in submission["TAGS"] %}
-                                <a class="badge bg-primary bg-link overflow-hidden text-decoration-none"
+                                <a class="badge bg-primary bg-link text-truncate text-decoration-none"
                                    href='/search/submissions/?query=%40tags%20%22%7C{{ tag }}%7C%22'>{{ tag }}</a>
                             {% endfor %}
                             {% if not submission["TAGS"] %}
-                                <span class="badge bg-danger w-100 overflow-hidden">No tags</span>
+                                <span class="badge bg-danger w-100 text-truncate">No tags</span>
                             {% endif %}
                         </div>
                     </div>
@@ -188,11 +188,11 @@
                         <h6 class="col-4 card-title">Favorites</h6>
                         <div class="col-8 card-text">
                             {% for user in submission["FAVORITE"] %}
-                                <a class="badge bg-primary bg-link overflow-hidden text-decoration-none"
+                                <a class="badge bg-primary bg-link text-truncate text-decoration-none"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
                             {% if not submission["FAVORITE"] %}
-                                <span class="badge bg-danger w-100 overflow-hidden">No favorites</span>
+                                <span class="badge bg-danger w-100 text-truncate">No favorites</span>
                             {% endif %}
                         </div>
                     </div>
@@ -200,11 +200,11 @@
                         <h6 class="col-4 card-title">Mentions</h6>
                         <div class="col-8 card-text">
                             {% for user in submission["MENTIONS"] %}
-                                <a class="badge bg-primary bg-link overflow-hidden text-decoration-none"
+                                <a class="badge bg-primary bg-link text-truncate text-decoration-none"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
                             {% if not submission["MENTIONS"] %}
-                                <span class="badge bg-danger w-100 overflow-hidden">No mentions</span>
+                                <span class="badge bg-danger w-100 text-truncate">No mentions</span>
                             {% endif %}
                         </div>
                     </div>

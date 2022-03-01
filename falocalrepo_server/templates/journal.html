@@ -47,7 +47,7 @@
                     <div class="row">
                         <h6 class="col-4 card-title">Author</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/user/{{ journal["AUTHOR"] }}">
                                 {{ journal["AUTHOR"] }}
                             </a>
@@ -56,7 +56,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Date</h6>
                         <div class="col-8 card-text">
-                            <span class="badge bg-secondary w-100 overflow-hidden text-decoration-none disabled">
+                            <span class="badge bg-secondary w-100 text-truncate text-decoration-none disabled">
                                 {{ journal["DATE"].strftime("%Y-%m-%d %H:%M") }}
                             </span>
                         </div>
@@ -65,11 +65,11 @@
                         <h6 class="col-4 card-title">Mentions</h6>
                         <div class="col-8 card-text">
                             {% for user in journal["MENTIONS"] %}
-                                <a class="badge bg-primary bg-link overflow-hidden text-decoration-none"
+                                <a class="badge bg-primary bg-link text-truncate text-decoration-none"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
                             {% if not journal["MENTIONS"] %}
-                                <span class="badge bg-danger w-100 overflow-hidden">No mentions</span>
+                                <span class="badge bg-danger w-100 text-truncate">No mentions</span>
                             {% endif %}
                         </div>
                     </div>

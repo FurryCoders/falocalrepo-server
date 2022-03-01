@@ -28,7 +28,7 @@
                 <div class="card-header">
                     <h2>{{ user }}</h2>
                     {% if not active %}
-                        <span class="badge bg-danger overflow-hidden w-100">Inactive</span>
+                        <span class="badge bg-danger w-100">Inactive</span>
                     {% endif %}
                 </div>
 
@@ -37,7 +37,7 @@
                         <h6 class="col-5 col-xxl-4 card-title">Submissions</h6>
                         <div class="col-7 col-xxl-8 card-text">
                             <a href="/submissions/{{ user }}"
-                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                               class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none">
                                 {{ gallery_length + scraps_length }}
                             </a>
                         </div>
@@ -46,7 +46,7 @@
                         <h6 class="col-5 col-xxl-4 card-title">Gallery</h6>
                         <div class="col-7 col-xxl-8 card-text">
                             <a href="/gallery/{{ user }}"
-                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                               class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none">
                                 {{ gallery_length }}
                             </a>
                         </div>
@@ -55,7 +55,7 @@
                         <h6 class="col-5 col-xxl-4 card-title">Scraps</h6>
                         <div class="col-7 col-xxl-8 card-text">
                             <a href="/scraps/{{ user }}"
-                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                               class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none">
                                 {{ scraps_length }}
                             </a>
                         </div>
@@ -64,7 +64,7 @@
                         <h6 class="col-5 col-xxl-4 card-title">Favorites</h6>
                         <div class="col-7 col-xxl-8 card-text">
                             <a href="/favorites/{{ user }}"
-                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                               class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none">
                                 {{ favorites_length }}
                             </a>
                         </div>
@@ -73,7 +73,7 @@
                         <h6 class="col-5 col-xxl-4 card-title">Mentions</h6>
                         <div class="col-7 col-xxl-8 card-text">
                             <a href="/mentions/{{ user }}"
-                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                               class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none">
                                 {{ mentions_length }}
                             </a>
                         </div>
@@ -82,7 +82,7 @@
                         <h6 class="col-5 col-xxl-4 card-title">Journals</h6>
                         <div class="col-7 col-xxl-8 card-text">
                             <a href="/journals/{{ user }}"
-                               class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none">
+                               class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none">
                                 {{ journals_length }}
                             </a>
                         </div>
@@ -91,10 +91,12 @@
                         <h6 class="col-5 col-xxl-4 card-title">Folders</h6>
                         <div class="col-7 col-xxl-8 card-text">
                             {% for folder in folders|sort %}
-                                <span class="badge bg-info overflow-hidden mw-100 overflow-hidden">{{ folder }}</span>
+                                <span class="badge bg-info text-truncate mw-100 text-truncate" title="{{ folder }}">
+                                    {{ folder }}
+                                </span>
                             {% endfor %}
                             {% if not folders %}
-                                <span class="badge bg-danger w-100 overflow-hidden">No folders</span>
+                                <span class="badge bg-danger w-100 text-truncate">No folders</span>
                             {% endif %}
                         </div>
                     </div>
