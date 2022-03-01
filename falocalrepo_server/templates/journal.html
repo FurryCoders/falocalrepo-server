@@ -30,6 +30,19 @@
                         {% autoescape false %}{{ journal["CONTENT"] }}{% endautoescape %}
                     </div>
                 </div>
+                <div class="card-header text-center d-lg-none">
+                    <div class="btn-group col-12 col-md-8" role="group">
+                        <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/journal/{{ next }}">
+                            Next
+                        </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary" href="/journals/{{ journal["AUTHOR"] }}">All </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}" href="/journal/{{ prev }}">
+                            Prev
+                        </a>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="row">
                         <h6 class="col-4 card-title">Author</h6>
@@ -62,28 +75,34 @@
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-sm btn-primary"
-                           href="/submission/{{ journal["ID"] }}/zip/submission-{{ "{0:010}".format(journal["ID"]) }}.zip">
-                            Download as ZIP
-                        </a>
-                    </div>
-                    <br>
-                    <a class="btn btn-sm btn-primary mt-1"
-                       href="https://www.furaffinity.net/journals/{{ journal["ID"] }}">
-                        Open on Fur Affinity
-                    </a>
-                    <br>
-                    <div class="btn-group mt-1" role="group">
-                        <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/journal/{{ next }}">
-                            Next
-                        </a>
-                        <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/journals/{{ journal["AUTHOR"] }}">All </a>
-                        <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}" href="/journal/{{ prev }}">
-                            Prev
-                        </a>
+                    <div class="row text-center">
+                        <div class="btn-group col-8 col-md-6 col-lg-8 ms-auto" role="group">
+                            <a class="btn btn-sm btn-secondary disabled">Download</a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary"
+                               href="/journal/{{ journal["ID"] }}/zip/submission-{{ "{0:010}".format(journal["ID"]) }}.zip">
+                                ZIP
+                            </a>
+                        </div>
+                        <div class="btn-group col-4 col-md-2 col-lg-4 me-auto">
+                            <a class="btn btn-sm btn-primary"
+                               href="https://www.furaffinity.net/journal/{{ journal["ID"] }}">
+                                FA
+                            </a>
+                        </div>
+                        <div class="btn-group col-12 mt-1 d-none d-lg-flex" role="group">
+                            <a class="btn btn-sm btn-primary {{ "disabled" if not next }}"
+                               href="/journal/{{ next }}">
+                                Next
+                            </a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary" href="/journals/{{ journal["AUTHOR"] }}">All </a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}"
+                               href="/journal/{{ prev }}">
+                                Prev
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
