@@ -73,6 +73,12 @@ body {
     }
 }
 
+@media (min-width: 992px) {
+    .border-lg {
+        border: 1px solid var(--border-color) !important
+    }
+}
+
 .clickable {
     cursor: pointer;
 }

@@ -24,88 +24,87 @@
 
 <div class="container">
     <div class="row align-middle">
+        {% set file %}
         {% if submission["FILESAVED"] < 2 %}
-        <div class="col-8 d-none d-lg-block align-middle text-center mt-5 pt-5" id="submission_file">
-            <p class="badge bg-danger"><b>Submission has no file</b></p>
+        <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 text-center">
+            <span class="badge bg-danger">Submission has no file</span>
         </div>
         {% elif submission["TYPE"].lower() == "image" %}
-        <div class="col-8 d-none d-lg-block text-center" id="submission_file">
+        <div class="text-center">
+            <div class="error-file mt-1 mb-2 mt-lg-5 pt-lg-5" hidden>
+                <span class="badge bg-danger">Image not found</span>
+            </div>
             <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
                 <img class="img-fluid mx-auto fit-height"
                      src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
-                     onerror="this.onload = null; this.src = '/static/not-found.png'">
+                     onload="this.hidden = false"
+                     onerror="this.parentNode.parentNode.querySelector('.error-file').hidden = false" hidden>
             </a>
         </div>
         {% elif submission["TYPE"].lower() == "music" %}
-        <div class="col-8 d-none d-lg-block align-middle text-center mt-5 pt-5" id="submission_file">
-            <img class="rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
-                 onerror="this.src = '/static/not-found.png'">
-            <br>
-            <audio class="mt-1" src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" controls>
-                File not found
+        <div class="text-center mb-1 mt-lg-5 pt-lg-5" id="submission_file">
+            <div class="col-12">
+                <span class="mt-2 badge bg-danger" hidden>Thumbnail not found</span>
+                <img class="rounded mt-2" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+                     onload="this.hidden = false"
+                     onerror="this.previousElementSibling.querySelector('.error-thumbnail').hidden = false" hidden>
+            </div>
+            <span class="mt-2 badge bg-danger" hidden>File not found</span>
+            <audio class="mt-2" src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
+                   onerror="this.hidden = true; this.previousElementSibling.querySelector('.error-file').hidden = false"
+                   style=""
+                   controls>
             </audio>
         </div>
         {% elif file_text is not none %}
-        <div class="col-8 d-none d-lg-block text-center submission-text">
-            <div class="border rounded p-2 text-start font-monospace small overflow-scroll text-wrap fit-height">
-                {% autoescape false %}{{ file_text.strip() }}{% endautoescape %}
-            </div>
+        <div class="border-lg rounded p-2 text-start font-monospace small overflow-scroll text-wrap fit-height">
+            {% autoescape false %}{{ file_text.strip() }}{% endautoescape %}
         </div>
         {% else %}
-        <div class="col-8 d-none d-lg-block align-middle text-center mt-5 pt-5" id="submission_file">
-            <img class="rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
-                 onerror="this.src = '/static/not-found.png'">
-            <br>
-            <a class="mt-1 btn btn-sm btn-primary" href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+        <div class="text-center mb-2 mt-lg-5 pt-lg-5" id="submission_file">
+            <div class="col-12">
+                <span class="mt-2 badge bg-danger" hidden>Thumbnail not found</span>
+                <img class="rounded mt-2" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+                     onload="this.hidden = false"
+                     onerror="this.previousElementSibling.hidden = false" hidden>
+            </div>
+            <a class="mt-2 btn btn-sm btn-primary" href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
                 {{ filename|title }}
             </a>
         </div>
         {% endif %}
+        {% endset %}
+
+        <div class="d-none d-lg-block col-8">{{ file }}</div>
 
         <div class="col-12 col-lg-4 mx-auto" id="submission_metadata">
             <div class="card h-100">
                 <h2 class="card-header">{{ submission["TITLE"] }}</h2>
-                <div class="d-lg-none border-bottom text-center">
-                    {% if submission["FILESAVED"] < 2 %}
-                    <div class="mt-2 ms-1 me-1">
-                        <span class="badge bg-danger overflow-hidden w-100">Submission has no file</span>
-                    </div>
-                    {% elif submission["TYPE"].lower() == "image" %}
-                    <a href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
-                        <img class="img-fluid mx-auto fit-height"
-                             src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
-                             onerror="this.onload = null; this.src = '/static/not-found.png'">
-                    </a>
-                    {% elif submission["TYPE"].lower() == "music" %}
-                    <div class="m-1">
-                        <img class="rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
-                             onerror="this.src = '/static/not-found.png'">
-                        <br>
-                        <audio class="mt-1" src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" controls>
-                            File not found
-                        </audio>
-                    </div>
-                    {% elif file_text is not none %}
-                    <div class="p-2 text-start font-monospace small overflow-scroll text-wrap fit-height submission-text">
-                        {% autoescape false %}{{ file_text.strip() }}{% endautoescape %}
-                    </div>
-                    {% else %}
-                    <div class="m-1">
-                        <img class="rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
-                             onerror="this.src = '/static/not-found.png'">
-                        <br>
-                        <a class="mt-1 btn btn-sm btn-primary"
-                           href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
-                            {{ filename|title }}
+                <div class="card-header text-center d-lg-none p-0">
+                    {{ file }}
+                </div>
+                <div class="card-header text-center d-lg-none">
+                    <div class="btn-group col-12 col-md-8" role="group">
+                        <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
+                            Next
+                        </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps </a>
+                        <span class="btn-separator"></span>
+                        <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
+                            Prev
                         </a>
                     </div>
-                    {% endif %}
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <h6 class="col-4 card-title">Author</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
+                            <a class="col-8 card-text btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
                                href="/user/{{ submission["AUTHOR"] }}">{{ submission["AUTHOR"] }}
                             </a>
                         </div>
@@ -211,37 +210,43 @@
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-sm btn-primary {{ "disabled" if submission["FILESAVED"] < 2 }}"
-                           href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" download>
-                            Download File
-                        </a>
-                        <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary"
-                           href="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
-                            Download as ZIP
-                        </a>
-                    </div>
-                    <br>
-                    <a class="btn btn-sm btn-primary mt-1"
-                       href="https://www.furaffinity.net/view/{{ submission["ID"] }}">
-                        Open on Fur Affinity
-                    </a>
-                    <br>
-                    <div class="btn-group mt-1" role="group">
-                        <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
-                            Next
-                        </a>
-                        <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery </a>
-                        <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All </a>
-                        <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps </a>
-                        <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
-                            Prev
-                        </a>
+                    <div class="row text-center">
+                        <div class="btn-group col-8 col-md-6 col-lg-8 ms-auto" role="group">
+                            <a class="btn btn-sm btn-secondary disabled">Download</a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary {{ "disabled" if submission["FILESAVED"] < 2 }}"
+                               href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" download>
+                                File
+                            </a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary"
+                               href="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
+                                ZIP
+                            </a>
+                        </div>
+                        <div class="btn-group col-4 col-md-2 col-lg-4 me-auto">
+                            <a class="btn btn-sm btn-primary"
+                               href="https://www.furaffinity.net/view/{{ submission["ID"] }}">
+                                FA
+                            </a>
+                        </div>
+                        <div class="btn-group col-12 mt-1 d-none d-lg-flex" role="group">
+                            <a class="btn btn-sm btn-primary {{ "disabled" if not next }}"
+                               href="/submission/{{ next }}">
+                                Next
+                            </a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery </a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All </a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps </a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}"
+                               href="/submission/{{ prev }}">
+                                Prev
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
