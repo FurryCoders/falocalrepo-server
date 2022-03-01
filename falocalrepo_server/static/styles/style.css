@@ -89,3 +89,10 @@ body {
 .hover_underline:hover {
     text-decoration: underline;
 }
+
+.bbcode_center {
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    font-family: inherit;
+}
