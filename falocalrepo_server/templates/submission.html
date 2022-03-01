@@ -82,11 +82,11 @@
                             Next
                         </a>
                         <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery </a>
+                        <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery</a>
                         <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All </a>
+                        <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All</a>
                         <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps </a>
+                        <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps</a>
                         <span class="btn-separator"></span>
                         <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
                             Prev
@@ -229,11 +229,11 @@
                                 Next
                             </a>
                             <span class="btn-separator"></span>
-                            <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery </a>
+                            <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery</a>
                             <span class="btn-separator"></span>
-                            <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All </a>
+                            <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All</a>
                             <span class="btn-separator"></span>
-                            <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps </a>
+                            <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps</a>
                             <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}"
                                href="/submission/{{ prev }}">
@@ -249,7 +249,7 @@
     <div class="row mt-3">
         <div class="col-12">
             <div class="card">
-                <div class="card-body col-12 col-lg-8 mx-auto">
+                <div class="card-body col-12 col-lg-9 mx-auto">
                     <div class="card-text text-wrap text-justify overflow-hidden">
                         {% autoescape false %}{{ submission["DESCRIPTION"] }}{% endautoescape %}
                     </div>
