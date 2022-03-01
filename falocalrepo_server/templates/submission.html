@@ -35,7 +35,7 @@
             </a>
         </div>
         {% elif submission["TYPE"].lower() == "music" %}
-        <div class="text-center mb-1 mt-lg-5 pt-lg-5" id="submission_file">
+        <div class="text-center mb-1 mt-lg-5 pt-lg-5">
             <div class="col-12">
                 <span class="mt-2 badge bg-danger" hidden>Thumbnail not found</span>
                 <img class="rounded mt-2" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
@@ -54,7 +54,7 @@
             {% autoescape false %}{{ file_text.strip() }}{% endautoescape %}
         </div>
         {% else %}
-        <div class="text-center mb-2 mt-lg-5 pt-lg-5" id="submission_file">
+        <div class="text-center mb-2 mt-lg-5 pt-lg-5">
             <div class="col-12">
                 <span class="mt-2 badge bg-danger" hidden>Thumbnail not found</span>
                 <img class="rounded mt-2" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
@@ -70,7 +70,7 @@
 
         <div class="d-none d-lg-block col-8">{{ file }}</div>
 
-        <div class="col-12 col-lg-4 mx-auto" id="submission_metadata">
+        <div class="col-12 col-lg-4 mx-auto">
             <div class="card h-100">
                 <h2 class="card-header">{{ submission["TITLE"] }}</h2>
                 <div class="card-header text-center d-lg-none p-0">
@@ -250,7 +250,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body col-12 col-lg-8 mx-auto">
-                    <div class="card-text text-wrap text-justify overflow-hidden" id="submission_description">
+                    <div class="card-text text-wrap text-justify overflow-hidden">
                         {% autoescape false %}{{ submission["DESCRIPTION"] }}{% endautoescape %}
                     </div>
                 </div>

@@ -17,16 +17,16 @@
 <div class="container">
     <div class="row align-middle">
         <div class="col-8 d-none d-lg-block fit-height">
-            <div class="border rounded p-2 overflow-scroll fit-height h-100 journal_content">
+            <div class="border rounded p-2 overflow-scroll fit-height h-100">
                 {% autoescape false %}{{ journal["CONTENT"] }}{% endautoescape %}
             </div>
         </div>
 
-        <div class="col-12 col-lg-4 mx-auto" id="journal_metadata">
+        <div class="col-12 col-lg-4 mx-auto">
             <div class="card h-100">
                 <h2 class="card-header">{{ journal["TITLE"] }}</h2>
                 <div class="col-12 d-lg-none border-bottom">
-                    <div class="p-2 overflow-scroll text-wrap fit-height journal_content">
+                    <div class="p-2 overflow-scroll text-wrap fit-height">
                         {% autoescape false %}{{ journal["CONTENT"] }}{% endautoescape %}
                     </div>
                 </div>

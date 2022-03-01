@@ -17,7 +17,7 @@
     <div class="row align-middle">
         {% if userpage != "" %}
         <div class="col-8 d-none d-lg-block">
-            <div class="border rounded p-2 overflow-scroll text-wrap fit-height h-100 user_profile">
+            <div class="border rounded p-2 overflow-scroll text-wrap fit-height h-100">
                 {% autoescape false %}{{ userpage }}{% endautoescape %}
             </div>
         </div>
@@ -110,7 +110,7 @@
 
                 {% if userpage != "" %}
                 <div class="card-footer col-12 d-lg-none">
-                    <div class="p-2 overflow-scroll text-wrap user_profile">
+                    <div class="p-2 overflow-scroll text-wrap">
                         {% autoescape false %}{{ userpage }}{% endautoescape %}
                     </div>
                 </div>
