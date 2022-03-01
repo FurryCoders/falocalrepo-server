@@ -12,13 +12,6 @@
     <link rel="apple-touch-icon-precomposed" href="/static/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles/style.css">
-    <style>
-        #submission_description {
-            text-align: justify;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    </style>
 </head>
 <body class="mt-4 mb-4">
 
@@ -257,7 +250,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body col-12 col-lg-8 mx-auto">
-                    <div class="card-text" id="submission_description">
+                    <div class="card-text text-wrap text-justify overflow-hidden" id="submission_description">
                         {% autoescape false %}{{ submission["DESCRIPTION"] }}{% endautoescape %}
                     </div>
                 </div>

@@ -87,6 +87,10 @@ body {
     color: var(--color-primary) !important;
 }
 
+.text-justify {
+    text-align: justify;
+}
+
 .hover_highlight:hover {
     background-blend-mode: multiply;
     background-color: var(--color-highlight);
