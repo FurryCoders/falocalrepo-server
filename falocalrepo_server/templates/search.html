@@ -262,18 +262,22 @@
                         {% endif %}
                     </a>
                     {% if table in ("submissions", "journals") %}
-                        <div class="card-footer text-center p-1 pt-0 small">
-                            <a href="/user/{{ item["AUTHOR"] }}" class="w-100">
-                                <span class="badge bg-secondary w-100 ">{{ item["DATE"].strftime("%Y-%m-%d") }}</span>
-                                <span class="badge bg-primary w-100">{{ item["AUTHOR"] }}</span>
-                            </a>
+                        <div class="card-footer text-center small p-1 pb-0">
+                            <div class="row">
+                                <a href="/user/{{ item["AUTHOR"] }}" class="w-100">
+                                    <span class="col-12 badge bg-secondary w-100 text-truncate"
+                                          title="{{ item["DATE"].strftime("%Y-%m-%d") }}">{{ item["DATE"].strftime("%Y-%m-%d") }}</span>
+                                    <span class="col-12 badge bg-primary w-100 text-truncate"
+                                          title="{{ item["AUTHOR"] }}">{{ item["AUTHOR"] }}</span>
+                                </a>
+                            </div>
                         </div>
                     {% elif table == "users" %}
                         <a href="/user/{{ item["USERNAME"] }}" class="text-decoration-none w-100">
                             <div class="card-footer text-center p-1 pb-0 small">
                                 {% for folder in item["FOLDERS"]|sort %}
-                                    <span title="{{ folder }}"
-                                          class="badge bg-info w-100 overflow-hidden">{{ folder.strip("!") }}</span>
+                                    <span title="{{ folder }}" class="badge bg-info w-100 text-truncate"
+                                          title="{{ folder }}">{{ folder }}</span>
                                 {% endfor %}
                             </div>
                         </a>
