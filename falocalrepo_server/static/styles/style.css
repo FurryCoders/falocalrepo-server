@@ -7,7 +7,7 @@
     --color-tertiary: #C4C4C6;
     --color-link: 65, 105, 225; /*royalblue*/
     --color-highlight: cyan;
-    --border-color: var(--color-primary);
+    --border-color: var(--color-tertiary);
 }
 
 @media (prefers-color-scheme: dark) {
