@@ -375,7 +375,7 @@
 
     const updateUrl = (form) => {
         const url = new URL(window.location.href);
-        Array.from((new FormData(form)).entries()).forEach(([param, value]) => url.searchParams.set(param, value))
+        Array.from((new FormData(form)).entries()).forEach(([param, value]) => url.searchParams.set(param, String(value)))
         window.history.replaceState({}, document.title, url.href)
     }
 
