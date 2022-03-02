@@ -26,10 +26,10 @@
         <div class="col-12 col-lg-4 mx-auto">
             <div class="card h-100">
                 <div class="card-header">
-                    <h2>{{ user }}</h2>
                     {% if not active %}
-                        <span class="badge bg-danger w-100">Inactive</span>
+                        <span class="badge bg-danger float-end mt-2">Inactive</span>
                     {% endif %}
+                    <span class="h2">{{ user }}</span>
                 </div>
 
                 <div class="card-body">
