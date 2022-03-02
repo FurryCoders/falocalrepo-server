@@ -296,7 +296,7 @@
                         {% if table in ("submissions", "journals") %}
                             <a href="/user/{{ item["AUTHOR"] }}" class="text-decoration-none w-100">
                                 <div class="card-footer text-center p-1 pb-0 small bg-link">
-                                    <span class="badge bg-secondary w-100 text-truncate"
+                                    <span class="badge bg-info w-100 text-truncate"
                                           title="{{ item["DATE"].strftime("%Y-%m-%d") }}">
                                         {{ item["DATE"].strftime("%Y-%m-%d") }}
                                     </span>
