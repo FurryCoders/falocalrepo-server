@@ -71,7 +71,8 @@
                 <div class="row mb-2">
                     <div class="col-12">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="query" name="query" placeholder="Search">
+                            <input type="text" class="form-control" id="query" name="query" placeholder="Search"
+                                   oninput="updateUrl(this.form)">
                             <select class="form-select form-select-sm" id="queryAdd"
                                     oninput="addToInput(document.getElementById('query'), '@' + this.value); this.options[0].selected = true;"
                                     style="max-width: 5rem; background-color: #E9ECEF">
@@ -89,14 +90,16 @@
                     <div class="col-12">
                         <div class="input-group">
                             <span class="input-group-text" style="width: 4.4rem">Sort</span>
-                            <select class="form-select form-select-sm" id="sort" name="sort">
+                            <select class="form-select form-select-sm" id="sort" name="sort"
+                                    oninput="updateUrl(this.form)">
                                 {% for col in columns_table %}
                                     <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">
                                         {{ col.title() if col|length > 2 else col.upper() }}
                                     </option>
                                 {% endfor %}
                             </select>
-                            <select class="form-select form-select-sm" id="order" name="order">
+                            <select class="form-select form-select-sm" id="order" name="order"
+                                    oninput="updateUrl(this.form)">
                                 <option {{ "selected" if order == "asc" }} value="asc">Ascending</option>
                                 <option {{ "selected" if order == "desc" }} value="desc">Descending</option>
                             </select>
@@ -110,7 +113,8 @@
                                 <option id="viewGrid" value="grid" {{ "selected" if view == "grid" }}>Grid</option>
                                 <option id="viewList" value="list"{{ "selected" if view == "list" }}>List</option>
                             </select>
-                            <select class="form-select form-select-sm" id="limit" name="limit">
+                            <select class="form-select form-select-sm" id="limit" name="limit"
+                                    oninput="updateUrl(this.form)">
                                 <option value="12" {{ "selected" if limit == 12 }}>12</option>
                                 <option value="24" {{ "selected" if limit == 24 }}>24</option>
                                 <option value="48" {{ "selected" if limit == 48 }}>48</option>
@@ -252,121 +256,131 @@
 {% endset %}
 {{ navigation }}
 
-<div class="container" id="grid_view" style="{{ "display: none" if view == "list" }}">
-    <div class="row">
-        {% for item in results %}
-            <div class="col-6 col-sm-4 col-md-3 col-lg-2 mt-3">
-                <div class="card h-100">
-                    <a href="/{{ table_short }}/{{ item[column_id] }}" class="text-decoration-none h-100">
-                        {% if thumbnails %}
-                            <div class="card-header text-center p-0">
-                                <span class="spinner spinner-border spinner-border-sm" role="status"></span>
-                                <span class="error fw-bold text-muted" style="font-size: .75rem" hidden>
+{% if view == "grid" or not view %}
+    <div class="container" id="grid_view">
+        <div class="row">
+            {% for item in results %}
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 mt-3">
+                    <div class="card h-100">
+                        <a href="/{{ table_short }}/{{ item[column_id] }}" class="text-decoration-none h-100">
+                            {% if thumbnails %}
+                                <div class="card-header text-center p-0">
+                                    <span class="spinner spinner-border spinner-border-sm" role="status"></span>
+                                    <span class="error fw-bold text-muted" style="font-size: .75rem" hidden>
                                     Thumbnail not found
                                 </span>
-                                <div class="p-1" hidden>
-                                    <img class="card-img mw-100 w-auto"
-                                         src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
-                                         onload="this.parentNode.hidden = false; this.parentNode.parentNode.querySelector('.spinner').hidden = true"
-                                         onerror="const p = this.parentNode.parentNode; p.querySelector('.spinner').hidden = true; p.querySelector('.error').hidden = false"
-                                         alt="" style="max-height: 150px">
+                                    <div class="p-1" hidden>
+                                        <img class="card-img mw-100 w-auto"
+                                             src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
+                                             onload="this.parentNode.hidden = false; this.parentNode.parentNode.querySelector('.spinner').hidden = true"
+                                             onerror="const p = this.parentNode.parentNode; p.querySelector('.spinner').hidden = true; p.querySelector('.error').hidden = false"
+                                             alt="" style="max-height: 150px">
+                                    </div>
                                 </div>
-                            </div>
-                        {% endif %}
-                        {% if table in ("submissions", "journals") %}
-                            <div class="card-body overflow-hidden text-center align-middle p-1">
+                            {% endif %}
+                            {% if table in ("submissions", "journals") %}
+                                <div class="card-body overflow-hidden text-center align-middle p-1">
                                 <span class="card-title fw-bold small m-0"
                                       title="{{ item["TITLE"] }}">{{ item["TITLE"] }}</span>
-                            </div>
-                        {% elif table == "users" %}
-                            <div class="card-body overflow-hidden text-center p-1">
-                                <h6 class="card-title small mt-0 mb-0">{{ item["USERNAME"] }}</h6>
-                                {% if not item["ACTIVE"] %}
-                                    <span class="badge bg-danger w-100">Inactive</span>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </a>
-                    {% if table in ("submissions", "journals") %}
-                        <div class="card-footer text-center small p-1 pb-0">
-                            <div class="row">
-                                <a href="/user/{{ item["AUTHOR"] }}" class="w-100">
+                                </div>
+                            {% elif table == "users" %}
+                                <div class="card-body overflow-hidden text-center p-1">
+                                    <h6 class="card-title small mt-0 mb-0">{{ item["USERNAME"] }}</h6>
+                                    {% if not item["ACTIVE"] %}
+                                        <span class="badge bg-danger w-100">Inactive</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </a>
+                        {% if table in ("submissions", "journals") %}
+                            <div class="card-footer text-center small p-1 pb-0">
+                                <div class="row">
+                                    <a href="/user/{{ item["AUTHOR"] }}" class="w-100">
                                     <span class="col-12 badge bg-secondary w-100 text-truncate"
                                           title="{{ item["DATE"].strftime("%Y-%m-%d") }}">{{ item["DATE"].strftime("%Y-%m-%d") }}</span>
-                                    <span class="col-12 badge bg-primary w-100 text-truncate"
-                                          title="{{ item["AUTHOR"] }}">{{ item["AUTHOR"] }}</span>
-                                </a>
+                                        <span class="col-12 badge bg-primary w-100 text-truncate"
+                                              title="{{ item["AUTHOR"] }}">{{ item["AUTHOR"] }}</span>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    {% elif table == "users" %}
-                        <a href="/user/{{ item["USERNAME"] }}" class="text-decoration-none w-100">
-                            <div class="card-footer text-center p-1 pb-0 small">
-                                {% for folder in item["FOLDERS"]|sort %}
-                                    <span title="{{ folder }}" class="badge bg-info w-100 text-truncate"
-                                          title="{{ folder }}">{{ folder }}</span>
-                                {% endfor %}
-                            </div>
-                        </a>
-                    {% endif %}
+                        {% elif table == "users" %}
+                            <a href="/user/{{ item["USERNAME"] }}" class="text-decoration-none w-100">
+                                <div class="card-footer text-center p-1 pb-0 small">
+                                    {% for folder in item["FOLDERS"]|sort %}
+                                        <span title="{{ folder }}" class="badge bg-info w-100 text-truncate"
+                                              title="{{ folder }}">{{ folder }}</span>
+                                    {% endfor %}
+                                </div>
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
-</div>
+{% endif %}
 
-<div class="container" id="list_view" style="{{ "display: none" if view == "grid" }}">
-    <div class="row mt-3 mb-3">
-        <div class="col-12">
-            <div class="border rounded p-1 table-responsive">
-                <table class="w-100 table table-sm table-striped table-hover table-follow-scheme">
-                    <thead>
-                    <tr>
-                        {% for column in columns_results %}
-                            <th class="col-{{ column.lower() }} ps-0 pe-0 text-body">{{ column }}</th>
-                        {% endfor %}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in results %}
+{% if view == "list" %}
+    <div class="container" id="list_view">
+        <div class="row mt-3 mb-3">
+            <div class="col-12">
+                <div class="border rounded p-1 table-responsive">
+                    <table class="w-100 table table-sm table-striped table-hover table-follow-scheme">
+                        <thead>
                         <tr>
                             {% for column in columns_results %}
-                                <td class="col-{{ column.lower() }} text-nowrap clickable ps-0 pe-0">
-                                    <a class="d-block text-decoration-none text-body h-100 ps-1 pe-1"
-                                       href="/{{ table_short }}/{{ item[column_id] }}">
-                                        {% if column == "DATE" %}
-                                            {{ item[column].strftime("%Y-%m-%d") }}
-                                            <span class="d-none d-lg-inline">&nbsp;{{ item[column].strftime("%H:%M") }}</span>
-                                        {% elif column == "ACTIVE" %}
-                                            <span class="badge w-100 {{ "bg-success" if item[column] else "bg-danger" }}">
-                                                {{ "Active" if item[column] else "Inactive" }}
-                                            </span>
-                                        {% elif column == "FOLDERS" %}
-                                            {% for list_item in item[column]|sort %}
-                                                <span class="badge bg-info overflow-hidden">{{ list_item[0] + ("-" + list_item.split(":")[0].split("-")[1] if "-" in list_item else "") }}</span>
-                                            {% endfor %}
-                                        {% elif column in columns_list %}
-                                            {% for list_item in item[column] %}
-                                                <span class="badge bg-info overflow-hidden">{{ list_item }}</span>
-                                            {% endfor %}
-                                        {% else %}
-                                            {{ item[column] }}
-                                        {% endif %}
-                                    </a>
-                                </td>
+                                <th class="col-{{ column.lower() }} ps-0 pe-0 text-body">{{ column }}</th>
                             {% endfor %}
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {% for item in results %}
+                            <tr>
+                                {% for column in columns_results %}
+                                    <td class="col-{{ column.lower() }} text-nowrap clickable ps-0 pe-0">
+                                        <a class="d-block text-decoration-none text-body h-100 ps-1 pe-1"
+                                           href="/{{ table_short }}/{{ item[column_id] }}">
+                                            {% if column == "DATE" %}
+                                                {{ item[column].strftime("%Y-%m-%d") }}
+                                                <span class="d-none d-lg-inline">&nbsp;{{ item[column].strftime("%H:%M") }}</span>
+                                            {% elif column == "ACTIVE" %}
+                                                <span class="badge w-100 {{ "bg-success" if item[column] else "bg-danger" }}">
+                                                {{ "Active" if item[column] else "Inactive" }}
+                                            </span>
+                                            {% elif column == "FOLDERS" %}
+                                                {% for list_item in item[column]|sort %}
+                                                    <span class="badge bg-info overflow-hidden">{{ list_item[0] + ("-" + list_item.split(":")[0].split("-")[1] if "-" in list_item else "") }}</span>
+                                                {% endfor %}
+                                            {% elif column in columns_list %}
+                                                {% for list_item in item[column] %}
+                                                    <span class="badge bg-info overflow-hidden">{{ list_item }}</span>
+                                                {% endfor %}
+                                            {% else %}
+                                                {{ item[column] }}
+                                            {% endif %}
+                                        </a>
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
+{% endif %}
 
 {{ navigation }}
 {% endif %}
 <script>
     document.getElementById("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
+
+    const updateUrl = (form) => {
+        const url = new URL(window.location.href);
+        Array.from((new FormData(form)).entries()).forEach(([param, value]) => url.searchParams.set(param, value))
+        window.history.replaceState({}, document.title, url.href)
+    }
 
     const addToInput = (input, value) => {
         const selectStart = input.selectionStart, selectEnd = input.selectionEnd
@@ -378,16 +392,10 @@
     }
 
     const changeView = (view) => {
-        if (view === "list") {
-            document.getElementById("list_view").style.display = ""
-            document.getElementById("grid_view").style.display = "none"
-        } else if (view === "grid") {
-            document.getElementById("list_view").style.display = "none"
-            document.getElementById("grid_view").style.display = ""
-        }
         const url = new URL(window.location.href)
         url.searchParams.set("view", view)
         window.history.replaceState({}, document.title, url.href)
+        window.location.reload()
     }
 
     {% if table == "submissions" %}
