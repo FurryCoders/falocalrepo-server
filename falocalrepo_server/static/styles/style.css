@@ -34,7 +34,7 @@ body {
     border-color: var(--border-color);
 }
 
-.bg-link:focus, .bg-link:hover {
+.text-link:focus, .text-link:hover {
     color: #3dd5f3 !important
 }
 
