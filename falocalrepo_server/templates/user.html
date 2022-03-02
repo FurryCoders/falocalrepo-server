@@ -27,7 +27,7 @@
             <div class="card h-100">
                 <div class="card-header">
                     <span class="h2">{{ user }}</span>
-                    {% if in_database %}
+                    {% if not in_database %}
                         <span class="badge bg-danger float-end mt-2 ms-1">Not in database</span>
                     {% elif not active %}
                         <span class="badge bg-danger float-end mt-2 ms-1">Inactive</span>
