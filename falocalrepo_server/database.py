@@ -124,17 +124,34 @@ class Database(_Database):
         return self.journals[journal_id]
 
     @cache
-    def _load_prev_next_cached(self, table: str, item_id: int, *, _cache=None) -> tuple[int, int]:
+    def _load_prev_next_cached(self, table: str, item_id: int | str, *, _cache=None) -> tuple[int, int]:
         db_table: Table = self[table]
-        item: dict | None = db_table[item_id]
-        query: Selector = Sb("AUTHOR").__eq__(item["AUTHOR"])
-        query = Sb() & [query, Sb("FOLDER").__eq__(item["FOLDER"])] if table.upper() == submissions_table else query
-        return db_table.select(
-            query,
-            columns=[Column("LAG(ID, 1, 0) over (order by ID)", int), Column("LEAD(ID, 1, 0) over (order by ID)", int)],
-            order=[f"ABS(ID - {item_id})"],
-            limit=1
-        ).cursor.fetchone() if item else (0, 0)
+
+        if table in (submissions_table, journals_table):
+            if not (item := db_table[item_id]):
+                return 0, 0
+
+            query: Selector = Sb("AUTHOR").__eq__(item["AUTHOR"])
+            query = Sb() & [query, Sb("FOLDER").__eq__(item["FOLDER"])] if table.upper() == submissions_table else query
+            return db_table.select(
+                query,
+                columns=[Column("LAG(ID, 1, 0) over (order by ID)", int),
+                         Column("LEAD(ID, 1, 0) over (order by ID)", int)],
+                order=[f"ABS(ID - {item_id})"],
+                limit=1
+            ).cursor.fetchone()
+        elif table == users_table:
+            if not (item := db_table[item_id]):
+                return 0, 0
+
+            query1: Selector = Sb("USERNAME").__gt__(item["USERNAME"])
+            query2: Selector = Sb("USERNAME").__lt__(item["USERNAME"])
+            return (
+                next(db_table.select(query1, columns=["USERNAME"], order=["USERNAME ASC"], limit=1).cursor, [0])[0],
+                next(db_table.select(query2, columns=["USERNAME"], order=["USERNAME DESC"], limit=1).cursor, [0])[0]
+            )
+        else:
+            raise KeyError(f"Unknown table {table!r}")
 
     @cache
     def _load_search_cached(self, table: str, query: str, sort: str, order: str, *, _cache=None):
@@ -206,7 +223,7 @@ class Database(_Database):
     def load_journal(self, journal_id: int) -> dict | None:
         return self._load_journal_cached(journal_id, _cache=self.m_time)
 
-    def load_prev_next(self, table: str, item_id: int) -> tuple[int, int]:
+    def load_prev_next(self, table: str, item_id: int | str) -> tuple[int, int]:
         return self._load_prev_next_cached(table, item_id, _cache=self.m_time)
 
     def load_search(self, table: str, query: str, sort: str, order: str):
@@ -233,7 +250,7 @@ class Database(_Database):
     def load_journal_uncached(self, journal_id: int) -> dict | None:
         return self._load_journal_cached.__wrapped__(self, journal_id)
 
-    def load_prev_next_uncached(self, table: str, item_id: int) -> tuple[int, int]:
+    def load_prev_next_uncached(self, table: str, item_id: int | str) -> tuple[int, int]:
         return self._load_prev_next_cached.__wrapped__(self, table, item_id)
 
     def load_search_uncached(self, table: str, query: str, sort: str, order: str):
