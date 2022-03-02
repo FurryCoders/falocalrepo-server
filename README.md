@@ -188,6 +188,22 @@ Under the search controls are the number of results and current page.
 Under the results numbers are the page controls. _First_ leads to page 1, _Prev_ leads to the previous page, _Next_
 leads to the next page, and _Last_ leads to the last page. These controls are also available at the bottom of the page.
 
+In grid view, the results are presented using cards containing the same information as the list view, with the addition
+of thumbnails for submissions. When searching for submissions or journals, clicking on the card footer (containing the
+date and author) will open the author's page.
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-card.png" width="200">
+</div>
+
+In list view, the results are presented in a table with the most important columns: ID, AUTHOR, DATE, and TITLE (
+submissions and journals); USERNAME, FOLDERS, and ACTIVE (users). On small screens some of these columns are shortened
+or removed.
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-list.png" width="800">
+</div>
+
 #### Query Language
 
 The query language used for this server is based on and improves the search syntax currently used by the Fur Affinity
