@@ -350,7 +350,9 @@
                                             {% elif column in columns_list %}
                                                 {% for list_item in item[column] %}
                                                     <span class="badge bg-info text-truncate align-middle"
-                                                          style="max-width: 10rem">{{ list_item }}</span>
+                                                          style="max-width: 10rem" title="{{ list_item }}">
+                                                        {{ list_item.split(":")[0] }}
+                                                    </span>
                                                 {% endfor %}
                                             {% else %}
                                                 {{ item[column] }}
