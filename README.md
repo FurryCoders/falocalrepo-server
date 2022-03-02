@@ -161,10 +161,11 @@ for users searches.
 The controls at the top of the page allow to query the database and control the visualisation of the results.
 
 <div align="center">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-form.png" width="600">
+</div>
 
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-form.png" width="1240">
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-nav.png" width="1240">
-
+<div align="center">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-nav.png" width="600">
 </div>
 
 The _Search_ input allows to insert the search query.
@@ -319,9 +320,7 @@ Under the metadata table are a number of buttons that allow to access the submis
 counterpart, and navigate the other submissions from the author.
 
 <div align="center">
-
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission.png" width="774">
-
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission.png" width="600">
 </div>
 
 The download _File_ button opens the submission file in the current browser tab.
@@ -347,9 +346,7 @@ Under the metadata table are a number of buttons that allow to download the jour
 and navigate the other journals from the same user.
 
 <div align="center">
-
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-journal.png" width =774>
-
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-journal.png" width="600">
 </div>
 
 The download _ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON format.
