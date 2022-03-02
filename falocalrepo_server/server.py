@@ -353,7 +353,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
 
     return HTMLResponse(minify(templates.get_template("search.html").render({
         "app": app.title,
-        "title": title or f"{request.url.path.split('/')[1].title()} {table.title()}",
+        "title": title or f"Search {table.title()}",
         "action": request.url.path,
         "table": table.lower(),
         "query": query,
