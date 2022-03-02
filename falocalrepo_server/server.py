@@ -315,6 +315,7 @@ async def serve_user(request: Request, username: str):
         "mentions_length": user_stats["mentions"],
         "journals_length": user_stats["journals"],
         "userpage": clean_html(user_entry["USERPAGE"]) if user_entry else "",
+        "in_database": user_entry is not None,
         "prev": p,
         "next": n,
         "request": request}),
