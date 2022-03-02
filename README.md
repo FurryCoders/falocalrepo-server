@@ -181,8 +181,8 @@ The _Search_ button submits the search request using the current query and sorti
 
 The _Browse_ button resets the current search query and reverts to browse mode (all entries).
 
-The _Search on FA_ button opens the current search on Fur Affinity, translating the shared search and sorting fields (
-tags, author, description, and fileurl/fileext). The button is only available when searching submissions.
+The _FA_ button opens the current search on Fur Affinity, translating the shared search and sorting fields (tags,
+author, description, and fileurl/fileext). The button is only available when searching submissions.
 
 Under the search controls are the number of results and current page.
 
@@ -311,8 +311,8 @@ counterpart, and navigate the other submissions from the author.
 
 The download _File_ button opens the submission file in the current browser tab.
 
-The download _ZIP_ button generates a ZIP file containing the submission file, submission thumbnail, description
-HTML, and metadata in JSON format.
+The download _ZIP_ button generates a ZIP file containing the submission file, submission thumbnail, description HTML,
+and metadata in JSON format.
 
 The _FA_ button opens the submission on Fur Affinity
 
