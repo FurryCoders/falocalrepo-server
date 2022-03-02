@@ -25,11 +25,11 @@
         <div class="col-12 col-lg-4 mx-auto">
             <div class="card h-100">
                 <h2 class="card-header">{{ journal["TITLE"] }}</h2>
-                <div class="col-12 d-lg-none border-bottom">
-                    <div class="p-2 overflow-scroll text-wrap fit-height">
-                        {% autoescape false %}{{ journal["CONTENT"] }}{% endautoescape %}
-                    </div>
+
+                <div class="card-header d-lg-none overflow-scroll text-wrap fit-height">
+                    {% autoescape false %}{{ journal["CONTENT"] }}{% endautoescape %}
                 </div>
+
                 <div class="card-header text-center d-lg-none">
                     <div class="btn-group col-12 col-md-8" role="group">
                         <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/journal/{{ next }}">
