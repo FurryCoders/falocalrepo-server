@@ -348,7 +348,7 @@
                                                 {{ item[column].strftime("%Y-%m-%d") }}
                                                 <span class="d-none d-lg-inline">&nbsp;{{ item[column].strftime("%H:%M") }}</span>
                                             {% elif column == "ACTIVE" %}
-                                                <span class="badge w-100 {{ "bg-success" if item[column] else "bg-danger" }}">
+                                                <span class="badge {{ "bg-success" if item[column] else "bg-danger" }}">
                                                 {{ "Active" if item[column] else "Inactive" }}
                                             </span>
                                             {% elif column in columns_list %}
