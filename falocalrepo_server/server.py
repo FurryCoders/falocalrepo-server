@@ -462,7 +462,8 @@ async def serve_journal(request: Request, id_: int):
 
     p, n = settings.database.load_prev_next(journals_table, id_)
     return HTMLResponse(minify(templates.get_template("journal.html").render({
-        "title": f"{app.title} · {jrnl['TITLE']} by {jrnl['AUTHOR']}",
+        "app": app.title,
+        "title": f"{jrnl['TITLE']} by {jrnl['AUTHOR']}",
         "journal": jrnl | {"CONTENT": clean_html(jrnl["CONTENT"])},
         "prev": p,
         "next": n,
