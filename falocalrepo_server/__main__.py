@@ -40,15 +40,15 @@ def database_callback(ctx: Context, param: Parameter, value: Path) -> Path | Non
     return value
 
 
-def port_callback(ctx: Context, param: Parameter, value: str | int) -> int | None:
+def port_callback(ctx: Context, param: Parameter, value: str) -> int | None:
     if ctx.get_parameter_source(param.name) == ParameterSource.DEFAULT:
         return None
-    elif isinstance(value, str) and not value.lstrip("-").isdigit():
+    elif not value.isdigit():
         raise BadParameter(f"{value!r} is not a valid integer.", ctx, param)
-    elif (value := int(value)) <= 0:
+    elif (port := int(value)) <= 0:
         raise BadParameter(f"{value!r} is not a valid port.", ctx, param)
     else:
-        return int(value)
+        return port
 
 
 def color_callback(ctx: Context, param: Parameter, value: bool) -> bool:
@@ -66,7 +66,7 @@ def docstring_format(*args, **kwargs):
 
 
 # noinspection HttpUrlsUsage
-@command(__prog__name__, cls=CustomHelpColorsCommand)
+@command(__prog__name__, cls=CustomHelpColorsCommand, no_args_is_help=True)
 @argument("database", callback=database_callback, required=False, default=None,
           type=PathClick(exists=True, dir_okay=False, writable=True, resolve_path=True, path_type=Path))
 @option("--host", metavar="HOST", type=str, default="0.0.0.0", show_default=True, help="Server host.")
