@@ -72,7 +72,7 @@
                     <div class="col-12">
                         <div class="input-group">
                             <input type="text" class="form-control" id="query" name="query" placeholder="Search"
-                                   oninput="updateUrl(this.form)">
+                                   oninput="enableSearch()">
                             <select class="form-select form-select-sm" id="queryAdd"
                                     oninput="addToInput(document.getElementById('query'), '@' + this.value); this.options[0].selected = true;"
                                     style="max-width: 5rem; background-color: #E9ECEF">
@@ -91,7 +91,7 @@
                         <div class="input-group">
                             <span class="input-group-text" style="width: 4.4rem">Sort</span>
                             <select class="form-select form-select-sm" id="sort" name="sort"
-                                    oninput="updateUrl(this.form)">
+                                    oninput="enableSearch()">
                                 {% for col in columns_table %}
                                     <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">
                                         {{ col.title() if col|length > 2 else col.upper() }}
@@ -99,7 +99,7 @@
                                 {% endfor %}
                             </select>
                             <select class="form-select form-select-sm" id="order" name="order"
-                                    oninput="updateUrl(this.form)">
+                                    oninput="enableSearch()">
                                 <option {{ "selected" if order == "asc" }} value="asc">Ascending</option>
                                 <option {{ "selected" if order == "desc" }} value="desc">Descending</option>
                             </select>
@@ -109,12 +109,12 @@
                         <div class="input-group">
                             <span class="input-group-text" style="width: 4.4rem">View</span>
                             <select class="form-select form-select-sm" id="view" name="view"
-                                    onchange="changeView(this.value)">
+                                    oninput="enableSearch()">
                                 <option id="viewGrid" value="grid" {{ "selected" if view == "grid" }}>Grid</option>
                                 <option id="viewList" value="list"{{ "selected" if view == "list" }}>List</option>
                             </select>
                             <select class="form-select form-select-sm" id="limit" name="limit"
-                                    oninput="updateUrl(this.form)">
+                                    oninput="enableSearch()">
                                 <option value="12" {{ "selected" if limit == 12 }}>12</option>
                                 <option value="24" {{ "selected" if limit == 24 }}>24</option>
                                 <option value="48" {{ "selected" if limit == 48 }}>48</option>
@@ -186,7 +186,7 @@
 
                 <div class="row text-center mt-3">
                     <div class="col-4 ms-auto">
-                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                        <button type="submit" id="search_submit" class="btn btn-primary w-100" disabled>Search</button>
                     </div>
                     <div class="col-4 me-auto">
                         <button type="submit" class="btn btn-primary w-100"
@@ -373,11 +373,7 @@
 <script>
     document.getElementById("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
 
-    const updateUrl = (form) => {
-        const url = new URL(window.location.href);
-        Array.from((new FormData(form)).entries()).forEach(([param, value]) => url.searchParams.set(param, String(value)))
-        window.history.replaceState({}, document.title, url.href)
-    }
+    const enableSearch = () => document.getElementById("search_submit").disabled = false
 
     const addToInput = (input, value) => {
         const selectStart = input.selectionStart, selectEnd = input.selectionEnd
@@ -386,13 +382,6 @@
         input.value = a + addition + (!!b ? " " : "") + b
         input.focus()
         input.setSelectionRange(selectStart + addition.length, selectStart + addition.length)
-    }
-
-    const changeView = (view) => {
-        const url = new URL(window.location.href)
-        url.searchParams.set("view", view)
-        window.history.replaceState({}, document.title, url.href)
-        window.location.reload()
     }
 
     {% if table == "submissions" %}
