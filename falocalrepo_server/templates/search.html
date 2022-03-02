@@ -271,8 +271,8 @@
                                 <div class="card-header text-center p-0">
                                     <span class="spinner spinner-border spinner-border-sm" role="status"></span>
                                     <span class="error fw-bold text-muted" style="font-size: .75rem" hidden>
-                                    Thumbnail not found
-                                </span>
+                                        Thumbnail not found
+                                    </span>
                                     <div class="p-1" hidden>
                                         <img class="card-img mw-100 w-auto"
                                              src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
@@ -284,8 +284,9 @@
                             {% endif %}
                             {% if table in ("submissions", "journals") %}
                                 <div class="card-body overflow-hidden text-center align-middle p-1">
-                                <span class="card-title fw-bold small m-0 text-body"
-                                      title="{{ item["TITLE"] }}">{{ item["TITLE"] }}</span>
+                                    <span class="card-title fw-bold small m-0 text-body" title="{{ item["TITLE"] }}">
+                                        {{ item["TITLE"] }}
+                                    </span>
                                 </div>
                             {% elif table == "users" %}
                                 <div class="card-body overflow-hidden text-center p-1">
