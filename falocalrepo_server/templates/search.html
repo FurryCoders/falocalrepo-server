@@ -211,14 +211,14 @@
 {% set navigation %}
 <div class="container">
     <div class="row mt-3">
-        <div class="col-12 col-lg-8 mx-auto">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-4 mx-auto">
             <div class="card w-100">
                 <div class="card-header p-1">
                     <div class="row">
-                        <div class="col-6 text-center border-end">
+                        <div class="col-6 text-center pe-1 border-end">
                             {{ offset + (results_total > 0) }}-{{ offset + results|length }} of {{ results_total }}
                         </div>
-                        <div class="col-6 text-center border-start">
+                        <div class="col-6 text-center ps-1 border-start">
                             Page {{ page }} of {{ (results_total / limit)|round(0, 'ceil')|int }}
                         </div>
                     </div>
