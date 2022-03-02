@@ -301,6 +301,7 @@ async def serve_user(request: Request, username: str):
 
     user_entry: dict | None = settings.database.load_user(username)
     user_stats: dict[str, int] = settings.database.load_user_stats(username)
+    p, n = settings.database.load_prev_next(users_table, username) if user_entry else (0, 0)
 
     return HTMLResponse(minify(templates.get_template("user.html").render({
         "app": app.title,
@@ -314,6 +315,8 @@ async def serve_user(request: Request, username: str):
         "mentions_length": user_stats["mentions"],
         "journals_length": user_stats["journals"],
         "userpage": clean_html(user_entry["USERPAGE"]) if user_entry else "",
+        "prev": p,
+        "next": n,
         "request": request}),
         remove_comments=True))
 

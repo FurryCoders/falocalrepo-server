@@ -103,9 +103,24 @@
                 </div>
 
                 <div class="card-footer text-center">
-                    <a class="btn btn-sm btn-primary" href="https://www.furaffinity.net/user/{{ user }}">
-                        FA
-                    </a>
+                    <div class="row text-center">
+                        <div class="btn-group col-8 col-sm-4 col-lg-8 ms-auto" role="group">
+                            <a class="btn btn-sm btn-primary {{ "disabled" if not next }}"
+                               href="/user/{{ next }}">
+                                Next
+                            </a>
+                            <span class="btn-separator"></span>
+                            <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}"
+                               href="/user/{{ prev }}">
+                                Prev
+                            </a>
+                        </div>
+                        <div class="btn-group col-4 col-sm-2 col-lg-4 me-auto">
+                            <a class="btn btn-sm btn-primary" href="https://www.furaffinity.net/user/{{ user }}">
+                                FA
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 {% if userpage != "" %}
