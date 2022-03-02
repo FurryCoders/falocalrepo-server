@@ -169,7 +169,7 @@
                         <h6 class="col-4 card-title">Tags</h6>
                         <div class="col-8 card-text">
                             {% for tag in submission["TAGS"] %}
-                                <a class="badge bg-primary text-link text-truncate text-decoration-none"
+                                <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
                                    href='/search/submissions/?query=%40tags%20%22%7C{{ tag }}%7C%22'>{{ tag }}</a>
                             {% endfor %}
                             {% if not submission["TAGS"] %}
@@ -181,7 +181,7 @@
                         <h6 class="col-4 card-title">Favorites</h6>
                         <div class="col-8 card-text">
                             {% for user in submission["FAVORITE"] %}
-                                <a class="badge bg-primary text-link text-truncate text-decoration-none"
+                                <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
                             {% if not submission["FAVORITE"] %}
@@ -193,7 +193,7 @@
                         <h6 class="col-4 card-title">Mentions</h6>
                         <div class="col-8 card-text">
                             {% for user in submission["MENTIONS"] %}
-                                <a class="badge bg-primary text-link text-truncate text-decoration-none"
+                                <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
                             {% if not submission["MENTIONS"] %}
