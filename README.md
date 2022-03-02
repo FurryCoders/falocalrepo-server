@@ -162,9 +162,8 @@ The controls at the top of the page allow to query the database and control the 
 
 <div align="center">
 
-![search controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-form.png)
-
-![search controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-nav.png)
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-form.png" width="1240">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-nav.png" width="1240">
 
 </div>
 
@@ -305,7 +304,7 @@ counterpart, and navigate the other submissions from the author.
 
 <div align="center">
 
-![submission controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission.png)
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission.png" width="774">
 
 </div>
 
@@ -333,7 +332,7 @@ and navigate the other journals from the same user.
 
 <div align="center">
 
-![journal controls](https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-journal.png)
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-journal.png" width =774>
 
 </div>
 
