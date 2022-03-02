@@ -347,13 +347,10 @@
                                                 <span class="badge w-100 {{ "bg-success" if item[column] else "bg-danger" }}">
                                                 {{ "Active" if item[column] else "Inactive" }}
                                             </span>
-                                            {% elif column == "FOLDERS" %}
-                                                {% for list_item in item[column]|sort %}
-                                                    <span class="badge bg-info overflow-hidden">{{ list_item[0] + ("-" + list_item.split(":")[0].split("-")[1] if "-" in list_item else "") }}</span>
-                                                {% endfor %}
                                             {% elif column in columns_list %}
                                                 {% for list_item in item[column] %}
-                                                    <span class="badge bg-info overflow-hidden">{{ list_item }}</span>
+                                                    <span class="badge bg-info text-truncate align-middle"
+                                                          style="max-width: 10rem">{{ list_item }}</span>
                                                 {% endfor %}
                                             {% else %}
                                                 {{ item[column] }}
