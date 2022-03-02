@@ -164,10 +164,6 @@ The controls at the top of the page allow to query the database and control the 
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-form.png" width="600">
 </div>
 
-<div align="center">
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-nav.png" width="600">
-</div>
-
 The _Search_ input allows to insert the search query.
 
 The _Field_ menu allows to insert a specific search field using a simple dropdown menu.
@@ -185,6 +181,10 @@ The _FA_ button opens the current search on Fur Affinity, translating the shared
 author, description, and fileurl/fileext). The button is only available when searching submissions.
 
 Under the search controls are the number of results and current page.
+
+<div align="center">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-nav.png" width="600">
+</div>
 
 Under the results numbers are the page controls. _First_ leads to page 1, _Prev_ leads to the previous page, _Next_
 leads to the next page, and _Last_ leads to the last page. These controls are also available at the bottom of the page.
