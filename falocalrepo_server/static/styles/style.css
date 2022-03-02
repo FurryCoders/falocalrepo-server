@@ -17,7 +17,7 @@
         --color-secondary: #989899;
         --color-tertiary: #5A5A5E;
         --color-link: 65, 105, 225; /*royalblue*/
-        --color-highlight: #004d5b;
+        --color-highlight: #00353L;
         --border-color: var(--color-tertiary);
     }
 }
