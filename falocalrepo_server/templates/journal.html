@@ -56,9 +56,10 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Date</h6>
                         <div class="col-8 card-text">
-                            <span class="badge bg-secondary w-100 text-truncate text-decoration-none disabled">
+                            <a class="btn-sm btn-primary badge text-truncate text-decoration-none w-100"
+                               href="/search/journals/?query=%40date%20{{ journal["DATE"].strftime("%Y-%m-%d") }}">
                                 {{ journal["DATE"].strftime("%Y-%m-%d %H:%M") }}
-                            </span>
+                            </a>
                         </div>
                     </div>
                     <div class="row mt-1">
