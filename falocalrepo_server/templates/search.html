@@ -308,7 +308,7 @@
                             </a>
                         {% elif table == "users" %}
                             <a href="/user/{{ item["USERNAME"] }}" class="text-decoration-none w-100">
-                                <div class="card-footer text-center p-1 pb-0 small bg-link">
+                                <div class="card-footer text-center p-1 pb-0 small">
                                     {% for folder in item["FOLDERS"]|sort %}
                                         <span title="{{ folder }}" class="badge bg-info w-100 text-truncate">
                                             {{ folder }}
