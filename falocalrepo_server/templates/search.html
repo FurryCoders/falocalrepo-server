@@ -185,19 +185,19 @@
                 </div>
 
                 <div class="row text-center mt-3">
-                    <div class="col-6">
+                    <div class="col-4 ms-auto">
                         <button type="submit" class="btn btn-primary w-100">Search</button>
                     </div>
-                    <div class="col-6">
+                    <div class="col-4 me-auto">
                         <button type="submit" class="btn btn-primary w-100"
                                 onclick="document.getElementById('query').value = ''">
                             Browse
                         </button>
                     </div>
                     {% if table == "submissions" %}
-                        <div class="col-12 col-lg-6 mx-auto mt-2">
+                        <div class="col-4">
                             <button type="button" class="btn btn-info w-100" onclick="convertToFAQuery()">
-                                Search on FA
+                                FA
                             </button>
                         </div>
                     {% endif %}
