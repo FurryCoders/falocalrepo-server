@@ -68,7 +68,7 @@ def docstring_format(*args, **kwargs):
 # noinspection HttpUrlsUsage
 @command(__prog__name__, cls=CustomHelpColorsCommand, no_args_is_help=True)
 @argument("database", callback=database_callback, required=False, default=None,
-          type=PathClick(exists=True, dir_okay=False, writable=True, resolve_path=True, path_type=Path))
+          type=PathClick(exists=True, dir_okay=False, resolve_path=True, path_type=Path))
 @option("--host", metavar="HOST", type=str, default="0.0.0.0", show_default=True, help="Server host.")
 @option("--port", metavar="PORT", type=str, default="80, 443", show_default=True, callback=port_callback,
         help="Server port.")
