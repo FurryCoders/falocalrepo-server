@@ -34,6 +34,12 @@
                     {% endif %}
                 </div>
 
+                {% if userpage != "" %}
+                <div class="card-header d-lg-none overflow-scroll text-wrap fit-height">
+                    {% autoescape false %}{{ userpage }}{% endautoescape %}
+                </div>
+                {% endif %}
+
                 <div class="card-body">
                     <div class="row">
                         <h6 class="col-5 col-xxl-4 card-title">Submissions</h6>
@@ -124,14 +130,6 @@
                         </div>
                     </div>
                 </div>
-
-                {% if userpage != "" %}
-                <div class="card-footer col-12 d-lg-none">
-                    <div class="p-2 overflow-scroll text-wrap">
-                        {% autoescape false %}{{ userpage }}{% endautoescape %}
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
