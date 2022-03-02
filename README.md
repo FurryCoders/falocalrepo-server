@@ -104,28 +104,28 @@ falocalrepo-server ~/FA.db --host 127.0.0.1 --port 8443 --ssl-cert ~/FA.certific
 
 _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 
-| Route                                    | Destination                                                                 |
-|------------------------------------------|-----------------------------------------------------------------------------|
-| `/`                                      | Show home page with general information regarding the database              |
-| `/search/`                               | Redirects to `/search/submissions/`                                         |
-| `/search/submissions/`                   | Search & browse submissions                                                 |
-| `/search/journals/`                      | Search & browse journals                                                    |
-| `/search/users/`                         | Search & browse users                                                       |
-| `/user/<username>/`                      | Show information regarding a specific user                                  |
-| `/gallery/<username>/`                   | Browse & search a user's gallery submissions                                |
-| `/scraps/<username>/`                    | Browse & search a user's scraps submissions                                 |
-| `/submissions/<username>/`               | Browse & search a user's gallery & scraps submissions                       | 
-| `/favorites/<username>/`                 | Browse & search a user's favorite submissions                               |
-| `/mentions/<username>/`                  | Browse & search the submissions where the user is mentioned                 |
-| `/journals/<username>/`                  | Browse & search a user's journals                                           |
-| `/full/<submission id>/`                 | Redirect to `/submission/<submission id>/`                                  |
-| `/view/<submission id>/`                 | Redirect to `/submission/<submission id>/`                                  |
-| `/submission/<submission id>/`           | View a submission                                                           |
-| `/submission/<submission id>/file/`      | Open a submission file                                                      |
-| `/submission/<submission id>/thumbnail/` | Open a submission thumbnail (generated for image if no thumbnail is stored) |
-| `/submission/<submission id>/zip/`       | Download a submission's file, description, and metadata as a ZIP archive    |
-| `/journal/<journal id>/`                 | View a journal                                                              |
-| `/journal/<journal id>/zip/`             | Download a journal's content and metadata as a ZIP archive                  |
+| Route                                    | Destination                                                                             |
+|------------------------------------------|-----------------------------------------------------------------------------------------|
+| `/`                                      | Show home page with general information regarding the database                          |
+| `/search/`                               | Redirects to `/search/submissions/`                                                     |
+| `/search/submissions/`                   | Search & browse submissions                                                             |
+| `/search/journals/`                      | Search & browse journals                                                                |
+| `/search/users/`                         | Search & browse users                                                                   |
+| `/user/<username>/`                      | Show information regarding a specific user                                              |
+| `/gallery/<username>/`                   | Browse & search a user's gallery submissions                                            |
+| `/scraps/<username>/`                    | Browse & search a user's scraps submissions                                             |
+| `/submissions/<username>/`               | Browse & search a user's gallery & scraps submissions                                   | 
+| `/favorites/<username>/`                 | Browse & search a user's favorite submissions                                           |
+| `/mentions/<username>/`                  | Browse & search the submissions where the user is mentioned                             |
+| `/journals/<username>/`                  | Browse & search a user's journals                                                       |
+| `/full/<submission id>/`                 | Redirect to `/submission/<submission id>/`                                              |
+| `/view/<submission id>/`                 | Redirect to `/submission/<submission id>/`                                              |
+| `/submission/<submission id>/`           | View a submission                                                                       |
+| `/submission/<submission id>/file/`      | Open a submission file                                                                  |
+| `/submission/<submission id>/thumbnail/` | Open a submission thumbnail (generated for image submissions if no thumbnail is stored) |
+| `/submission/<submission id>/zip/`       | Download a submission's file, description, and metadata as a ZIP archive                |
+| `/journal/<journal id>/`                 | View a journal                                                                          |
+| `/journal/<journal id>/zip/`             | Download a journal's content and metadata as a ZIP archive                              |
 
 ### JSON API Routes
 
