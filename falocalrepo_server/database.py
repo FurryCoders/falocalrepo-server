@@ -1,4 +1,6 @@
 from functools import cache
+from json import dumps
+from json import loads
 from os import W_OK
 from os import access
 from pathlib import Path
@@ -209,6 +211,16 @@ class Database(_Database):
     def _load_info_cached(self, *, _cache=None) -> tuple[int, int, int, str]:
         return len(self.users), len(self.submissions), len(
             self.journals), self.version
+
+    def save_settings(self, name: str, settings: dict):
+        if self.read_only:
+            return
+
+        self.settings[f"SERVER.{name}"] = dumps(settings)
+        self.commit()
+
+    def load_settings(self, name: str) -> dict:
+        return loads(self.settings[f"SERVER.{name}"] or "{}")
 
     def load_user(self, user: str) -> dict | None:
         return self._load_user_cached(user, _cache=self.m_time)
