@@ -335,14 +335,14 @@ async def serve_settings(request: Request):
 
 @app.get("/settings/set")
 async def save_settings(request: Request):
-    if settings.database.read_only:
-        return Response("Database is read only", status_code=status.HTTP_403_FORBIDDEN)
-
     search_settings.reset()
 
     for param, value in request.query_params.items():
         table, setting = param.split(".")
         search_settings.__setattr__(setting, search_settings.__getattribute__(setting) | {table.upper(): value})
+
+    if settings.database.read_only:
+        return Response("Database is read only, settings will be reset on restart", status_code=status.HTTP_403_FORBIDDEN)
 
     settings.database.save_settings("SEARCH", search_settings.dict())
 
