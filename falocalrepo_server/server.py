@@ -360,7 +360,6 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
         "sort": sort,
         "order": order,
         "view": view,
-        "allow_view": table == submissions_table,
         "thumbnails": table == submissions_table,
         "columns_table": columns_table,
         "columns_results": columns_results,
