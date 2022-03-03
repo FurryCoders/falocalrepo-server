@@ -34,10 +34,6 @@ body {
     border-color: var(--border-color);
 }
 
-.text-link:focus, .text-link:hover {
-    color: #3dd5f3 !important
-}
-
 .bg-link:focus, .bg-link:hover {
     background-color: var(--color-highlight) !important
 }
@@ -81,15 +77,6 @@ body {
 
 .text-justify {
     text-align: justify;
-}
-
-.hover_highlight:hover {
-    background-blend-mode: multiply;
-    background-color: var(--color-highlight);
-}
-
-.hover_underline:hover {
-    text-decoration: underline;
 }
 
 .bbcode_center {
