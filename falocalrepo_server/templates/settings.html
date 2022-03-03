@@ -104,7 +104,7 @@
                         <button type="button" class="btn btn-primary w-100" onclick="save(this.form)">Save</button>
                     </div>
                     <div class="col-4 me-auto">
-                        <button type="button" class="btn btn-danger w-100" onclick="reset(this.form)">Reset</button>
+                        <button type="button" class="btn btn-danger w-100" onclick="defaults(this.form)">Reset</button>
                     </div>
                 </div>
             </form>
@@ -118,8 +118,8 @@
     </div>
 </div>
 <script>
-    const reset = (form) => {
-        form.querySelectorAll("select").forEach(select => select.selectedIndex = select.querySelector("[data-default='true']").index)
+    const defaults = (form) => {
+        form.querySelectorAll("option[data-default='true']").forEach(option => option.parentElement.selectedIndex = option.index)
     }
 
     const save = (form) => {
