@@ -116,7 +116,7 @@
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
-                                {{ submission["FOLDER"] }}
+                                {{ submission["FOLDER"]|title }}
                             </a>
                         </div>
                     </div>
@@ -125,7 +125,7 @@
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40type%20%22{{ submission["TYPE"] }}%22">
-                                {{ submission["TYPE"] }}
+                                {{ submission["TYPE"]|title }}
                             </a>
                         </div>
                     </div>
@@ -134,7 +134,7 @@
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40category%20%22{{ submission["CATEGORY"] }}%22">
-                                {{ submission["CATEGORY"] }}
+                                {{ submission["CATEGORY"]|title }}
                             </a>
                         </div>
                     </div>
@@ -143,7 +143,7 @@
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40species%20%22{{ submission["SPECIES"] }}%22">
-                                {{ submission["SPECIES"] }}
+                                {{ submission["SPECIES"]|title }}
                             </a>
                         </div>
                     </div>
@@ -152,7 +152,7 @@
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40gender%20%22{{ submission["GENDER"] }}%22">
-                                {{ submission["GENDER"] }}
+                                {{ submission["GENDER"]|title }}
                             </a>
                         </div>
                     </div>
@@ -161,7 +161,7 @@
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40rating%20%22{{ submission["RATING"] }}%22">
-                                {{ submission["RATING"] }}
+                                {{ submission["RATING"]|title }}
                             </a>
                         </div>
                     </div>
