@@ -76,6 +76,7 @@ LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
     '%(levelprefix)s %(asctime)s %(client_addr)s - %(request_line)s %(status_code)s %(msecs).0fms'
 
 fa_base_url: str = "https://www.furaffinity.net"
+fa_link: Pattern = re_compile(r"(https?://)?(www.)?furaffinity.net", flags=IGNORECASE)
 root: Path = Path(__file__).resolve().parent
 app: FastAPI = FastAPI(title="FurAffinity Local Repo", openapi_url=None)
 templates: Jinja2Templates = Jinja2Templates(str(root / "templates"))
@@ -97,8 +98,6 @@ tags_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"(:icon([^:]+):|:([^:]+)icon:)"), r'<a href="/user/\2\3">@\2\3</a>'),
     (re_compile(r"\n"), "<br/>")
 ]
-
-fa_link: Pattern = re_compile(r"(https?://)?(www.)?furaffinity.net", flags=IGNORECASE)
 
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
