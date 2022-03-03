@@ -111,6 +111,8 @@ _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 | `/search/submissions/`                   | Search & browse submissions                                                             |
 | `/search/journals/`                      | Search & browse journals                                                                |
 | `/search/users/`                         | Search & browse users                                                                   |
+| `/settings/`                             | Change default search settings                                                          |
+| `/settings/set/`                         | Change default search settings                                                          |
 | `/user/<username>/`                      | Show information regarding a specific user                                              |
 | `/gallery/<username>/`                   | Browse & search a user's gallery submissions                                            |
 | `/scraps/<username>/`                    | Browse & search a user's scraps submissions                                             |
@@ -295,6 +297,14 @@ Search for journals/submissions whose title is exactly "cat":
 Search for text submissions with PDF files:
 
 `@type text @fileext pdf`
+
+### Search Settings
+
+The search settings page allows modifying the sorting, ordering, and viewing option that are applied by default to the
+various searches. Settings can be saved to the database if it is writable, otherwise they are simply saved for the
+current session and reset when the program stops.
+
+Settings values are saved in the `SETTINGS` table with the `SERVER.SEARCH` setting name.
 
 ### User
 
