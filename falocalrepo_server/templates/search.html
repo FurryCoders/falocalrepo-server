@@ -90,16 +90,14 @@
                     <div class="col-12">
                         <div class="input-group">
                             <span class="input-group-text" style="width: 4.4rem">Sort</span>
-                            <select class="form-select form-select-sm" id="sort" name="sort"
-                                    oninput="enableSearch()">
+                            <select class="form-select form-select-sm" id="sort" name="sort" oninput="enableSearch()">
                                 {% for col in columns_table %}
                                     <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">
                                         {{ col.title() if col|length > 2 else col.upper() }}
                                     </option>
                                 {% endfor %}
                             </select>
-                            <select class="form-select form-select-sm" id="order" name="order"
-                                    oninput="enableSearch()">
+                            <select class="form-select form-select-sm" id="order" name="order" oninput="enableSearch()">
                                 <option {{ "selected" if order == "asc" }} value="asc">Ascending</option>
                                 <option {{ "selected" if order == "desc" }} value="desc">Descending</option>
                             </select>
@@ -108,12 +106,11 @@
                     <div class="col-12 mt-2">
                         <div class="input-group">
                             <span class="input-group-text" style="width: 4.4rem">View</span>
-                            <select class="form-select form-select-sm" id="view" name="view"
-                                    oninput="enableSearch()">
-                                <option id="viewGrid" value="grid" {{ "selected" if view == "grid" }}>Grid</option>
-                                <option id="viewList" value="list"{{ "selected" if view == "list" }}>List</option>
+                            <select class="form-select form-select-sm" name="view" oninput="enableSearch()">
+                                <option value="grid" {{ "selected" if view == "grid" }}>Grid</option>
+                                <option value="list"{{ "selected" if view == "list" }}>List</option>
                             </select>
-                            <select class="form-select form-select-sm" id="limit" name="limit"
+                            <select class="form-select form-select-sm" name="limit"
                                     oninput="enableSearch()">
                                 <option value="12" {{ "selected" if limit == 12 }}>12</option>
                                 <option value="24" {{ "selected" if limit == 24 }}>24</option>
@@ -381,7 +378,8 @@
 
     let enableSearch = () => {
         document.getElementById("search_submit").disabled = false
-        enableSearch = () => {}
+        enableSearch = () => {
+        }
     }
 
     const addToInput = (input, value) => {
