@@ -26,6 +26,7 @@ from falocalrepo_database.tables import JournalsColumns
 from falocalrepo_database.tables import SubmissionsColumns
 from falocalrepo_database.tables import UsersColumns
 from fastapi import FastAPI
+from fastapi import Form
 from fastapi import Request
 from fastapi import Response
 from fastapi import status
@@ -335,8 +336,6 @@ async def serve_settings(request: Request):
 
 @app.get("/settings/set/")
 async def save_settings(request: Request):
-    search_settings.reset()
-
     for param, value in request.query_params.items():
         table, setting = param.split(".")
         search_settings.__setattr__(setting, search_settings.__getattribute__(setting) | {table.upper(): value})
