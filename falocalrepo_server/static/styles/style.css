@@ -25,7 +25,13 @@
 body {
     background-color: var(--background-color);
     color: var(--color-primary);
-    font-family: -apple-system, Roboto, sans-serif;
+    font-family: /* macos */ -apple-system, BlinkMacSystemFont,
+        /* windows */ "Segoe UI",
+        /* android */ "Roboto",
+        /* linux */ "Oxygen", "Ubuntu", "Cantarell",
+        /* firefox os */ "Fira Sans",
+        /* older android */ "Droid Sans",
+        /* fallbacks */ "Helvetica Neue", sans-serif;
 }
 
 
