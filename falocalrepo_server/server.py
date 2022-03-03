@@ -253,21 +253,21 @@ async def error_database_not_found(request: Request, err: FileNotFoundError):
     return error_response(request, 500, "Database not found")
 
 
-@app.get("/view/{id_}", response_class=HTMLResponse)
-@app.get("/full/{id_}", response_class=HTMLResponse)
+@app.get("/view/{id_}/", response_class=HTMLResponse)
+@app.get("/full/{id_}/", response_class=HTMLResponse)
 async def redirect_submission(id_: int):
     return RedirectResponse(app.url_path_for(serve_submission.__name__, id_=str(id_)),
                             status.HTTP_301_MOVED_PERMANENTLY)
 
 
-@app.get("/gallery/{username}", response_class=HTMLResponse)
+@app.get("/gallery/{username}/", response_class=HTMLResponse)
 @app.get("/search/gallery/{username}/", response_class=HTMLResponse)
 async def serve_user_gallery(request: Request, username: str):
     return await serve_search(request, "submissions", f"Gallery {username}",
                               {"query": f'@author "{clean_username(username)}" @folder "gallery"'})
 
 
-@app.get("/scraps/{username}", response_class=HTMLResponse)
+@app.get("/scraps/{username}/", response_class=HTMLResponse)
 @app.get("/search/scraps/{username}/", response_class=HTMLResponse)
 async def serve_user_scraps(request: Request, username: str):
     return await serve_search(request, "submissions", f"Scraps {username}",
@@ -288,14 +288,14 @@ async def serve_user_journals(request: Request, username: str):
                               {"query": f'@author "{clean_username(username)}"'})
 
 
-@app.get("/favorites/{username}", response_class=HTMLResponse)
+@app.get("/favorites/{username}/", response_class=HTMLResponse)
 @app.get("/search/favorites/{username}/", response_class=HTMLResponse)
 async def serve_user_favorites(request: Request, username: str):
     return await serve_search(request, "submissions", f"Favorites {username}",
                               {"query": f'@favorite "|{clean_username(username)}|"'})
 
 
-@app.get("/mentions/{username}", response_class=HTMLResponse)
+@app.get("/mentions/{username}/", response_class=HTMLResponse)
 @app.get("/search/mentions/{username}/", response_class=HTMLResponse)
 async def serve_user_mentions(request: Request, username: str):
     return await serve_search(request, "submissions", f"Mentions {username}",
@@ -317,7 +317,7 @@ async def serve_home(request: Request):
         remove_comments=True))
 
 
-@app.get("/settings")
+@app.get("/settings/")
 async def serve_settings(request: Request):
     return HTMLResponse(minify(templates.get_template("settings.html").render({
         "app": app.title,
@@ -333,7 +333,7 @@ async def serve_settings(request: Request):
         remove_comments=True))
 
 
-@app.get("/settings/set")
+@app.get("/settings/set/")
 async def save_settings(request: Request):
     search_settings.reset()
 
@@ -349,7 +349,7 @@ async def save_settings(request: Request):
     return Response("Settings saved", status_code=200)
 
 
-@app.get("/user/{username}", response_class=HTMLResponse)
+@app.get("/user/{username}/", response_class=HTMLResponse)
 async def serve_user(request: Request, username: str):
     if username != (username_clean := clean_username(username)):
         return RedirectResponse(app.url_path_for(serve_user.__name__, username=username_clean))
@@ -590,8 +590,8 @@ async def serve_journal_json(id_: int):
         return j
 
 
-@app.get("/json/user/{username}", response_class=JSONResponse)
-@app.post("/json/user/{username}", response_class=JSONResponse)
+@app.get("/json/user/{username}/", response_class=JSONResponse)
+@app.post("/json/user/{username}/", response_class=JSONResponse)
 async def serve_user_json(username: str):
     username = clean_username(username)
     user_entry: dict | None = settings.database.load_user_uncached(username)
