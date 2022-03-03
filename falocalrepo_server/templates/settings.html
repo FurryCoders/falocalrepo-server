@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!--suppress HtmlUnknownTarget, HtmlFormInputWithoutLabel -->
+<html lang="en">
+<head>
+    <title>{{ title }} · {{ app }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" href="/touch-icon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
+    <link rel="stylesheet" href="/static/styles/style.css">
+    <style>
+        .transparent {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="mt-4 mb-4">
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <form action="/settings/set" class="rounded border p-3" id="search_form" onsubmit="return false">
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <h2>Search Settings</h2>
+                    </div>
+                </div>
+                {% for table in tables %}
+                {% set fallback_sort %}{{ default_sort[table].lower() }}{% endset %}
+                {% set fallback_order %}{{ default_order[table].lower() }}{% endset %}
+                {% set fallback_view %}{{ "grid" }}{% endset %}
+                {% set fallback_limit %}{{ "48" }}{% endset %}
+                {% set selected_sort %}{{ settings.sort.get(table, fallback_sort).lower() }}{% endset %}
+                {% set selected_order %}{{ settings.order.get(table, fallback_order).lower() }}{% endset %}
+                {% set selected_view %}{{ settings.view.get(table, fallback_view).lower() }}{% endset %}
+                {% set selected_limit %}{{ settings.limit.get(table, fallback_limit).lower() }}{% endset %}
+                <div class="row {{ "mb-3" if not loop.last }}">
+                    <h5>{{ table|title }}</h5>
+                    <div class="col-12">
+                        <div class="input-group">
+                            <span class="input-group-text" style="width: 4.4rem">Sort</span>
+                            <select name="{{ table }}.sort" class="form-select form-select-sm">
+                                {% for col in columns[table] %}
+                                    <option value="{{ col|lower }}"
+                                            {{ 'data-default="true"' if col|lower == fallback_sort }}
+                                            {{ "selected" if col|lower == selected_sort }}>
+                                        {{ col.title() if col|length > 2 else col.upper() }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <select name="{{ table }}.order" class="form-select form-select-sm">
+                                <option value="asc"
+                                        {{ 'data-default="true"' if "asc" == fallback_order }}
+                                        {{ "selected" if "asc" == selected_order }}>
+                                    Ascending
+                                </option>
+                                <option value="desc"
+                                        {{ 'data-default="true"' if "desc" == fallback_order }}
+                                        {{ "selected" if "desc" == selected_order }}>
+                                    Descending
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <div class="input-group">
+                            <span class="input-group-text" style="width: 4.4rem">View</span>
+                            <select class="form-select form-select-sm" name="{{ table }}.view">
+                                <option value="grid" data-default="true" {{ "selected" if "grid" == selected_view }}>
+                                    Grid
+                                </option>
+                                <option value="list" {{ "selected" if "list" == selected_view }}>
+                                    List
+                                </option>
+                            </select>
+                            <select class="form-select form-select-sm" name="{{ table }}.limit">
+                                <option value="12" {{ "selected" if "12" == selected_limit }}>
+                                    12
+                                </option>
+                                <option value="24" {{ "selected" if "24" == selected_limit }}>
+                                    24
+                                </option>
+                                <option value="48" data-default="true" {{ "selected" if "48" == selected_limit }}>
+                                    48
+                                </option>
+                                <option value="72" {{ "selected" if "72" == selected_limit }}>
+                                    72
+                                </option>
+                                <option value="96" {{ "selected" if "96" == selected_limit }}>
+                                    96
+                                </option>
+                                <option value="120" {{ "selected" if "120" == selected_limit }}>
+                                    120
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="row text-center mt-3">
+                    <div class="col-4 ms-auto">
+                        <button type="button" class="btn btn-primary w-100" onclick="save(this.form)">Save</button>
+                    </div>
+                    <div class="col-4 me-auto">
+                        <button type="button" class="btn btn-danger w-100" onclick="reset(this.form)">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mt-3 transparent" id="saved_banner" style="transition: all 250ms">
+        <div class="col-6 col-lg-4 mx-auto">
+            <div class="mx-auto alert alert-info p-2 text-center" id="saved_banner_alert">Settings saved</div>
+        </div>
+    </div>
+</div>
+<script>
+    const reset = (form) => {
+        form.querySelectorAll("select").forEach(select => select.selectedIndex = select.querySelector("[data-default='true']").index)
+    }
+
+    const save = (form) => {
+        const banner = document.getElementById("saved_banner")
+        const alert = document.getElementById("saved_banner_alert")
+        const url = new URL(form.action)
+        Array.from((new FormData(form)).entries()).forEach(([name, value]) => url.searchParams.set(name, String(value)))
+        fetch(url.href).then(async (response) => {
+            alert.innerText = await response.text()
+            alert.classList.remove("alert-danger", "alert-info")
+            response.ok ? alert.classList.add("alert-info") : alert.classList.add("alert-danger")
+            banner.classList.remove("transparent")
+            setTimeout(() => banner.classList.add("transparent"), 1500)
+        })
+    }
+</script>
+</body>
+</html>
