@@ -96,6 +96,7 @@ tags_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"\[/url]"), "</a>"),
     (re_compile(r"\[yt]((?:.(?!\[yt]))+)\[/yt]"), r'</a href="\1">\1</a>'),
     (re_compile(r"(:icon([^:]+):|:([^:]+)icon:)"), r'<a href="/user/\2\3">@\2\3</a>'),
+    (re_compile(r"((?:\n(?!\n)|[^\n])+)\n\n+"), r"<p>\1</p>"),
     (re_compile(r"\n"), "<br/>")
 ]
 
@@ -103,7 +104,7 @@ app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
 
 def tags_to_html(text: str) -> str:
-    return reduce(lambda t, es: es[0].sub(es[1], t), tags_expressions, text)
+    return reduce(lambda t, es: es[0].sub(es[1], t), tags_expressions, text.strip() + "\n\n")
 
 
 def clean_html(html: str) -> str:
