@@ -323,7 +323,7 @@ counterpart, and navigate the other submissions from the author.
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission.png" width="600">
 </div>
 
-The download _File_ button opens the submission file in the current browser tab.
+The download _File_ button downloads the submission file (if present).
 
 The download _ZIP_ button generates a ZIP file containing the submission file, submission thumbnail, description HTML,
 and metadata in JSON format.
