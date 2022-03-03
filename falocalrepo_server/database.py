@@ -1,4 +1,6 @@
 from functools import cache
+from os import W_OK
+from os import access
 from pathlib import Path
 from re import match
 from re import split
@@ -70,7 +72,7 @@ def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliase
 class Database(_Database):
     def __init__(self, database_path: Path):
         _Database.check_connection(database_path)
-        super().__init__(database_path, read_only=True)
+        super().__init__(database_path, read_only=not access(database_path, W_OK))
         if not self.is_formatted:
             raise DatabaseError("Database not formatted")
 
