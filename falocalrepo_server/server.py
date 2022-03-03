@@ -22,6 +22,9 @@ from PIL import UnidentifiedImageError
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from chardet import detect as detect_encoding
+from falocalrepo_database.tables import JournalsColumns
+from falocalrepo_database.tables import SubmissionsColumns
+from falocalrepo_database.tables import UsersColumns
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi import Response
@@ -53,6 +56,25 @@ from .database import submissions_table
 from .database import users_table
 
 
+class SearchSettings(BaseSettings):
+    view: dict[str, str] = {users_table: "grid", submissions_table: "grid", journals_table: "grid"}
+    limit: dict[str, str] = {users_table: "48", submissions_table: "48", journals_table: "48"}
+    sort: dict[str, str] = default_sort
+    order: dict[str, str] = default_order
+
+    def reset(self):
+        self.view = {users_table: "grid", submissions_table: "grid", journals_table: "grid"}
+        self.limit = {users_table: "48", submissions_table: "48", journals_table: "48"}
+        self.sort = default_sort
+        self.order = default_order
+
+    def load(self, obj: dict):
+        self.view = obj.get("view", self.view)
+        self.limit = obj.get("limit", self.limit)
+        self.sort = obj.get("sort", self.sort)
+        self.order = obj.get("order", self.order)
+
+
 class Settings(BaseSettings):
     database: Database = None
     static_folder: Path = None
@@ -81,6 +103,7 @@ root: Path = Path(__file__).resolve().parent
 app: FastAPI = FastAPI(title="FurAffinity Local Repo", openapi_url=None)
 templates: Jinja2Templates = Jinja2Templates(str(root / "templates"))
 settings: Settings = Settings(static_folder=root / "static")
+search_settings: SearchSettings = SearchSettings()
 security: HTTPBasic = HTTPBasic()
 
 bbcode_expressions: list[tuple[Pattern, str]] = [
@@ -294,6 +317,38 @@ async def serve_home(request: Request):
         remove_comments=True))
 
 
+@app.get("/settings")
+async def serve_settings(request: Request):
+    return HTMLResponse(minify(templates.get_template("settings.html").render({
+        "app": app.title,
+        "title": "Search Settings",
+        "tables": [users_table, submissions_table, journals_table],
+        "columns": {users_table: [c.name for c in UsersColumns],
+                    submissions_table: [c.name for c in SubmissionsColumns] + ["relevance"],
+                    journals_table: [c.name for c in JournalsColumns]},
+        "settings": search_settings,
+        "default_sort": default_sort,
+        "default_order": default_order,
+        "request": request}),
+        remove_comments=True))
+
+
+@app.get("/settings/set")
+async def save_settings(request: Request):
+    if settings.database.read_only:
+        return Response("Database is read only", status_code=status.HTTP_403_FORBIDDEN)
+
+    search_settings.reset()
+
+    for param, value in request.query_params.items():
+        table, setting = param.split(".")
+        search_settings.__setattr__(setting, search_settings.__getattribute__(setting) | {table.upper(): value})
+
+    settings.database.save_settings("SEARCH", search_settings.dict())
+
+    return Response("Settings saved", status_code=200)
+
+
 @app.get("/user/{username}", response_class=HTMLResponse)
 async def serve_user(request: Request, username: str):
     if username != (username_clean := clean_username(username)):
@@ -333,10 +388,10 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
     args |= args_req
 
     page: int = p if (p := int(args.get("page", 1))) > 0 else 1
-    limit: int = l if (l := int(args.get("limit", 48))) > 0 else 48
-    sort: str = args.get("sort", default_sort[table]).lower()
-    order: str = args.get("order", default_order[table]).lower()
-    view: str = "grid" if (v := args.get("view", "").lower()) not in ("list", "grid") else v
+    limit: int = l if (l := int(args.get("limit", search_settings.limit[table]))) > 0 else 48
+    sort: str = args.get("sort", search_settings.sort[table]).lower()
+    order: str = args.get("order", search_settings.order[table]).lower()
+    view: str = v if (v := args.get("view", search_settings.view[table]).lower()) in ("list", "grid") else "grid"
 
     results: list[dict]
     columns_table: list[str]
@@ -577,5 +632,6 @@ def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = Non
         run_args |= {"port": port or 443, "ssl_certfile": settings.ssl_cert, "ssl_keyfile": settings.ssl_key}
     run_args |= {"port": run_args.get("port", port) or 80}
     with Database(Path(database_path).resolve()) as settings.database:
+        search_settings.load(settings.database.load_settings("SEARCH"))
         # noinspection PyTypeChecker
         run(app, host=host, **run_args)
