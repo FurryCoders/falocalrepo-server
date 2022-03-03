@@ -342,7 +342,8 @@ async def save_settings(request: Request):
         search_settings.__setattr__(setting, search_settings.__getattribute__(setting) | {table.upper(): value})
 
     if settings.database.read_only:
-        return Response("Database is read only, settings will be reset on restart", status_code=status.HTTP_403_FORBIDDEN)
+        return Response("Database is read only, settings will be reset on restart",
+                        status_code=status.HTTP_403_FORBIDDEN)
 
     settings.database.save_settings("SEARCH", search_settings.dict())
 
