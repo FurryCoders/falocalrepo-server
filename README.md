@@ -180,6 +180,8 @@ The _Browse_ button resets the current search query and reverts to browse mode (
 The _FA_ button opens the current search on Fur Affinity, translating the shared search and sorting fields (tags,
 author, description, and fileurl/fileext). The button is only available when searching submissions.
 
+The gear button opens the search settings, the question mark button shows a quick help about the query language.
+
 Under the search controls are the number of results and current page.
 
 <div align="center">
