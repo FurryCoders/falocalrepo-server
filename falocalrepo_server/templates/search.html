@@ -379,7 +379,10 @@
 <script>
     document.getElementById("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
 
-    const enableSearch = () => document.getElementById("search_submit").disabled = false
+    let enableSearch = () => {
+        document.getElementById("search_submit").disabled = false
+        enableSearch = () => {}
+    }
 
     const addToInput = (input, value) => {
         const selectStart = input.selectionStart, selectEnd = input.selectionEnd
