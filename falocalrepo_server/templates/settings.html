@@ -23,7 +23,7 @@
             <form action="/settings/set" class="rounded border p-3" id="search_form" onsubmit="return false">
                 <div class="row mb-2">
                     <div class="col-12">
-                        <h2>Search Settings</h2>
+                        <h5>Search Settings</h5>
                     </div>
                 </div>
                 {% for table in tables %}
@@ -36,7 +36,7 @@
                 {% set selected_view %}{{ settings.view.get(table, fallback_view).lower() }}{% endset %}
                 {% set selected_limit %}{{ settings.limit.get(table, fallback_limit).lower() }}{% endset %}
                 <div class="row {{ "mb-3" if not loop.last }}">
-                    <h5>{{ table|title }}</h5>
+                    <h6>{{ table|title }}</h6>
                     <div class="col-12">
                         <div class="input-group">
                             <span class="input-group-text" style="width: 4.4rem">Sort</span>
