@@ -83,7 +83,7 @@ templates: Jinja2Templates = Jinja2Templates(str(root / "templates"))
 settings: Settings = Settings(static_folder=root / "static")
 security: HTTPBasic = HTTPBasic()
 
-tags_expressions: list[tuple[Pattern, str]] = [
+bbcode_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"\[(/?)([bius]|sup|sub|h\d)]"), r"<\1\2>",),
     (re_compile(r"\[color=([^]]+)]"), r'<span style="color: \1">,'),
     (re_compile(r"\[/color]"), "</span>",),
@@ -103,8 +103,8 @@ tags_expressions: list[tuple[Pattern, str]] = [
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
 
-def tags_to_html(text: str) -> str:
-    return reduce(lambda t, es: es[0].sub(es[1], t), tags_expressions, text.strip() + "\n\n")
+def bbcode_to_html(text: str) -> str:
+    return reduce(lambda t, es: es[0].sub(es[1], t), bbcode_expressions, text.strip() + "\n\n")
 
 
 def clean_html(html: str) -> str:
@@ -389,7 +389,7 @@ async def serve_submission(request: Request, id_: int):
         "app": app.title,
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
         "submission": sub | {"DESCRIPTION": clean_html(sub["DESCRIPTION"])},
-        "file_text": tags_to_html(f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"])) if f else None,
+        "file_text": bbcode_to_html(f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"])) if f else None,
         "filename": f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         "filename_id": f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         "prev": p,
