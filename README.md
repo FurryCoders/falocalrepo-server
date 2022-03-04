@@ -112,7 +112,6 @@ _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 | `/search/journals/`                      | Search & browse journals                                                                |
 | `/search/users/`                         | Search & browse users                                                                   |
 | `/settings/`                             | Change default search settings                                                          |
-| `/settings/set/`                         | Change default search settings                                                          |
 | `/user/<username>/`                      | Show information regarding a specific user                                              |
 | `/gallery/<username>/`                   | Browse & search a user's gallery submissions                                            |
 | `/scraps/<username>/`                    | Browse & search a user's scraps submissions                                             |
