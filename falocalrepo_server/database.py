@@ -181,7 +181,7 @@ class Database(_Database):
                                    default_field,
                                    [*map(str.lower,
                                          {*cols_table, "any", "keywords", "message", "filename"} -
-                                         {"ID", "AUTHOR", "USERNAME"})],
+                                         {"ID", "AUTHOR", "USERNAME", "FILESAVED", "USERUPDATE", "ACTIVE"})],
                                    {"author": "replace(author, '_', '')",
                                     "lower": "replace(author, '_', '')",
                                     "keywords": "tags",
