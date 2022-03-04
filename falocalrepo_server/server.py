@@ -302,6 +302,13 @@ async def serve_user_mentions(request: Request, username: str):
                               {"query": f'@mentions "|{clean_username(username)}|"'})
 
 
+@app.get("/search/")
+async def server_search_default(request: Request):
+    return RedirectResponse(app.url_path_for(serve_search.__name__, table=submissions_table.lower()) +
+                            "?" + request.url.query,
+                            status.HTTP_301_MOVED_PERMANENTLY)
+
+
 @app.get("/", response_class=HTMLResponse)
 async def serve_home(request: Request):
     usr_n, sub_n, jrn_n, version = settings.database.load_info()
