@@ -410,7 +410,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
         "title": title or f"Search {table.title()}",
         "action": request.url.path,
         "table": table.lower(),
-        "query": query,
+        "query": args_req.get("query", ""),
         "sort": sort,
         "order": order,
         "view": view,

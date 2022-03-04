@@ -79,6 +79,7 @@
                     <div class="col-12">
                         <div class="input-group">
                             <input type="text" class="form-control" id="query" name="query" placeholder="Search"
+                                   value="{{ query }}"
                                    oninput="enableSearch()">
                             <select class="form-select form-select-sm" id="queryAdd"
                                     oninput="addToInput(document.getElementById('query'), '@' + this.value); this.options[0].selected = true;"
@@ -379,8 +380,6 @@
 {{ navigation }}
 {% endif %}
 <script>
-    document.getElementById("query").value = (new URL(window.location.href)).searchParams.get("query") || ""
-
     {% if thumbnails %}
         let loadThumbnails = (container) => {
             if (container.hidden) return
