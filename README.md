@@ -211,6 +211,15 @@ or removed.
 <img src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-list.png" width="800">
 </div>
 
+#### Compatibility with Fur Affinity Search
+
+Most Fur Affinity search queries (and links) are fully compatible with the program, except for the _NOT_ (!) operator
+which follows different syntax rules.
+
+Otherwise, all Fur Affinity search fields are fully supported: `@lower` (treated as `@author`),
+`@keywords` (treated as `@tags`), `@message` (treated as `@description`), `@title` (treated as `@title`),
+`@filename` (treated as `@fileurl`).
+
 #### Query Language
 
 The query language used for this server is based on and improves the search syntax currently used by the Fur Affinity
