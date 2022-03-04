@@ -26,7 +26,6 @@ from falocalrepo_database.tables import JournalsColumns
 from falocalrepo_database.tables import SubmissionsColumns
 from falocalrepo_database.tables import UsersColumns
 from fastapi import FastAPI
-from fastapi import Form
 from fastapi import Request
 from fastapi import Response
 from fastapi import status
