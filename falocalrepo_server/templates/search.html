@@ -389,9 +389,8 @@
     {% endif %}
 
     const changeView = (view) => {
-        const grid = document.getElementById("grid_view"), list = document.getElementById("list_view")
-        grid.hidden = view.toLowerCase() !== "grid"
-        list.hidden = view.toLowerCase() !== "list"
+        const grid = document.getElementById("grid_view")
+        document.getElementById("list_view").hidden = !(grid.hidden = view.toLowerCase() !== "grid")
         {% if thumbnails %}
             loadThumbnails(grid)
         {% endif %}
