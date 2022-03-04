@@ -179,8 +179,14 @@ class Database(_Database):
 
         sql, values = query_to_sql(query,
                                    default_field,
-                                   [*map(str.lower, {*cols_table, "any"} - {"ID", "AUTHOR", "USERNAME"})],
+                                   [*map(str.lower,
+                                         {*cols_table, "any", "keywords", "message", "filename"} -
+                                         {"ID", "AUTHOR", "USERNAME"})],
                                    {"author": "replace(author, '_', '')",
+                                    "lower": "replace(author, '_', '')",
+                                    "keywords": "tags",
+                                    "message": "description",
+                                    "filename": "fileurl",
                                     "any": f"({'||'.join(cols_table)})"},
                                    score=sort == "relevance")
 
