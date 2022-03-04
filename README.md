@@ -213,12 +213,11 @@ or removed.
 
 #### Compatibility with Fur Affinity Search
 
-Most Fur Affinity search queries (and links) are fully compatible with the program, except for the _NOT_ (!) operator
-which follows different syntax rules.
+Most Fur Affinity search queries (and links) are fully compatible with the program.
 
-Otherwise, all Fur Affinity search fields are fully supported: `@lower` (treated as `@author`),
-`@keywords` (treated as `@tags`), `@message` (treated as `@description`), `@title` (treated as `@title`),
-`@filename` (treated as `@fileurl`).
+Except for the _NOT_ (!) operator, which follows different syntax rules, all Fur Affinity search fields are fully
+supported: `@lower` (treated as `@author`), `@keywords` (treated as `@tags`), `@message` (treated as `@description`)
+, `@title` (treated as `@title`), `@filename` (treated as `@fileurl`).
 
 #### Query Language
 
