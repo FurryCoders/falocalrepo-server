@@ -314,6 +314,8 @@ more details on this. The user's profile will be displayed if present in the dat
 Clicking on any of the counters opens the relevant results via the search interface, allowing to refine the search
 further.
 
+The _Next_ and _Prev_ buttons move to the respective users in ascending alphabetical order.
+
 ### Submission
 
 The submission page shows the submission file (if present), the submission metadata, and the description.
