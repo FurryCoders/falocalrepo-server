@@ -196,7 +196,7 @@ class Database(_Database):
                 dict(zip([c.name for c in cols_results] + ["RELEVANCE"], s)) for s in
                 db_table.select_sql(f"RELEVANCE > 0", values,
                                     columns=[*cols_results, Column(f"({sql if sql else 1}) as RELEVANCE", int)],
-                                    order=[f"{sort} {order}", f"{default_sort[table]} {default_order[table]}"]).cursor]
+                                    order=[f"{sort} {order}", f"{default_sort[table]} {default_order[table]}"]).tuples]
         else:
             results = list(db_table.select_sql(sql, values, columns=cols_results, order=[f"{sort} {order}"]))
         return (
