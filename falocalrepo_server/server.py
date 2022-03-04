@@ -390,7 +390,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
 
     args = {k.lower(): v for k, v in (args or {}).items()}
     args_req = {k.lower(): v for k, v in request.query_params.items()}
-    query: str = " & ".join([f"({q})" for args_ in (args_req, args) if (q := args_.get("query", None))])
+    query: str = " & ".join([f"({q})" for args_ in (args_req, args) if (q := args_.get("query", args_.get("q", None)))])
     args |= args_req
 
     page: int = p if (p := int(args.get("page", 1))) > 0 else 1
@@ -417,7 +417,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
         "title": title or f"Search {table.title()}",
         "action": request.url.path,
         "table": table.lower(),
-        "query": args_req.get("query", ""),
+        "query": args_req.get("query", args_req.get("q", "")),
         "sort": sort,
         "order": order,
         "view": view,
