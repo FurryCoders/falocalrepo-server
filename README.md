@@ -332,7 +332,7 @@ The _Next_ and _Prev_ buttons move to the respective users in ascending alphabet
 The submission page shows the submission file (if present), the submission metadata, and the description.
 
 Image, audio, and plain text submission files are displayed directly in the page, others (e.g. PDF files) will display a
-link to open them. For images, clicking on the images opens its file.
+link to open them. Clicking on image files will enlarge them to fill the width of the screen for easier viewing.
 
 The metadata table contains clickable links to the user's page (see [User](#user) for details), tags, category, species,
 gender, rating, folder (gallery/scraps), and to user pages of favouring and mentioned users.
