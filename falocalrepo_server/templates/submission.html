@@ -27,11 +27,14 @@
             <div class="error-file mt-1 mb-2 mt-lg-5 pt-lg-5" hidden>
                 <span class="badge bg-danger">Image not found</span>
             </div>
+            <div class="spinner mt-2 mb-2 mt-lg-5 pt-lg-5">
+                <span class="spinner spinner-border spinner-border-sm" role="status"></span>
+            </div>
             <img class="img-fluid mx-auto fit-height"
                  src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
                  onclick="this.classList.contains('fit-height') ? this.classList.remove('fit-height') : this.classList.add('fit-height')"
-                 onload="this.hidden = false"
-                 onerror="this.parentNode.querySelector('.error-file').hidden = false" hidden>
+                 onload="this.parentNode.querySelector('.spinner').hidden = true; this.hidden = false"
+                 onerror="this.parentNode.querySelector('.spinner').hidden = true; this.parentNode.querySelector('.error-file').hidden = false" hidden>
         </div>
         {% elif submission["TYPE"].lower() == "music" %}
         <div class="text-center mb-1 mt-lg-5 pt-lg-5">
