@@ -20,7 +20,7 @@ from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
 
-default_sort: dict[str, str] = {submissions_table: "id", journals_table: "id", users_table: "username"}
+default_sort: dict[str, str] = {submissions_table: "date", journals_table: "date", users_table: "username"}
 default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
 
 
