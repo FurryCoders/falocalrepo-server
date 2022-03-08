@@ -238,7 +238,8 @@ website. Its basic elements are:
 
 All other strings are considered search terms.
 
-The search uses the `@any` field by default, allowing to do general searches without specifying a field.
+The search uses the `@any` field by default for submissions and journals, allowing to do general searches without
+specifying a field. When searching users, `@username` is the default field.
 
 Search terms that are not separated by a logic operator are considered _AND_ terms (i.e. `a b c` -> `a & b & c`).
 
