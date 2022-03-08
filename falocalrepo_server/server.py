@@ -449,7 +449,7 @@ async def serve_submission(request: Request, id_: int):
         "app": app.title,
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
         "submission": sub | {"DESCRIPTION": clean_html(sub["DESCRIPTION"])},
-        "file_text": bbcode_to_html(f.read_text(encoding=detect_encoding(f.read_bytes())["encoding"])) if f else None,
+        "file_text": bbcode_to_html(f.read_text(detect_encoding(f.read_bytes())["encoding"], "ignore")) if f else None,
         "filename": f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         "filename_id": f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         "prev": p,
