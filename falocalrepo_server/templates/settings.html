@@ -43,7 +43,7 @@
                             <select name="{{ table }}.sort" class="form-select form-select-sm">
                                 {% for col in columns[table] %}
                                     <option value="{{ col|lower }}"
-                                            {{ 'data-default="true"' if col|lower == fallback_sort }}
+                                            {{ "data-default" if col|lower == fallback_sort }}
                                             {{ "selected" if col|lower == selected_sort }}>
                                         {{ col.title() if col|length > 2 else col.upper() }}
                                     </option>
@@ -51,12 +51,12 @@
                             </select>
                             <select name="{{ table }}.order" class="form-select form-select-sm">
                                 <option value="asc"
-                                        {{ 'data-default="true"' if "asc" == fallback_order }}
+                                        {{ "data-default" if "asc" == fallback_order }}
                                         {{ "selected" if "asc" == selected_order }}>
                                     Ascending
                                 </option>
                                 <option value="desc"
-                                        {{ 'data-default="true"' if "desc" == fallback_order }}
+                                        {{ "data-default" if "desc" == fallback_order }}
                                         {{ "selected" if "desc" == selected_order }}>
                                     Descending
                                 </option>
@@ -81,7 +81,7 @@
                                 <option value="24" {{ "selected" if "24" == selected_limit }}>
                                     24
                                 </option>
-                                <option value="48" data-default="true" {{ "selected" if "48" == selected_limit }}>
+                                <option value="48" data-default {{ "selected" if "48" == selected_limit }}>
                                     48
                                 </option>
                                 <option value="72" {{ "selected" if "72" == selected_limit }}>
@@ -119,7 +119,7 @@
 </div>
 <script>
     const defaults = (form) => {
-        form.querySelectorAll("option[data-default='true']").forEach(option => option.parentElement.selectedIndex = option.index)
+        form.querySelectorAll("option[data-default]").forEach(option => option.parentElement.selectedIndex = option.index)
     }
 
     const save = (form) => {
