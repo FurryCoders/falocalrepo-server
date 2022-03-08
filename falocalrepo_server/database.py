@@ -170,6 +170,7 @@ class Database(_Database):
                             SubmissionsColumns.DATE.value, SubmissionsColumns.TITLE.value]
             db_table = self.submissions if table == submissions_table else self.journals
         else:
+            default_field = "username"
             cols_results = [UsersColumns.USERNAME.value, UsersColumns.FOLDERS.value, UsersColumns.ACTIVE.value]
             db_table = self.users
 
