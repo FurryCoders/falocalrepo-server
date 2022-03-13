@@ -405,7 +405,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
     columns_list: list[str]
     column_id: str
 
-    results, columns_table, columns_results, columns_list, column_id, sort, order = settings.database.load_search(
+    results, columns_table, columns_results, columns_list, column_id, _, order = settings.database.load_search(
         table,
         query.lower().strip(),
         "id" if sort == "date" else sort,
