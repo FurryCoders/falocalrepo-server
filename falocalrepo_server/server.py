@@ -189,8 +189,8 @@ def log_settings():
         for table in (settings.database.users, settings.database.submissions, settings.database.journals):
             for order in ("asc", "desc"):
                 logger.info(
-                    f"Caching {table.name.upper()}:{(sort := default_sort[table.name]).upper()}:{order.upper()}")
-                settings.database.load_search(table.name, "", sort, order)
+                    f"Caching {table.name.upper()}:{(sort := search_settings.sort[table.name]).upper()}:{order.upper()}")
+                settings.database.load_search(table.name, "", "id" if sort.lower() == "date" else sort, order)
 
 
 @app.on_event("shutdown")
