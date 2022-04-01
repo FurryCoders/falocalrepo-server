@@ -17,6 +17,7 @@ classifiers = [
 
 [tool.poetry.urls]
 "Source" = "https://github.com/FurryCoders/falocalrepo-server"
+"Changelog" = "https://github.com/FurryCoders/falocalrepo-server/blob/main/CHANGELOG.md"
 "Bug Reports" = "https://github.com/FurryCoders/falocalrepo-server/issues"
 "Download" = "https://pypi.org/project/falocalrepo-server/#files"
 
