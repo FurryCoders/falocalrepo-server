@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "falocalrepo-server"
-version = "3.0.4"
+version = "3.0.5"
 description = "Web interface for falocalrepo."
 authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
 license = "EUPL-1.2"
