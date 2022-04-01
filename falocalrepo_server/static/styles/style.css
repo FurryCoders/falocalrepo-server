@@ -91,3 +91,11 @@ body {
     text-align: center;
     font-family: inherit;
 }
+
+.zoom {
+    cursor: zoom-in;
+}
+
+.zoom.zoomed {
+    cursor: zoom-out;
+}
