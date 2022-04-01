@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.5
+
+### Changes
+
+* When hovering above a submission image, the cursor changes depending on whether it is zoomed in or out
+
 ## v3.0.4
 
 ### Fixes
