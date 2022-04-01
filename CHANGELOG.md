@@ -6,6 +6,10 @@
 
 * When hovering above a submission image, the cursor changes depending on whether it is zoomed in or out
 
+### Dependencies
+
+* Use [click ^8.0.12](https://pypi.org/project/click/8.0.12)
+
 ## v3.0.4
 
 ### Fixes
