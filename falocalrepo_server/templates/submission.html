@@ -34,7 +34,8 @@
                  src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
                  onclick="if (this.classList.contains('fit-height')) {this.classList.remove('fit-height'); this.classList.add('zoomed')} else {this.classList.add('fit-height'); this.classList.remove('zoomed')}"
                  onload="this.parentNode.querySelector('.spinner').hidden = true; this.hidden = false"
-                 onerror="this.parentNode.querySelector('.spinner').hidden = true; this.parentNode.querySelector('.error-file').hidden = false" hidden>
+                 onerror="this.parentNode.querySelector('.spinner').hidden = true; this.parentNode.querySelector('.error-file').hidden = false"
+                 hidden>
         </div>
         {% elif submission["TYPE"].lower() == "music" %}
         <div class="text-center mb-1 mt-lg-5 pt-lg-5">
