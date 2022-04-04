@@ -12,8 +12,8 @@
     * The overlaid image still supports tap-to-zoom
 * Legacy Fur Affinity emojis
     * Full support for legacy emojis like `:veryhappy:`, `:love:`, etc. which are now rendered with modern emojis
-    * No modern emoji exists for `:whatever:` and `:badhairday:` emojis, so instead `:3` and `:badhair:` are used
-      instead to avoid empty tags
+    * No modern emoji exists for `:whatever:` and `:badhairday:` emojis, so `:3` and `:badhair:` are used instead to
+      avoid empty tags
 
 ### Changes
 
