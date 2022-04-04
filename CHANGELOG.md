@@ -23,6 +23,11 @@
 
 * Fix error which caused the pre-cache to be ignored
 
+### Dependencies
+
+* Use [falocalrepo-database ~5.2.0](https://pypi.org/project/falocalrepo-database/5.2.0)
+* Use [fastapi ^0.75.1](https://pypi.org/project/fastapi/0.75.0)
+
 ## v3.0.5
 
 ### Changes
