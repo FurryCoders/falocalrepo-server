@@ -535,6 +535,8 @@ async def serve_submission_zip(id_: int, _filename=None):
         z.writestr("description.html", sub["DESCRIPTION"].encode())
         z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(sub).items()
                                            if k != "DESCRIPTION"}).encode())
+        z.writestr("comments.json", dumps([serialise_entry(c)
+                                           for c in settings.database.load_submission_comments(id_)]).encode())
 
     f_obj.seek(0)
     return StreamingResponse(f_obj, media_type="application/zip")
@@ -568,6 +570,8 @@ async def serve_journal_zip(id_: int, _filename=None):
         z.writestr("content.html", jrnl["CONTENT"].encode())
         z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(jrnl).items()
                                            if k != "CONTENT"}).encode())
+        z.writestr("comments.json", dumps([serialise_entry(c)
+                                           for c in settings.database.load_journal_comments(id_)]).encode())
 
     f_obj.seek(0)
     return StreamingResponse(f_obj, media_type="application/zip")
