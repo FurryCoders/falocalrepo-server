@@ -126,6 +126,19 @@ bbcode_expressions: list[tuple[Pattern, str]] = [
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
 
+def flatten_comments(comments: list[dict]) -> list[dict]:
+    return [*{c["ID"]: c for c in [r for c in comments for r in [c, *flatten_comments(c["REPLIES"])]]}.values()]
+
+
+def comments_depth(comments: list[dict], depth: int = 0) -> list[dict]:
+    return flatten_comments([com | {"DEPTH": depth, "REPLIES": comments_depth(com.get("REPLIES", []), depth + 1)}
+                             for com in comments])
+
+
+def prepare_comments(comments: list[dict]) -> list[dict]:
+    return [c | {"TEXT": clean_html(c["TEXT"])} for c in comments_depth(comments, 0)]
+
+
 def bbcode_to_html(text: str) -> str:
     return reduce(lambda t, es: es[0].sub(es[1], t), bbcode_expressions, text.strip() + "\n\n")
 
@@ -452,6 +465,7 @@ async def serve_submission(request: Request, id_: int):
         "file_text": bbcode_to_html(f.read_text(detect_encoding(f.read_bytes())["encoding"], "ignore")) if f else None,
         "filename": f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
         "filename_id": f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
+        "comments": prepare_comments(settings.database.comments.get_comments_tree(submissions_table, id_)),
         "prev": p,
         "next": n,
         "request": request}),
@@ -525,6 +539,7 @@ async def serve_journal(request: Request, id_: int):
         "app": app.title,
         "title": f"{jrnl['TITLE']} by {jrnl['AUTHOR']}",
         "journal": jrnl | {"CONTENT": clean_html(jrnl["CONTENT"])},
+        "comments": prepare_comments(settings.database.comments.get_comments_tree(journals_table, id_)),
         "prev": p,
         "next": n,
         "request": request}),
