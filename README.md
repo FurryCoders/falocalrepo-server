@@ -145,6 +145,8 @@ former supports sending body fields as URL parameters.
 
 ## Pages
 
+_Note:_ the images used in the following sections were taken using light mode, but all pages also support dark mode.
+
 ### Home
 
 The home page displays general information about the database and contains links to browse and search pages for the
