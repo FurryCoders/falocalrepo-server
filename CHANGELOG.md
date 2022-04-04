@@ -10,6 +10,10 @@
     * When viewing a submission with an image file on mobile, a new button appears in the lower right which when clicked
       puts the image into an overlay, so it can be seen when scrolling down to read the description
     * The overlaid image still supports tap-to-zoom
+* Legacy Fur Affinity emojis
+    * Full support for legacy emojis like `:veryhappy:`, `:love:`, etc. which are now rendered with modern emojis
+    * No modern emoji exists for `:whatever:` and `:badhairday:` emojis, so instead `:3` and `:badhair:` are used
+      instead to avoid empty tags
 
 ### Changes
 
