@@ -124,8 +124,16 @@ class Database(_Database):
         return self.submissions.get_submission_files(submission_id)
 
     @cache
+    def _load_submission_comments_cached(self, submission_id: int, *, _cache=None) -> list[dict]:
+        return self.comments.get_comments_tree(submissions_table, submission_id)
+
+    @cache
     def _load_journal_cached(self, journal_id: int, *, _cache=None) -> dict | None:
         return self.journals[journal_id]
+
+    @cache
+    def _load_journal_comments_cached(self, journal_id: int, *, _cache=None) -> list[dict]:
+        return self.comments.get_comments_tree(journals_table, journal_id)
 
     @cache
     def _load_prev_next_cached(self, table: str, item_id: int | str, *, _cache=None) -> tuple[int, int]:
@@ -241,8 +249,14 @@ class Database(_Database):
     def load_submission_files(self, submission_id: int) -> tuple[Path | None, Path | None]:
         return self._load_submission_files_cached(submission_id, _cache=self.m_time)
 
+    def load_submission_comments(self, submission_id: int) -> list[dict]:
+        return self._load_submission_comments_cached(submission_id, _cache=self.m_time)
+
     def load_journal(self, journal_id: int) -> dict | None:
         return self._load_journal_cached(journal_id, _cache=self.m_time)
+
+    def load_journal_comments(self, journal_id: int) -> list[dict]:
+        return self._load_journal_comments_cached(journal_id, _cache=self.m_time)
 
     def load_prev_next(self, table: str, item_id: int | str) -> tuple[int, int]:
         return self._load_prev_next_cached(table, item_id, _cache=self.m_time)
