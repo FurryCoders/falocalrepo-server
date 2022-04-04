@@ -112,3 +112,129 @@ body {
 .zoom.zoomed {
     cursor: zoom-out;
 }
+
+.smilie.tongue::before {
+    content: "😛";
+}
+
+.smilie.cool::before {
+    content: "😎";
+}
+
+.smilie.wink::before {
+    content: "😉";
+}
+
+.smilie.oooh::before {
+    content: "😮";
+}
+
+.smilie.smile::before {
+    content: "🙂";
+}
+
+.smilie.evil::before {
+    content: "😈";
+}
+
+.smilie.huh::before {
+    content: "😵‍💫";
+}
+
+.smilie.whatever::before {
+    content: ":3";
+    font-style: normal;
+    text-align: center;
+    padding: .2rem .3rem .2rem .3rem;
+    border-radius: 50%;
+    background: var(--color-tertiary);
+}
+
+.smilie.angel::before {
+    content: "😇";
+}
+
+.smilie.badhairday::before {
+    content: ":badhair:";
+    font-style: normal;
+    text-align: center;
+    padding: .2rem .3rem .2rem .3rem;
+    border-radius: .25rem;
+    background: var(--color-tertiary);
+}
+
+.smilie.lmao::before {
+    content: "😂";
+}
+
+.smilie.cd::before {
+    content: "💿";
+}
+
+.smilie.crying::before {
+    content: "😭";
+}
+
+.smilie.dunno::before {
+    content: "🤨";
+}
+
+.smilie.embarrassed::before {
+    content: "😊";
+}
+
+.smilie.note::before {
+    content: "🎁";
+}
+
+.smilie.coffee::before {
+    content: "🍺";
+}
+
+.smilie.love::before {
+    content: "❤️";
+}
+
+.smilie.nerd::before {
+    content: "🤓";
+}
+
+.smilie.note::before {
+    content: "🎵";
+}
+
+.smilie.derp::before {
+    content: "🥴";
+}
+
+.smilie.sarcastic::before {
+    content: "🤨";
+}
+
+.smilie.serious::before {
+    content: "😐";
+}
+
+.smilie.sad::before {
+    content: "☹️";
+}
+
+.smilie.sleepy::before {
+    content: "🥱";
+}
+
+.smilie.teeth::before {
+    content: "😡";
+}
+
+.smilie.veryhappy::before {
+    content: "😃";
+}
+
+.smilie.yelling::before {
+    content: "🤬";
+}
+
+.smilie.zipped::before {
+    content: "🤐";
+}
