@@ -130,8 +130,11 @@ def flatten_comments(comments: list[dict]) -> list[dict]:
     return [*{c["ID"]: c for c in [r for c in comments for r in [c, *flatten_comments(c["REPLIES"])]]}.values()]
 
 
-def comments_depth(comments: list[dict], depth: int = 0) -> list[dict]:
-    return flatten_comments([com | {"DEPTH": depth, "REPLIES": comments_depth(com.get("REPLIES", []), depth + 1)}
+def comments_depth(comments: list[dict], depth: int = 0, root_comment: int = None) -> list[dict]:
+    return flatten_comments([com | {"DEPTH": depth,
+                                    "REPLIES": comments_depth(com.get("REPLIES", []), depth + 1,
+                                                              root_comment or com["ID"]),
+                                    "ROOT": root_comment}
                              for com in comments])
 
 
