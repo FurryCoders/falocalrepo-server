@@ -199,11 +199,14 @@ def log_settings():
     logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
     logger.info(f"Using HTTP Basic authentication") if settings.username or settings.password else None
     if settings.precache:
-        for table in (settings.database.users, settings.database.submissions, settings.database.journals):
-            for order in ("asc", "desc"):
-                logger.info(
-                    f"Caching {table.name.upper()}:{(sort := search_settings.sort[table.name]).upper()}:{order.upper()}")
-                settings.database.load_search(table.name, "", "id" if sort.lower() == "date" else sort, order)
+        for table, order in [
+            (t, o)
+            for t in (settings.database.users, settings.database.submissions, settings.database.journals)
+            for o in ("asc", "desc")
+        ]:
+            logger.info(
+                f"Caching {table.name.upper()}:{(sort := search_settings.sort[table.name]).upper()}:{order.upper()}")
+            settings.database.load_search(table.name, "", "id" if sort.lower() == "date" else sort, order)
 
 
 @app.on_event("shutdown")
