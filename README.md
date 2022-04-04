@@ -140,8 +140,8 @@ former supports sending body fields as URL parameters.
 |------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
 | `/json/search/<table>/`            | Perform a search on the database. The query field in the body uses the same [syntax](#query-language) as the query field in the [search page](#browse--search). | `{query?: str, offset?: int, limit?: int, sort?: str, order?: Union["asc", "desc"]}` |
 | `/json/user/<username>`            | Get user metadata and total submissions/journals                                                                                                                | None                                                                                 |
-| `/json/submission/<submission id>` | Get submission metadata                                                                                                                                         | None                                                                                 |
-| `/json/journal/<journal id>`       | Get journal metadata                                                                                                                                            | None                                                                                 |
+| `/json/submission/<submission id>` | Get submission metadata and comments                                                                                                                            | None                                                                                 |
+| `/json/journal/<journal id>`       | Get journal metadata and comments                                                                                                                               | None                                                                                 |
 
 ## Pages
 
@@ -351,7 +351,7 @@ counterpart, and navigate the other submissions from the author.
 The download _File_ button downloads the submission file (if present).
 
 The download _ZIP_ button generates a ZIP file containing the submission file, submission thumbnail, description HTML,
-and metadata in JSON format.
+and metadata and comments in JSON format.
 
 The _FA_ button opens the submission on Fur Affinity
 
@@ -389,7 +389,8 @@ and navigate the other journals from the same user.
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-journal.png" width="600">
 </div>
 
-The download _ZIP_ button generates a ZIP file containing the journal content HTML and metadata in JSON format.
+The download _ZIP_ button generates a ZIP file containing the journal content HTML and metadata and comments in JSON
+format.
 
 The _FA_ button opens the journal on Fur Affinity
 
