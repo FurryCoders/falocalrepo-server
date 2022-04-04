@@ -369,7 +369,9 @@ fails to load.
 The comments to the submission can be found below the description. Each comment contains the author (with a link to
 their user page), post date, and links to the comment itself and, if the comment is a reply, its parent comments.
 
+<div align="center">
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comment-card.png" width="600">
+</div>
 
 The button furthest to the left (arrow pointing up and to the left) links to the first comment in a reply chain. The
 middle button (bent arrow pointing to the left) links to the previous comment in the reply chain. The link button
@@ -402,7 +404,9 @@ The comments to the journal can be found below the journal text and metadata. Ea
 link to their user page), post date, and links to the comment itself and, if the comment is a reply, its parent
 comments.
 
+<div align="center">
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comment-card.png" width="600">
+</div>
 
 The button furthest to the left (arrow pointing up and to the left) links to the first comment in a reply chain. The
 middle button (bent arrow pointing to the left) links to the previous comment in the reply chain. The link button
