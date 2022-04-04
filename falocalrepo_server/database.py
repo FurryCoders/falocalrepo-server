@@ -262,7 +262,7 @@ class Database(_Database):
         return self._load_prev_next_cached(table, item_id, _cache=self.m_time)
 
     def load_search(self, table: str, query: str, sort: str, order: str):
-        return self._load_search_cached(table, query, sort, order, _cache=self.m_time)
+        return self._load_search_cached(table.lower(), query.lower(), sort.lower(), order.lower(), _cache=self.m_time)
 
     def load_files_folder(self) -> Path:
         return self._load_files_folder_cached(_cache=self.m_time)
