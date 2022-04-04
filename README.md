@@ -47,7 +47,7 @@ The `--precache` options can be used to prepare an initial cache of results from
 The optional `--redirect-http` argument changes the app mode to redirection. In this mode the app runs a tiny server
 that redirects all HTTP requests it receives on `http://HOST:PORT` to `https://HOST:REDIRECT_PORT`.
 
-_Note:_ In redirect mode the `database` argument is not checked, so a simple `.` is sufficient.
+_Note:_ In redirect mode the `database` argument is not checked, so a simple `.` is sufficient.<br/>
 _Note:_ In redirect mode the app does not operate the database portion of the server. To run in redirect and server
 mode, two separate instances of the program are needed.
 
