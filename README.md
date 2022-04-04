@@ -360,6 +360,21 @@ The _Next_ and _Prev_ buttons lead to the next more recent and the previous less
 The _Gallery_, _All_, and _Scraps_ buttons open a search page with the user's gallery submissions, scraps and gallery
 submissions together, and scraps submissions respectively.
 
+When viewing a submission on mobile, a button becomes available in the lower right which opens the image in a small
+overlay, allowing to view the image while reading the description. The button does not appear if the submission file
+fails to load.
+
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission-overlay.png" width="50">
+
+The comments to the submission can be found below the description. Each comment contains the author (with a link to
+their user page), post date, and links to the comment itself and, if the comment is a reply, its parent comments.
+
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comments-links.png" width="125">
+
+The button furthest to the left (arrow pointing up and to the left) links to the first comment in a reply chain. The
+middle button (bent arrow pointing to the left) links to the previous comment in the reply chain. The link button
+furthest to the right is a link to that specific comment.
+
 ### Journal
 
 The journal page shows the journal metadata and content.
@@ -381,3 +396,13 @@ The _FA_ button opens the journal on Fur Affinity
 The _Next_ and _Prev_ buttons lead to the next more recent, and the previous less recent journals respectively.
 
 The _All_ button opens a search page with all the user's journals.
+
+The comments to the journal can be found below the journal text and metadata. Each comment contains the author (with a
+link to their user page), post date, and links to the comment itself and, if the comment is a reply, its parent
+comments.
+
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comments-links.png" width="125">
+
+The button furthest to the left (arrow pointing up and to the left) links to the first comment in a reply chain. The
+middle button (bent arrow pointing to the left) links to the previous comment in the reply chain. The link button
+furthest to the right is a link to that specific comment.
