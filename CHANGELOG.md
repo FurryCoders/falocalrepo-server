@@ -1,5 +1,20 @@
 # Changelog
 
+## v3.1.0
+
+### New Features
+
+* Comments
+    * Comments for submissions and journals are shown at the bottom of the respective page, with indentation for replies
+* Submission image overlay
+    * When viewing a submission with an image file on mobile, a new button appears in the lower right which when clicked
+      puts the image into an overlay, so it can be seen when scrolling down to read the description
+    * The overlaid image still supports tap-to-zoom
+
+### Fixes
+
+* Fix error which caused the pre-cache to be ignored
+
 ## v3.0.5
 
 ### Changes
