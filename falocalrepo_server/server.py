@@ -156,8 +156,17 @@ def clean_html(html: str) -> str:
     return str(html_parsed)
 
 
-def serialise_entry(entry: dict) -> dict:
-    return {k: sorted(v) if isinstance(v, set) else str(v) if isinstance(v, datetime) else v for k, v in entry.items()}
+def serialise_entry(entry: Any) -> Any:
+    if isinstance(entry, dict):
+        return {k: serialise_entry(v) for k, v in entry.items()}
+    elif isinstance(entry, (list, tuple)):
+        return list(map(serialise_entry, entry))
+    elif isinstance(entry, set):
+        return sorted(map(serialise_entry, entry))
+    elif isinstance(entry, datetime):
+        return str(entry)
+    else:
+        return entry
 
 
 def error_response(request: Request, code: int, message: str = None, buttons: list[tuple[str, str]] = None) -> Response:
