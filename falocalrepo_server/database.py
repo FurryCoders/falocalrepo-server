@@ -279,11 +279,17 @@ class Database(_Database):
     def load_submission_uncached(self, submission_id: int) -> dict | None:
         return self._load_submission_cached.__wrapped__(self, submission_id)
 
+    def load_submission_comments_uncached(self, submission_id: int) -> list[dict]:
+        return self._load_submission_comments_cached.__wrapped__(self, submission_id)
+
     def load_submission_files_uncached(self, submission_id: int) -> tuple[Path | None, Path | None]:
         return self._load_submission_files_cached.__wrapped__(self, submission_id)
 
     def load_journal_uncached(self, journal_id: int) -> dict | None:
         return self._load_journal_cached.__wrapped__(self, journal_id)
+
+    def load_journal_comments_uncached(self, journal_id: int) -> list[dict]:
+        return self._load_journal_comments_cached.__wrapped__(self, journal_id)
 
     def load_prev_next_uncached(self, table: str, item_id: int | str) -> tuple[int, int]:
         return self._load_prev_next_cached.__wrapped__(self, table, item_id)
