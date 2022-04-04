@@ -121,8 +121,16 @@
                         <a class="btn-sm btn-primary badge text-decoration-none"
                            href="/user/{{ comment["AUTHOR"] }}">{{ comment["AUTHOR"] }}</a>
                         {% if comment["REPLY_TO"] %}
+                            <a href="#cid:{{ comment["ROOT"] }}" class="position-absolute end-0"
+                               style="margin-right: calc(1rem + 16px + 14px + 5px)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                                     viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M2 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1H3.707l10.147 10.146a.5.5 0 0 1-.708.708L3 3.707V8.5a.5.5 0 0 1-1 0v-6z"></path>
+                                </svg>
+                            </a>
                             <a href="#cid:{{ comment["REPLY_TO"] }}" class="position-absolute end-0"
-                               style="margin-right: 2.25rem">
+                               style="margin-right: calc(1rem + 16px + 3px)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
                                      viewBox="0 0 16 16">
                                     <path fill-rule="evenodd"
