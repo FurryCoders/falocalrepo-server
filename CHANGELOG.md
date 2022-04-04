@@ -11,6 +11,10 @@
       puts the image into an overlay, so it can be seen when scrolling down to read the description
     * The overlaid image still supports tap-to-zoom
 
+### Changes
+
+* Submission images can fill the entire width of the window when enlarged on desktop
+
 ### Fixes
 
 * Fix error which caused the pre-cache to be ignored
