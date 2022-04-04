@@ -173,7 +173,7 @@ class Database(_Database):
         order = order or default_order[table]
         db_table: Table
 
-        if table in (submissions_table, journals_table):
+        if (table := table.upper()) in (submissions_table.upper(), journals_table.upper()):
             cols_results = [SubmissionsColumns.ID.value, SubmissionsColumns.AUTHOR.value,
                             SubmissionsColumns.DATE.value, SubmissionsColumns.TITLE.value]
             db_table = self.submissions if table == submissions_table else self.journals
@@ -197,10 +197,10 @@ class Database(_Database):
                                     "message": "description",
                                     "filename": "fileurl",
                                     "any": f"({'||'.join(cols_table)})"},
-                                   score=sort == "relevance")
+                                   score=sort.lower() == "relevance")
 
         results: list[dict]
-        if sort == "relevance":
+        if sort.lower() == "relevance":
             results = [
                 dict(zip([c.name for c in cols_results] + ["RELEVANCE"], s)) for s in
                 db_table.select_sql(f"RELEVANCE > 0", values,
