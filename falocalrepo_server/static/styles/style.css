@@ -180,7 +180,7 @@ body {
 }
 
 .smilie.embarrassed::before {
-    content: "😊";
+    content: "😳";
 }
 
 .smilie.note::before {
