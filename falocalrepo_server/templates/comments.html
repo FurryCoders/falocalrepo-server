@@ -1,0 +1,47 @@
+<div class="row mt-3">
+    <div class="col-12 col-lg-8 mx-auto">
+        {% for comment in comments %}
+        <div class="w-100"
+             style="padding-left: {{ (comment["DEPTH"] if comment["DEPTH"] < 10 else 10) * 0.75 }}rem !important">
+            <div class="card mb-2" id="cid:{{ comment["ID"] }}">
+                <div class="card-header pt-1 pb-1">
+                    <a class="btn-sm btn-primary badge text-decoration-none"
+                       href="/user/{{ comment["AUTHOR"] }}">{{ comment["AUTHOR"] }}</a>
+                    <span class="position-absolute end-0 me-3">
+                        {% if comment["REPLY_TO"] %}
+                            <a href="#cid:{{ comment["ROOT"] }}" class="text-decoration-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M2 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1H3.707l10.147 10.146a.5.5 0 0 1-.708.708L3 3.707V8.5a.5.5 0 0 1-1 0v-6z"></path>
+                                </svg>
+                            </a>
+                            <a href="#cid:{{ comment["REPLY_TO"] }}" class="text-decoration-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                                     viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1.146 4.854a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H12.5A2.5 2.5 0 0 1 15 6.5v8a.5.5 0 0 1-1 0v-8A1.5 1.5 0 0 0 12.5 5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4z"></path>
+                                </svg>
+                            </a>
+                        {% endif %}
+                        <a href="#cid:{{ comment["ID"] }}" class="text-decoration-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                                     viewBox="0 0 16 16">
+                                    <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"></path>
+                                    <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"></path>
+                                </svg>
+                            </a>
+                        </span>
+                    <br>
+                    <span class="text-muted" style="font-size: 80%">{{ comment["DATE"] }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="card-text text-wrap overflow-hidden">
+                        {% autoescape false %}{{ comment["TEXT"] }}{% endautoescape %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
