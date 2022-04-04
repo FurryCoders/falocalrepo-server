@@ -599,7 +599,7 @@ async def serve_submission_json(id_: int):
     if not (s := settings.database.load_submission_uncached(id_)):
         raise HTTPException(404)
     else:
-        return s
+        return s | {"COMMENTS": settings.database.load_submission_comments_uncached(id_)}
 
 
 @app.get("/json/journal/{id_}/", response_class=JSONResponse)
@@ -608,7 +608,7 @@ async def serve_journal_json(id_: int):
     if not (j := settings.database.load_journal_uncached(id_)):
         raise HTTPException(404)
     else:
-        return j
+        return j | {"COMMENTS": settings.database.load_journal_comments_uncached(id_)}
 
 
 @app.get("/json/user/{username}/", response_class=JSONResponse)
