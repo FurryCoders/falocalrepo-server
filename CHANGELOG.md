@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.1.1
+## v3.1.1
 
 ### Changes
 
