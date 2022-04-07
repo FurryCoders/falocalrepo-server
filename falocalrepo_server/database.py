@@ -19,6 +19,7 @@ from falocalrepo_database.tables import UsersColumns
 from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
+from falocalrepo_database.util import compare_version
 
 default_sort: dict[str, str] = {submissions_table: "date", journals_table: "date", users_table: "username"}
 default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
@@ -74,9 +75,11 @@ def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliase
 class Database(_Database):
     def __init__(self, database_path: Path):
         _Database.check_connection(database_path)
-        super().__init__(database_path, read_only=not access(database_path, W_OK))
+        super().__init__(database_path, read_only=not access(database_path, W_OK), check_version=False)
         if not self.is_formatted:
             raise DatabaseError("Database not formatted")
+        elif err := compare_version(self.version, patch=False):
+            raise err
 
     def __enter__(self):
         return self
