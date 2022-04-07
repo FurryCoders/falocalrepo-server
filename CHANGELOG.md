@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.1.1
+
+### Changes
+
+* Using a database with a version number that differs only in patch will not trigger a `VersionError` exception
+
+### Fixes
+
+* Fix legacy emojis being rendered in italic and disregarding the style of the text around them
+
+### Dependencies
+
+* Use [falocalrepo-database ~5.2.1](https://pypi.org/project/falocalrepo-database/5.2.1)
+
 ## v3.1.0
 
 ### New Features
