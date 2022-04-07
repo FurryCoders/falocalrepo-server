@@ -113,6 +113,10 @@ body {
     cursor: zoom-out;
 }
 
+i.smilie {
+    font-style: inherit;
+}
+
 .smilie.tongue::before {
     content: "😛";
 }
