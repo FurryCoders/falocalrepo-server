@@ -25,7 +25,7 @@
 <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 text-center">
     <span class="badge bg-danger">Submission has no file</span>
 </div>
-{% elif submission["TYPE"].lower() == "image" %}
+{% elif submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
 <div class="text-center">
     <div class="error-file mt-1 mb-2 mt-lg-5 pt-lg-5" hidden>
         <span class="badge bg-danger">Image not found</span>
@@ -275,7 +275,7 @@
 
     {% if comments %}{% include "comments.html" %}{% endif %}
 
-    {% if submission["TYPE"].lower() == "image" %}
+    {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
         <div class="position-fixed d-lg-none" style="bottom: .25rem; right: .25rem;" id="button-sticky" hidden>
             <button class="btn btn-sm btn-secondary btn-circle"
                     onclick="const c1 = document.getElementById('file-container-sticky'), c2 = document.getElementById('file-container-sm'); c2.hidden = !(c1.hidden = !c1.hidden)">
