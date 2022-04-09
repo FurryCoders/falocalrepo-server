@@ -19,6 +19,7 @@
 ### Fixes
 
 * Fix submissions that have type `flash` but use GIF files not being shown
+* Fix buttons not being clickable if on the same line as the sticky image button
 * Fix sticky image button not being drawn above zoomed sticky image
 
 ## v3.1.1
