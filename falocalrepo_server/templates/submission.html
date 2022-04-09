@@ -14,6 +14,48 @@
     <link rel="stylesheet" href="/static/styles/style.css">
     {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
         <style>
+            .fit-height.zoomed {
+                max-height: none !important;
+            }
+
+            .sticky-top .zoom {
+                border-radius: .25rem;
+                border: 2px solid var(--border-color);
+            }
+
+            .sticky-top .fit-height {
+                max-height: 50vh;
+            }
+
+            .sticky-top .fit-height.zoomed {
+                max-height: 100vh;
+            }
+
+            #file-container.sticky-top ~ #button-sticky > button {
+                color: #fff;
+                background-color: #198754;
+                border-color: #198754
+            }
+
+            #file-container.sticky-top ~ #button-sticky > button:hover {
+                color: #fff;
+                background-color: #157347;
+                border-color: #146c43
+            }
+
+            #file-container.sticky-top ~ #button-sticky > button:focus {
+                color: #fff;
+                background-color: #157347;
+                border-color: #146c43;
+                box-shadow: 0 0 0 .25rem rgba(60, 153, 110, .5)
+            }
+
+            #file-container.sticky-top ~ #button-sticky > button.active {
+                color: #fff;
+                background-color: #146c43;
+                border-color: #13653f
+            }
+
             @media (min-width: 992px) {
                 #file-container.zoomed {
                     width: 100%;
