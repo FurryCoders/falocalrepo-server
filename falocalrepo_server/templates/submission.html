@@ -12,11 +12,37 @@
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles/style.css">
-    <style>
-        #file-container-sticky .fit-height {
-            max-height: 50vh;
-        }
-    </style>
+    {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
+        <style>
+            @media (min-width: 992px) {
+                #file-container.zoomed {
+                    width: 100%;
+                    margin-bottom: 1rem;
+                }
+
+                #file-container ~ #metadata .card {
+                    height: 100%;
+                }
+
+                #file-container.zoomed ~ #metadata .card {
+                    height: auto;
+                }
+
+                #file-container.zoomed ~ #description {
+                    width: 66.66666667%;
+                    margin-top: 0 !important;
+                }
+
+                #file-container.zoomed ~ #description .card {
+                    height: 100%;
+                }
+
+                #file-container.zoomed ~ #description .card-body {
+                    width: 100%;
+                }
+            }
+        </style>
+    {% endif %}
 </head>
 <body class="mt-3 mt-lg-4 mb-4">
 
@@ -33,9 +59,9 @@
     <div class="spinner mt-2 mb-2 mt-lg-5 pt-lg-5">
         <span class="spinner spinner-border spinner-border-sm" role="status"></span>
     </div>
-    <img class="img-fluid mx-auto fit-height zoom"
+    <img class="img-fluid mx-auto fit-height zoom" id="submission-image"
          src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
-         onclick="if (this.classList.contains('fit-height')) {this.classList.remove('fit-height'); this.classList.add('zoomed'); document.getElementById('file-container-lg').classList.add('col-12', 'mb-3')} else {this.classList.add('fit-height'); this.classList.remove('zoomed'); document.getElementById('file-container-lg').classList.remove('col-12', 'mb-3')}"
+         onclick="if (this.classList.contains('fit-height')) {this.classList.remove('fit-height'); this.classList.add('zoomed'); document.getElementById('file-container').classList.add('zoomed')} else {this.classList.add('fit-height'); this.classList.remove('zoomed'); document.getElementById('file-container').classList.remove('zoomed')}"
          onload="this.parentNode.querySelector('.spinner').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = false"
          onerror="this.parentNode.querySelector('.spinner').hidden = true; this.parentNode.querySelector('.error-file').hidden = false"
          hidden>
@@ -75,23 +101,13 @@
 {% endset %}
 
 <div class="container">
-    {% if submission["TYPE"].lower() == "image" %}
-        <div class="text-center d-lg-none sticky-top mb-2 rounded bg-body bg-opacity-50" id="file-container-sticky"
-             hidden>
-            {{ file }}
-        </div>
-    {% endif %}
-
     <div class="row align-middle">
-        <div class="d-none d-lg-block col-8" id="file-container-lg">{{ file }}</div>
+        <div class="col-12 col-lg-8" id="file-container">{{ file }}</div>
 
-        <div class="col-12 col-lg-4 mx-auto">
-            <div class="card h-100">
+        <div class="col-12 col-lg-4 mt-3 mt-lg-0 mx-auto" id="metadata">
+            <div class="card">
                 <h2 class="card-header">{{ submission["TITLE"] }}</h2>
-                <div class="card-header text-center d-lg-none p-0" id="file-container-sm">
-                    {{ file }}
-                </div>
-                <div class="card-header text-center d-lg-none">
+                <div class="card-header d-lg-none">
                     <div class="btn-group col-12 col-md-8" role="group">
                         <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
                             Next
@@ -259,10 +275,8 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row mt-3">
-        <div class="col-12">
+        <div class="col-12 mt-3" id="description">
             <div class="card">
                 <div class="card-body col-12 col-lg-9 mx-auto">
                     <div class="card-text text-wrap overflow-hidden">
@@ -271,24 +285,24 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="mt-3">
-        {% if comments %}{% include "comments.html" %}{% endif %}
-    </div>
-
-    {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
-        <div class="position-fixed d-lg-none" style="bottom: .25rem; right: .25rem;" id="button-sticky" hidden>
-            <button class="btn btn-sm btn-secondary btn-circle"
-                    onclick="const c1 = document.getElementById('file-container-sticky'), c2 = document.getElementById('file-container-sm'); c2.hidden = !(c1.hidden = !c1.hidden)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="mb-1"
-                     viewBox="0 0 16 16">
-                    <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
-                    <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"></path>
-                </svg>
-            </button>
+        <div class="mt-3">
+            {% if comments %}{% include "comments.html" %}{% endif %}
         </div>
-    {% endif %}
+
+        {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
+            <div class="position-fixed d-lg-none" style="bottom: .25rem; right: .25rem;" id="button-sticky" hidden>
+                <button class="btn btn-sm btn-secondary btn-circle"
+                        onclick="const c = document.getElementById('file-container'); c.classList.contains('sticky-top') ? c.classList.remove('sticky-top') : c.classList.add('sticky-top')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="mb-1"
+                         viewBox="0 0 16 16">
+                        <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
+                        <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"></path>
+                    </svg>
+                </button>
+            </div>
+        {% endif %}
+    </div>
 </div>
 </body>
 </html>
