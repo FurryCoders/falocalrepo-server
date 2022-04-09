@@ -273,7 +273,9 @@
         </div>
     </div>
 
-    {% if comments %}{% include "comments.html" %}{% endif %}
+    <div class="mt-3">
+        {% if comments %}{% include "comments.html" %}{% endif %}
+    </div>
 
     {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
         <div class="position-fixed d-lg-none" style="bottom: .25rem; right: .25rem;" id="button-sticky" hidden>
