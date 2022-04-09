@@ -1,5 +1,26 @@
 # Changelog
 
+## v3.1.2
+
+### New Features
+
+* Flash Player! ▶️
+    * Playback of Flash files is now fully supported thanks to [Ruffle](https://ruffle.rs)
+    * Ruffle is loaded via CDN to avoid making the package too heavy (Ruffle weighs around 6MB), so an internet
+      connection is required to play Flash files
+
+### Changes
+
+* Improved layout when zooming on desktop screens
+* Improved efficiency of submission pages
+* Submission file is now placed above the metadata instead of inside the card on small screens
+* Sticky image button is available on all devices
+
+### Fixes
+
+* Fix submissions that have type `flash` but use GIF files not being shown
+* Fix sticky image button not being drawn above zoomed sticky image
+
 ## v3.1.1
 
 ### Changes
