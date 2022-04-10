@@ -11,12 +11,19 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/style.css">
+    <style>
+        @media (max-width: 992px) {
+            .fit-height {
+                max-height: none;
+            }
+        }
+    </style>
 </head>
 <body class="mt-3 mt-lg-4 mb-4">
 
 <div class="container">
     <div class="row align-middle">
-        <div class="col-8 d-none d-lg-block fit-height">
+        <div class="col-12 col-lg-8 mt-3 mt-lg-0 order-last order-lg-first">
             <div class="border rounded p-2 overflow-scroll fit-height h-100">
                 {% autoescape false %}{{ journal["CONTENT"] }}{% endautoescape %}
             </div>
@@ -25,24 +32,6 @@
         <div class="col-12 col-lg-4 mx-auto">
             <div class="card h-100">
                 <h2 class="card-header">{{ journal["TITLE"] }}</h2>
-
-                <div class="card-header d-lg-none overflow-scroll text-wrap fit-height">
-                    {% autoescape false %}{{ journal["CONTENT"] }}{% endautoescape %}
-                </div>
-
-                <div class="card-header text-center d-lg-none">
-                    <div class="btn-group col-12 col-md-8" role="group">
-                        <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/journal/{{ next }}">
-                            Next
-                        </a>
-                        <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/journals/{{ journal["AUTHOR"] }}">All </a>
-                        <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}" href="/journal/{{ prev }}">
-                            Prev
-                        </a>
-                    </div>
-                </div>
                 <div class="card-body">
                     <div class="row">
                         <h6 class="col-4 card-title">Author</h6>
@@ -91,7 +80,7 @@
                                 FA
                             </a>
                         </div>
-                        <div class="btn-group col-12 mt-1 d-none d-lg-flex" role="group">
+                        <div class="btn-group col-12 mt-1" role="group">
                             <a class="btn btn-sm btn-primary {{ "disabled" if not next }}"
                                href="/journal/{{ next }}">
                                 Next

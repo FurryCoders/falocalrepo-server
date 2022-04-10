@@ -11,12 +11,19 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/style.css">
+    <style>
+        @media (max-width: 992px) {
+            .fit-height {
+                max-height: none;
+            }
+        }
+    </style>
 </head>
 <body class="mt-3 mt-lg-4 mb-4">
 <div class="container">
     <div class="row align-middle">
         {% if userpage != "" %}
-        <div class="col-8 d-none d-lg-block">
+        <div class="col-12 col-lg-8 mt-3 mt-lg-0 order-last order-lg-first">
             <div class="border rounded p-2 overflow-scroll text-wrap fit-height h-100">
                 {% autoescape false %}{{ userpage }}{% endautoescape %}
             </div>
@@ -33,12 +40,6 @@
                         <span class="badge bg-danger float-end mt-2 ms-1">Inactive</span>
                     {% endif %}
                 </div>
-
-                {% if userpage != "" %}
-                <div class="card-header d-lg-none overflow-scroll text-wrap fit-height">
-                    {% autoescape false %}{{ userpage }}{% endautoescape %}
-                </div>
-                {% endif %}
 
                 <div class="card-body">
                     <div class="row">
