@@ -133,7 +133,7 @@
     </audio>
 </div>
 {% elif file_text is not none %}
-<div class="border-lg rounded p-2 text-start font-monospace small overflow-scroll text-wrap fit-height">
+<div class="border rounded p-2 text-start font-monospace small overflow-scroll text-wrap fit-height">
     {% autoescape false %}{{ file_text.strip() }}{% endautoescape %}
 </div>
 {% else %}
