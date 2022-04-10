@@ -92,17 +92,17 @@
 </div>
 {% elif submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
 <div class="text-center">
-    <div class="error-file mt-1 mb-2 mt-lg-5 pt-lg-5" hidden>
+    <div class="mt-1 mb-2 mt-lg-5 pt-lg-5" id="image-error" hidden>
         <span class="badge bg-danger">Image not found</span>
     </div>
-    <div class="spinner mt-2 mb-2 mt-lg-5 pt-lg-5">
+    <div class="mt-2 mb-2 mt-lg-5 pt-lg-5" id="image-loading">
         <span class="spinner spinner-border spinner-border-sm" role="status"></span>
     </div>
     <img class="img-fluid mx-auto fit-height zoom" id="submission-image"
          src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
-         onclick="if (this.classList.contains('fit-height')) {this.classList.remove('fit-height'); this.classList.add('zoomed'); document.getElementById('file-container').classList.add('zoomed')} else {this.classList.add('fit-height'); this.classList.remove('zoomed'); document.getElementById('file-container').classList.remove('zoomed')}"
-         onload="this.parentNode.querySelector('.spinner').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = false"
-         onerror="this.parentNode.querySelector('.spinner').hidden = true; this.parentNode.querySelector('.error-file').hidden = false"
+         onclick="if (!this.classList.contains('zoomed')) {this.classList.add('zoomed'); document.getElementById('file-container').classList.add('zoomed')} else {this.classList.remove('zoomed'); document.getElementById('file-container').classList.remove('zoomed')}"
+         onload="this.parentNode.querySelector('#image-loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = false"
+         onerror="this.parentNode.querySelector('#image-loading').hidden = true; this.parentNode.querySelector('#image-error').hidden = false"
          hidden>
 </div>
 {% elif submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "swf" %}
@@ -118,15 +118,17 @@
 {% elif submission["TYPE"].lower() == "music" %}
 <div class="text-center mb-1 mt-lg-5 pt-lg-5">
     <div class="col-12">
-        <span class="mt-2 badge bg-danger" hidden>Thumbnail not found</span>
+        <span class="mt-2 badge bg-danger" id="thumbnail-error" hidden>Thumbnail not found</span>
+        <div class="mt-2 mb-2 mt-lg-5 pt-lg-5" id="thumbnail-loading">
+            <span class="spinner spinner-border spinner-border-sm" role="status"></span>
+        </div>
         <img class="img-fluid rounded mt-2" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
-             onload="this.hidden = false"
-             onerror="this.previousElementSibling.querySelector('.error-thumbnail').hidden = false" hidden>
+             onload="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.hidden = false"
+             onerror="this.parentNode.querySelector('#thumbnail-error').hidden = false" hidden>
     </div>
-    <span class="mt-2 badge bg-danger" hidden>File not found</span>
+    <span class="mt-2 badge bg-danger" id="file-error" hidden>File not found</span>
     <audio class="mt-2" src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
-           onerror="this.hidden = true; this.previousElementSibling.querySelector('.error-file').hidden = false"
-           style=""
+           onerror="this.hidden = true; this.parentNode.querySelector('#file-error').hidden = false"
            controls>
     </audio>
 </div>
@@ -137,10 +139,13 @@
 {% else %}
 <div class="text-center mb-2 mt-lg-5 pt-lg-5">
     <div class="col-12">
-        <span class="mt-2 badge bg-danger" hidden>Thumbnail not found</span>
+        <span class="mt-2 badge bg-danger" id="thumbnail-error" hidden>Thumbnail not found</span>
+        <div class="mt-2 mb-2 mt-lg-5 pt-lg-5" id="thumbnail-loading">
+            <span class="spinner spinner-border spinner-border-sm" role="status"></span>
+        </div>
         <img class="img-fluid rounded mt-2" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
-             onload="this.hidden = false"
-             onerror="this.previousElementSibling.hidden = false" hidden>
+             onload="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.hidden = false"
+             onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false" hidden>
     </div>
     <a class="mt-2 btn btn-sm btn-primary" href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
         {{ filename|title }}
