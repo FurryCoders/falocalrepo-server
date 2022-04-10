@@ -12,8 +12,12 @@
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles/style.css">
-    {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
-        <style>
+    <style>
+        #file-container ~ #metadata .card {
+            height: 100%;
+        }
+
+        {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
             .fit-height.zoomed {
                 max-height: none !important;
             }
@@ -53,10 +57,6 @@
                     margin-bottom: 1rem;
                 }
 
-                #file-container ~ #metadata .card {
-                    height: 100%;
-                }
-
                 #file-container.zoomed ~ #metadata .card {
                     height: auto;
                 }
@@ -74,14 +74,12 @@
                     width: 100%;
                 }
             }
-        </style>
-    {% elif submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "swf" %}
-        <style>
+        {% elif submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "swf" %}
             #flash-container > ruffle-player {
                 max-width: 100% !important;
             }
-        </style>
-    {% endif %}
+        {% endif %}
+    </style>
 </head>
 <body class="mt-3 mt-lg-4 mb-4">
 
@@ -145,7 +143,8 @@
         </div>
         <img class="img-fluid rounded mt-2" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
              onload="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.hidden = false"
-             onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false" hidden>
+             onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false"
+             hidden>
     </div>
     <a class="mt-2 btn btn-sm btn-primary" href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
         {{ filename|title }}
