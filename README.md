@@ -245,12 +245,12 @@ specifying a field. When searching users, `@username` is the default field.
 
 Search terms that are not separated by a logic operator are considered _AND_ terms (i.e. `a b c` -> `a & b & c`).
 
-Except for the `ID`, `AUTHOR`, `USERNAME`, `FILESAVED`, `USERUPDATE`, and `ACTIVE` fields, all search terms are searched
-through the whole content of the various fields: i.e. `@description cat` will match any item whose description field
-contains "cat". To match items that contain only "cat" (or start with, end with, etc.), the `%`, `_`, `^`, and `$`
+Except for the `ID`, `AUTHOR`, `FILESAVED`, `USERUPDATE`, and `ACTIVE` fields, all search terms are searched through the
+whole content of the various fields: i.e. `@description cat` will match any item whose description field contains "cat".
+To match items that contain only "cat" (or start with, end with, etc.), the `%`, `_`, `^`, and `$`
 operators need to be used (e.g. `@description ^cat`).
 
-Search terms for `ID`, `AUTHOR`, `USERNAME`, `FILESAVED`, `USERUPDATE`, and `ACTIVE` are matched exactly as they are:
+Search terms for `ID`, `AUTHOR`, `FILESAVED`, `USERUPDATE`, and `ACTIVE` are matched exactly as they are:
 i.e. `@author tom` will match only items whose author field is exactly equal to "tom", to match items that contain "tom"
 the `%`, `_`, `^`, and `$` operators need to be used (e.g. `@author %tom%`).
 
@@ -368,8 +368,13 @@ fails to load.
 
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission-overlay.png" width="50">
 
-The comments to the submission can be found below the description. Each comment contains the author (with a link to
-their user page), post date, and links to the comment itself and, if the comment is a reply, its parent comments.
+The comments to the submission can be found below the description, and can be reached quickly by clicking on the
+floating comments button that appears in the lower right corner of the screen if the submission has comments.
+
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-comments-link.png" width="50">
+
+Each comment contains the author (with a link to their user page), post date, and links to the comment itself and, if
+the comment is a reply, its parent comments.
 
 <div align="center">
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comment-card.png" width="600">
@@ -402,9 +407,13 @@ The _Next_ and _Prev_ buttons lead to the next more recent, and the previous les
 
 The _All_ button opens a search page with all the user's journals.
 
-The comments to the journal can be found below the journal text and metadata. Each comment contains the author (with a
-link to their user page), post date, and links to the comment itself and, if the comment is a reply, its parent
-comments.
+The comments to the journal can be found below the journal text, and can be reached quickly by clicking on the floating
+comments button that appears in the lower right corner of the screen if the journal has comments.
+
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-comments-link.png" width="50">
+
+Each comment contains the author (with a link to their user page), post date, and links to the comment itself and, if
+the comment is a reply, its parent comments.
 
 <div align="center">
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comment-card.png" width="600">
