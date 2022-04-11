@@ -12,12 +12,13 @@
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles/style.css">
+    {% set is_image = submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() in ["gif", "jpg", "png"]) %}
     <style>
         #file-container ~ #metadata .card {
             height: 100%;
         }
 
-        {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
+        {% if is_image %}
             .fit-height.zoomed {
                 max-height: none !important;
             }
@@ -102,7 +103,7 @@
 <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 text-center">
     <span class="badge bg-danger">Submission has no file</span>
 </div>
-{% elif submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
+{% elif is_image %}
 <div class="text-center">
     <div class="mt-1 mb-2 mt-lg-5 pt-lg-5" id="image-error" hidden>
         <span class="badge bg-danger">Image not found</span>
@@ -236,7 +237,7 @@
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40type%20%22{{ submission["TYPE"] }}%22">
                                 {{ submission["TYPE"]|title }}
-                                {{ "(GIF)" if submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif" }}
+                                {{ "({})".format(submission["FILEEXT"].upper()) if submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() != "swf" }}
                             </a>
                         </div>
                     </div>
@@ -394,7 +395,7 @@
             </a>
         {% endif %}
 
-        {% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
+        {% if is_image %}
             <button id="button-sticky"
                     class="btn btn-secondary btn-circle position-fixed"
                     style="right: .25rem; bottom: {{ "calc(.25rem" + (" + 45px + .25rem" * floating_buttons) + ")" if floating_buttons else ".25rem" }}; z-index: 1 !important;"
@@ -410,7 +411,7 @@
     </div>
 </div>
 
-{% if submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif") %}
+{% if is_image %}
     <script>
         const margin = Number(window.getComputedStyle(document.body, null).marginTop.replace(/[^\d]/g, ""))
         window.onscroll = () => document.body.dataset.scroll = window.scrollY > margin ? String(window.scrollY) : "0"
