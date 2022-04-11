@@ -236,6 +236,7 @@
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
                                href="/search/submissions/?query=%40type%20%22{{ submission["TYPE"] }}%22">
                                 {{ submission["TYPE"]|title }}
+                                {{ "(GIF)" if submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "gif" }}
                             </a>
                         </div>
                     </div>
