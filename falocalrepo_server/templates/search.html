@@ -286,36 +286,36 @@
                         {% endif %}
                         {% if table in ("submissions", "journals") %}
                             <div class="card-body overflow-hidden text-center align-middle p-1">
-                                    <span class="card-title fw-bold small m-0 text-body" title="{{ item["TITLE"] }}">
-                                        {{ item["TITLE"] }}
+                                    <span class="card-title fw-bold small m-0 text-body" title="{{ item.TITLE }}">
+                                        {{ item.TITLE }}
                                     </span>
                             </div>
                         {% elif table == "users" %}
                             <div class="card-body overflow-hidden text-center p-1">
-                                <h6 class="card-title small mt-0 mb-0 text-body">{{ item["USERNAME"] }}</h6>
-                                {% if not item["ACTIVE"] %}
+                                <h6 class="card-title small mt-0 mb-0 text-body">{{ item.USERNAME }}</h6>
+                                {% if not item.ACTIVE %}
                                     <span class="badge bg-danger w-100">Inactive</span>
                                 {% endif %}
                             </div>
                         {% endif %}
                     </a>
                     {% if table in ("submissions", "journals") %}
-                        <a href="/user/{{ item["AUTHOR"] }}" class="text-decoration-none w-100">
+                        <a href="/user/{{ item.AUTHOR }}" class="text-decoration-none w-100">
                             <div class="card-footer text-center p-1 pb-0 small bg-link">
                                     <span class="badge bg-info w-100 text-truncate"
-                                          title="{{ item["DATE"].strftime("%Y-%m-%d") }}">
-                                        {{ item["DATE"].strftime("%Y-%m-%d") }}
+                                          title="{{ item.DATE.strftime("%Y-%m-%d") }}">
+                                        {{ item.DATE.strftime("%Y-%m-%d") }}
                                     </span>
                                 <span class="badge bg-primary w-100 text-truncate"
-                                      title="{{ item["AUTHOR"] }}">
-                                        {{ item["AUTHOR"] }}
+                                      title="{{ item.AUTHOR }}">
+                                        {{ item.AUTHOR }}
                                     </span>
                             </div>
                         </a>
                     {% elif table == "users" %}
-                        <a href="/user/{{ item["USERNAME"] }}" class="text-decoration-none w-100">
+                        <a href="/user/{{ item.USERNAME }}" class="text-decoration-none w-100">
                             <div class="card-footer text-center p-1 pb-0 small">
-                                {% for folder in item["FOLDERS"]|sort %}
+                                {% for folder in item.FOLDERS|sort %}
                                     <span title="{{ folder }}" class="badge bg-info w-100 text-truncate">
                                             {{ folder }}
                                         </span>

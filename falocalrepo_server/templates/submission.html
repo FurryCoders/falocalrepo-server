@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles/style.css">
-    {% set is_image = submission["TYPE"].lower() == "image" or (submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() in ["gif", "jpg", "png"]) %}
+    {% set is_image = submission.TYPE.lower() == "image" or (submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() in ["gif", "jpg", "png"]) %}
     <style>
         #file-container ~ #metadata .card {
             height: 100%;
@@ -89,7 +89,7 @@
                     width: 100%;
                 }
             }
-        {% elif submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "swf" %}
+        {% elif submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() == "swf" %}
             #flash-container > ruffle-player {
                 max-width: 100% !important;
             }
@@ -99,7 +99,7 @@
 <body class="mt-3 mt-lg-4 mb-4" data-scroll="0">
 
 {% set file %}
-{% if submission["FILESAVED"] < 2 %}
+{% if submission.FILESAVED < 2 %}
 <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 text-center">
     <span class="badge bg-danger">Submission has no file</span>
 </div>
@@ -112,13 +112,13 @@
         <span class="spinner spinner-border spinner-border-sm" role="status"></span>
     </div>
     <img class="img-fluid mx-auto fit-height zoom" id="submission-image"
-         src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" alt=""
+         src="/submission/{{ submission.ID }}/file/{{ filename_id }}" alt=""
          onclick="if (!this.classList.contains('zoomed')) {this.classList.add('zoomed'); document.getElementById('file-container').classList.add('zoomed')} else {this.classList.remove('zoomed'); document.getElementById('file-container').classList.remove('zoomed')}"
          onload="this.parentNode.querySelector('#image-loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = false"
          onerror="this.parentNode.querySelector('#image-loading').hidden = true; this.parentNode.querySelector('#image-error').hidden = false"
          hidden>
 </div>
-{% elif submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "swf" %}
+{% elif submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() == "swf" %}
 <div class="text-center">
     <div class="mt-1 mb-2 mt-lg-5 pt-lg-5" id="flash-error" hidden>
         <span class="badge bg-danger">Ruffle error</span>
@@ -128,20 +128,20 @@
     </div>
     <div class="fit-height mx-auto" id="flash-container" hidden></div>
 </div>
-{% elif submission["TYPE"].lower() == "music" %}
+{% elif submission.TYPE.lower() == "music" %}
 <div class="text-center mb-1 mt-lg-5 pt-lg-5">
     <div class="col-12 text-center" style="min-height: 120px">
         <span class="badge bg-danger" id="thumbnail-error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
         <span class="spinner spinner-border spinner-border-sm" id="thumbnail-loading" role="status"
               style="margin-top: calc(60px - .5rem)"></span>
-        <img class="img-fluid rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+        <img class="img-fluid rounded" src="/submission/{{ submission.ID }}/thumbnail" alt=""
              onload="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.hidden = false"
              onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false"
              hidden>
     </div>
     <div class="mt-2">
         <span class="badge bg-danger" id="file-error" hidden>File not found</span>
-        <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
+        <audio src="/submission/{{ submission.ID }}/file/{{ filename_id }}"
                onerror="this.hidden = true; this.parentNode.querySelector('#file-error').hidden = false"
                controls>
         </audio>
@@ -153,7 +153,7 @@
         <span class="badge bg-danger" id="thumbnail-error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
         <span class="spinner spinner-border spinner-border-sm" id="thumbnail-loading" role="status"
               style="margin-top: calc(60px - .5rem)"></span>
-        <img class="img-fluid rounded" src="/submission/{{ submission["ID"] }}/thumbnail/" alt=""
+        <img class="img-fluid rounded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
              onload="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.hidden = false"
              onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false"
              hidden>
@@ -168,12 +168,12 @@
         <span class="badge bg-danger" id="thumbnail-error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
         <span class="spinner spinner-border spinner-border-sm" id="thumbnail-loading" role="status"
               style="margin-top: calc(60px - .5rem)"></span>
-        <img class="img-fluid rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+        <img class="img-fluid rounded" src="/submission/{{ submission.ID }}/thumbnail" alt=""
              onload="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.hidden = false"
              onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false"
              hidden>
     </div>
-    <a class="btn btn-sm btn-primary mt-2" href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+    <a class="btn btn-sm btn-primary mt-2" href="/submission/{{ submission.ID }}/file/{{ filename_id }}">
         {{ filename|title }}
     </a>
 </div>
@@ -186,18 +186,18 @@
 
         <div class="col-12 col-lg-4 mt-3 mt-lg-0 mx-auto" id="metadata">
             <div class="card">
-                <h2 class="card-header">{{ submission["TITLE"] }}</h2>
+                <h2 class="card-header">{{ submission.TITLE }}</h2>
                 <div class="card-header d-lg-none text-center">
                     <div class="btn-group col-12 col-md-8" role="group">
                         <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
                             Next
                         </a>
                         <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery</a>
+                        <a class="btn btn-sm btn-primary" href="/gallery/{{ submission.AUTHOR }}">Gallery</a>
                         <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All</a>
+                        <a class="btn btn-sm btn-primary" href="/submissions/{{ submission.AUTHOR }}">All</a>
                         <span class="btn-separator"></span>
-                        <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps</a>
+                        <a class="btn btn-sm btn-primary" href="/scraps/{{ submission.AUTHOR }}">Scraps</a>
                         <span class="btn-separator"></span>
                         <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
                             Prev
@@ -209,7 +209,7 @@
                         <h6 class="col-4 card-title">Author</h6>
                         <div class="col-8 card-text">
                             <a class="col-8 card-text btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
-                               href="/user/{{ submission["AUTHOR"] }}">{{ submission["AUTHOR"] }}
+                               href="/user/{{ submission.AUTHOR }}">{{ submission.AUTHOR }}
                             </a>
                         </div>
                     </div>
@@ -217,8 +217,8 @@
                         <h6 class="col-4 card-title">Date</h6>
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge text-truncate text-decoration-none w-100"
-                               href="/search/submissions/?query=%40date%20{{ submission["DATE"].strftime("%Y-%m-%d") }}">
-                                {{ submission["DATE"].strftime("%Y-%m-%d %H:%M") }}
+                               href="/search/submissions/?query=%40date%20{{ submission.DATE.strftime("%Y-%m-%d") }}">
+                                {{ submission.DATE.strftime("%Y-%m-%d %H:%M") }}
                             </a>
                         </div>
                     </div>
@@ -226,8 +226,8 @@
                         <h6 class="col-4 card-title">Folder</h6>
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
-                               href="/{{ submission["FOLDER"] }}/{{ submission["AUTHOR"] }}">
-                                {{ submission["FOLDER"]|title }}
+                               href="/{{ submission.FOLDER }}/{{ submission.AUTHOR }}">
+                                {{ submission.FOLDER|title }}
                             </a>
                         </div>
                     </div>
@@ -235,9 +235,9 @@
                         <h6 class="col-4 card-title">Type</h6>
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
-                               href="/search/submissions/?query=%40type%20%22{{ submission["TYPE"] }}%22">
-                                {{ submission["TYPE"]|title }}
-                                {{ "({})".format(submission["FILEEXT"].upper()) if submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() != "swf" }}
+                               href="/search/submissions/?query=%40type%20%22{{ submission.TYPE }}%22">
+                                {{ submission.TYPE|title }}
+                                {{ "({})".format(submission.FILEEXT.upper()) if submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() != "swf" }}
                             </a>
                         </div>
                     </div>
@@ -245,8 +245,8 @@
                         <h6 class="col-4 card-title">Category</h6>
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
-                               href="/search/submissions/?query=%40category%20%22{{ submission["CATEGORY"] }}%22">
-                                {{ submission["CATEGORY"]|title }}
+                               href="/search/submissions/?query=%40category%20%22{{ submission.CATEGORY }}%22">
+                                {{ submission.CATEGORY|title }}
                             </a>
                         </div>
                     </div>
@@ -254,8 +254,8 @@
                         <h6 class="col-4 card-title">Species</h6>
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
-                               href="/search/submissions/?query=%40species%20%22{{ submission["SPECIES"] }}%22">
-                                {{ submission["SPECIES"]|title }}
+                               href="/search/submissions/?query=%40species%20%22{{ submission.SPECIES }}%22">
+                                {{ submission.SPECIES|title }}
                             </a>
                         </div>
                     </div>
@@ -263,8 +263,8 @@
                         <h6 class="col-4 card-title">Gender</h6>
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
-                               href="/search/submissions/?query=%40gender%20%22{{ submission["GENDER"] }}%22">
-                                {{ submission["GENDER"]|title }}
+                               href="/search/submissions/?query=%40gender%20%22{{ submission.GENDER }}%22">
+                                {{ submission.GENDER|title }}
                             </a>
                         </div>
                     </div>
@@ -272,19 +272,19 @@
                         <h6 class="col-4 card-title">Rating</h6>
                         <div class="col-8 card-text">
                             <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
-                               href="/search/submissions/?query=%40rating%20%22{{ submission["RATING"] }}%22">
-                                {{ submission["RATING"]|title }}
+                               href="/search/submissions/?query=%40rating%20%22{{ submission.RATING }}%22">
+                                {{ submission.RATING|title }}
                             </a>
                         </div>
                     </div>
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Tags</h6>
                         <div class="col-8 card-text">
-                            {% for tag in submission["TAGS"] %}
+                            {% for tag in submission.TAGS %}
                                 <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
                                    href='/search/submissions/?query=%40tags%20%22%7C{{ tag }}%7C%22'>{{ tag }}</a>
                             {% endfor %}
-                            {% if not submission["TAGS"] %}
+                            {% if not submission.TAGS %}
                                 <span class="badge bg-danger w-100 text-truncate">No tags</span>
                             {% endif %}
                         </div>
@@ -292,11 +292,11 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Favorites</h6>
                         <div class="col-8 card-text">
-                            {% for user in submission["FAVORITE"] %}
+                            {% for user in submission.FAVORITE %}
                                 <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
-                            {% if not submission["FAVORITE"] %}
+                            {% if not submission.FAVORITE %}
                                 <span class="badge bg-danger w-100 text-truncate">No favorites</span>
                             {% endif %}
                         </div>
@@ -304,11 +304,11 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Mentions</h6>
                         <div class="col-8 card-text">
-                            {% for user in submission["MENTIONS"] %}
+                            {% for user in submission.MENTIONS %}
                                 <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
-                            {% if not submission["MENTIONS"] %}
+                            {% if not submission.MENTIONS %}
                                 <span class="badge bg-danger w-100 text-truncate">No mentions</span>
                             {% endif %}
                         </div>
@@ -327,19 +327,19 @@
                         <div class="btn-group col-8 col-md-6 col-lg-8 ms-auto" role="group">
                             <a class="btn btn-sm btn-secondary disabled">Download</a>
                             <span class="btn-separator"></span>
-                            <a class="btn btn-sm btn-primary {{ "disabled" if submission["FILESAVED"] < 2 }}"
-                               href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}" download>
+                            <a class="btn btn-sm btn-primary {{ "disabled" if submission.FILESAVED < 2 }}"
+                               href="/submission/{{ submission.ID }}/file/{{ filename_id }}" download>
                                 File
                             </a>
                             <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary"
-                               href="/submission/{{ submission["ID"] }}/zip/submission-{{ "{0:010}".format(submission["ID"]) }}.zip">
+                               href="/submission/{{ submission.ID }}/zip/submission-{{ "{0:010}".format(submission.ID) }}.zip">
                                 ZIP
                             </a>
                         </div>
                         <div class="btn-group col-4 col-md-2 col-lg-4 me-auto">
                             <a class="btn btn-sm btn-primary"
-                               href="https://www.furaffinity.net/view/{{ submission["ID"] }}">
+                               href="https://www.furaffinity.net/view/{{ submission.ID }}">
                                 FA
                             </a>
                         </div>
@@ -349,11 +349,11 @@
                                 Next
                             </a>
                             <span class="btn-separator"></span>
-                            <a class="btn btn-sm btn-primary" href="/gallery/{{ submission["AUTHOR"] }}">Gallery</a>
+                            <a class="btn btn-sm btn-primary" href="/gallery/{{ submission.AUTHOR }}">Gallery</a>
                             <span class="btn-separator"></span>
-                            <a class="btn btn-sm btn-primary" href="/submissions/{{ submission["AUTHOR"] }}">All</a>
+                            <a class="btn btn-sm btn-primary" href="/submissions/{{ submission.AUTHOR }}">All</a>
                             <span class="btn-separator"></span>
-                            <a class="btn btn-sm btn-primary" href="/scraps/{{ submission["AUTHOR"] }}">Scraps</a>
+                            <a class="btn btn-sm btn-primary" href="/scraps/{{ submission.AUTHOR }}">Scraps</a>
                             <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}"
                                href="/submission/{{ prev }}">
@@ -369,7 +369,7 @@
             <div class="card">
                 <div class="card-body col-12 col-lg-9 mx-auto">
                     <div class="card-text text-wrap overflow-hidden">
-                        {% autoescape false %}{{ submission["DESCRIPTION"] }}{% endautoescape %}
+                        {% autoescape false %}{{ submission.DESCRIPTION }}{% endautoescape %}
                     </div>
                 </div>
             </div>
@@ -416,7 +416,7 @@
         const margin = Number(window.getComputedStyle(document.body, null).marginTop.replace(/[^\d]/g, ""))
         window.onscroll = () => document.body.dataset.scroll = window.scrollY > margin ? String(window.scrollY) : "0"
     </script>
-{% elif submission["TYPE"].lower() == "flash" and submission["FILEEXT"].lower() == "swf" %}
+{% elif submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() == "swf" %}
     <!--suppress JSUnresolvedFunction, JSUnusedLocalSymbols, JSUnresolvedVariable -->
     <script>
         const ruffleError = (e) => {
@@ -444,7 +444,7 @@
                 document.getElementById("flash-loading").hidden = true
                 document.getElementById("flash-container").hidden = false
             })
-            player.load("/submission/{{ submission["ID"] }}/file")
+            player.load("/submission/{{ submission.ID }}/file")
                 .then()
                 .catch(ruffleError);
         });
