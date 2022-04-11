@@ -435,7 +435,7 @@
 
         window.RufflePlayer = window.RufflePlayer || {};
         window.addEventListener("load", (event) => {
-            if (window.RufflePlayer.newest === undefined) return ruffleError()
+            if (window.RufflePlayer.newest === undefined) return ruffleError(new Error("Ruffle is not loaded"))
             const player = window.RufflePlayer.newest().createPlayer();
             player.config = {
                 scale: "showAll",
