@@ -379,14 +379,17 @@
 {{ navigation }}
 {% endif %}
 <script>
-    window.onpageshow = () => document.body.classList.remove('loading')
-
     {% if thumbnails %}
         let loadThumbnails = (container) => {
             if (container.hidden) return
             container.querySelectorAll("img").forEach(img => img.src = img.dataset.src)
-            loadThumbnails = () => null
         }
+        window.onpageshow = () => {
+            document.body.classList.remove('loading')
+            loadThumbnails(document.getElementById('grid_view'))
+        }
+    {% else %}
+        window.onpageshow = () => document.body.classList.remove('loading')
     {% endif %}
 
     const changeView = (view) => {
