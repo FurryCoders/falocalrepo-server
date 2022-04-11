@@ -146,6 +146,14 @@
 </div>
 {% elif file_text is not none %}
 <div class="border rounded p-2 text-start font-monospace small overflow-scroll text-wrap fit-height">
+    <div class="col-12 text-center p-2" style="min-height: calc(1rem + 120px)">
+        <span class="badge bg-danger" id="thumbnail-error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
+        <span class="spinner spinner-border spinner-border-sm" id="thumbnail-loading" role="status" style="margin-top: calc(60px - .5rem)"></span>
+        <img class="img-fluid rounded" src="/submission/{{ submission["ID"] }}/thumbnail/" alt=""
+             onload="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.hidden = false"
+             onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false"
+             hidden>
+    </div>
     {% autoescape false %}{{ file_text.strip() }}{% endautoescape %}
 </div>
 {% else %}
