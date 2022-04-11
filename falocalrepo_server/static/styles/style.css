@@ -113,6 +113,14 @@ body {
     cursor: zoom-out;
 }
 
+.loading, .loading * {
+    cursor: wait !important;
+}
+
+.loading button, .loading select, .loading input {
+    pointer-events: none;
+}
+
 i.smilie {
     font-style: inherit;
 }
