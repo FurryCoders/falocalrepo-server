@@ -345,8 +345,8 @@
                     {% for item in results %}
                         <tr>
                             {% for column in columns_results %}
-                                <td class="col-{{ column.lower() }} text-nowrap clickable ps-0 pe-0">
-                                    <a class="d-block text-decoration-none text-body h-100 ps-1 pe-1"
+                                <td class="col-{{ column.lower() }} text-nowrap clickable p-0">
+                                    <a class="d-block text-decoration-none text-body p-1"
                                        href="/{{ table_short }}/{{ item[column_id] }}">
                                         {% if column == "DATE" %}
                                             {{ item[column].strftime("%Y-%m-%d") }}
