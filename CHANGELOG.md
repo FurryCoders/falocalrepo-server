@@ -1,5 +1,36 @@
 # Changelog
 
+## v3.1.3
+
+### New Features
+
+* Floating button for comments
+    * If a submission/journal has comments, a new floating button appears in the lower right corner of the screen to
+      navigate directly to the comments
+
+### Changes
+
+* USERNAME is matched using `like` (i.e. when searching for users the results will be of users whose name contains the
+  query string instead of being matched exactly)
+* Journal content and user profiles are longer part of the metadata card on small screens
+* Text submissions now show their thumbnail above the text
+* When zooming an image submission, the metadata card is now moved to the right of the description
+* Submissions and journals have a new metadata card with the total number of comments related to them
+* Improved the style of submission image overlay
+* When searching and saving settings, a wait cursor appears
+* The submission thumbnail route now supports setting height and width separately
+
+### Fixes
+
+* Fix missing border around text submissions
+* Fix list view links not covering the full height of the row
+* Fix thumbnails that weren't loaded before moving to the next search page not loading when going back
+* Fix submissions whose type is `flash` but used image files other than GIF not being displayed as images
+
+### Dependencies
+
+* Use [falocalrepo-database ~5.2.2](https://pypi.org/project/falocalrepo-database/5.2.2)
+
 ## v3.1.2
 
 ### New Features
