@@ -131,15 +131,14 @@ def flatten_comments(comments: list[dict]) -> list[dict]:
 
 
 def comments_depth(comments: list[dict], depth: int = 0, root_comment: int = None) -> list[dict]:
-    return flatten_comments([com | {"DEPTH": depth,
-                                    "REPLIES": comments_depth(com.get("REPLIES", []), depth + 1,
-                                                              root_comment or com["ID"]),
-                                    "ROOT": root_comment}
-                             for com in comments])
+    return [com | {"DEPTH": depth,
+                   "REPLIES": comments_depth(com.get("REPLIES", []), depth + 1, root_comment or com["ID"]),
+                   "ROOT": root_comment}
+            for com in comments]
 
 
 def prepare_comments(comments: list[dict]) -> list[dict]:
-    return [c | {"TEXT": clean_html(c["TEXT"])} for c in comments_depth(comments, 0)]
+    return [c | {"TEXT": clean_html(c["TEXT"])} for c in flatten_comments(comments_depth(comments, 0))]
 
 
 def bbcode_to_html(text: str) -> str:
