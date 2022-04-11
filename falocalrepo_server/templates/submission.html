@@ -129,14 +129,13 @@
 </div>
 {% elif submission["TYPE"].lower() == "music" %}
 <div class="text-center mb-1 mt-lg-5 pt-lg-5">
-    <div class="col-12">
-        <span class="mt-2 badge bg-danger" id="thumbnail-error" hidden>Thumbnail not found</span>
-        <div class="mt-2 mb-2 mt-lg-5 pt-lg-5" id="thumbnail-loading">
-            <span class="spinner spinner-border spinner-border-sm" role="status"></span>
-        </div>
-        <img class="img-fluid rounded mt-2" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+    <div class="col-12 text-center" style="min-height: 120px">
+        <span class="badge bg-danger" id="thumbnail-error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
+        <span class="spinner spinner-border spinner-border-sm" id="thumbnail-loading" role="status" style="margin-top: calc(60px - .5rem)"></span>
+        <img class="img-fluid rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
              onload="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.hidden = false"
-             onerror="this.parentNode.querySelector('#thumbnail-error').hidden = false" hidden>
+             onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false"
+             hidden>
     </div>
     <span class="mt-2 badge bg-danger" id="file-error" hidden>File not found</span>
     <audio class="mt-2" src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
@@ -158,17 +157,15 @@
 </div>
 {% else %}
 <div class="text-center mb-2 mt-lg-5 pt-lg-5">
-    <div class="col-12">
-        <span class="mt-2 badge bg-danger" id="thumbnail-error" hidden>Thumbnail not found</span>
-        <div class="mt-2 mb-2 mt-lg-5 pt-lg-5" id="thumbnail-loading">
-            <span class="spinner spinner-border spinner-border-sm" role="status"></span>
-        </div>
-        <img class="img-fluid rounded mt-2" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
+    <div class="col-12 text-center" style="min-height: 120px">
+        <span class="badge bg-danger" id="thumbnail-error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
+        <span class="spinner spinner-border spinner-border-sm" id="thumbnail-loading" role="status" style="margin-top: calc(60px - .5rem)"></span>
+        <img class="img-fluid rounded" src="/submission/{{ submission["ID"] }}/thumbnail" alt=""
              onload="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.hidden = false"
              onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false"
              hidden>
     </div>
-    <a class="mt-2 btn btn-sm btn-primary" href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
+    <a class="btn btn-sm btn-primary mt-2" href="/submission/{{ submission["ID"] }}/file/{{ filename_id }}">
         {{ filename|title }}
     </a>
 </div>
