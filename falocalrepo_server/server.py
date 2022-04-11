@@ -497,24 +497,26 @@ async def serve_submission_file(id_: int, _filename=None):
 
 @app.get("/submission/{id_}/thumbnail/")
 @app.get("/submission/{id_}/thumbnail/{_filename}")
-@app.get("/submission/{id_}/thumbnail/{x}/")
-@app.get("/submission/{id_}/thumbnail/{x}/{_filename}")
+@app.get("/submission/{id_}/thumbnail/{x}x/")
+@app.get("/submission/{id_}/thumbnail/{x}x/{_filename}")
+@app.get("/submission/{id_}/thumbnail/x{y}/")
+@app.get("/submission/{id_}/thumbnail/x{y}/{_filename}")
 @app.get("/submission/{id_}/thumbnail/{x}x{y}>/")
 @app.get("/submission/{id_}/thumbnail/{x}x{y}>/{_filename}")
 async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _filename=None):
     f, t = settings.database.load_submission_files(id_)
     if t is not None and t.is_file():
-        if not x:
+        if not x and not y:
             return FileResponse(t)
         with Image.open(t) as img:
-            img.thumbnail((x, y or x))
+            img.thumbnail((x or y, y or x))
             img.save(f_obj := BytesIO(), img.format, quality=95)
             f_obj.seek(0)
             return StreamingResponse(f_obj, 201, media_type=f"image/{img.format}".lower())
     elif f is not None and f.is_file():
         try:
             with Image.open(f) as img:
-                img.thumbnail((x or 400, y or x or 400))
+                img.thumbnail((x or y or 400, y or x or 400))
                 img.save(f_obj := BytesIO(), img.format, quality=95)
                 f_obj.seek(0)
                 return StreamingResponse(f_obj, 201, media_type=f"image/{img.format}".lower())
