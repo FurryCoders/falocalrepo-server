@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles/style.css">
     {% set is_image = submission.TYPE.lower() == "image" or (submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() in ["gif", "jpg", "png"]) %}
+    {% set is_flash = submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() == "swf" %}
     <style>
         #file-container ~ #metadata .card {
             height: 100%;
@@ -89,7 +90,7 @@
                     width: 100%;
                 }
             }
-        {% elif submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() == "swf" %}
+        {% elif is_flash %}
             #flash-container > ruffle-player {
                 max-width: 100% !important;
             }
@@ -118,7 +119,7 @@
          onerror="this.parentNode.querySelector('#image-loading').hidden = true; this.parentNode.querySelector('#image-error').hidden = false"
          hidden>
 </div>
-{% elif submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() == "swf" %}
+{% elif is_flash %}
 <div class="text-center">
     <div class="mt-1 mb-2 mt-lg-5 pt-lg-5" id="flash-error" hidden>
         <span class="badge bg-danger">Ruffle error</span>
@@ -416,7 +417,7 @@
         const margin = Number(window.getComputedStyle(document.body, null).marginTop.replace(/[^\d]/g, ""))
         window.onscroll = () => document.body.dataset.scroll = window.scrollY > margin ? String(window.scrollY) : "0"
     </script>
-{% elif submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() == "swf" %}
+{% elif is_flash %}
     <!--suppress JSUnresolvedFunction, JSUnusedLocalSymbols, JSUnresolvedVariable -->
     <script>
         const ruffleError = (e) => {
