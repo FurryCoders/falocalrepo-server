@@ -138,11 +138,13 @@
              onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false"
              hidden>
     </div>
-    <span class="mt-2 badge bg-danger" id="file-error" hidden>File not found</span>
-    <audio class="mt-2" src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
-           onerror="this.hidden = true; this.parentNode.querySelector('#file-error').hidden = false"
-           controls>
-    </audio>
+    <div class="mt-2">
+        <span class="badge bg-danger" id="file-error" hidden>File not found</span>
+        <audio src="/submission/{{ submission["ID"] }}/file/{{ filename_id }}"
+               onerror="this.hidden = true; this.parentNode.querySelector('#file-error').hidden = false"
+               controls>
+        </audio>
+    </div>
 </div>
 {% elif file_text is not none %}
 <div class="border rounded p-2 text-start font-monospace small overflow-scroll text-wrap fit-height">
