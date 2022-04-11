@@ -26,6 +26,7 @@
 * Fix list view links not covering the full height of the row
 * Fix thumbnails that weren't loaded before moving to the next search page not loading when going back
 * Fix submissions whose type is `flash` but used image files other than GIF not being displayed as images
+* Fix rare infinite recursion error when processing comments
 
 ### Dependencies
 
