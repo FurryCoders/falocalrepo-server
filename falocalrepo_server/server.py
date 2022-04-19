@@ -347,6 +347,7 @@ async def serve_home(request: Request):
         "users_total": usr_n,
         "version_db": version,
         "version": __version__,
+        "m_time": datetime.fromtimestamp(settings.database.m_time),
         "request": request}),
         remove_comments=True))
 
