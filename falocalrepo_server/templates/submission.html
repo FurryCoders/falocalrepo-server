@@ -413,7 +413,7 @@
 
 {% if is_image %}
     <script>
-        const margin = Number(window.getComputedStyle(document.body, null).marginTop.replace(/[^\d]/g, ""))
+        const margin = Number(window.getComputedStyle(document.body, null).marginTop.replace(/\D/g, ""))
         window.onscroll = () => document.body.dataset.scroll = window.scrollY > margin ? String(window.scrollY) : "0"
     </script>
 {% elif is_flash %}
