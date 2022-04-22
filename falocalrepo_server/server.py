@@ -154,7 +154,7 @@ def clean_html(html: str) -> str:
     for code in html_parsed.select("code"):
         code.name = "div"
     for link in html_parsed.select("a[href*='furaffinity.net']"):
-        link.attrs["href"] = "/" + fa_link.sub("", link.attrs["href"]).strip("/")
+        link["href"] = "/" + fa_link.sub("", link.attrs["href"]).strip("/")
     return str(html_parsed)
 
 
