@@ -339,6 +339,7 @@ async def server_search_default(request: Request):
 @app.get("/", response_class=HTMLResponse)
 async def serve_home(request: Request):
     usr_n, sub_n, jrn_n, version = settings.database.load_info()
+    hist = settings.database.history.select(order=[f"{settings.database.history.key.name} DESC"])
     return HTMLResponse(minify(templates.get_template("info.html").render({
         "app": app.title,
         "title": "",
@@ -347,7 +348,7 @@ async def serve_home(request: Request):
         "users_total": usr_n,
         "version_db": version,
         "version": __version__,
-        "m_time": datetime.fromtimestamp(settings.database.m_time),
+        "m_time": next(hist.tuples, [datetime.fromtimestamp(settings.database.m_time)])[0],
         "request": request}),
         remove_comments=True))
 
