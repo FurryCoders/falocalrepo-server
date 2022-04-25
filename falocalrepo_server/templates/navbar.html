@@ -3,8 +3,8 @@
     <div class="container">
         <a href="/" class="navbar-brand"><img alt="" src="/static/touch-icon.png" height="40"/></a>
         <div class="navbar-nav me-auto">
-            <a class="nav-link {{ "active" if request.url.path.startswith("/search/submissions/") }}" href="/search/submissions/">Submissions</a>
             <a class="nav-link {{ "active" if request.url.path.startswith("/search/users/") }}" href="/search/users/">Users</a>
+            <a class="nav-link {{ "active" if request.url.path.startswith("/search/submissions/") }}" href="/search/submissions/">Submissions</a>
             <a class="nav-link {{ "active" if request.url.path.startswith("/search/journals/") }}" href="/search/journals/">Journals</a>
         </div>
     </div>
