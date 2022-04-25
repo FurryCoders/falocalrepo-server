@@ -5,6 +5,7 @@
     --bs-body-bg: var(--background-color);
     --bs-body-bg-rgb: 255, 255, 255;
     --color-primary: black;
+    --color-primary-rgb: 0, 0, 0;
     --color-secondary: #8A8A8E;
     --color-tertiary: #C4C4C6;
     --color-link: 65, 105, 225; /*royalblue*/
@@ -18,12 +19,29 @@
         --bs-body-bg: var(--background-color);
         --bs-body-bg-rgb: 28, 28, 30;
         --color-primary: white;
+        --color-primary-rgb: 255, 255, 255;
         --color-secondary: #989899;
         --color-tertiary: #5A5A5E;
         --color-link: 65, 105, 225; /*royalblue*/
         --color-highlight: #00353F;
         --border-color: var(--color-tertiary);
     }
+}
+
+.nav-link {
+    color: rgba(var(--color-primary-rgb), .7);
+}
+
+.nav-link:focus, .nav-link:hover {
+    color: rgba(var(--color-primary-rgb), .9);
+}
+
+.nav-link.disabled {
+    color: rgba(var(--color-primary-rgb), .3);
+}
+
+.nav-link.active {
+    color: rgba(var(--color-primary-rgb), .9);
 }
 
 body {
