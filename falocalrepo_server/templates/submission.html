@@ -32,7 +32,7 @@
                 transition: all 250ms;
             }
 
-            body:not([data-scroll="0"]) #file-container.sticky-top img.zoom {
+            #file-container.sticky-top img.zoom[data-scroll="1"] {
                 border-radius: .25rem;
             }
 
@@ -112,6 +112,7 @@
         <span class="spinner spinner-border spinner-border-sm" role="status"></span>
     </div>
     <img class="img-fluid mx-auto fit-height zoom" id="submission-image"
+         data-scroll="0"
          src="/submission/{{ submission.ID }}/file/{{ filename_id }}" alt=""
          onclick="if (!this.classList.contains('zoomed')) {this.classList.add('zoomed'); document.getElementById('file-container').classList.add('zoomed')} else {this.classList.remove('zoomed'); document.getElementById('file-container').classList.remove('zoomed')}"
          onload="this.parentNode.querySelector('#image-loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = false"
@@ -414,8 +415,10 @@
 
 {% if is_image %}
     <script>
-        const margin = Number(window.getComputedStyle(document.body, null).marginTop.replace(/\D/g, ""))
-        window.onscroll = () => document.body.dataset.scroll = window.scrollY > margin ? String(window.scrollY) : "0"
+        window.onscroll = () => {
+            const submissionImage = document.getElementById("submission-image")
+            submissionImage.dataset.scroll = String(submissionImage.getBoundingClientRect().top <= 0 ? 1 : 0)
+        }
     </script>
 {% elif is_flash %}
     <!--suppress JSUnresolvedFunction, JSUnusedLocalSymbols, JSUnresolvedVariable -->
