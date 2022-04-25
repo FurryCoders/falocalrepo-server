@@ -96,7 +96,6 @@
         {% endif %}
     </style>
 </head>
-<body class="mt-3 mt-lg-4 mb-4" data-scroll="0">
 
 {% set file %}
 {% if submission.FILESAVED < 2 %}
@@ -181,7 +180,11 @@
 {% endif %}
 {% endset %}
 
-<div class="container">
+<body class="mb-4" data-scroll="0">
+
+{% include "navbar.html" %}
+
+<div class="container mt-3 mt-lg-4">
     <div class="row align-middle">
         <div class="col-12 col-lg-8" style="z-index: 1 !important" id="file-container">{{ file }}</div>
 

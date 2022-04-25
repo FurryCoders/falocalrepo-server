@@ -53,8 +53,11 @@
         }
     </style>
 </head>
-<body class="mt-3 mt-lg-4 mb-4">
-<div class="container" id="form_container">
+<body class="mb-4">
+
+{% include "navbar.html" %}
+
+<div class="container mt-3 mt-lg-4" id="form_container">
     <div class="row">
         <div class="col-12 col-lg-8 mx-auto">
             <form action="{{ action }}" class="rounded border p-3" id="search_form"
