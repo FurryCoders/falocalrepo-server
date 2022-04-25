@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.1.4
+
+### New Features
+
+* Navbar
+    * A persistent navbar with links to the home screen, submissions, journals, and users searches
+    * The navbar is not sticky and remains at the top of the page
+* Last update badge on home screen
+    * The date of the last event in the HISTORY table, or the modified time of the database file if there are not events
+      saved
+
 ## v3.1.3
 
 ### New Features
