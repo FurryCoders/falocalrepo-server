@@ -29,7 +29,7 @@
 }
 
 .nav-link {
-    color: rgba(var(--color-primary-rgb), .7);
+    color: rgba(var(--color-primary-rgb), .55);
 }
 
 .nav-link:focus, .nav-link:hover {
