@@ -4,6 +4,7 @@ from io import BytesIO
 from json import dumps
 from logging import Logger
 from logging import getLogger
+from math import ceil
 from os import PathLike
 from pathlib import Path
 from re import IGNORECASE
@@ -440,6 +441,9 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
         "id" if sort == "date" else sort,
         order
     )
+
+    if (page - 1) * limit > len(results):
+        page = ceil(len(results) / limit) or 1
 
     return HTMLResponse(minify(templates.get_template("search.html").render({
         "app": app.title,
