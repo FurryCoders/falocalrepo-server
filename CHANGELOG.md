@@ -11,6 +11,11 @@
     * The date of the last event in the HISTORY table, or the modified time of the database file if there are not events
       saved
 
+### Changes
+
+* Setting the `page` query parameter for search URLs will show the last page if the page value is beyond the results of
+  the search.
+
 ## v3.1.3
 
 ### New Features
