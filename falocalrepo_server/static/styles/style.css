@@ -29,19 +29,19 @@
 }
 
 .nav-link {
-    color: rgba(var(--color-primary-rgb), .55);
+    color: rgba(var(--color-primary-rgb), .55) !important;
 }
 
 .nav-link:focus, .nav-link:hover {
-    color: rgba(var(--color-primary-rgb), .9);
+    color: rgba(var(--color-primary-rgb), .9) !important;
 }
 
 .nav-link.disabled {
-    color: rgba(var(--color-primary-rgb), .3);
+    color: rgba(var(--color-primary-rgb), .3) !important;
 }
 
 .nav-link.active {
-    color: rgba(var(--color-primary-rgb), .9);
+    color: rgba(var(--color-primary-rgb), .9) !important;
 }
 
 body {
