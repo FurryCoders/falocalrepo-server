@@ -28,8 +28,7 @@
                         <h6 class="col-5 card-title">Users</h6>
                         <div class="col-7 card-text">
                             <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
-                               href='/search/users/'
-                               onclick="document.body.classList.add('loading')">
+                               href='/search/users/'>
                                 {{ users_total }}
                             </a>
                         </div>
@@ -38,8 +37,7 @@
                         <h6 class="col-5 card-title">Submissions</h6>
                         <div class="col-7 card-text">
                             <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
-                               href='/search/submissions/'
-                               onclick="document.body.classList.add('loading')">
+                               href='/search/submissions/'>
                                 {{ submissions_total }}
                             </a>
                         </div>
@@ -48,8 +46,7 @@
                         <h6 class="col-5 card-title">Journals</h6>
                         <div class="col-7 card-text">
                             <a class="btn-sm btn-primary badge w-100 overflow-hidden text-decoration-none"
-                               href='/search/journals/'
-                               onclick="document.body.classList.add('loading')">
+                               href='/search/journals/'>
                                 {{ journals_total }}
                             </a>
                         </div>
@@ -78,8 +75,5 @@
         </div>
     </div>
 </div>
-<script>
-    window.onpageshow = () => document.body.classList.remove('loading')
-</script>
 </body>
 </html>

@@ -60,8 +60,7 @@
 <div class="container mt-3 mt-lg-4" id="form_container">
     <div class="row">
         <div class="col-12 col-lg-8 mx-auto">
-            <form action="{{ action }}" class="rounded border p-3" id="search_form"
-                  onsubmit="document.body.classList.add('loading')">
+            <form action="{{ action }}" class="rounded border p-3" id="search_form">
                 <div class="row mb-2">
                     <div class="col-12">
                         <span class="float-end btn btn-sm btn-outline-secondary badge"
@@ -387,12 +386,7 @@
             if (container.hidden) return
             container.querySelectorAll("img").forEach(img => img.src = img.dataset.src)
         }
-        window.onpageshow = () => {
-            document.body.classList.remove('loading')
-            loadThumbnails(document.getElementById('grid_view'))
-        }
-    {% else %}
-        window.onpageshow = () => document.body.classList.remove('loading')
+        window.onpageshow = () => loadThumbnails(document.getElementById('grid_view'))
     {% endif %}
 
     const changeView = (view) => {
