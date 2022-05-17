@@ -75,12 +75,16 @@ body {
     border-radius: 50%;
 }
 
-.btn-separator {
-    background-color: var(--border-color);
-    min-width: .1em;
-    max-width: .1em;
-    width: .1em;
+.btn-xs {
+    --bs-btn-padding-y: .35em;
+    --bs-btn-padding-x: .65em;
+    --bs-btn-font-size: .75em;
+    font-weight: bold;
+    line-height: 1;
+}
 
+.btn-group.btn-separator > .btn:not(:first-child), .btn-group-sm.btn-separator > .btn:not(:first-child) {
+    margin-left: 1px;
 }
 
 .border, .border-top, .border-end, .border-bottom, .border-start {
