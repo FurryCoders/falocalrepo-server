@@ -192,17 +192,13 @@
             <div class="card">
                 <h2 class="card-header">{{ submission.TITLE }}</h2>
                 <div class="card-header d-lg-none text-center">
-                    <div class="btn-group col-12 col-md-8" role="group">
+                    <div class="btn-group btn-separator col-12 col-md-8" role="group">
                         <a class="btn btn-sm btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
                             Next
                         </a>
-                        <span class="btn-separator"></span>
                         <a class="btn btn-sm btn-primary" href="/gallery/{{ submission.AUTHOR }}">Gallery</a>
-                        <span class="btn-separator"></span>
                         <a class="btn btn-sm btn-primary" href="/submissions/{{ submission.AUTHOR }}">All</a>
-                        <span class="btn-separator"></span>
                         <a class="btn btn-sm btn-primary" href="/scraps/{{ submission.AUTHOR }}">Scraps</a>
-                        <span class="btn-separator"></span>
                         <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
                             Prev
                         </a>
@@ -212,7 +208,7 @@
                     <div class="row">
                         <h6 class="col-4 card-title">Author</h6>
                         <div class="col-8 card-text">
-                            <a class="col-8 card-text btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
+                            <a class="btn btn-xs btn-primary w-100 text-truncate"
                                href="/user/{{ submission.AUTHOR }}">{{ submission.AUTHOR }}
                             </a>
                         </div>
@@ -220,7 +216,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Date</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge text-truncate text-decoration-none w-100"
+                            <a class="btn btn-xs btn-primary text-truncate w-100"
                                href="/search/submissions/?query=%40date%20{{ submission.DATE.strftime("%Y-%m-%d") }}">
                                 {{ submission.DATE.strftime("%Y-%m-%d %H:%M") }}
                             </a>
@@ -229,7 +225,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Folder</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
+                            <a class="btn btn-xs btn-primary w-100 text-truncate"
                                href="/{{ submission.FOLDER }}/{{ submission.AUTHOR }}">
                                 {{ submission.FOLDER|title }}
                             </a>
@@ -238,7 +234,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Type</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
+                            <a class="btn btn-xs btn-primary w-100 text-truncate"
                                href="/search/submissions/?query=%40type%20%22{{ submission.TYPE }}%22">
                                 {{ submission.TYPE|title }}
                                 {{ "({})".format(submission.FILEEXT.upper()) if submission.TYPE.lower() == "flash" and submission.FILEEXT.lower() != "swf" }}
@@ -248,7 +244,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Category</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
+                            <a class="btn btn-xs btn-primary w-100 text-truncate"
                                href="/search/submissions/?query=%40category%20%22{{ submission.CATEGORY }}%22">
                                 {{ submission.CATEGORY|title }}
                             </a>
@@ -257,7 +253,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Species</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
+                            <a class="btn btn-xs btn-primary w-100 text-truncate"
                                href="/search/submissions/?query=%40species%20%22{{ submission.SPECIES }}%22">
                                 {{ submission.SPECIES|title }}
                             </a>
@@ -266,7 +262,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Gender</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
+                            <a class="btn btn-xs btn-primary w-100 text-truncate"
                                href="/search/submissions/?query=%40gender%20%22{{ submission.GENDER }}%22">
                                 {{ submission.GENDER|title }}
                             </a>
@@ -275,7 +271,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Rating</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
+                            <a class="btn btn-xs btn-primary w-100 text-truncate"
                                href="/search/submissions/?query=%40rating%20%22{{ submission.RATING }}%22">
                                 {{ submission.RATING|title }}
                             </a>
@@ -285,7 +281,7 @@
                         <h6 class="col-4 card-title">Tags</h6>
                         <div class="col-8 card-text">
                             {% for tag in submission.TAGS %}
-                                <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
+                                <a class="btn btn-xs btn-primary text-truncate"
                                    href='/search/submissions/?query=%40tags%20%22%7C{{ tag }}%7C%22'>{{ tag }}</a>
                             {% endfor %}
                             {% if not submission.TAGS %}
@@ -297,7 +293,7 @@
                         <h6 class="col-4 card-title">Favorites</h6>
                         <div class="col-8 card-text">
                             {% for user in submission.FAVORITE %}
-                                <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
+                                <a class="btn btn-xs btn-primary text-truncate"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
                             {% if not submission.FAVORITE %}
@@ -309,7 +305,7 @@
                         <h6 class="col-4 card-title">Mentions</h6>
                         <div class="col-8 card-text">
                             {% for user in submission.MENTIONS %}
-                                <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
+                                <a class="btn btn-xs btn-primary text-truncate"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
                             {% if not submission.MENTIONS %}
@@ -328,14 +324,12 @@
                 </div>
                 <div class="card-footer text-center">
                     <div class="row text-center">
-                        <div class="btn-group col-8 col-md-6 col-lg-8 ms-auto" role="group">
+                        <div class="btn-group btn-separator col-8 col-md-6 col-lg-8 ms-auto" role="group">
                             <a class="btn btn-sm btn-secondary disabled">Download</a>
-                            <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary {{ "disabled" if submission.FILESAVED < 2 }}"
                                href="/submission/{{ submission.ID }}/file/{{ filename_id }}" download>
                                 File
                             </a>
-                            <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary"
                                href="/submission/{{ submission.ID }}/zip/submission-{{ "{0:010}".format(submission.ID) }}.zip">
                                 ZIP
@@ -347,18 +341,14 @@
                                 FA
                             </a>
                         </div>
-                        <div class="btn-group col-12 mt-1 d-none d-lg-flex" role="group">
+                        <div class="btn-group btn-separator col-12 mt-1 d-none d-lg-flex" role="group">
                             <a class="btn btn-sm btn-primary {{ "disabled" if not next }}"
                                href="/submission/{{ next }}">
                                 Next
                             </a>
-                            <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary" href="/gallery/{{ submission.AUTHOR }}">Gallery</a>
-                            <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary" href="/submissions/{{ submission.AUTHOR }}">All</a>
-                            <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary" href="/scraps/{{ submission.AUTHOR }}">Scraps</a>
-                            <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}"
                                href="/submission/{{ prev }}">
                                 Prev

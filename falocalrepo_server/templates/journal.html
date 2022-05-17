@@ -38,7 +38,7 @@
                     <div class="row">
                         <h6 class="col-4 card-title">Author</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge w-100 text-truncate text-decoration-none"
+                            <a class="btn btn-xs btn-primary w-100 text-truncate"
                                href="/user/{{ journal.AUTHOR }}">
                                 {{ journal.AUTHOR }}
                             </a>
@@ -47,7 +47,7 @@
                     <div class="row mt-1">
                         <h6 class="col-4 card-title">Date</h6>
                         <div class="col-8 card-text">
-                            <a class="btn-sm btn-primary badge text-truncate text-decoration-none w-100"
+                            <a class="btn btn-xs btn-primary w-100 text-truncate"
                                href="/search/journals/?query=%40date%20{{ journal.DATE.strftime("%Y-%m-%d") }}">
                                 {{ journal.DATE.strftime("%Y-%m-%d %H:%M") }}
                             </a>
@@ -57,7 +57,7 @@
                         <h6 class="col-4 card-title">Mentions</h6>
                         <div class="col-8 card-text">
                             {% for user in journal.MENTIONS %}
-                                <a class="btn-sm btn-primary badge text-truncate text-decoration-none"
+                                <a class="btn btn-xs btn-primary text-truncate"
                                    href="/user/{{ user }}">{{ user }}</a>
                             {% endfor %}
                             {% if not journal.MENTIONS %}
@@ -76,28 +76,25 @@
                 </div>
                 <div class="card-footer text-center">
                     <div class="row text-center">
-                        <div class="btn-group col-8 col-md-6 col-lg-8 ms-auto" role="group">
+                        <div class="btn-group btn-separator col-8 col-md-6 col-lg-8 ms-auto" role="group">
                             <a class="btn btn-sm btn-secondary disabled">Download</a>
-                            <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary"
                                href="/journal/{{ journal.ID }}/zip/submission-{{ "{0:010}".format(journal.ID) }}.zip">
                                 ZIP
                             </a>
                         </div>
-                        <div class="btn-group col-4 col-md-2 col-lg-4 me-auto">
+                        <div class="btn-group btn-separator col-4 col-md-2 col-lg-4 me-auto">
                             <a class="btn btn-sm btn-primary"
                                href="https://www.furaffinity.net/journal/{{ journal.ID }}">
                                 FA
                             </a>
                         </div>
-                        <div class="btn-group col-12 mt-1" role="group">
+                        <div class="btn-group btn-separator col-12 mt-1" role="group">
                             <a class="btn btn-sm btn-primary {{ "disabled" if not next }}"
                                href="/journal/{{ next }}">
                                 Next
                             </a>
-                            <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary" href="/journals/{{ journal.AUTHOR }}">All</a>
-                            <span class="btn-separator"></span>
                             <a class="btn btn-sm btn-primary {{ "disabled" if not prev }}"
                                href="/journal/{{ prev }}">
                                 Prev
