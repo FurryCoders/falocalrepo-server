@@ -81,6 +81,8 @@ body {
     --bs-btn-font-size: .75em;
     font-weight: bold;
     line-height: 1;
+    white-space: nowrap;
+    vertical-align: baseline;
 }
 
 .btn-group.btn-separator > .btn:not(:first-child), .btn-group-sm.btn-separator > .btn:not(:first-child) {
