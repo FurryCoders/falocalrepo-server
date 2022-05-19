@@ -98,7 +98,7 @@
 </head>
 
 {% set file %}
-{% if submission.FILESAVED < 2 %}
+{% if submission.FILESAVED == 0 %}
 <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 text-center">
     <span class="badge bg-danger">Submission has no file</span>
 </div>
@@ -111,12 +111,17 @@
         <span class="spinner spinner-border spinner-border-sm" role="status"></span>
     </div>
     <img class="img-fluid mx-auto fit-height zoom" id="submission-image"
-         data-scroll="0"
-         src="/submission/{{ submission.ID }}/file/{{ filename_id }}" alt=""
+         alt="" data-scroll="0"
+         src="{{ "/submission/{0}/file/{1}".format(submission.ID, filename_id) if submission.FILESAVED > 1 else "/submission/{0}/thumbnail".format(submission.ID) }}"
          onclick="if (!this.classList.contains('zoomed')) {this.classList.add('zoomed'); document.getElementById('file-container').classList.add('zoomed')} else {this.classList.remove('zoomed'); document.getElementById('file-container').classList.remove('zoomed')}"
-         onload="this.parentNode.querySelector('#image-loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = false"
-         onerror="this.parentNode.querySelector('#image-loading').hidden = true; this.parentNode.querySelector('#image-error').hidden = false"
+         onload="document.getElementById('image-loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = false{{ "; document.getElementById('image-thumbnail-badge').hidden = false" if submission.FILESAVED < 2 }}"
+         onerror="document.getElementById('image-loading').hidden = true; document.getElementById('image-error').hidden = false"
          hidden>
+    {% if submission.FILESAVED < 2 %}
+        <div class="mt-1 mb-2" id="image-thumbnail-badge" hidden>
+            <span class="badge bg-warning">Thumbnail</span>
+        </div>
+    {% endif %}
 </div>
 {% elif is_flash %}
 <div class="text-center">
