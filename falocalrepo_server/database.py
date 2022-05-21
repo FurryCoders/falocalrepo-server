@@ -123,7 +123,7 @@ class Database(_Database):
 
     @cache
     def _load_submission_files_cached(self, submission_id: int, *, _cache=None
-                                      ) -> tuple[Path | None, Path | None]:
+                                      ) -> tuple[list[Path] | None, Path | None]:
         return self.submissions.get_submission_files(submission_id)
 
     @cache
@@ -249,7 +249,7 @@ class Database(_Database):
     def load_submission(self, submission_id: int) -> dict | None:
         return self._load_submission_cached(submission_id, _cache=self.m_time)
 
-    def load_submission_files(self, submission_id: int) -> tuple[Path | None, Path | None]:
+    def load_submission_files(self, submission_id: int) -> tuple[list[Path] | None, Path | None]:
         return self._load_submission_files_cached(submission_id, _cache=self.m_time)
 
     def load_submission_comments(self, submission_id: int) -> list[dict]:
@@ -285,7 +285,7 @@ class Database(_Database):
     def load_submission_comments_uncached(self, submission_id: int) -> list[dict]:
         return self._load_submission_comments_cached.__wrapped__(self, submission_id)
 
-    def load_submission_files_uncached(self, submission_id: int) -> tuple[Path | None, Path | None]:
+    def load_submission_files_uncached(self, submission_id: int) -> tuple[list[Path] | None, Path | None]:
         return self._load_submission_files_cached.__wrapped__(self, submission_id)
 
     def load_journal_uncached(self, journal_id: int) -> dict | None:
