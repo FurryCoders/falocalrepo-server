@@ -469,39 +469,39 @@
     }
 </script>
 {% elif is_flash %}
-    <!--suppress JSUnresolvedFunction, JSUnusedLocalSymbols, JSUnresolvedVariable -->
-    <script>
-        const ruffleError = (e) => {
-            if (e !== undefined) console.error(e)
-            document.getElementById("flash-loading").hidden = true
-            document.getElementById("flash-container").hidden = true
-            document.getElementById("flash-error").hidden = false
+<!--suppress JSUnresolvedFunction, JSUnusedLocalSymbols, JSUnresolvedVariable -->
+<script>
+    const ruffleError = (e) => {
+        if (e !== undefined) console.error(e)
+        document.getElementById("flash-loading").hidden = true
+        document.getElementById("flash-container").hidden = true
+        document.getElementById("flash-error").hidden = false
+    }
+
+    const _console_error = console.error;
+    console.error = function (...arguments) {
+        if (String(arguments[0]).toLowerCase() === "asynchronous error occurred: invalid swf") ruffleError();
+        return _console_error.apply(console, arguments);
+    };
+
+    window.RufflePlayer = window.RufflePlayer || {};
+    window.addEventListener("load", (event) => {
+        if (window.RufflePlayer.newest === undefined) return ruffleError(new Error("Ruffle is not loaded"))
+        const player = window.RufflePlayer.newest().createPlayer();
+        player.config = {
+            scale: "showAll",
         }
-
-        const _console_error = console.error;
-        console.error = function (...arguments) {
-            if (String(arguments[0]).toLowerCase() === "asynchronous error occurred: invalid swf") ruffleError();
-            return _console_error.apply(console, arguments);
-        };
-
-        window.RufflePlayer = window.RufflePlayer || {};
-        window.addEventListener("load", (event) => {
-            if (window.RufflePlayer.newest === undefined) return ruffleError(new Error("Ruffle is not loaded"))
-            const player = window.RufflePlayer.newest().createPlayer();
-            player.config = {
-                scale: "showAll",
-            }
-            document.getElementById("flash-container").appendChild(player);
-            player.addEventListener("loadeddata", () => {
-                document.getElementById("flash-loading").hidden = true
-                document.getElementById("flash-container").hidden = false
-            })
-            player.load("/submission/{{ submission.ID }}/file")
-                .then()
-                .catch(ruffleError);
-        });
-    </script>
-    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+        document.getElementById("flash-container").appendChild(player);
+        player.addEventListener("loadeddata", () => {
+            document.getElementById("flash-loading").hidden = true
+            document.getElementById("flash-container").hidden = false
+        })
+        player.load("/submission/{{ submission.ID }}/file")
+            .then()
+            .catch(ruffleError);
+    });
+</script>
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 {% endif %}
 </body>
 </html>
