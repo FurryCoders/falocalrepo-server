@@ -147,11 +147,11 @@ body {
     font-family: inherit;
 }
 
-.zoom {
+img.zoom {
     cursor: zoom-in;
 }
 
-.zoom.zoomed {
+img.zoom.zoomed, .zoomed img.zoom {
     cursor: zoom-out;
 }
 
