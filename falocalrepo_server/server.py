@@ -474,15 +474,16 @@ async def serve_submission(request: Request, id_: int):
         return error_response(request, 404, "Submission not found",
                               [("Open on Fur Affinity", f"{fa_base_url}/view/{id_}")])
 
-    f: Path | None = None
-    if sub["FILEEXT"] == "txt" and sub["FILESAVED"] & 0b10:
-        f, _ = settings.database.load_submission_files(id_)
+    fs: list[Path] | None = None
+    if "txt" in sub["FILEEXT"] and sub["FILESAVED"] & 0b10:
+        fs, _ = settings.database.load_submission_files(id_)
     p, n = settings.database.load_prev_next(submissions_table, id_)
     return HTMLResponse(minify(templates.get_template("submission.html").render({
         "app": app.title,
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
         "submission": sub | {"DESCRIPTION": clean_html(sub["DESCRIPTION"])},
-        "file_text": bbcode_to_html(f.read_text(detect_encoding(f.read_bytes())["encoding"], "ignore")) if f else None,
+        "files_text": [bbcode_to_html(fs[i].read_text(detect_encoding(fs[i].read_bytes())["encoding"], "ignore"))
+                       for i, ext in enumerate(sub['FILEEXT']) if ext.lower() == "txt"] if fs else [],
         "filenames": [f"submission{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
         "filenames_id": [f"{sub['ID']:010d}{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
         "comments": prepare_comments(settings.database.load_submission_comments(id_)),
