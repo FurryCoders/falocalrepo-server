@@ -228,15 +228,15 @@
                 </button>
             </div>
             {% if ext not in ["jpg", "jpeg", "png", "gif"] %}
-                <button class="btn btn-xs btn-primary ms-1" style="height: 1.5rem"
+                <button class="btn btn-xs btn-primary ms-1"
                         onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}">
                     <i class="zoom"></i>
                 </button>
             {% endif %}
         </div>
     {% elif ext in ["mp4", "mov"] %}
-        <div class="text-center mt-1">
-            <button class="btn btn-xs btn-primary" style="max-height: 1.5rem"
+        <div class="btn-toolbar mt-1 justify-content-center" style="height: 1.5rem">
+            <button class="btn btn-xs btn-primary"
                     onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}">
                 <i class="zoom"></i>
             </button>
