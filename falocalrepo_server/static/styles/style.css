@@ -101,9 +101,9 @@ body {
     border-bottom-right-radius: 0 !important;
 }
 
-.btn-group.btn-separator > .btn:not(:first-child),
-.btn-group-sm.btn-separator > .btn:not(:first-child),
-.btn-group-lg.btn-separator > .btn:not(:first-child) {
+.btn-group.btn-separator > .btn:not(:first-child):not(:only-child),
+.btn-group-sm.btn-separator > .btn:not(:first-child):not(:only-child),
+.btn-group-lg.btn-separator > .btn:not(:first-child):not(:only-child) {
     margin-left: 1px;
 }
 
