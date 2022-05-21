@@ -501,6 +501,24 @@ async def serve_submission_file(id_: int, n: int = 0, _filename=None):
     return FileResponse(fs[n])
 
 
+@app.get("/submission/{id_}/files/")
+@app.get("/submission/{id_}/files/{_filename}")
+@app.get("/submission/{id_}/files/{n1}-{n2}")
+@app.get("/submission/{id_}/files/{n1}-{n2}/{_filename}")
+async def serve_submission_zip(id_: int, n1: int = 0, n2: int = None, _filename=None):
+    if id_ not in settings.database.submissions:
+        raise HTTPException(404)
+
+    sub_files, _ = settings.database.load_submission_files(id_)
+
+    with ZipFile(f_obj := BytesIO(), "w") as z:
+        for sub_file in sub_files[n1:(n2 + 1) if n2 is not None else None]:
+            z.writestr(sub_file.name, sub_file.read_bytes())
+
+    f_obj.seek(0)
+    return StreamingResponse(f_obj, media_type="application/zip")
+
+
 @app.get("/submission/{id_}/thumbnail/")
 @app.get("/submission/{id_}/thumbnail/{_filename}")
 @app.get("/submission/{id_}/thumbnail/{x}x/")
