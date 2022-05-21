@@ -483,8 +483,8 @@ async def serve_submission(request: Request, id_: int):
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
         "submission": sub | {"DESCRIPTION": clean_html(sub["DESCRIPTION"])},
         "file_text": bbcode_to_html(f.read_text(detect_encoding(f.read_bytes())["encoding"], "ignore")) if f else None,
-        "filename": f"submission{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
-        "filename_id": f"{sub['ID']:010d}{('.' + sub['FILEEXT']) * bool(sub['FILEEXT'])}",
+        "filenames": [f"submission{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
+        "filenames_id": [f"{sub['ID']:010d}{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
         "comments": prepare_comments(settings.database.load_submission_comments(id_)),
         "prev": p,
         "next": n,
@@ -493,11 +493,12 @@ async def serve_submission(request: Request, id_: int):
 
 
 @app.get("/submission/{id_}/file/")
-@app.get("/submission/{id_}/file/{_filename}")
-async def serve_submission_file(id_: int, _filename=None):
-    if (f := settings.database.load_submission_files(id_)[0]) is None or not f.is_file():
+@app.get("/submission/{id_}/file/{n}")
+@app.get("/submission/{id_}/file/{n}/{_filename}")
+async def serve_submission_file(id_: int, n: int = 0, _filename=None):
+    if (fs := settings.database.load_submission_files(id_)[0]) is None or not fs[n].is_file():
         return Response(status_code=404)
-    return FileResponse(f)
+    return FileResponse(fs[n])
 
 
 @app.get("/submission/{id_}/thumbnail/")
@@ -509,7 +510,7 @@ async def serve_submission_file(id_: int, _filename=None):
 @app.get("/submission/{id_}/thumbnail/{x}x{y}>/")
 @app.get("/submission/{id_}/thumbnail/{x}x{y}>/{_filename}")
 async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _filename=None):
-    f, t = settings.database.load_submission_files(id_)
+    fs, t = settings.database.load_submission_files(id_)
     if t is not None and t.is_file():
         if not x and not y:
             return FileResponse(t)
@@ -518,9 +519,9 @@ async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _fi
             img.save(f_obj := BytesIO(), img.format, quality=95)
             f_obj.seek(0)
             return StreamingResponse(f_obj, 201, media_type=f"image/{img.format}".lower())
-    elif f is not None and f.is_file():
+    elif fs and fs[0].is_file():
         try:
-            with Image.open(f) as img:
+            with Image.open(fs[0]) as img:
                 img.thumbnail((x or y or 400, y or x or 400))
                 img.save(f_obj := BytesIO(), img.format, quality=95)
                 f_obj.seek(0)
@@ -537,10 +538,11 @@ async def serve_submission_zip(id_: int, _filename=None):
     if (sub := settings.database.load_submission(id_)) is None:
         raise HTTPException(404)
 
-    sub_file, sub_thumb = settings.database.load_submission_files(id_)
+    sub_files, sub_thumb = settings.database.load_submission_files(id_)
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
-        z.writestr(sub_file.name, sub_file.read_bytes()) if sub_file else None
+        for sub_file in sub_files:
+            z.writestr(sub_file.name, sub_file.read_bytes())
         z.writestr(sub_thumb.name, sub_thumb.read_bytes()) if sub_thumb else None
         z.writestr("description.html", sub["DESCRIPTION"].encode())
         z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(sub).items()
