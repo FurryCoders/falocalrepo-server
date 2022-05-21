@@ -61,7 +61,7 @@
                 border-color: #13653f
             }
 
-            @media (min-width: 991px) {
+            @media (min-width: 992px) {
                 #file-container.zoomed {
                     width: 100%;
                     margin-bottom: 1rem;
@@ -103,20 +103,38 @@
     <span class="badge bg-danger">Submission has no file</span>
 </div>
 {% elif is_image %}
-<div class="text-center">
+<div class="text-center position-relative">
     <div class="mt-1 mb-2 mt-lg-5 pt-lg-5" id="image-error" hidden>
         <span class="badge bg-danger">Image not found</span>
     </div>
     <div class="mt-2 mb-2 mt-lg-5 pt-lg-5" id="image-loading">
         <span class="spinner spinner-border spinner-border-sm" role="status"></span>
     </div>
-    <img class="img-fluid mx-auto fit-height zoom" id="submission-image"
-         alt="" data-scroll="0"
-         src="{{ "/submission/{0}/file/{1}".format(submission.ID, filename_id) if submission.FILESAVED > 1 else "/submission/{0}/thumbnail".format(submission.ID) }}"
-         onclick="if (!this.classList.contains('zoomed')) {this.classList.add('zoomed'); document.getElementById('file-container').classList.add('zoomed')} else {this.classList.remove('zoomed'); document.getElementById('file-container').classList.remove('zoomed')}"
-         onload="document.getElementById('image-loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = false{{ "; document.getElementById('image-thumbnail-badge').hidden = false" if submission.FILESAVED < 2 }}"
-         onerror="document.getElementById('image-loading').hidden = true; document.getElementById('image-error').hidden = false"
-         hidden>
+    <div>
+        <img class="img-fluid mx-auto fit-height zoom" id="submission-image"
+             alt="" data-scroll="0"
+             src="{{ "/submission/{0}/file/0/{1}".format(submission.ID, filenames_id[0]) if submission.FILESAVED > 1 else "/submission/{0}/thumbnail".format(submission.ID) }}"
+             data-index="0" data-index-max="{{ submission.FILEEXT|length - 1 }}"
+             data-src="{{ "/submission/{0}/file".format(submission.ID) }}"
+             onclick="if (!this.classList.contains('zoomed')) {this.classList.add('zoomed'); document.getElementById('file-container').classList.add('zoomed')} else {this.classList.remove('zoomed'); document.getElementById('file-container').classList.remove('zoomed')}"
+             onload="document.getElementById('image-error').hidden = document.getElementById('image-loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = false
+                 {{ "; document.getElementById('image-thumbnail-badge').hidden = false" if submission.FILESAVED < 2 }}"
+             onerror="document.getElementById('image-loading').hidden = true; document.getElementById('image-error').hidden = false"
+             hidden>
+    </div>
+    {% if submission.FILEEXT|length > 1 and submission.FILESAVED > 1 %}
+        <div class="btn-group btn-separator mt-2">
+            <button class="btn btn-sm btn-primary" id="image-switcher-prev" onclick="prevSubmission()" disabled>
+                &lt;
+            </button>
+            <button class="btn btn-sm btn-primary" style="width: 4rem" disabled>
+                <span id="image-switcher-count">1</span>/{{ submission.FILEEXT|length }}
+            </button>
+            <button class="btn btn-sm btn-primary" id="image-switcher-next" onclick="nextSubmission()">
+                &gt;
+            </button>
+        </div>
+    {% endif %}
     {% if submission.FILESAVED < 2 %}
         <div class="mt-1 mb-2" id="image-thumbnail-badge" hidden>
             <span class="badge bg-warning">Thumbnail</span>
@@ -146,7 +164,7 @@
     </div>
     <div class="mt-2">
         <span class="badge bg-danger" id="file-error" hidden>File not found</span>
-        <audio src="/submission/{{ submission.ID }}/file/{{ filename_id }}"
+        <audio src="/submission/{{ submission.ID }}/file"
                onerror="this.hidden = true; this.parentNode.querySelector('#file-error').hidden = false"
                controls>
         </audio>
@@ -178,7 +196,7 @@
              onerror="this.parentNode.querySelector('#thumbnail-loading').hidden = true; this.parentNode.querySelector('#thumbnail-error').hidden = false"
              hidden>
     </div>
-    <a class="btn btn-sm btn-primary mt-2" href="/submission/{{ submission.ID }}/file/{{ filename_id }}">
+    <a class="btn btn-sm btn-primary mt-2" href="/submission/{{ submission.ID }}/file">
         {{ filename|title }}
     </a>
 </div>
@@ -332,8 +350,9 @@
                         <div class="btn-group btn-separator col-8 col-md-6 col-lg-8 ms-auto" role="group">
                             <a class="btn btn-sm btn-secondary disabled">Download</a>
                             <a class="btn btn-sm btn-primary {{ "disabled" if submission.FILESAVED < 2 }}"
-                               href="/submission/{{ submission.ID }}/file/{{ filename_id }}" download>
-                                File
+                               href="{{ "/submission/{0}/file/0/{1}".format(submission.ID, filenames_id[0]) if submission.FILEEXT|length < 2 else "/submission/{0}/files/{0:010d}.zip".format(submission.ID) }}"
+                               download>
+                                {{ "File" if submission.FILEEXT|length < 2 else "Files" }}
                             </a>
                             <a class="btn btn-sm btn-primary"
                                href="/submission/{{ submission.ID }}/zip/submission-{{ "{0:010}".format(submission.ID) }}.zip">
@@ -412,12 +431,43 @@
 </div>
 
 {% if is_image %}
-    <script>
-        window.onscroll = () => {
-            const submissionImage = document.getElementById("submission-image")
-            submissionImage.dataset.scroll = String(submissionImage.getBoundingClientRect().top <= 0 ? 1 : 0)
-        }
-    </script>
+<script>
+    {% if submission.FILEEXT|length > 1 and submission.FILESAVED > 1 %}
+    const filenames =
+    {% autoescape false %}{{ filenames_id }}{% endautoescape %}
+
+    const prevSubmission = () => {
+        const image = document.getElementById("submission-image"),
+            prev = document.getElementById("image-switcher-prev"),
+            next = document.getElementById("image-switcher-next"),
+            count = document.getElementById("image-switcher-count")
+        const index = Number(image.dataset.index) - 1
+        count.innerText = String(index + 1)
+        image.src = `${image.dataset.src}/${index}/${filenames[index]}`
+        image.dataset.index = String(index)
+        prev.disabled = index <= 0
+        next.disabled = false
+    }
+
+    const nextSubmission = () => {
+        const image = document.getElementById("submission-image"),
+            prev = document.getElementById("image-switcher-prev"),
+            next = document.getElementById("image-switcher-next"),
+            count = document.getElementById("image-switcher-count")
+        const index = Number(image.dataset.index) + 1
+        count.innerText = String(index + 1)
+        image.src = `${image.dataset.src}/${index}/${filenames[index]}`
+        image.dataset.index = String(index)
+        next.disabled = index >= Number(image.dataset.indexMax)
+        prev.disabled = false
+    }
+    {% endif %}
+
+    window.onscroll = () => {
+        const submissionImage = document.getElementById("submission-image")
+        submissionImage.dataset.scroll = String(submissionImage.getBoundingClientRect().top <= 0 ? 1 : 0)
+    }
+</script>
 {% elif is_flash %}
     <!--suppress JSUnresolvedFunction, JSUnusedLocalSymbols, JSUnresolvedVariable -->
     <script>
