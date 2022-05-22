@@ -189,18 +189,21 @@ class Database(_Database):
         cols_list: list[str] = [c.name for c in db_table.columns if c.type in (list, set)]
         col_id: Column = db_table.key
 
-        sql, values = query_to_sql(query,
-                                   default_field,
-                                   [*map(str.lower,
-                                         {*cols_table, "any", "keywords", "message", "filename"} -
-                                         {"ID", "AUTHOR", "FILESAVED", "USERUPDATE", "ACTIVE"})],
-                                   {"author": "replace(author, '_', '')",
-                                    "lower": "replace(author, '_', '')",
-                                    "keywords": "tags",
-                                    "message": "description",
-                                    "filename": "fileurl",
-                                    "any": f"({'||'.join(cols_table)})"},
-                                   score=sort.lower() == "relevance")
+        sql, values = query_to_sql(
+            query,
+            default_field,
+            [*map(str.lower,
+                  {*cols_table, "any", "keywords", "message", "filename"} -
+                  {"ID", "AUTHOR", "FILESAVED", "USERUPDATE", "ACTIVE"})],
+            {"author": "replace(author, '_', '')",
+             "lower": "replace(author, '_', '')",
+             "keywords": "tags",
+             "message": "description",
+             "filename": "fileurl",
+             "any": "(" +
+                    '||'.join(set(cols_table) - {'FAVORITE', 'FILESAVED', 'USERUPDATE', 'ACTIVE'}) +
+                    ")"},
+            score=sort.lower() == "relevance")
 
         results: list[dict]
         if sort.lower() == "relevance":
