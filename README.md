@@ -244,16 +244,17 @@ website. Its basic elements are:
 All other strings are considered search terms.
 
 The search uses the `@any` field by default for submissions and journals, allowing to do general searches without
-specifying a field. When searching users, `@username` is the default field.
+specifying a field. The `@any` field does not include the `FAVORITE`, `FILESAVED`, `USERUPDATE`, and `ACTIVE` fields and
+must be searched manually using the respective query fields. When searching users, `@username` is the default field.
 
 Search terms that are not separated by a logic operator are considered _AND_ terms (i.e. `a b c` -> `a & b & c`).
 
-Except for the `ID`, `AUTHOR`, `FILESAVED`, `USERUPDATE`, and `ACTIVE` fields, all search terms are searched through the
+Except for the `ID`, `FILESAVED`, `USERUPDATE`, and `ACTIVE` fields, all search terms are searched through the
 whole content of the various fields: i.e. `@description cat` will match any item whose description field contains "cat".
 To match items that contain only "cat" (or start with, end with, etc.), the `%`, `_`, `^`, and `$`
 operators need to be used (e.g. `@description ^cat`).
 
-Search terms for `ID`, `AUTHOR`, `FILESAVED`, `USERUPDATE`, and `ACTIVE` are matched exactly as they are:
+Search terms for `ID`, `FILESAVED`, `USERUPDATE`, and `ACTIVE` are matched exactly as they are:
 i.e. `@author tom` will match only items whose author field is exactly equal to "tom", to match items that contain "tom"
 the `%`, `_`, `^`, and `$` operators need to be used (e.g. `@author %tom%`).
 
