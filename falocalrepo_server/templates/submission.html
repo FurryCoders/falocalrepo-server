@@ -98,23 +98,21 @@
     <span class="badge bg-danger">Submission has no file</span>
 </div>
 {% elif submission.FILESAVED == 1 %}
-<div class="text-center" id="thumbnail">
+<div class="text-center position-relative bg-body bg-opacity-75 mx-auto" id="thumbnail" style="width: fit-content">
     <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 error" hidden>
         <span class="badge bg-danger">Thumbnail not found</span>
     </div>
     <div class="mt-2 mb-2 mt-lg-5 pt-lg-5 loading">
         <span class="spinner spinner-border spinner-border-sm" role="status"></span>
     </div>
-    <div>
-        <img class="img-fluid mx-auto fit-height zoom"
-             alt="" data-scroll="0"
-             src="/submission/{{ submission.ID }}/thumbnail/thumbnail.jpg"
-             onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
-             onload="document.querySelector('#thumbnail .error').hidden = document.querySelector('#thumbnail .loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = document.querySelector('#thumbnail .thumbnail-badge').hidden = false"
-             onerror="document.querySelector('#thumbnail .loading').hidden = true; document.querySelector('#thumbnail .error').hidden = false"
-             hidden>
-    </div>
-    <div class="mt-1 mb-2 thumbnail-badge" hidden>
+    <img class="img-fluid mx-auto fit-height zoom"
+         alt="" data-scroll="0"
+         src="/submission/{{ submission.ID }}/thumbnail/{{ "{0:010d}".format(submission.ID) }}-thumbnail.jpg"
+         onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
+         onload="document.querySelector('#thumbnail .error').hidden = document.querySelector('#thumbnail .loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = document.querySelector('#thumbnail .thumbnail-badge').hidden = false"
+         onerror="document.querySelector('#thumbnail .loading').hidden = true; document.querySelector('#thumbnail .error').hidden = false"
+         hidden>
+    <div class="btn-toolbar mt-1 justify-content-center thumbnail-badge" hidden>
         <span class="badge bg-warning">Thumbnail</span>
     </div>
 </div>
