@@ -524,7 +524,7 @@
         document
             .querySelectorAll("[data-scroll]")
             .forEach((elem) =>
-                elem.dataset.scroll = String(elem.getBoundingClientRect().top <= 0 ? 1 : 0))
+                elem.dataset.scroll = String(elem.getBoundingClientRect().top <= 1 ? 1 : 0))
     }
 </script>
 
