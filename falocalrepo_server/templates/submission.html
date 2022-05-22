@@ -134,7 +134,7 @@
          onload="document.querySelector('#file-{{ loop.index0 }} .error').hidden = document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; this.hidden = false"
          onerror="document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; document.querySelector('#file-{{ loop.index0 }} .error').hidden = false"
          hidden>
-    {% elif ext in ["mp4", "mov"] %}
+    {% elif ext in ["mp4", "mov", "webm", "ogg", "3gp"] %}
     <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 error" hidden>
         <span class="badge bg-danger">Video not found</span>
     </div>
@@ -239,7 +239,7 @@
                 </button>
             {% endif %}
         </div>
-    {% elif ext in ["mp4", "mov"] %}
+    {% elif ext in ["mp4", "mov", "webm", "ogg", "3gp"] %}
         <div class="btn-toolbar mt-1 justify-content-center" style="height: 1.5rem">
             <button class="btn btn-xs btn-primary"
                     style="max-height: 1.5rem"
