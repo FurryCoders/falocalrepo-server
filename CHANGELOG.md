@@ -1,5 +1,32 @@
 # Changelog
 
+## v3.2.0
+
+### New Features
+
+* Support multiple submission files
+    * New file switcher to select the submission file to view
+    * New route to download multiple submission files as a ZIP
+* Support video files
+    * Show MP4, WebM, and OGG files directly in the browser
+
+### Changes
+
+* Show thumbnail when no main file is available for a submission
+* The `@any` query field does not include `FAVORITES`, `FILESAVED`, `USERUPDATE`, nor `ACTIVE` to avoid redundant
+  results
+* The `@author` field matches submissions that contain the query value instead of finding only exact matches (i.e. `ab`
+  matches `cabd`, `abcd`, etc.)
+* Removed loading cursor and behaviour to avoid problems when opening links in new tabs/windows
+
+### Fixes
+
+* Fix rounded borders of submission files triggering incorrectly on mobile while scrolling
+
+### Dependencies
+
+* Use [falocalrepo-database ~5.3.0](https://pypi.org/project/falocalrepo-database/5.3.0)
+
 ## v3.1.4
 
 ### New Features
