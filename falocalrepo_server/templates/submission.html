@@ -149,7 +149,10 @@
            onloadedmetadata="document.querySelector('#file-{{ loop.index0 }} .error').hidden = document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; this.hidden = false"
            onerror="document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; document.querySelector('#file-{{ loop.index0 }} .error').hidden = false"
            hidden controls>
-        Video not supported
+        <a class="btn btn-sm btn-primary mt-2"
+           href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
+            {{ filenames[loop.index0]|title }}
+        </a>
     </video>
     {% elif ext in ["swf"] %}
     <div class="flash-file">
@@ -195,6 +198,10 @@
         <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
                onerror="this.hidden = true; this.parentNode.querySelector('.error').hidden = false"
                controls>
+            <a class="btn btn-sm btn-primary mt-2"
+               href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
+                {{ filenames[loop.index0]|title }}
+            </a>
         </audio>
     </div>
     {% else %}
