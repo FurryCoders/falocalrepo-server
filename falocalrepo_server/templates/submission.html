@@ -12,8 +12,8 @@
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/style.css">
     <style>
-        #file-container.sticky-top img.zoom {
-            transition: all 250ms;
+        #file-container [data-scroll="1"] {
+            transition: border-radius 250ms;
         }
 
         #file-container.sticky-top [data-scroll="1"] {
@@ -47,6 +47,10 @@
 
         #file-container.zoomed .fit-height {
             max-height: none !important;
+        }
+
+        #file-container.sticky-top.zoomed .fit-height {
+            max-height: 100vh !important;
         }
 
         #file-container ~ #metadata .card {
