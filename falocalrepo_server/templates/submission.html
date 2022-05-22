@@ -481,7 +481,7 @@
 </div>
 
 <script>
-    {% if submission.FILEEXT|length > 1 and submission.FILESAVED > 1 %}
+    {% if submission.FILEEXT|length > 1 %}
         let index = 0
         const maxIndex = {{ submission.FILEEXT|length - 1 }}
 
