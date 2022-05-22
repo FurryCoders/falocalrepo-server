@@ -336,10 +336,18 @@ The _Next_ and _Prev_ buttons move to the respective users in ascending alphabet
 
 ### Submission
 
-The submission page shows the submission file (if present), the submission metadata, and the description.
+The submission page shows the submission file(s) (if present), the submission metadata, and the description.
 
-Image, audio, and plain text submission files are displayed directly in the page, others (e.g. PDF files) will display a
-link to open them. Clicking on image files will enlarge them to fill the width of the screen for easier viewing.
+Image, audio, video, and plain text submission files are displayed directly in the page, others (e.g. PDF files) will
+display a link to open them. Clicking on image files will enlarge them to fill the width of the screen for easier
+viewing. Video files can be enlarged by using the zoom button under them.
+
+When a submission has 2 or more files, a toolbar appears below the file section with buttons to switch between the
+different files.
+
+<div align="center">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-file-switcher.png" width="600">
+</div>
 
 The metadata table contains clickable links to the user's page (see [User](#user) for details), tags, category, species,
 gender, rating, folder (gallery/scraps), and to user pages of favouring and mentioned users.
@@ -366,9 +374,8 @@ The _Next_ and _Prev_ buttons lead to the next more recent and the previous less
 The _Gallery_, _All_, and _Scraps_ buttons open a search page with the user's gallery submissions, scraps and gallery
 submissions together, and scraps submissions respectively.
 
-When viewing a submission on mobile, a button becomes available in the lower right which opens the image in a small
-overlay, allowing to view the image while reading the description. The button does not appear if the submission file
-fails to load.
+To view the currently selected submission file when scrolling down the page, the button in the lower right corner can be
+used to open the image in a floating overlay that will remain at the top of the page view.
 
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission-overlay.png" width="50">
 
