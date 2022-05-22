@@ -4,10 +4,10 @@
 
 ### New Features
 
-* Support multiple submission files
+* Support multiple submission files files 🗂
     * New file switcher to select the submission file to view
     * New route to download multiple submission files as a ZIP
-* Support video files
+* Support video files 📼
     * Show MP4, WebM, and OGG files directly in the browser
 
 ### Changes
