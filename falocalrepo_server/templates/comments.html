@@ -1,7 +1,8 @@
 {% for comment in comments %}
 <div class="w-100"
      style="padding-left: {{ (comment.DEPTH if comment.DEPTH < 10 else 10) * 0.75 }}rem !important">
-    <div class="card mb-2" id="cid:{{ comment.ID }}">
+    <div class="card {{ "" if not loop.index0 else ("mt-1" if comment.REPLY_TO else "mt-2") }}"
+         id="cid:{{ comment.ID }}">
         <div class="card-header pt-1 pb-1">
             <a class="btn btn-xs btn-primary"
                href="/user/{{ comment.AUTHOR }}">{{ comment.AUTHOR }}</a>
