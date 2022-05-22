@@ -143,7 +143,8 @@
            style="max-width: 100%" data-scroll="0"
            src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
            poster="/submission/{{ submission.ID }}/thumbnail/"
-           onloadeddata="document.querySelector('#file-{{ loop.index0 }} .error').hidden = document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; this.hidden = false"
+           preload="metadata"
+           onloadedmetadata="document.querySelector('#file-{{ loop.index0 }} .error').hidden = document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; this.hidden = false"
            onerror="document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; document.querySelector('#file-{{ loop.index0 }} .error').hidden = false"
            hidden controls>
         Video not supported
@@ -229,6 +230,7 @@
             </div>
             {% if ext not in ["jpg", "jpeg", "png", "gif"] %}
                 <button class="btn btn-xs btn-primary ms-1"
+                        style="max-height: 1.5rem"
                         onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}">
                     <i class="zoom"></i>
                 </button>
@@ -237,6 +239,7 @@
     {% elif ext in ["mp4", "mov"] %}
         <div class="btn-toolbar mt-1 justify-content-center" style="height: 1.5rem">
             <button class="btn btn-xs btn-primary"
+                    style="max-height: 1.5rem"
                     onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}">
                 <i class="zoom"></i>
             </button>
