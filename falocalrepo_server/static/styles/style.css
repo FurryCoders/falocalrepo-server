@@ -28,6 +28,10 @@
     }
 }
 
+[hidden] {
+    display: none !important;
+}
+
 .nav-link {
     color: rgba(var(--color-primary-rgb), .55) !important;
 }
