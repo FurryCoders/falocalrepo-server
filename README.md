@@ -342,7 +342,7 @@ Image, audio, video, and plain text submission files are displayed directly in t
 display a link to open them. Clicking on image files will enlarge them to fill the width of the screen for easier
 viewing. Video files can be enlarged by using the zoom button under them.
 
-When a submission has 2 or more files, a toolbar appears below the file section with buttons to switch between the
+When a submission has two or more files, a toolbar appears below the file section with buttons to switch between the
 different files.
 
 <div align="center">
@@ -362,7 +362,8 @@ counterpart, and navigate the other submissions from the author.
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission.png" width="600">
 </div>
 
-The download _File_ button downloads the submission file (if present).
+The download _File_ button downloads the submission file (if present). If more than one file is present, then the button
+downloads a zip file containing all submission files.
 
 The download _ZIP_ button generates a ZIP file containing the submission file, submission thumbnail, description HTML,
 and metadata and comments in JSON format.
