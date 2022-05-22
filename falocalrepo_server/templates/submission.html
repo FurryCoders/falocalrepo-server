@@ -139,10 +139,10 @@
     <div class="mt-2 mb-2 mt-lg-5 pt-lg-5 loading">
         <span class="spinner spinner-border spinner-border-sm" role="status"></span>
     </div>
-    <video class="mx-auto fit-height zoom"
+    <video class="mx-auto fit-height zoom d-block"
            style="max-width: 100%" data-scroll="0"
            src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
-           onloadedmetadata="document.querySelector('#file-{{ loop.index0 }} .error').hidden = document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; this.hidden = false"
+           onloadeddata="document.querySelector('#file-{{ loop.index0 }} .error').hidden = document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; this.hidden = false"
            onerror="document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; document.querySelector('#file-{{ loop.index0 }} .error').hidden = false"
            hidden controls>
         Video not supported
