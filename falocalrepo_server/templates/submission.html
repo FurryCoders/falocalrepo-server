@@ -142,6 +142,7 @@
     <video class="mx-auto fit-height zoom d-block"
            style="max-width: 100%" data-scroll="0"
            src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
+           poster="/submission/{{ submission.ID }}/thumbnail/"
            onloadeddata="document.querySelector('#file-{{ loop.index0 }} .error').hidden = document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; this.hidden = false"
            onerror="document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; document.querySelector('#file-{{ loop.index0 }} .error').hidden = false"
            hidden controls>
