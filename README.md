@@ -346,7 +346,7 @@ When a submission has 2 or more files, a toolbar appears below the file section 
 different files.
 
 <div align="center">
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-file-switcher.png" width="600">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-file-switcher.png" width="200">
 </div>
 
 The metadata table contains clickable links to the user's page (see [User](#user) for details), tags, category, species,
