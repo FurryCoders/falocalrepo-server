@@ -221,36 +221,34 @@
             <div class="card w-100">
                 <div class="card-header p-1">
                     <div class="row">
-                        <div class="col-6 text-center pe-1 border-end">
+                        <div class="col-6 text-center pe-1 border-end" style="font-size: .875rem">
                             {{ offset + (results_total > 0) }}-{{ offset + results|length }} of {{ results_total }}
                         </div>
-                        <div class="col-6 text-center ps-1 border-start">
+                        <div class="col-6 text-center ps-1 border-start" style="font-size: .875rem">
                             Page {{ page }} of {{ (results_total / limit)|round(0, 'ceil')|int }}
                         </div>
                     </div>
                 </div>
-                <div class="card-body text-center row p-1">
-                    <div class="col-3">
-                        <button type="submit" class="btn btn-sm btn-primary w-100" form="search_form" name="page"
-                                value="1" {{ 'disabled' if page == 1 }}>
+                <div class="card-body text-center row p-1" style="height: 2rem">
+                    <div class="btn-toolbar justify-content-between">
+                        <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="search_form" name="page"
+                                value="1" {{ 'disabled' if page == 1 }}
+                                style="height: 1.5rem; width: calc(25% - .5rem)">
                             First
                         </button>
-                    </div>
-                    <div class="col-3">
-                        <button type="submit" class="btn btn-sm btn-primary w-100" form="search_form" name="page"
-                                value="{{ page - 1 }}" {{ 'disabled' if page == 1 }}>
+                        <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="search_form" name="page"
+                                value="{{ page - 1 }}" {{ 'disabled' if page == 1 }}
+                                style="height: 1.5rem; width: calc(25% - .5rem)">
                             Prev
                         </button>
-                    </div>
-                    <div class="col-3">
-                        <button type="submit" class="btn btn-sm btn-primary w-100" form="search_form" name="page"
-                                value="{{ page + 1 }}" {{ 'disabled' if offset + limit >= results_total }}>
+                        <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="search_form" name="page"
+                                value="{{ page + 1 }}" {{ 'disabled' if offset + limit >= results_total }}
+                                style="height: 1.5rem; width: calc(25% - .5rem)">
                             Next
                         </button>
-                    </div>
-                    <div class="col-3">
-                        <button type="submit" class="btn btn-sm btn-primary w-100" form="search_form" name="page"
-                                value="{{ (results_total // limit) + 1 }}" {{ 'disabled' if offset + limit >= results_total }}>
+                        <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="search_form" name="page"
+                                value="{{ (results_total // limit) + 1 }}" {{ 'disabled' if offset + limit >= results_total }}
+                                style="height: 1.5rem; width: calc(25% - .5rem)">
                             Last
                         </button>
                     </div>
