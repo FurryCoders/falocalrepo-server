@@ -140,6 +140,10 @@ body {
     color: var(--color-primary) !important;
 }
 
+.submission-footer {
+    color: rgba(var(--color-primary-rgb), .75) !important;
+}
+
 .bbcode_center {
     width: 100%;
     margin: auto;
