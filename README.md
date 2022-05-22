@@ -128,7 +128,7 @@ _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 | `/submission/<submission id>/file/`            | Open the first submission file                                                          |
 | `/submission/<submission id>/file/<n>/`        | Open the nth first submission file                                                      |
 | `/submission/<submission id>/files/`           | Download all the submission files as a zip                                              |
-| `/submission/<submission id>/files/<n1>-<n2>/` | Download submissions files from index n1 to index n2 (0 indexed)                        |
+| `/submission/<submission id>/files/<n1>-<n2>/` | Download submissions files from index n1 to index n2 (0 indexed inclusive)              |
 | `/submission/<submission id>/thumbnail/`       | Open a submission thumbnail (generated for image submissions if no thumbnail is stored) |
 | `/submission/<submission id>/zip/`             | Download a submission's file, description, and metadata as a ZIP archive                |
 | `/journal/<journal id>/`                       | View a journal                                                                          |
