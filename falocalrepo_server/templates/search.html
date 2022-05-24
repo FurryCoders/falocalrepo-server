@@ -272,7 +272,7 @@
                                 <span class="error fw-bold text-muted" style="font-size: .75rem" hidden>
                                         Thumbnail not found
                                     </span>
-                                <div class="p-1" hidden>
+                                <div class="p-1 position-relative" hidden>
                                     <!--suppress RequiredAttributes -->
                                     <img class="card-img mw-100 w-auto"
                                             {{ 'src=/{0}/{1}/thumbnail/'.format(table_short, item[column_id]) if view == "grid" }}
@@ -280,6 +280,13 @@
                                          onload="this.parentNode.hidden = false; this.parentNode.parentNode.querySelector('.spinner').hidden = true"
                                          onerror="const p = this.parentNode.parentNode; p.querySelector('.spinner').hidden = true; p.querySelector('.error').hidden = false"
                                          alt="" style="max-height: 150px">
+                                    {% if table == "submissions" and item.FILEEXT|length > 1 %}
+                                        <span class="badge bg-body text-body border position-absolute"
+                                              title="{{ item.FILEEXT|join(", ") }}"
+                                              style="top: .125rem; right: .125rem; padding: .175rem .325rem">
+                                            {{ item.FILEEXT|length }}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endif %}
@@ -335,7 +342,7 @@
                 <table class="w-100 table table-sm table-striped table-hover table-follow-scheme">
                     <thead>
                     <tr>
-                        {% for column in columns_results %}
+                        {% for column in columns_results if column != "FILEEXT" %}
                             <th class="col-{{ column.lower() }} text-body">{{ column }}</th>
                         {% endfor %}
                     </tr>
@@ -343,7 +350,7 @@
                     <tbody>
                     {% for item in results %}
                         <tr>
-                            {% for column in columns_results %}
+                            {% for column in columns_results if column != "FILEEXT" %}
                                 <td class="col-{{ column.lower() }} text-nowrap clickable p-0">
                                     <a class="d-block text-decoration-none text-body p-1"
                                        href="/{{ table_short }}/{{ item[column_id] }}">
