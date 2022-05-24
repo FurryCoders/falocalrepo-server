@@ -194,7 +194,7 @@ The gear button opens the search settings, the question mark button shows a quic
 Under the search controls are the number of results and current page.
 
 <div align="center">
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-nav.png" width="600">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-nav.png" width="400">
 </div>
 
 Under the results numbers are the page controls. _First_ leads to page 1, _Prev_ leads to the previous page, _Next_
@@ -213,7 +213,7 @@ submissions and journals); USERNAME, FOLDERS, and ACTIVE (users). On small scree
 or removed.
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-list.png" width="800">
+<img src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-list.png" width="600">
 </div>
 
 #### Compatibility with Fur Affinity Search
