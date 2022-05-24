@@ -213,7 +213,7 @@ submissions and journals); USERNAME, FOLDERS, and ACTIVE (users). On small scree
 or removed.
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-list.png" width="600">
+<img src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-list.png" width="800">
 </div>
 
 #### Compatibility with Fur Affinity Search
