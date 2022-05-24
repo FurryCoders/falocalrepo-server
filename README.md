@@ -359,7 +359,7 @@ Under the metadata table are a number of buttons that allow to access the submis
 counterpart, and navigate the other submissions from the author.
 
 <div align="center">
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission.png" width="600">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-submission.png" width="400">
 </div>
 
 The download _File_ button downloads the submission file (if present). If more than one file is present, then the button
@@ -389,7 +389,7 @@ Each comment contains the author (with a link to their user page), post date, an
 the comment is a reply, its parent comments.
 
 <div align="center">
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comment-card.png" width="600">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comment-card.png" width="400">
 </div>
 
 The button furthest to the left (arrow pointing up and to the left) links to the first comment in a reply chain. The
@@ -407,7 +407,7 @@ Under the metadata table are a number of buttons that allow to download the jour
 and navigate the other journals from the same user.
 
 <div align="center">
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-journal.png" width="600">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-journal.png" width="400">
 </div>
 
 The download _ZIP_ button generates a ZIP file containing the journal content HTML and metadata and comments in JSON
@@ -428,7 +428,7 @@ Each comment contains the author (with a link to their user page), post date, an
 the comment is a reply, its parent comments.
 
 <div align="center">
-<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comment-card.png" width="600">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/comment-card.png" width="400">
 </div>
 
 The button furthest to the left (arrow pointing up and to the left) links to the first comment in a reply chain. The
