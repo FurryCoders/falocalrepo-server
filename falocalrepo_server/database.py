@@ -178,7 +178,8 @@ class Database(_Database):
 
         if (table := table.upper()) in (submissions_table.upper(), journals_table.upper()):
             cols_results = [SubmissionsColumns.ID.value, SubmissionsColumns.AUTHOR.value,
-                            SubmissionsColumns.DATE.value, SubmissionsColumns.TITLE.value]
+                            SubmissionsColumns.DATE.value, SubmissionsColumns.TITLE.value,
+                            SubmissionsColumns.FILEEXT.value]
             db_table = self.submissions if table == submissions_table else self.journals
         else:
             default_field = "username"
