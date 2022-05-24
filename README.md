@@ -202,7 +202,8 @@ leads to the next page, and _Last_ leads to the last page. These controls are al
 
 In grid view, the results are presented using cards containing the same information as the list view, with the addition
 of thumbnails for submissions. When searching for submissions or journals, clicking on the card footer (containing the
-date and author) will open the author's page.
+date and author) will open the author's page. Submissions with more than one file will display a small counter with the
+number of files in the upper right corner of the card.
 
 <div align="center">
 <img src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/search-card.png" width="200">
