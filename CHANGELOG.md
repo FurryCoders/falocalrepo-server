@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.2.1
+
+### New Features
+
+* Add file counter in search results for submissions with more than one submission file
+
 ## v3.2.0
 
 ### New Features
