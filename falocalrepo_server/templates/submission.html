@@ -92,12 +92,14 @@
     </style>
 </head>
 
+{% set data_scroll = false %}
 {% set file %}
 {% if submission.FILESAVED == 0 %}
 <div class="mt-1 mt-lg-5 pt-lg-5 text-center">
     <span class="badge bg-danger">Submission has no file</span>
 </div>
 {% elif submission.FILESAVED == 1 %}
+{% set data_scroll = true %}
 <div class="text-center position-relative bg-body bg-opacity-75 mx-auto" id="thumbnail" style="width: fit-content">
     <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 error" hidden>
         <span class="badge bg-danger">Thumbnail not found</span>
@@ -121,6 +123,7 @@
 <div class="text-center position-relative bg-body bg-opacity-75 mx-auto"
      id="file-{{ loop.index0 }}" style="width: fit-content" {{ "hidden" if not loop.first }}>
     {% if ext in ["jpg", "jpeg", "png", "gif"] %}
+    {% set data_scroll = false %}
     <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 error" hidden>
         <span class="badge bg-danger">Image not found</span>
     </div>
@@ -135,6 +138,7 @@
          onerror="document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; document.querySelector('#file-{{ loop.index0 }} .error').hidden = false"
          hidden>
     {% elif ext in ["mp4", "mov", "webm", "ogg", "3gp"] %}
+    {% set data_scroll = false %}
     <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 error" hidden>
         <span class="badge bg-danger">Video not found</span>
     </div>
@@ -485,10 +489,11 @@
     </div>
 </div>
 
-<script>
-    {% if submission.FILEEXT|length > 1 %}
+{% if submission.FILEEXT|length > 1 %}
+    <script>
         let index = 0
-        const maxIndex = {{ submission.FILEEXT|length - 1 }}
+        const maxIndex =
+        {{ submission.FILEEXT|length - 1 }}
 
         const prevSubmission = () => {
             const fileCurrent = document.getElementById(`file-${index}`),
@@ -523,15 +528,19 @@
             }
             if (fileNext) fileNext.hidden = false
         }
-    {% endif %}
+    </script>
+{% endif %}
 
-    window.onscroll = () => {
-        document
-            .querySelectorAll("[data-scroll]")
-            .forEach((elem) =>
-                elem.dataset.scroll = String(elem.getBoundingClientRect().top <= 1 ? 1 : 0))
-    }
-</script>
+{% if data_scroll %}
+    <script>
+        window.onscroll = () => {
+            document
+                .querySelectorAll("[data-scroll]")
+                .forEach((elem) =>
+                    elem.dataset.scroll = String(elem.getBoundingClientRect().top <= 1 ? 1 : 0))
+        }
+    </script>
+{% endif %}
 
 {% if submission.FILEEXT|map("lower")|select("swf") %}
     <!--suppress JSUnresolvedFunction, JSUnusedLocalSymbols, JSUnresolvedVariable -->
