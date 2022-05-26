@@ -29,6 +29,9 @@ For the program to run, a properly formatted database created by falocalrepo nee
 
 The styling is based on the [Boostrap CSS framework](https://getbootstrap.com).
 
+_Note:_ When upgrading to a new version the styling may be broken to due to the browser using the old stylesheet in its
+cache. To fix it, simply delete the browser cache to fetch the new version.f
+
 ## Usage
 
 ```
