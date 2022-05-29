@@ -4,3 +4,26 @@
     text-align: center;
     font-family: inherit;
 }
+
+.bbcode_spoiler {
+    color: transparent;
+    background: #000;
+    border-radius: .2rem;
+    transition: color 250ms, background-color 250ms;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.bbcode_spoiler:hover, .bbcode_spoiler:focus, .bbcode_spoiler:active {
+    color: inherit;
+    background: inherit;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -khtml-user-select: text;
+    -ms-user-select: text;
+    user-select: text
+}
