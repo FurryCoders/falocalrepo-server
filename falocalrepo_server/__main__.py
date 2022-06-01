@@ -82,13 +82,14 @@ def docstring_format(*args, **kwargs):
 @option("--auth", metavar="USERNAME:PASSWORD", type=str, default=None,
         help=f"Enable HTTP Basic authentication.")
 @option("--precache", is_flag=True, default=False, help="Cache tables on startup.")
+@option("--browser/--no-browser", is_flag=True, default=True, show_default=True, help="Open browser on startup.")
 @option("--color/--no-color", is_flag=True, is_eager=True, default=None, expose_value=False,
         callback=color_callback, help="Toggle ANSI colors.")
 @help_option("--help", "-h", is_eager=True, help="Show help message and exit.")
 @pass_context
 @docstring_format(server_name=__prog__name__, server_version=__version__)
 def main(ctx: Context, database: Path | None, host: str, port: int | None, ssl_cert: Path | None, ssl_key: Path | None,
-         redirect_http: int | None, auth: str | None, precache: bool):
+         redirect_http: int | None, auth: str | None, precache: bool, browser: bool):
     """
     Start a server at {yellow}HOST{reset}:{yellow}PORT{reset} to navigate the database at {yellow}DATABASE{reset}. The
     {yellow}--ssl-cert{reset} and {yellow}--ssl-cert{reset} options allow serving with HTTPS. Setting
@@ -108,7 +109,7 @@ def main(ctx: Context, database: Path | None, host: str, port: int | None, ssl_c
         raise BadParameter("PORT and PORT2 cannot be identical.", ctx,
                            next(_p for _p in ctx.command.params if _p.name == "redirect_http"))
 
-    server(database or Path(), host, port, ssl_cert, ssl_key, redirect_http, precache, auth)
+    server(database or Path(), host, port, ssl_cert, ssl_key, redirect_http, precache, auth, browser)
 
 
 if __name__ == '__main__':
