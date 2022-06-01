@@ -1,5 +1,24 @@
 # Changelog
 
+## v3.2.2
+
+### New Features
+
+* Open browser on startup 💻
+    * A new browser tab with the running app is opened automatically when the programs starts
+    * New `--browser` and `--no-browser` options to toggle opening the browser (defaults on)
+
+### Changes
+
+* Improved handling of spoiler text
+
+### Fixes
+
+* Fix [CVE-2022-30595](https://github.com/advisories/GHSA-hr8g-f6r6-mr22) and
+  solve [security issue 1](https://github.com/FurryCoders/falocalrepo-server/security/dependabot/1)
+* Fix journals searches
+* Fix rounded corners for overlaid submission images not behaving correctly when scrolling on mobile
+
 ## v3.2.1
 
 ### New Features
