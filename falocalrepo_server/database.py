@@ -14,6 +14,7 @@ from falocalrepo_database import Database as _Database
 from falocalrepo_database import Table
 from falocalrepo_database.selector import Selector
 from falocalrepo_database.selector import SelectorBuilder as Sb
+from falocalrepo_database.tables import JournalsColumns
 from falocalrepo_database.tables import SubmissionsColumns
 from falocalrepo_database.tables import UsersColumns
 from falocalrepo_database.tables import journals_table
@@ -176,11 +177,15 @@ class Database(_Database):
         order = order or default_order[table]
         db_table: Table
 
-        if (table := table.upper()) in (submissions_table.upper(), journals_table.upper()):
+        if (table := table.upper()) == submissions_table.upper():
             cols_results = [SubmissionsColumns.ID.value, SubmissionsColumns.AUTHOR.value,
                             SubmissionsColumns.DATE.value, SubmissionsColumns.TITLE.value,
                             SubmissionsColumns.FILEEXT.value]
-            db_table = self.submissions if table == submissions_table else self.journals
+            db_table = self.submissions
+        elif table == journals_table.upper():
+            cols_results = [JournalsColumns.ID.value, JournalsColumns.AUTHOR.value,
+                            JournalsColumns.DATE.value, JournalsColumns.TITLE.value]
+            db_table = self.journals
         else:
             default_field = "username"
             cols_results = [UsersColumns.USERNAME.value, UsersColumns.FOLDERS.value, UsersColumns.ACTIVE.value]
