@@ -16,6 +16,7 @@ from sqlite3 import OperationalError
 from typing import Any
 from typing import Callable
 from typing import Coroutine
+from webbrowser import open as open_browser
 from zipfile import ZipFile
 
 from PIL import Image
@@ -82,6 +83,8 @@ class Settings(BaseSettings):
     ssl_cert: Path = None
     ssl_key: Path = None
     precache: bool = False
+    open_browser: bool = True
+    address: str = None
     username: str = None
     password: str = None
 
@@ -219,6 +222,8 @@ def log_settings():
             logger.info(
                 f"Caching {table.name.upper()}:{(sort := search_settings.sort[table.name]).upper()}:{order.upper()}")
             settings.database.load_search(table.name, "", "id" if sort.lower() == "date" else sort, order)
+    if settings.open_browser:
+        open_browser(settings.address)
 
 
 @app.on_event("shutdown")
@@ -682,10 +687,12 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
 
 def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = None,
            ssl_cert: str | PathLike | None = None, ssl_key: str | PathLike | None = None,
-           redirect_port: int = None, precache: bool = False, authentication: str = None):
+           redirect_port: int = None, precache: bool = False, authentication: str = None,
+           browser: bool = True):
     if redirect_port:
         return run_redirect(host, port, redirect_port)
     settings.precache = precache
+    settings.open_browser = browser
     if authentication:
         settings.username = authentication.split(":")[0]
         settings.password = authentication.split(":", 1)[1] if ":" in authentication else ""
@@ -698,6 +705,9 @@ def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = Non
         elif not settings.ssl_key.is_file():
             raise FileNotFoundError(f"SSL private key {settings.ssl_key}")
         run_args |= {"port": port or 443, "ssl_certfile": settings.ssl_cert, "ssl_keyfile": settings.ssl_key}
+    settings.address = f"{'https' if settings.ssl_cert else 'http'}://" \
+                       f"{'localhost' if host == '0.0.0.0' else host}" \
+                       f"{f':{port}' if port else ''}"
     run_args |= {"port": run_args.get("port", port) or 80}
     with Database(Path(database_path).resolve()) as settings.database:
         search_settings.load(settings.database.load_settings("SEARCH"))
