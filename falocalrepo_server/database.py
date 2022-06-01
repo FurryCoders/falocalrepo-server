@@ -28,7 +28,7 @@ default_order: dict[str, str] = {submissions_table: "desc", journals_table: "des
 
 @cache
 def clean_username(username: str, exclude: str = "") -> str:
-    return sub(rf"[^a-zA-Z0-9\-.~{exclude}]", "", username.lower().strip())
+    return sub(rf"[^a-zA-Z\d\-.~{exclude}]", "", username.lower().strip())
 
 
 def format_value(value: str, *, like: bool = False) -> str:
