@@ -36,7 +36,7 @@ cache. To fix it, simply delete the browser cache to fetch the new version.f
 
 ```
 falocalrepo-server <database> [--host HOST] [--port PORT] [--ssl-cert SSL_CERT] [--ssl-key SSL_KEY] 
-                   [--redirect-http REDIRECT_PORT] [--auth <username>:<password>] [--precache]
+                   [--redirect-http REDIRECT_PORT] [--auth <username>:<password>] [--precache] [--browser/--no-browser]
 ```
 
 The server needs one argument pointing at the location of a valid [falocalrepo](https://pypi.org/project/falocalrepo/)
@@ -44,6 +44,9 @@ database and accepts optional arguments to manually set host, port, and an SSL c
 server is run on 0.0.0.0:80 for HTTP (without certificate) and 0.0.0.0:443 for HTTPS (with certificate).
 
 The `--precache` options can be used to prepare an initial cache of results from the database to speed up searches.
+
+When the app has finished loading, it automatically opens a browser window. To avoid this, use the `--no-browser`
+option.
 
 ### Redirect Mode
 
@@ -63,16 +66,17 @@ protocol.
 
 ### Arguments
 
-| Argument          | Default                                          |
-|-------------------|--------------------------------------------------|
-| `database`        | None, mandatory argument                         |
-| `--host`          | 0.0.0.0                                          |
-| `--port`          | 80 if no SSL certificate is given, 443 otherwise |
-| `--ssl-cert`      | None                                             |
-| `--ssl-key`       | None                                             |
-| `--redirect-http` | None                                             |
-| `--auth`          | None                                             |
-| `--precache`      | False                                            |
+| Argument                 | Default                                          |
+|--------------------------|--------------------------------------------------|
+| `database`               | None, mandatory argument                         |
+| `--host`                 | 0.0.0.0                                          |
+| `--port`                 | 80 if no SSL certificate is given, 443 otherwise |
+| `--ssl-cert`             | None                                             |
+| `--ssl-key`              | None                                             |
+| `--redirect-http`        | None                                             |
+| `--auth`                 | None                                             |
+| `--precache`             | False                                            |
+| `--browser/--no-browser` | True [`--browser`]                               |
 
 ### Examples
 
