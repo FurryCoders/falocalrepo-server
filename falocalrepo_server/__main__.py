@@ -97,6 +97,9 @@ def main(ctx: Context, database: Path | None, host: str, port: int | None, ssl_c
 
     {yellow}DATABASE{reset} can be omitted when using the {yellow}--redirect-http{reset} option.
 
+    When the app has finished loading, it automatically opens a browser window. To avoid this, use the
+    {yellow}--no-browser{reset} option.
+
     For more details on usage see https://pypi.org/project/{server_name}/{server_version}.
     """
     if ssl_cert and not ssl_key:
