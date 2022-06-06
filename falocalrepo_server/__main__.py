@@ -82,7 +82,7 @@ def docstring_format(*args, **kwargs):
 @option("--auth", metavar="USERNAME:PASSWORD", type=str, default=None,
         help=f"Enable HTTP Basic authentication.")
 @option("--precache", is_flag=True, default=False, help="Cache tables on startup.")
-@option("--browser/--no-browser", is_flag=True, default=True, show_default=True, help="Open browser on startup.")
+@option("--no-browser", "browser", is_flag=True, default=True, help="Do not browser on startup.")
 @option("--color/--no-color", is_flag=True, is_eager=True, default=None, expose_value=False,
         callback=color_callback, help="Toggle ANSI colors.")
 @help_option("--help", "-h", is_eager=True, help="Show help message and exit.")
