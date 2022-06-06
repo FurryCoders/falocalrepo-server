@@ -36,7 +36,7 @@ cache. To fix it, simply delete the browser cache to fetch the new version.f
 
 ```
 falocalrepo-server <database> [--host HOST] [--port PORT] [--ssl-cert SSL_CERT] [--ssl-key SSL_KEY] 
-                   [--redirect-http REDIRECT_PORT] [--auth <username>:<password>] [--precache] [--browser/--no-browser]
+                   [--redirect-http REDIRECT_PORT] [--auth <username>:<password>] [--precache] [--no-browser]
 ```
 
 The server needs one argument pointing at the location of a valid [falocalrepo](https://pypi.org/project/falocalrepo/)
@@ -66,17 +66,17 @@ protocol.
 
 ### Arguments
 
-| Argument                 | Default                                          |
-|--------------------------|--------------------------------------------------|
-| `database`               | None, mandatory argument                         |
-| `--host`                 | 0.0.0.0                                          |
-| `--port`                 | 80 if no SSL certificate is given, 443 otherwise |
-| `--ssl-cert`             | None                                             |
-| `--ssl-key`              | None                                             |
-| `--redirect-http`        | None                                             |
-| `--auth`                 | None                                             |
-| `--precache`             | False                                            |
-| `--browser/--no-browser` | True [`--browser`]                               |
+| Argument          | Default                                          |
+|-------------------|--------------------------------------------------|
+| `database`        | None, mandatory argument                         |
+| `--host`          | 0.0.0.0                                          |
+| `--port`          | 80 if no SSL certificate is given, 443 otherwise |
+| `--ssl-cert`      | None                                             |
+| `--ssl-key`       | None                                             |
+| `--redirect-http` | None                                             |
+| `--auth`          | None                                             |
+| `--precache`      | False                                            |
+| `--no-browser`    | True                                             |
 
 ### Examples
 
