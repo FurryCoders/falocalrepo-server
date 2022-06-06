@@ -82,12 +82,6 @@ class Database(_Database):
         elif err := compare_version(self.version, patch=False):
             raise err
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-
     @property
     def m_time(self):
         return self.path.stat().st_mtime
