@@ -1,5 +1,6 @@
 @import "bootstrap.min.css";
 @import "bbcode.css";
+@import "icons.css";
 
 :root {
     --background-color: white;
