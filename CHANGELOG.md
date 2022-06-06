@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.2.3
+
+### Changes
+
+* Removed `--browser` option as it duplicated the default behaviour
+    * The `--no-browser` option remains and disabled opening the browser automatically
+
+### Fixes
+
+* Fix rounded corners for overlaid submission images and videos
+* Fix Ruffle being loaded when not necessary
+* Fix missing legacy icons rendering
+
 ## v3.2.2
 
 ### New Features
