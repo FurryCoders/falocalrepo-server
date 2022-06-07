@@ -5,7 +5,7 @@
 ### Changes
 
 * Removed `--browser` option as it duplicated the default behaviour
-    * The `--no-browser` option remains and disabled opening the browser automatically
+    * The `--no-browser` option remains and disables opening the browser automatically
 
 ### Fixes
 
