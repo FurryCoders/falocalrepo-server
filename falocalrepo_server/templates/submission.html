@@ -503,7 +503,8 @@
             nexts.forEach(next => next.disabled = false)
             if (fileCurrent) {
                 fileCurrent.hidden = true
-                fileCurrent.querySelectorAll("video").forEach((v) => v.pause())
+                fileCurrent.querySelector("video")?.pause()
+                fileCurrent.querySelector("ruffle-player")?.pause()
             }
             if (fileNext) fileNext.hidden = false
         }
@@ -520,7 +521,8 @@
             nexts.forEach(next => next.disabled = index >= maxIndex)
             if (fileCurrent) {
                 fileCurrent.hidden = true
-                fileCurrent.querySelectorAll("video").forEach((v) => v.pause())
+                fileCurrent.querySelector("video")?.pause()
+                fileCurrent.querySelector("ruffle-player")?.pause()
             }
             if (fileNext) fileNext.hidden = false
         }
