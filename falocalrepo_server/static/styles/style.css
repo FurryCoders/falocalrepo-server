@@ -107,6 +107,10 @@ body {
     border-bottom-right-radius: 0 !important;
 }
 
+.btn-group.btn-separator, .btn-group-sm.btn-separator, .btn-group-lg.btn-separator {
+    background: transparent !important;
+}
+
 .btn-group.btn-separator > .btn:not(:first-child):not(:only-child),
 .btn-group-sm.btn-separator > .btn:not(:first-child):not(:only-child),
 .btn-group-lg.btn-separator > .btn:not(:first-child):not(:only-child) {
