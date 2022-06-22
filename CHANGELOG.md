@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.2.4
+
+### Changes
+
+* Ruffle player pauses if the file is changed
+
+### Fixes
+
+* Fix width of Ruffle player
+
 ## v3.2.3
 
 ### Changes
