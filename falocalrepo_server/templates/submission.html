@@ -165,23 +165,24 @@
         <div class="fit-height mx-auto flash-container" hidden></div>
     </div>
     {% elif ext in ["txt"] %}
-    <div class="border rounded p-2 text-start font-monospace small overflow-scroll text-wrap fit-height bg-body">
-        <div class="col-12 text-center" style="min-height: 120px">
+    <div class="border rounded text-start overflow-scroll fit-height">
+        <div class="col-12 text-center mt-2" style="min-height: 120px">
             <span class="badge bg-danger error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
             <span class="spinner spinner-border spinner-border-sm loading" role="status"
                   style="margin-top: calc(60px - .5rem)"></span>
             <img class="img-fluid rounded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
+                 style="max-height: 120px"
                  onload="this.parentNode.querySelector('.loading').hidden = true; this.hidden = false"
                  onerror="this.parentNode.querySelector('.loading').hidden = true; this.parentNode.querySelector('.error').hidden = false"
                  hidden>
         </div>
-        <div class="mt-2">
-            {% if files_text[loop.index0] %}
+        {% if files_text[loop.index0] %}
+        <div class="font-monospace small p-2 text-wrap">
             {% autoescape false %}{{ files_text[loop.index0].strip() }}{% endautoescape %}
-            {% else %}
-            <div class="text-center"><span class="badge bg-danger">No text</span></div>
-            {% endif %}
         </div>
+        {% else %}
+        <div class="text-center"><span class="badge bg-danger">No text</span></div>
+        {% endif %}
     </div>
     {% elif ext in ["mp3", "wav", "mid"] %}
     <div class="col-12 text-center" style="min-height: 120px">
@@ -189,6 +190,7 @@
         <span class="spinner spinner-border spinner-border-sm loading" role="status"
               style="margin-top: calc(60px - .5rem)"></span>
         <img class="img-fluid rounded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
+             style="max-height: 120px"
              onload="this.parentNode.querySelector('.loading').hidden = true; this.hidden = false"
              onerror="this.parentNode.querySelector('.loading').hidden = true; this.parentNode.querySelector('.error').hidden = false"
              hidden>
@@ -210,6 +212,7 @@
         <span class="spinner spinner-border spinner-border-sm loading" role="status"
               style="margin-top: calc(60px - .5rem)"></span>
         <img class="img-fluid rounded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
+             style="max-height: 120px"
              onload="this.parentNode.querySelector('.loading').hidden = true; this.hidden = false"
              onerror="this.parentNode.querySelector('.loading').hidden = true; this.parentNode.querySelector('.error').hidden = false"
              hidden>
