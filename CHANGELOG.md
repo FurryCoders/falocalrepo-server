@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.2.5
+
+### Changes
+
+* Thumbnail size is reduced for audio, text, and general files
+* Improved formatting of text files
+
+### Fixes
+
+* Fix text files not appearing if they were not the first in the index
+
+### Dependencies
+
+* Use [falocalrepo-database ~5.3.5](https://pypi.org/project/falocalrepo-database/5.3.5)
+* Use [uvicorn ^0.18.1](https://pypi.org/project/uvicorn/0.18.1)
+
 ## v3.2.4
 
 ### Changes
