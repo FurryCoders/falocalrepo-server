@@ -166,7 +166,7 @@
     </div>
     {% elif ext in ["txt"] %}
     <div class="border rounded text-start overflow-scroll fit-height">
-        <div class="col-12 text-center mt-2" style="min-height: 120px">
+        <div class="col-12 text-center mt-2">
             <span class="badge bg-danger error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
             <span class="spinner spinner-border spinner-border-sm loading" role="status"
                   style="margin-top: calc(60px - .5rem)"></span>
@@ -185,7 +185,7 @@
         {% endif %}
     </div>
     {% elif ext in ["mp3", "wav", "mid"] %}
-    <div class="col-12 text-center" style="min-height: 120px">
+    <div class="col-12 text-center">
         <span class="badge bg-danger error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
         <span class="spinner spinner-border spinner-border-sm loading" role="status"
               style="margin-top: calc(60px - .5rem)"></span>
@@ -207,7 +207,7 @@
         </audio>
     </div>
     {% else %}
-    <div class="col-12 text-center" style="min-height: 120px">
+    <div class="col-12 text-center">
         <span class="badge bg-danger error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
         <span class="spinner spinner-border spinner-border-sm loading" role="status"
               style="margin-top: calc(60px - .5rem)"></span>
