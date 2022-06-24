@@ -123,8 +123,6 @@ bbcode_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"\[/url]"), "</a>"),
     (re_compile(r"\[yt]((?:.(?!\[yt]))+)\[/yt]"), r'</a href="\1">\1</a>'),
     (re_compile(r"(:icon([^:]+):|:([^:]+)icon:)"), r'<a href="/user/\2\3">@\2\3</a>'),
-    (re_compile(r"((?:\n(?!\n)|[^\n])+)\n\n+"), r"<p>\1</p>"),
-    (re_compile(r"\n"), "<br/>")
 ]
 
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
@@ -146,7 +144,8 @@ def prepare_comments(comments: list[dict]) -> list[dict]:
 
 
 def bbcode_to_html(text: str) -> str:
-    return reduce(lambda t, es: es[0].sub(es[1], t), bbcode_expressions, text.strip() + "\n\n")
+    return "".join(f"<p>{reduce(lambda t, es: es[0].sub(es[1], t), bbcode_expressions, p)}</p>"
+                   for p in text.strip().split("\n"))
 
 
 def clean_html(html: str) -> str:
