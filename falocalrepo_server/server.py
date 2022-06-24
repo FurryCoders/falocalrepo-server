@@ -487,8 +487,10 @@ async def serve_submission(request: Request, id_: int):
         "app": app.title,
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
         "submission": sub | {"DESCRIPTION": clean_html(sub["DESCRIPTION"])},
-        "files_text": [bbcode_to_html(fs[i].read_text(detect_encoding(fs[i].read_bytes())["encoding"], "ignore"))
-                       for i, ext in enumerate(sub['FILEEXT']) if ext.lower() == "txt"] if fs else [],
+        "files_text": [
+            bbcode_to_html(fs[i].read_text(detect_encoding(fs[i].read_bytes())["encoding"], "ignore"))
+            if ext.lower() == "txt" else ""
+            for i, ext in enumerate(sub['FILEEXT'])] if fs else [],
         "filenames": [f"submission{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
         "filenames_id": [f"{sub['ID']:010d}{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
         "comments": prepare_comments(settings.database.load_submission_comments(id_)),
