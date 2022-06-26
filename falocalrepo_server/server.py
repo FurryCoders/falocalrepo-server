@@ -682,7 +682,6 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
         lambda r, *_: RedirectResponse(f"https://{r.url.hostname}:{port_redirect}{r.url.path}?{r.url.query}"),
         ["GET"]
     )
-    # noinspection PyTypeChecker
     run(redirect_app, host=host, port=port_listen)
 
 
@@ -712,5 +711,4 @@ def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = Non
     run_args |= {"port": run_args.get("port", port) or 80}
     with Database(Path(database_path).resolve()) as settings.database:
         search_settings.load(settings.database.load_settings("SEARCH"))
-        # noinspection PyTypeChecker
         run(app, host=host, **run_args)
