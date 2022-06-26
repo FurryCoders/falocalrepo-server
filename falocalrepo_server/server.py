@@ -123,6 +123,7 @@ bbcode_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"\[/url]"), "</a>"),
     (re_compile(r"\[yt]((?:.(?!\[yt]))+)\[/yt]"), r'</a href="\1">\1</a>'),
     (re_compile(r"(:icon([^:]+):|:([^:]+)icon:)"), r'<a href="/user/\2\3">@\2\3</a>'),
+    (re_compile(r"@(\S+)"), r'<a href="/user/\1">@\1</a>'),
 ]
 
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
