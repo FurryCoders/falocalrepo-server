@@ -122,7 +122,7 @@ bbcode_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"\[url=([^]]+)]"), r'<a href="\1">'),
     (re_compile(r"\[/url]"), "</a>"),
     (re_compile(r"\[yt]((?:.(?!\[yt]))+)\[/yt]"), r'</a href="\1">\1</a>'),
-    (re_compile(r"(:icon([^:]+):|:([^:]+)icon:)"), r'<a href="/user/\2\3">@\2\3</a>'),
+    (re_compile(r"(:(?:icon|link)([^:]+):|:([^:]+)icon:)"), r'<a href="/user/\2\3">@\2\3</a>'),
     (re_compile(r"@(\S+)"), r'<a href="/user/\1">@\1</a>'),
     (re_compile(r"\n"), "<br/>"),
     (re_compile(r"[-=+]{5,}"), "<hr/>"),
