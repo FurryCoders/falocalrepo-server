@@ -682,7 +682,7 @@ def run_redirect(host: str, port_listen: int, port_redirect: int):
         lambda r, *_: RedirectResponse(f"https://{r.url.hostname}:{port_redirect}{r.url.path}?{r.url.query}"),
         ["GET"]
     )
-    run(redirect_app, host=host, port=port_listen)
+    run(redirect_app, host=host, port=port_listen, log_config=LOGGING_CONFIG)
 
 
 def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = None,
@@ -711,4 +711,4 @@ def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = Non
     run_args |= {"port": run_args.get("port", port) or 80}
     with Database(Path(database_path).resolve()) as settings.database:
         search_settings.load(settings.database.load_settings("SEARCH"))
-        run(app, host=host, **run_args)
+        run(app, host=host, **run_args, log_config=LOGGING_CONFIG)
