@@ -50,6 +50,13 @@
     color: rgba(var(--color-primary-rgb), .9) !important;
 }
 
+a[href="/user/"], a[href="/submission/"], a[href="/journal/"] {
+    text-decoration: none !important;
+    color: var(--color-primary) !important;
+    cursor: default !important;
+    pointer-events: none !important;
+}
+
 body {
     background-color: var(--background-color);
     color: var(--color-primary);
