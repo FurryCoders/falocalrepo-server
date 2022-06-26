@@ -1,5 +1,20 @@
 # Changelog
 
+# v3.2.6
+
+### Changes
+
+* Text files are rendered without adding paragraphs for each new line, representing them closer to how they are
+* Add support for various tags to text files:
+    * Horizontal rules (5 or more of `-` or `=`)
+    * Prev, first, next links for submissions (e.g., `[2,1,3]`)
+    * `:linkusername:` and `@username`
+    * `(c)`, `(tm)`, and `(r)`
+
+### Fixes
+
+* Fix missing logging
+
 ## v3.2.5
 
 ### Changes
