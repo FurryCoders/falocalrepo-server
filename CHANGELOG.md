@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.2.7
+
+### Dependencies
+
+* Use [lxml ^4.9.1](https://pypi.org/project/lxml/4.9.1)
+    * Fix [CVE-2022-2309](https://cve.report/CVE-2022-2309.pdf) issue
+* Use [falocalrepo-database ~5.3.7](https://pypi.org/project/falocalrepo-database/5.3.7)
+* Use [uvicorn ^0.18.2](https://pypi.org/project/uvicorn/0.18.2)
+* Use [chardet ^5.0.0](https://pypi.org/project/chardet/5.0.0)
+* Use [Pillow ^9.2.0](https://pypi.org/project/Pillow/9.2.0)
+
 ## v3.2.6
 
 ### Changes
