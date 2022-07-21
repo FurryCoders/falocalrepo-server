@@ -126,7 +126,7 @@ bbcode_expressions: list[tuple[Pattern, str]] = [
     (re_compile(r"@(\S+)"), r'<a href="/user/\1">@\1</a>'),
     (re_compile(r"\n"), "<br/>"),
     (re_compile(r"[-=]{5,}"), "<hr/>"),
-    (re_compile(r"\[ *(\d*), *(\d*) *, *(\d*) *\]"),
+    (re_compile(r"\[ *(\d*), *(\d*) *, *(\d*) *]"),
      r'<a href="/submission/\1">PREV</a>|<a href="/submission/\2">FIRST</a>|<a href="/submission/\3">NEXT</a>'),
     (re_compile(r"\(c\)"), "&copy;"),
     (re_compile(r"\(r\)"), "&reg;"),
