@@ -83,7 +83,7 @@ class Database(_Database):
             raise err
 
     @property
-    def m_time(self):
+    def m_time(self) -> float:
         return self.path.stat().st_mtime
 
     @cache
