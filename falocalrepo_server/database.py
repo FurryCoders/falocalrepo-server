@@ -82,16 +82,30 @@ class Database(_Database):
         elif err := compare_version(self.version, patch=False):
             raise err
 
+    @cache
+    def clear_cache(self, _m_time: float = None):
+        self._load_user_cached.cache_clear()
+        self._load_user_stats_cached.cache_clear()
+        self._load_submission_cached.cache_clear()
+        self._load_submission_files_cached.cache_clear()
+        self._load_submission_comments_cached.cache_clear()
+        self._load_journal_cached.cache_clear()
+        self._load_journal_comments_cached.cache_clear()
+        self._load_prev_next_cached.cache_clear()
+        self._load_search_cached.cache_clear()
+        self._load_files_folder_cached.cache_clear()
+        self._load_info_cached.cache_clear()
+
     @property
     def m_time(self) -> float:
         return self.path.stat().st_mtime
 
     @cache
-    def _load_user_cached(self, user: str, *, _cache=None) -> dict | None:
+    def _load_user_cached(self, user: str) -> dict | None:
         return self.users[user]
 
     @cache
-    def _load_user_stats_cached(self, user: str, *, _cache=None) -> dict[str, int]:
+    def _load_user_stats_cached(self, user: str) -> dict[str, int]:
         return {
             "gallery": self.submissions.select(
                 Sb() & [Sb("replace(lower(author), '_', '')").__eq__(user), Sb("folder").__eq__("gallery")],
@@ -113,28 +127,28 @@ class Database(_Database):
         }
 
     @cache
-    def _load_submission_cached(self, submission_id: int, *, _cache=None) -> dict | None:
+    def _load_submission_cached(self, submission_id: int) -> dict | None:
         return self.submissions[submission_id]
 
     @cache
-    def _load_submission_files_cached(self, submission_id: int, *, _cache=None
+    def _load_submission_files_cached(self, submission_id: int
                                       ) -> tuple[list[Path] | None, Path | None]:
         return self.submissions.get_submission_files(submission_id)
 
     @cache
-    def _load_submission_comments_cached(self, submission_id: int, *, _cache=None) -> list[dict]:
+    def _load_submission_comments_cached(self, submission_id: int) -> list[dict]:
         return self.comments.get_comments_tree(submissions_table, submission_id)
 
     @cache
-    def _load_journal_cached(self, journal_id: int, *, _cache=None) -> dict | None:
+    def _load_journal_cached(self, journal_id: int) -> dict | None:
         return self.journals[journal_id]
 
     @cache
-    def _load_journal_comments_cached(self, journal_id: int, *, _cache=None) -> list[dict]:
+    def _load_journal_comments_cached(self, journal_id: int) -> list[dict]:
         return self.comments.get_comments_tree(journals_table, journal_id)
 
     @cache
-    def _load_prev_next_cached(self, table: str, item_id: int | str, *, _cache=None) -> tuple[int, int]:
+    def _load_prev_next_cached(self, table: str, item_id: int | str) -> tuple[int, int]:
         db_table: Table = self[table]
 
         if table in (submissions_table, journals_table):
@@ -164,7 +178,7 @@ class Database(_Database):
             raise KeyError(f"Unknown table {table!r}")
 
     @cache
-    def _load_search_cached(self, table: str, query: str, sort: str, order: str, *, _cache=None):
+    def _load_search_cached(self, table: str, query: str, sort: str, order: str):
         cols_results: list[Column]
         default_field: str = "any"
         sort = sort or default_sort[table]
@@ -225,11 +239,11 @@ class Database(_Database):
         )
 
     @cache
-    def _load_files_folder_cached(self, *, _cache=None) -> Path:
+    def _load_files_folder_cached(self) -> Path:
         return self.settings.files_folder.resolve()
 
     @cache
-    def _load_info_cached(self, *, _cache=None) -> tuple[int, int, int, str]:
+    def _load_info_cached(self) -> tuple[int, int, int, str]:
         return len(self.users), len(self.submissions), len(
             self.journals), self.version
 
@@ -244,37 +258,48 @@ class Database(_Database):
         return loads(self.settings[f"SERVER.{name}"] or "{}")
 
     def load_user(self, user: str) -> dict | None:
-        return self._load_user_cached(user, _cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_user_cached(user)
 
     def load_user_stats(self, user: str) -> dict[str, int]:
-        return self._load_user_stats_cached(user, _cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_user_stats_cached(user)
 
     def load_submission(self, submission_id: int) -> dict | None:
-        return self._load_submission_cached(submission_id, _cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_submission_cached(submission_id)
 
     def load_submission_files(self, submission_id: int) -> tuple[list[Path] | None, Path | None]:
-        return self._load_submission_files_cached(submission_id, _cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_submission_files_cached(submission_id)
 
     def load_submission_comments(self, submission_id: int) -> list[dict]:
-        return self._load_submission_comments_cached(submission_id, _cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_submission_comments_cached(submission_id)
 
     def load_journal(self, journal_id: int) -> dict | None:
-        return self._load_journal_cached(journal_id, _cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_journal_cached(journal_id)
 
     def load_journal_comments(self, journal_id: int) -> list[dict]:
-        return self._load_journal_comments_cached(journal_id, _cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_journal_comments_cached(journal_id)
 
     def load_prev_next(self, table: str, item_id: int | str) -> tuple[int, int]:
-        return self._load_prev_next_cached(table, item_id, _cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_prev_next_cached(table, item_id)
 
     def load_search(self, table: str, query: str, sort: str, order: str):
-        return self._load_search_cached(table.lower(), query.lower(), sort.lower(), order.lower(), _cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_search_cached(table.lower(), query.lower(), sort.lower(), order.lower())
 
     def load_files_folder(self) -> Path:
-        return self._load_files_folder_cached(_cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_files_folder_cached()
 
     def load_info(self) -> tuple[int, int, int, str]:
-        return self._load_info_cached(_cache=self.m_time)
+        self.clear_cache(self.m_time)
+        return self._load_info_cached()
 
     def load_user_uncached(self, user: str) -> dict | None:
         return self._load_user_cached.__wrapped__(self, user)
