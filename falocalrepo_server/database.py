@@ -1,6 +1,7 @@
 from functools import cache
 from json import dumps
 from json import loads
+from logging import Logger
 from os import W_OK
 from os import access
 from pathlib import Path
@@ -74,13 +75,14 @@ def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliase
 
 
 class Database(_Database):
-    def __init__(self, database_path: Path):
+    def __init__(self, database_path: Path, logger: Logger):
         _Database.check_connection(database_path)
         super().__init__(database_path, read_only=not access(database_path, W_OK), check_version=False)
         if not self.is_formatted:
             raise DatabaseError("Database not formatted")
         elif err := compare_version(self.version, patch=False):
             raise err
+        self.logger: Logger = logger
 
     @cache
     def clear_cache(self, _m_time: float = None):
@@ -95,6 +97,7 @@ class Database(_Database):
         self._load_search_cached.cache_clear()
         self._load_files_folder_cached.cache_clear()
         self._load_info_cached.cache_clear()
+        self.logger.info(f"Clearing cache for new m_time {_m_time}")
 
     @property
     def m_time(self) -> float:

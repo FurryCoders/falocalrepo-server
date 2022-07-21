@@ -716,6 +716,6 @@ def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = Non
                        f"{'localhost' if host == '0.0.0.0' else host}" \
                        f"{f':{port}' if port else ''}"
     run_args |= {"port": run_args.get("port", port) or 80}
-    with Database(Path(database_path).resolve()) as settings.database:
+    with Database(Path(database_path).resolve(), logger) as settings.database:
         search_settings.load(settings.database.load_settings("SEARCH"))
         run(app, host=host, **run_args, log_config=LOGGING_CONFIG)
