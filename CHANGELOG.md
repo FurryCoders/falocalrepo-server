@@ -109,6 +109,8 @@
     * New route to download multiple submission files as a ZIP
 * Support video files 📼
     * Show MP4, WebM, and OGG files directly in the browser
+* Boostrap 5.2.0 beta 1
+    * The Bootstrap library has been updated to its [newest beta version](https://blog.getbootstrap.com/2022/05/13/bootstrap-5-2-0-beta/)
 
 ### Changes
 
