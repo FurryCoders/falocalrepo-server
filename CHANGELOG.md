@@ -4,6 +4,10 @@
 
 ### New Features
 
+* Light & Dark mode toggle ☀️🌙
+    * A new button in the navbar allows to manually toggle between light and dark mode
+    * Changing your system's light/dark mode setting will override the currently selected option until the toggle is
+      pressed again
 * Boostrap 5.2.0
     * The Bootstrap library has been updated to
       its [latest stable version](https://blog.getbootstrap.com/2022/07/19/bootstrap-5-2-0/)
