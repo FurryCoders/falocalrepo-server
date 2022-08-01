@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.2.8
+
+### Changes
+
+* Cache is cleared automatically when the database changes to keep memory usage low
+
+### Dependencies
+
+* USe [fastapi ^0.79.0](https://pypi.org/project/fastapi/0.79.0)
+
 ## v3.2.7
 
 ### Dependencies
