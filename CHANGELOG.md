@@ -90,7 +90,7 @@
 ### New Features
 
 * Open browser on startup 💻
-    * A new browser tab with the running app is opened automatically when the programs starts
+    * A new browser tab with the running app is opened automatically when the program starts
     * New `--browser` and `--no-browser` options to toggle opening the browser (defaults on)
 
 ### Changes
