@@ -247,7 +247,7 @@
                             Next
                         </button>
                         <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="search_form" name="page"
-                                value="{{ (results_total // limit) + 1 }}" {{ 'disabled' if offset + limit >= results_total }}
+                                value="{{ (results_total / limit)|round(0, 'ceil')|int }}" {{ 'disabled' if offset + limit >= results_total }}
                                 style="height: 1.5rem; width: calc(25% - .5rem)">
                             Last
                         </button>
