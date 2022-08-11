@@ -29,7 +29,7 @@
 
 ### Dependencies
 
-* USe [fastapi ^0.79.0](https://pypi.org/project/fastapi/0.79.0)
+* Use [fastapi ^0.79.0](https://pypi.org/project/fastapi/0.79.0)
 
 ## v3.2.7
 
