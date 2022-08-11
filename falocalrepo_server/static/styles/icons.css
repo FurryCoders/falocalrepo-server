@@ -9,131 +9,138 @@ i.zoom.zoomed:after, .zoomed i.zoom:after {
 }
 
 i.smilie {
-    font-style: inherit;
+    display: inline-block;
+    background: url(sprite_smilies.png) no-repeat;
+    width: 26px;
+    height: 23px;
 }
 
-i.smilie.tongue::before {
-    content: "😛";
+i.smilie.crying {
+    background-position: -27px -147px
 }
 
-i.smilie.cool::before {
-    content: "😎";
+i.smilie.derp {
+    background-position: -108px -123px
 }
 
-i.smilie.wink::before {
-    content: "😉";
+i.smilie.dunno {
+    background-position: -81px -123px
 }
 
-i.smilie.oooh::before {
-    content: "😮";
+i.smilie.embarrassed {
+    background-position: -54px -123px
 }
 
-i.smilie.smile::before {
-    content: "🙂";
+i.smilie.evil {
+    background-position: 0 -147px;
+    height: 28px
 }
 
-i.smilie.evil::before {
-    content: "😈";
+i.smilie.gift {
+    background-position: -27px -123px
 }
 
-i.smilie.huh::before {
-    content: "😵‍💫";
+i.smilie.huh {
+    background-position: 0 -123px
 }
 
-i.smilie.whatever::before {
-    content: ":3";
-    font-style: normal;
-    text-align: center;
-    padding: .2rem .3rem .2rem .3rem;
-    border-radius: 50%;
-    background: var(--color-tertiary);
+i.smilie.lmao {
+    background-position: -108px -99px
 }
 
-i.smilie.angel::before {
-    content: "😇";
+i.smilie.love {
+    background-position: -81px -99px
 }
 
-i.smilie.badhairday::before {
-    content: ":badhair:";
-    font-style: normal;
-    text-align: center;
-    padding: .2rem .3rem .2rem .3rem;
-    border-radius: .25rem;
-    background: var(--color-tertiary);
+i.smilie.nerd {
+    background-position: -54px -99px
 }
 
-i.smilie.lmao::before {
-    content: "😂";
+i.smilie.note {
+    background-position: -55px -148px;
+    width: 22px
 }
 
-i.smilie.cd::before {
-    content: "💿";
+i.smilie.oooh {
+    background-position: -27px -99px
 }
 
-i.smilie.crying::before {
-    content: "😭";
+i.smilie.pleased {
+    background-position: 0 -99px
 }
 
-i.smilie.dunno::before {
-    content: "🤨";
+i.smilie.rollingeyes {
+    background-position: -108px -75px
 }
 
-i.smilie.embarrassed::before {
-    content: "😳";
+i.smilie.sad {
+    background-position: -81px -75px
 }
 
-i.smilie.note::before {
-    content: "🎁";
+i.smilie.sarcastic {
+    background-position: -54px -75px
 }
 
-i.smilie.coffee::before {
-    content: "🍺";
+i.smilie.serious {
+    background-position: -27px -75px
 }
 
-i.smilie.love::before {
-    content: "❤️";
+i.smilie.sleepy {
+    background-position: 0 -75px
 }
 
-i.smilie.nerd::before {
-    content: "🤓";
+i.smilie.smile {
+    background-position: -108px -47px
 }
 
-i.smilie.note::before {
-    content: "🎵";
+i.smilie.teeth {
+    background-position: -81px -47px
 }
 
-i.smilie.derp::before {
-    content: "🥴";
+i.smilie.tongue {
+    background-position: -54px -47px
 }
 
-i.smilie.sarcastic::before {
-    content: "🤨";
+i.smilie.veryhappy {
+    background-position: -108px -24px
 }
 
-i.smilie.serious::before {
-    content: "😐";
+i.smilie.wink {
+    background-position: -81px -24px
 }
 
-i.smilie.sad::before {
-    content: "☹️";
+i.smilie.yelling {
+    background-position: -54px -24px
 }
 
-i.smilie.sleepy::before {
-    content: "🥱";
+i.smilie.zipped {
+    background-position: -27px -24px
 }
 
-i.smilie.teeth::before {
-    content: "😡";
+i.smilie.angel {
+    background-position: -27px -47px;
+    height: 28px
 }
 
-i.smilie.veryhappy::before {
-    content: "😃";
+i.smilie.badhairday {
+    background-position: 0 -47px;
+    height: 27px
 }
 
-i.smilie.yelling::before {
-    content: "🤬";
+i.smilie.cd {
+    background-position: 0 -24px;
+    height: 22px
 }
 
-i.smilie.zipped::before {
-    content: "🤐";
+i.smilie.coffee {
+    background-position: -27px 0;
+    height: 20px
+}
+
+i.smilie.cool {
+    background-position: 0 0
+}
+
+i.smilie.whatever {
+    background-position: -79px -148px
 }
