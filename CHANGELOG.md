@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.2.9
+
+### Fixes
+
+* Fix last page button in search pages
+
+### Dependencies
+
+* Use [fastapi ^0.79.0](https://pypi.org/project/fastapi/0.79.0)
+    * Was incorrectly set to =0.79.0 in version v3.2.8
+
 ## v3.2.8
 
 ### New Features
