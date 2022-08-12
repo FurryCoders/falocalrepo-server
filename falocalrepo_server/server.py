@@ -152,7 +152,7 @@ def prepare_comments(comments: list[dict]) -> list[dict]:
 
 
 def bbcode_to_html(text: str) -> str:
-    return "".join(reduce(lambda t, es: es[0].sub(es[1], t), bbcode_expressions, text.strip()))
+    return "".join(reduce(lambda txt, exp: exp[0].sub(exp[1], txt), bbcode_expressions, text.strip()))
 
 
 def clean_html(html: str) -> str:
