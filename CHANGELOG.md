@@ -7,6 +7,10 @@
 * Original legacy Fur Affinity emojis ❤️
     * Furaffinity emojis, like `:love:` and `:veryhappy:` are now rendered with the same sprites used in Fur Affinity
 
+![](https://github.com/FurryCoders/falocalrepo-server/raw/main/falocalrepo_server/static/styles/sprite_smilies.png)
+
+_Full credits for the sprites goes to Fur Affinity_
+
 ### Fixes
 
 * Fix last page button in search pages
