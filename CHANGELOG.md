@@ -125,7 +125,7 @@
 
 ### New Features
 
-* Support multiple submission files files 🗂
+* Support multiple submission files 🗂
     * New file switcher to select the submission file to view
     * New route to download multiple submission files as a ZIP
 * Support video files 📼
