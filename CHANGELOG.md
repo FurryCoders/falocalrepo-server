@@ -2,6 +2,11 @@
 
 ## v3.2.9
 
+### New Features
+
+* Original legacy Fur Affinity emojis ❤️
+    * Furaffinity emojis, like `:love:` and `:veryhappy:` are now rendered with the same sprites used in Fur Affinity
+
 ### Fixes
 
 * Fix last page button in search pages
