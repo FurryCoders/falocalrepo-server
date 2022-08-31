@@ -27,7 +27,19 @@
     <div class="row align-middle">
         <div class="col-12 col-lg-8 mt-3 mt-lg-0 order-last order-lg-first">
             <div class="border rounded p-2 overflow-scroll fit-height h-100">
+                {% if journal.HEADER %}
+                <div class="journal-header">
+                    {% autoescape false %}{{ journal.HEADER }}{% endautoescape %}
+                    <hr class="mx-2"/>
+                </div>
+                {% endif %}
                 {% autoescape false %}{{ journal.CONTENT }}{% endautoescape %}
+                {% if journal.FOOTER %}
+                <div class="journal-footer">
+                    <hr class="mx-2"/>
+                    {% autoescape false %}{{ journal.FOOTER }}{% endautoescape %}
+                </div>
+                {% endif %}
             </div>
         </div>
 

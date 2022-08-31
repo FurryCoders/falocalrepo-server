@@ -449,6 +449,16 @@
                         {% autoescape false %}{{ submission.DESCRIPTION }}{% endautoescape %}
                     </div>
                 </div>
+                {% if submission.FOOTER %}
+                <div class="submission-footer">
+                    <hr class="mx-2"/>
+                    <div class="card-body col-12 col-lg-9 mx-auto">
+                        <div class="card-text text-wrap overflow-hidden">
+                            {% autoescape false %}{{ submission.FOOTER }}{% endautoescape %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
 
