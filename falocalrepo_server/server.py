@@ -154,8 +154,9 @@ def comments_depth(comments: list[dict], depth: int = 0, root_comment: int = Non
             for com in comments]
 
 
-def prepare_comments(comments: list[dict]) -> list[dict]:
-    return [c | {"TEXT": clean_html(c["TEXT"])} for c in flatten_comments(comments_depth(comments, 0))]
+def prepare_comments(comments: list[dict], use_bbcode: bool) -> list[dict]:
+    return [c | {"TEXT": bbcode_to_html(c["TEXT"]) if use_bbcode else clean_html(c["TEXT"])}
+            for c in flatten_comments(comments_depth(comments, 0))]
 
 
 def bbcode_to_html(text: str) -> str:
@@ -378,9 +379,9 @@ async def serve_settings(request: Request):
         "app": app.title,
         "title": "Search Settings",
         "tables": [users_table, submissions_table, journals_table],
-        "columns": {users_table: [c.name for c in UsersColumns],
-                    submissions_table: [c.name for c in SubmissionsColumns] + ["relevance"],
-                    journals_table: [c.name for c in JournalsColumns]},
+        "columns": {users_table: [c.name for c in UsersColumns.as_list()],
+                    submissions_table: [c.name for c in SubmissionsColumns.as_list()] + ["relevance"],
+                    journals_table: [c.name for c in JournalsColumns.as_list()]},
         "settings": search_settings,
         "default_sort": default_sort,
         "default_order": default_order,
@@ -423,7 +424,9 @@ async def serve_user(request: Request, username: str):
         "favorites_length": user_stats["favorites"],
         "mentions_length": user_stats["mentions"],
         "journals_length": user_stats["journals"],
-        "userpage": clean_html(user_entry["USERPAGE"]) if user_entry else "",
+        "userpage": "" if not user_entry
+        else bbcode_to_html(user_entry["USERPAGE"]) if settings.database.use_bbcode
+        else clean_html(user_entry["USERPAGE"]),
         "in_database": user_entry is not None,
         "prev": p,
         "next": n,
@@ -499,14 +502,20 @@ async def serve_submission(request: Request, id_: int):
     return HTMLResponse(minify(templates.get_template("submission.html").render({
         "app": app.title,
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
-        "submission": sub | {"DESCRIPTION": clean_html(sub["DESCRIPTION"])},
+        "submission": sub | {
+            "DESCRIPTION":
+                bbcode_to_html(sub["DESCRIPTION"]) if settings.database.use_bbcode()
+                else clean_html(sub["DESCRIPTION"]),
+            "FOOTER":
+                bbcode_to_html(sub["FOOTER"]) if settings.database.use_bbcode() else clean_html(sub["FOOTER"]),
+        },
         "files_text": [
             bbcode_to_html(fs[i].read_text(detect_encoding(fs[i].read_bytes())["encoding"], "ignore"))
             if ext.lower() == "txt" else ""
             for i, ext in enumerate(sub['FILEEXT'])] if fs else [],
         "filenames": [f"submission{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
         "filenames_id": [f"{sub['ID']:010d}{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
-        "comments": prepare_comments(settings.database.load_submission_comments(id_)),
+        "comments": prepare_comments(settings.database.load_submission_comments(id_), settings.database.use_bbcode()),
         "prev": p,
         "next": n,
         "request": request}),
@@ -583,7 +592,8 @@ async def serve_submission_zip(id_: int, _filename=None):
         for sub_file in sub_files:
             z.writestr(sub_file.name, sub_file.read_bytes())
         z.writestr(sub_thumb.name, sub_thumb.read_bytes()) if sub_thumb else None
-        z.writestr("description.html", sub["DESCRIPTION"].encode())
+        z.writestr("description.txt" if settings.database.use_bbcode() else "description.html",
+                   sub["DESCRIPTION"].encode())
         z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(sub).items()
                                            if k != "DESCRIPTION"}).encode())
         z.writestr("comments.json", dumps([serialise_entry(c)
@@ -603,8 +613,15 @@ async def serve_journal(request: Request, id_: int):
     return HTMLResponse(minify(templates.get_template("journal.html").render({
         "app": app.title,
         "title": f"{jrnl['TITLE']} by {jrnl['AUTHOR']}",
-        "journal": jrnl | {"CONTENT": clean_html(jrnl["CONTENT"])},
-        "comments": prepare_comments(settings.database.load_journal_comments(id_)),
+        "journal": jrnl | {
+            "CONTENT":
+                bbcode_to_html(jrnl["CONTENT"]) if settings.database.use_bbcode() else clean_html(jrnl["CONTENT"]),
+            "HEADER":
+                bbcode_to_html(jrnl["HEADER"]) if settings.database.use_bbcode() else clean_html(jrnl["HEADER"]),
+            "FOOTER":
+                bbcode_to_html(jrnl["FOOTER"]) if settings.database.use_bbcode() else clean_html(jrnl["FOOTER"]),
+        },
+        "comments": prepare_comments(settings.database.load_journal_comments(id_), settings.database.use_bbcode()),
         "prev": p,
         "next": n,
         "request": request}),
@@ -618,7 +635,7 @@ async def serve_journal_zip(id_: int, _filename=None):
         raise HTTPException(404)
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
-        z.writestr("content.html", jrnl["CONTENT"].encode())
+        z.writestr("content.txt" if settings.database.use_bbcode() else "content.html", jrnl["CONTENT"].encode())
         z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(jrnl).items()
                                            if k != "CONTENT"}).encode())
         z.writestr("comments.json", dumps([serialise_entry(c)
