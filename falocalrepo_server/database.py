@@ -9,6 +9,7 @@ from re import match
 from re import split
 from re import sub
 from sqlite3 import DatabaseError
+from datetime import datetime
 
 from falocalrepo_database import Column
 from falocalrepo_database import Database as _Database
@@ -98,7 +99,7 @@ class Database(_Database):
         self._load_search_cached.cache_clear()
         self._load_files_folder_cached.cache_clear()
         self._load_info_cached.cache_clear()
-        self.logger.info(f"Clearing cache for new m_time {_m_time}")
+        self.logger.info(f"Clearing cache for new m_time {datetime.fromtimestamp(_m_time)}")
 
     @property
     def m_time(self) -> float:
