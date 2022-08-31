@@ -107,6 +107,27 @@ body {
         /* fallbacks */ "Helvetica Neue", sans-serif;
 }
 
+blockquote {
+    padding-left: .5rem;
+    border-left: .125rem solid var(--color-tertiary);
+    margin-bottom: 0;
+}
+
+blockquote[cite]::after {
+    content: attr(cite);
+    display: block;
+    font-style: italic;
+    color: var(--color-secondary);
+}
+
+blockquote + br {
+    display: none;
+}
+
+hr {
+    margin-top: 0;
+    margin-bottom: 0;
+}
 
 .card, .card-header, .card-footer {
     background-color: var(--background-color);
