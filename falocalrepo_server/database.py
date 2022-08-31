@@ -2,8 +2,8 @@ from functools import cache
 from json import dumps
 from json import loads
 from logging import Logger
-from os import W_OK
 from os import access
+from os import W_OK
 from pathlib import Path
 from re import match
 from re import split
@@ -15,12 +15,12 @@ from falocalrepo_database import Database as _Database
 from falocalrepo_database import Table
 from falocalrepo_database.selector import Selector
 from falocalrepo_database.selector import SelectorBuilder as Sb
-from falocalrepo_database.tables import JournalsColumns
-from falocalrepo_database.tables import SubmissionsColumns
-from falocalrepo_database.tables import UsersColumns
 from falocalrepo_database.tables import journals_table
+from falocalrepo_database.tables import JournalsColumns
 from falocalrepo_database.tables import submissions_table
+from falocalrepo_database.tables import SubmissionsColumns
 from falocalrepo_database.tables import users_table
+from falocalrepo_database.tables import UsersColumns
 from falocalrepo_database.util import compare_version
 
 default_sort: dict[str, str] = {submissions_table: "date", journals_table: "date", users_table: "username"}
@@ -86,6 +86,7 @@ class Database(_Database):
 
     @cache
     def clear_cache(self, _m_time: float = None):
+        self.use_bbcode.cache_clear()
         self._load_user_cached.cache_clear()
         self._load_user_stats_cached.cache_clear()
         self._load_submission_cached.cache_clear()
@@ -102,6 +103,10 @@ class Database(_Database):
     @property
     def m_time(self) -> float:
         return self.path.stat().st_mtime
+
+    @cache
+    def use_bbcode(self) -> bool:
+        return self.settings["BBCODE"] == "true"
 
     @cache
     def _load_user_cached(self, user: str) -> dict | None:
@@ -189,17 +194,17 @@ class Database(_Database):
         db_table: Table
 
         if (table := table.upper()) == submissions_table.upper():
-            cols_results = [SubmissionsColumns.ID.value, SubmissionsColumns.AUTHOR.value,
-                            SubmissionsColumns.DATE.value, SubmissionsColumns.TITLE.value,
-                            SubmissionsColumns.FILEEXT.value]
+            cols_results = [SubmissionsColumns.ID, SubmissionsColumns.AUTHOR,
+                            SubmissionsColumns.DATE, SubmissionsColumns.TITLE,
+                            SubmissionsColumns.FILEEXT]
             db_table = self.submissions
         elif table == journals_table.upper():
-            cols_results = [JournalsColumns.ID.value, JournalsColumns.AUTHOR.value,
-                            JournalsColumns.DATE.value, JournalsColumns.TITLE.value]
+            cols_results = [JournalsColumns.ID, JournalsColumns.AUTHOR,
+                            JournalsColumns.DATE, JournalsColumns.TITLE]
             db_table = self.journals
         else:
             default_field = "username"
-            cols_results = [UsersColumns.USERNAME.value, UsersColumns.FOLDERS.value, UsersColumns.ACTIVE.value]
+            cols_results = [UsersColumns.USERNAME, UsersColumns.FOLDERS, UsersColumns.ACTIVE]
             db_table = self.users
 
         cols_table: list[str] = [c.name for c in db_table.columns]
