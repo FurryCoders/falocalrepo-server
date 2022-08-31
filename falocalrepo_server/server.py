@@ -311,28 +311,28 @@ async def redirect_submission(id_: int):
 @app.get("/search/gallery/{username}/", response_class=HTMLResponse)
 async def serve_user_gallery(request: Request, username: str):
     return await serve_search(request, "submissions", f"Gallery {username}",
-                              {"query": f'@author "{clean_username(username)}" @folder "gallery"'})
+                              {"query": f'@author ^{clean_username(username)}$ @folder "gallery"'})
 
 
 @app.get("/scraps/{username}/", response_class=HTMLResponse)
 @app.get("/search/scraps/{username}/", response_class=HTMLResponse)
 async def serve_user_scraps(request: Request, username: str):
     return await serve_search(request, "submissions", f"Scraps {username}",
-                              {"query": f'@author "{clean_username(username)}" @folder "scraps"'})
+                              {"query": f'@author ^{clean_username(username)}$ @folder "scraps"'})
 
 
 @app.get("/submissions/{username}/", response_class=HTMLResponse)
 @app.get("/search/submissions/{username}/", response_class=HTMLResponse)
 async def serve_user_submissions(request: Request, username: str):
     return await serve_search(request, "submissions", f"Submissions {username}",
-                              {"query": f'@author "{clean_username(username)}"'})
+                              {"query": f'@author ^{clean_username(username)}$'})
 
 
 @app.get("/journals/{username}/", response_class=HTMLResponse)
 @app.get("/search/journals/{username}/", response_class=HTMLResponse)
 async def serve_user_journals(request: Request, username: str):
     return await serve_search(request, "journals", f"Journals {username}",
-                              {"query": f'@author "{clean_username(username)}"'})
+                              {"query": f'@author ^{clean_username(username)}$'})
 
 
 @app.get("/favorites/{username}/", response_class=HTMLResponse)
