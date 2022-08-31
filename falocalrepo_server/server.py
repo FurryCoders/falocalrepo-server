@@ -8,6 +8,7 @@ from math import ceil
 from os import PathLike
 from pathlib import Path
 from re import IGNORECASE
+from re import MULTILINE
 from re import Pattern
 from re import compile as re_compile
 from secrets import compare_digest
@@ -111,26 +112,32 @@ search_settings: SearchSettings = SearchSettings()
 security: HTTPBasic = HTTPBasic()
 
 bbcode_expressions: list[tuple[Pattern, str]] = [
-    (re_compile(r"\[(/?)([bius]|sup|sub|h\d)]"), r"<\1\2>",),
-    (re_compile(r"\[color=([^]]+)]"), r'<span style="color: \1">,'),
-    (re_compile(r"\[/color]"), "</span>",),
-    (re_compile(r"\[(left|center|right)]"), r'<p style="text-align: \1">',),
-    (re_compile(r"\[/(left|center|right)]"), "</p>",),
-    (re_compile(r"\[quote=([^]]+)]"), r'<blockquote cite="\1">'),
-    (re_compile(r"\[quote]"), "<blockquote>"),
-    (re_compile(r"\[/quote]"), "</blockquote>"),
-    (re_compile(r"\[url=([^]]+)]"), r'<a href="\1">'),
-    (re_compile(r"\[/url]"), "</a>"),
-    (re_compile(r"\[yt]((?:.(?!\[yt]))+)\[/yt]"), r'</a href="\1">\1</a>'),
-    (re_compile(r"(:(?:icon|link)([^:]+):|:([^:]+)icon:)"), r'<a href="/user/\2\3">@\2\3</a>'),
-    (re_compile(r"@(\S+)"), r'<a href="/user/\1">@\1</a>'),
-    (re_compile(r"\n"), "<br/>"),
-    (re_compile(r"[-=]{5,}"), "<hr/>"),
-    (re_compile(r"\[ *(\d*), *(\d*) *, *(\d*) *]"),
-     r'<a href="/submission/\1">PREV</a>|<a href="/submission/\2">FIRST</a>|<a href="/submission/\3">NEXT</a>'),
+    (re_compile("&"), "&amp;"),
+    (re_compile("<"), "&lt;"),
+    (re_compile(">"), "&gt;"),
     (re_compile(r"\(c\)"), "&copy;"),
     (re_compile(r"\(r\)"), "&reg;"),
     (re_compile(r"\(tm\)"), "&trade;"),
+    (re_compile(r"\[(/?)([bius]|sup|sub|h\d)]"), r"<\1\2>",),
+    (re_compile(r"\[color=([^]]+)]"), r'<span style="color: \1">,'),
+    (re_compile(r"\[/color]"), "</span>",),
+    (re_compile(r"\[(left|center|right)]"), r'<div style="text-align: \1">',),
+    (re_compile(r"\[/(left|center|right)]"), "</div>",),
+    (re_compile(r"\[quote=([^]]*)]"), r'<blockquote cite="\1">'),
+    (re_compile(r"\[quote]"), "<blockquote>"),
+    (re_compile(r"\[/quote]"), "</blockquote>"),
+    (re_compile(r"\[yt]((?:.(?!\[yt]))+)\[/yt]"), r'</a href="\1">\1</a>'),
+    (re_compile(r"^((?:.(?!\[url))*)@([^\s@]+)"), r'\1<a href="/user/\2">@\2</a>'),
+    (re_compile(r"\[/url]((?:.(?!\[url)|\n|\r)*)@([^\s@]+)"), r'\1<a href="/user/\2">@\2</a>'),
+    (re_compile(r":(?:icon|link)([^:]+):|:([^:]+)icon:"), r'<a href="/user/\1\2">@\1\2</a>'),
+    (re_compile(r"\[url=(?:https?://(?:www\.)?furaffinity.net)?([^]]+)]"), r'<a href="\1">'),
+    (re_compile(r"\[/url]"), "</a>"),
+    (re_compile(r"\[tag\.([^.]*)(?:\.([^]]*))?]"), r'<\1 class="\2">'),
+    (re_compile(r"\[/tag\.([^]]*)]"), r"</\1>"),
+    (re_compile(r"\[ *(?:(\d+)|-)?, *(?:(\d+)|-)? *, *(?:(\d+)|-)? *]"),
+     r'<a href="/submission/\1">PREV</a>|<a href="/submission/\2">FIRST</a>|<a href="/submission/\3">NEXT</a>'),
+    (re_compile(r"^[-=]{5,}$", MULTILINE), "<hr/>"),
+    (re_compile(r"\n"), "<br/>"),
 ]
 
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
