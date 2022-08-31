@@ -425,7 +425,7 @@ async def serve_user(request: Request, username: str):
         "mentions_length": user_stats["mentions"],
         "journals_length": user_stats["journals"],
         "userpage": "" if not user_entry
-        else bbcode_to_html(user_entry["USERPAGE"]) if settings.database.use_bbcode
+        else bbcode_to_html(user_entry["USERPAGE"]) if settings.database.use_bbcode()
         else clean_html(user_entry["USERPAGE"]),
         "in_database": user_entry is not None,
         "prev": p,
