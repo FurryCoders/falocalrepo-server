@@ -197,6 +197,7 @@ body {
 
 .submission-footer, .journal-header, .journal-footer {
     color: rgba(var(--color-primary-rgb), .75) !important;
+    font-size: 90%;
 }
 
 img.zoom {
