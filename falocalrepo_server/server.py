@@ -182,11 +182,12 @@ def prepare_html(html: str, use_bbcode: bool) -> str:
 
 def serialise_entry(entry: Any, convert_datetime: bool = False, lowercase_keys: bool = True) -> Any:
     if isinstance(entry, dict):
-        return {(k.lower() if lowercase_keys else k): serialise_entry(v) for k, v in entry.items()}
+        return {(k.lower() if lowercase_keys else k): serialise_entry(v, convert_datetime, lowercase_keys)
+                for k, v in entry.items()}
     elif isinstance(entry, (list, tuple)):
-        return list(map(serialise_entry, entry))
+        return [serialise_entry(e, convert_datetime, lowercase_keys) for e in entry]
     elif isinstance(entry, set):
-        return sorted(map(serialise_entry, entry))
+        return sorted((serialise_entry(e, convert_datetime, lowercase_keys) for e in entry))
     elif isinstance(entry, datetime) and convert_datetime:
         return str(entry)
     else:
