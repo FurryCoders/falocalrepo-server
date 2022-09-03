@@ -107,7 +107,7 @@ class Database(_Database):
 
     @cache
     def use_bbcode(self) -> bool:
-        return self.settings["BBCODE"] == "true"
+        return self.settings.bbcode
 
     @cache
     def _load_user_cached(self, user: str) -> dict | None:
