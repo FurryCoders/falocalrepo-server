@@ -176,6 +176,10 @@ def clean_html(html: str) -> str:
     return str(html_parsed)
 
 
+def prepare_html(html: str, use_bbcode: bool) -> str:
+    return bbcode_to_html(html) if use_bbcode else clean_html(html)
+
+
 def serialise_entry(entry: Any) -> Any:
     if isinstance(entry, dict):
         return {k: serialise_entry(v) for k, v in entry.items()}
@@ -409,7 +413,7 @@ async def serve_user(request: Request, username: str):
     if username != (username_clean := clean_username(username)):
         return RedirectResponse(app.url_path_for(serve_user.__name__, username=username_clean))
 
-    user_entry: dict | None = settings.database.load_user(username)
+    user_entry: dict = settings.database.load_user(username) or {}
     user_stats: dict[str, int] = settings.database.load_user_stats(username)
     p, n = settings.database.load_prev_next(users_table, username) if user_entry else (0, 0)
 
@@ -417,17 +421,15 @@ async def serve_user(request: Request, username: str):
         "app": app.title,
         "title": username,
         "user": username,
-        "folders": user_entry["FOLDERS"] if user_entry else [],
-        "active": user_entry["ACTIVE"] if user_entry else True,
+        "folders": user_entry.get("FOLDERS", []),
+        "active": user_entry.get("ACTIVE", True),
         "gallery_length": user_stats["gallery"],
         "scraps_length": user_stats["scraps"],
         "favorites_length": user_stats["favorites"],
         "mentions_length": user_stats["mentions"],
         "journals_length": user_stats["journals"],
-        "userpage": "" if not user_entry
-        else bbcode_to_html(user_entry["USERPAGE"]) if settings.database.use_bbcode()
-        else clean_html(user_entry["USERPAGE"]),
-        "in_database": user_entry is not None,
+        "userpage": prepare_html(user_entry.get("USERPAGE", ""), settings.database.use_bbcode()),
+        "in_database": bool(user_entry),
         "prev": p,
         "next": n,
         "request": request}),
@@ -503,11 +505,8 @@ async def serve_submission(request: Request, id_: int):
         "app": app.title,
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
         "submission": sub | {
-            "DESCRIPTION":
-                bbcode_to_html(sub["DESCRIPTION"]) if settings.database.use_bbcode()
-                else clean_html(sub["DESCRIPTION"]),
-            "FOOTER":
-                bbcode_to_html(sub["FOOTER"]) if settings.database.use_bbcode() else clean_html(sub["FOOTER"]),
+            "DESCRIPTION": prepare_html(sub["DESCRIPTION"], settings.database.use_bbcode()),
+            "FOOTER": prepare_html(sub["FOOTER"], settings.database.use_bbcode()),
         },
         "files_text": [
             bbcode_to_html(fs[i].read_text(detect_encoding(fs[i].read_bytes())["encoding"], "ignore"))
@@ -614,12 +613,9 @@ async def serve_journal(request: Request, id_: int):
         "app": app.title,
         "title": f"{jrnl['TITLE']} by {jrnl['AUTHOR']}",
         "journal": jrnl | {
-            "CONTENT":
-                bbcode_to_html(jrnl["CONTENT"]) if settings.database.use_bbcode() else clean_html(jrnl["CONTENT"]),
-            "HEADER":
-                bbcode_to_html(jrnl["HEADER"]) if settings.database.use_bbcode() else clean_html(jrnl["HEADER"]),
-            "FOOTER":
-                bbcode_to_html(jrnl["FOOTER"]) if settings.database.use_bbcode() else clean_html(jrnl["FOOTER"]),
+            "CONTENT": prepare_html(jrnl["CONTENT"], settings.database.use_bbcode()),
+            "HEADER": prepare_html(jrnl["HEADER"], settings.database.use_bbcode()),
+            "FOOTER": prepare_html(jrnl["FOOTER"], settings.database.use_bbcode()),
         },
         "comments": prepare_comments(settings.database.load_journal_comments(id_), settings.database.use_bbcode()),
         "prev": p,
