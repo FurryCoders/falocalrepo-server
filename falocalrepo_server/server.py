@@ -180,14 +180,14 @@ def prepare_html(html: str, use_bbcode: bool) -> str:
     return bbcode_to_html(html) if use_bbcode else clean_html(html)
 
 
-def serialise_entry(entry: Any) -> Any:
+def serialise_entry(entry: Any, convert_datetime: bool = False, lowercase_keys: bool = True) -> Any:
     if isinstance(entry, dict):
-        return {k: serialise_entry(v) for k, v in entry.items()}
+        return {(k.lower() if lowercase_keys else k): serialise_entry(v) for k, v in entry.items()}
     elif isinstance(entry, (list, tuple)):
         return list(map(serialise_entry, entry))
     elif isinstance(entry, set):
         return sorted(map(serialise_entry, entry))
-    elif isinstance(entry, datetime):
+    elif isinstance(entry, datetime) and convert_datetime:
         return str(entry)
     else:
         return entry
@@ -593,9 +593,9 @@ async def serve_submission_zip(id_: int, _filename=None):
         z.writestr(sub_thumb.name, sub_thumb.read_bytes()) if sub_thumb else None
         z.writestr("description.txt" if settings.database.use_bbcode() else "description.html",
                    sub["DESCRIPTION"].encode())
-        z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(sub).items()
-                                           if k != "DESCRIPTION"}).encode())
-        z.writestr("comments.json", dumps([serialise_entry(c)
+        z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(sub, convert_datetime=True).items()
+                                           if k != "description"}).encode())
+        z.writestr("comments.json", dumps([serialise_entry(c, convert_datetime=True)
                                            for c in settings.database.load_submission_comments(id_)]).encode())
 
     f_obj.seek(0)
@@ -632,9 +632,9 @@ async def serve_journal_zip(id_: int, _filename=None):
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
         z.writestr("content.txt" if settings.database.use_bbcode() else "content.html", jrnl["CONTENT"].encode())
-        z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(jrnl).items()
-                                           if k != "CONTENT"}).encode())
-        z.writestr("comments.json", dumps([serialise_entry(c)
+        z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(jrnl, convert_datetime=True).items()
+                                           if k != "content"}).encode())
+        z.writestr("comments.json", dumps([serialise_entry(c, convert_datetime=True)
                                            for c in settings.database.load_journal_comments(id_)]).encode())
 
     f_obj.seek(0)
@@ -669,7 +669,7 @@ async def serve_search_json(request: Request, table: str, query_data: SearchQuer
             "column_id": col_id,
             "limit": query_data.limit,
             "offset": query_data.offset,
-            "results": results[query_data.offset:query_data.offset + query_data.limit],
+            "results": serialise_entry(results[query_data.offset:query_data.offset + query_data.limit]),
             "results_total": len(results)}
 
 
@@ -679,7 +679,7 @@ async def serve_submission_json(id_: int):
     if not (s := settings.database.load_submission_uncached(id_)):
         raise HTTPException(404)
     else:
-        return s | {"COMMENTS": settings.database.load_submission_comments_uncached(id_)}
+        return serialise_entry(s | {"comments": settings.database.load_submission_comments_uncached(id_)})
 
 
 @app.get("/json/journal/{id_}/", response_class=JSONResponse)
@@ -688,17 +688,17 @@ async def serve_journal_json(id_: int):
     if not (j := settings.database.load_journal_uncached(id_)):
         raise HTTPException(404)
     else:
-        return j | {"COMMENTS": settings.database.load_journal_comments_uncached(id_)}
+        return serialise_entry(j | {"comments": settings.database.load_journal_comments_uncached(id_)})
 
 
 @app.get("/json/user/{username}/", response_class=JSONResponse)
 @app.post("/json/user/{username}/", response_class=JSONResponse)
 async def serve_user_json(username: str):
     username = clean_username(username)
-    user_entry: dict | None = settings.database.load_user_uncached(username)
+    user_entry: dict = settings.database.load_user_uncached(username) or {}
     user_stats: dict[str, int] = settings.database.load_user_stats_uncached(username)
 
-    return {"username": username, **{k.lower(): v for k, v in (user_entry or {}).items()}, "length": user_stats}
+    return serialise_entry({"username": username, "length": user_stats} | user_entry)
 
 
 def run_redirect(host: str, port_listen: int, port_redirect: int):
