@@ -169,8 +169,6 @@ def clean_html(html: str) -> str:
         parent: Tag = icon.parent
         parent.clear()
         parent.insert(0, f"@{icon.attrs['title']}")
-    for code in html_parsed.select("code"):
-        code.name = "div"
     for link in html_parsed.select("a[href*='furaffinity.net']"):
         link["href"] = "/" + fa_link.sub("", link.attrs["href"]).strip("/")
     return str(html_parsed)
