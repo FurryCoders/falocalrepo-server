@@ -111,6 +111,11 @@ settings: Settings = Settings(static_folder=root / "static")
 search_settings: SearchSettings = SearchSettings()
 security: HTTPBasic = HTTPBasic()
 
+icons: list[str] = ["crying", "derp", "dunno", "embarrassed", "evil", "gift", "huh", "lmao", "love", "nerd", "note",
+                    "oooh", "pleased", "rollingeyes", "sad", "sarcastic", "serious", "sleepy", "smile", "teeth",
+                    "tongue", "veryhappy", "wink", "yelling", "zipped", "angel", "badhairday", "cd", "coffee", "cool",
+                    "whatever"]
+
 bbcode_expressions: list[tuple[Pattern, str]] = [
     (re_compile("&"), "&amp;"),
     (re_compile("<"), "&lt;"),
@@ -138,6 +143,7 @@ bbcode_expressions: list[tuple[Pattern, str]] = [
      r'<a href="/submission/\1">PREV</a>|<a href="/submission/\2">FIRST</a>|<a href="/submission/\3">NEXT</a>'),
     (re_compile(r"^[-=]{5,}$", MULTILINE), "<hr/>"),
     (re_compile(r"\n"), "<br/>"),
+    *((re_compile(f":{i}:", IGNORECASE), f'<i class="smilie {i}"></i>') for i in icons),
 ]
 
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
