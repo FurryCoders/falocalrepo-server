@@ -23,7 +23,7 @@ code.bbcode {
     margin-bottom: 0;
 }
 
-.bbcode.bbcode_quote_name {
+.bbcode.bbcode_quote .bbcode_quote_name {
     display: block;
     font-style: italic;
     color: var(--color-secondary);
