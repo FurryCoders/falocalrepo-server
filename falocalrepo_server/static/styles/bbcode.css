@@ -1,11 +1,35 @@
-.bbcode_center {
-    width: 100%;
-    margin: auto;
-    text-align: center;
-    font-family: inherit;
+code.bbcode {
+    font-family: inherit !important;
+    font-style: inherit !important;
+    display: block !important;
 }
 
-.bbcode_spoiler {
+.bbcode.bbcode_left {
+    text-align: left;
+}
+
+.bbcode.bbcode_center {
+    text-align: center;
+}
+
+.bbcode.bbcode_right {
+    text-align: right;
+}
+
+.bbcode.bbcode_quote {
+    display: block;
+    padding-left: .5rem;
+    border-left: .125rem solid var(--color-tertiary);
+    margin-bottom: 0;
+}
+
+.bbcode.bbcode_quote_name {
+    display: block;
+    font-style: italic;
+    color: var(--color-secondary);
+}
+
+.bbcode.bbcode_spoiler {
     color: transparent;
     background: #000;
     border-radius: .2rem;
@@ -18,7 +42,9 @@
     user-select: none;
 }
 
-.bbcode_spoiler:hover, .bbcode_spoiler:focus, .bbcode_spoiler:active {
+.bbcode.bbcode_spoiler:hover,
+.bbcode.bbcode_spoiler:focus,
+.bbcode.bbcode_spoiler:active {
     color: inherit;
     background: inherit;
     -webkit-user-select: text;
