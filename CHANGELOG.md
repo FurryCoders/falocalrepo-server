@@ -7,6 +7,7 @@
 * \[BBCode\]!
     * Support BBCode databases introduced
       with [falocalrepo-database 5.4.0](https://pypi.org/project/falocalrepo-database/5.4.0)
+      and [falocalrepo 4.4.0](https://pypi.org/project/falocalrepo/4.4.0)
     * Search is much more precise and does not return incorrect results (e.g. searching for "strong" would return all
       submissions that contained a `<strong>` tag)
     * **Note:** the BBCode to HTML conversion is still a work in progress and some submissions may not render correctly
