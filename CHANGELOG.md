@@ -1,5 +1,39 @@
 # Changelog
 
+## v3.3.0
+
+### New Features
+
+* \[BBCode\]!
+    * Support BBCode databases introduced
+      with [falocalrepo-database 5.4.0](https://pypi.org/project/falocalrepo-database/5.4.0)
+    * Search is much more precise and does not return incorrect results (e.g. searching for "strong" would return all
+      submissions that contained a `<strong>` tag)
+* Journal headers and footers
+    * Display headers and footers of journals if they are present in the database
+
+### Changes
+
+* Improved styling for quotes
+* Improved styling for headers and footers
+* Improved JSON responses
+* Support BBCode icons in text submissions
+
+### Fixes
+
+* Fix galleries showing submissions from different users if their usernames was a substring of others'  (e.g. gallery
+  for `ab` would also show submissions for `abc` and others)
+
+### Dependencies
+
+* Use [falocalrepo-database ~5.4.0](https://pypi.org/project/falocalrepo-database/5.4.0)
+* Use [fastapi ^0.83.0](https://pypi.org/project/fastapi/0.83.0)
+* Use [uvicorn ^0.18.3](https://pypi.org/project/uvicorn/0.18.3)
+* Use [jinja2 ^3.1.2](https://pypi.org/project/jinja2/3.1.2)
+* Use [click ^8.1.3](https://pypi.org/project/click/8.1.3)
+* Use [beautifulsoup4 ^4.11.1](https://pypi.org/project/beautifulsoup4/4.11.1)
+* Add [bbcode ^1.1.0](https://pypi.org/project/bbcode/1.1.0)
+
 ## v3.2.9
 
 ### New Features
