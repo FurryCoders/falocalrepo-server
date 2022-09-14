@@ -1,5 +1,4 @@
 from datetime import datetime
-from functools import reduce
 from io import BytesIO
 from json import dumps
 from logging import Logger
@@ -8,9 +7,10 @@ from math import ceil
 from os import PathLike
 from pathlib import Path
 from re import IGNORECASE
-from re import MULTILINE
 from re import Pattern
 from re import compile as re_compile
+from re import match
+from re import sub as re_sub
 from secrets import compare_digest
 from sqlite3 import DatabaseError
 from sqlite3 import OperationalError
@@ -22,7 +22,9 @@ from zipfile import ZipFile
 
 from PIL import Image
 from PIL import UnidentifiedImageError
+from bbcode import Parser as BBCodeParser
 from bs4 import BeautifulSoup
+from bs4 import NavigableString
 from bs4.element import Tag
 from chardet import detect as detect_encoding
 from falocalrepo_database.tables import JournalsColumns
@@ -116,36 +118,6 @@ icons: list[str] = ["crying", "derp", "dunno", "embarrassed", "evil", "gift", "h
                     "tongue", "veryhappy", "wink", "yelling", "zipped", "angel", "badhairday", "cd", "coffee", "cool",
                     "whatever"]
 
-bbcode_expressions: list[tuple[Pattern, str]] = [
-    (re_compile("&"), "&amp;"),
-    (re_compile("<"), "&lt;"),
-    (re_compile(">"), "&gt;"),
-    (re_compile(r"\(c\)"), "&copy;"),
-    (re_compile(r"\(r\)"), "&reg;"),
-    (re_compile(r"\(tm\)"), "&trade;"),
-    (re_compile(r"\[(/?)([bius]|sup|sub|h\d)]"), r"<\1\2>",),
-    (re_compile(r"\[color=([^]]+)]"), r'<span style="color: \1">,'),
-    (re_compile(r"\[/color]"), "</span>",),
-    (re_compile(r"\[(left|center|right)]"), r'<div style="text-align: \1">',),
-    (re_compile(r"\[/(left|center|right)]"), "</div>",),
-    (re_compile(r"\[quote=([^]]*)]"), r'<blockquote cite="\1">'),
-    (re_compile(r"\[quote]"), "<blockquote>"),
-    (re_compile(r"\[/quote]"), "</blockquote>"),
-    (re_compile(r"\[yt]((?:.(?!\[yt]))+)\[/yt]"), r'</a href="\1">\1</a>'),
-    (re_compile(r"^((?:.(?!\[url))*)@([^\s@]+)"), r'\1<a href="/user/\2">@\2</a>'),
-    (re_compile(r"\[/url]((?:.(?!\[url)|\n|\r)*)@([^\s@]+)"), r'\1<a href="/user/\2">@\2</a>'),
-    (re_compile(r":(?:icon|link)([^:]+):|:([^:]+)icon:"), r'<a href="/user/\1\2">@\1\2</a>'),
-    (re_compile(r"\[url=(?:https?://(?:www\.)?furaffinity.net)?([^]]+)]"), r'<a href="\1">'),
-    (re_compile(r"\[/url]"), "</a>"),
-    (re_compile(r"\[tag\.([^.]*)(?:\.([^]]*))?]"), r'<\1 class="\2">'),
-    (re_compile(r"\[/tag\.([^]]*)]"), r"</\1>"),
-    (re_compile(r"\[ *(?:(\d+)|-)?, *(?:(\d+)|-)? *, *(?:(\d+)|-)? *]"),
-     r'<a href="/submission/\1">PREV</a>|<a href="/submission/\2">FIRST</a>|<a href="/submission/\3">NEXT</a>'),
-    (re_compile(r"^[-=]{5,}$", MULTILINE), "<hr/>"),
-    (re_compile(r"\n"), "<br/>"),
-    *((re_compile(f":{i}:", IGNORECASE), f'<i class="smilie {i}"></i>') for i in icons),
-]
-
 app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
 
 
@@ -165,8 +137,125 @@ def prepare_comments(comments: list[dict], use_bbcode: bool) -> list[dict]:
             for c in flatten_comments(comments_depth(comments, 0))]
 
 
-def bbcode_to_html(text: str) -> str:
-    return "".join(reduce(lambda txt, exp: exp[0].sub(exp[1], txt), bbcode_expressions, text.strip()))
+def bbcode_to_html(bbcode: str) -> str:
+    def render_url(_tag_name, value: str, options: dict[str, str], _parent, _context) -> str:
+        return f'<a class="auto_link named_url" href="{options.get("url", "#")}">{value}</a>'
+
+    def render_color(_tag_name, value, options, _parent, _context) -> str:
+        return f'<span class=bbcode style="color:{options.get("color", "inherit")};">{value}</span>'
+
+    def render_quote(_tag_name, value: str, options: dict[str, str], _parent, _context) -> str:
+        author: str = options.get("quote", "")
+        author = f"<span class=bbcode_quote_name>{author} wrote:</span>" if author else ""
+        return f'<span class="bbcode bbcode_quote">{author}{value}</span>'
+
+    def render_tags(tag_name: str, value: str, options: dict[str, str], _parent, _context) -> str:
+        if not options and tag_name.islower():
+            return f"<{tag_name}>{value}</{tag_name}>"
+        return f"[{tag_name} {' '.join(f'{k}={v}' if v else k for k, v in options.items())}]{value}"
+
+    def render_tag(_tag_name, value: str, options: dict[str, str], _parent, _context) -> str:
+        name, *classes = options["tag"].split(".")
+        return f'<{name} class="{" ".join(classes)}">{value}</{name}>'
+
+    def parse_extra(page: BeautifulSoup) -> BeautifulSoup:
+        child: NavigableString
+        child_new: Tag
+        has_match: bool = True
+        while has_match:
+            has_match = False
+            for child in [c for e in page.select("*:not(a)") for c in e.children if isinstance(c, NavigableString)]:
+                if m_ := match(rf"(.*):({'|'.join(icons)}):(.*)", child):
+                    has_match = True
+                    child_new = Tag(name="i", attrs={"class": f"smilie {m_[2]}"})
+                    child.replaceWith(m_[1], child_new, m_[3])
+                elif m_ := match(r"(.*)(?:@([a-zA-Z0-9.~_-]+)|:link([a-zA-Z0-9.~_-]+):)(.*)", child):
+                    has_match = True
+                    child_new = Tag(name="a", attrs={"class": "linkusername", "href": f"/user/{m_[2] or m_[3]}"})
+                    child_new.insert(0, m_[2] or m_[3])
+                    child.replaceWith(m_[1], child_new, m_[4])
+                elif m_ := match(r"(.*):(?:icon([a-zA-Z0-9.~_-]+)|([a-zA-Z0-9.~_-]+)icon):(.*)", child):
+                    has_match = True
+                    user: str = m_[2] or m_[3] or ""
+                    child_new = Tag(name="a", attrs={"class": "iconusername", "href": f"/user/{user}"})
+                    child_new_img: Tag = Tag(name="img",
+                                             attrs={"alt": user, "title": user,
+                                                    "src": f"//a.furaffinity.net/{datetime.now():%Y%m%d}/{user}.gif"})
+                    child_new.insert(0, child_new_img)
+                    if m_[2]:
+                        child_new.insert(1, f"\xA0{m_[2]}")
+                    child.replaceWith(m_[1], child_new, m_[4])
+                elif m_ := match(r"(.*)\[ *(?:(\d+)|-)?, *(?:(\d+)|-)? *, *(?:(\d+)|-)? *](.*)", child):
+                    has_match = True
+                    child_new = Tag(name="span", attrs={"class": "parsed_nav_links"})
+                    child_new_1: Tag | str = "<<<\xA0PREV"
+                    child_new_2: Tag | str = "FIRST"
+                    child_new_3: Tag | str = "NEXT\xA0>>>"
+                    if m_[2]:
+                        child_new_1 = Tag(name="a", attrs={"href": f"/view/{m_[2]}"})
+                        child_new_1.insert(0, "<<<\xA0PREV")
+                    if m_[3]:
+                        child_new_2 = Tag(name="a", attrs={"href": f"/view/{m_[3]}"})
+                        child_new_2.insert(0, "<<<\xA0FIRST")
+                    if m_[4]:
+                        child_new_3 = Tag(name="a", attrs={"href": f"/view/{m_[4]}"})
+                        child_new_3.insert(0, "NEXT\xA0>>>")
+                    child_new.insert(0, child_new_1)
+                    child_new.insert(1, "\xA0|\xA0")
+                    child_new.insert(2, child_new_2)
+                    child_new.insert(3, "\xA0|\xA0")
+                    child_new.insert(4, child_new_3)
+                    child.replaceWith(m_[1], child_new, m_[5])
+
+        for p in page.select("p"):
+            p.replaceWith(*p.children)
+
+        return page
+
+    parser: BBCodeParser = BBCodeParser(install_defaults=False, replace_links=False, replace_cosmetic=True)
+    parser.REPLACE_ESCAPE = (
+        ("&", "&amp;"),
+        ("<", "&lt;"),
+        (">", "&gt;"),
+    )
+    parser.REPLACE_COSMETIC = (
+        ("(c)", "&copy;"),
+        ("(r)", "&reg;"),
+        ("(tm)", "&trade;"),
+    )
+
+    for tag in ("i", "b", "u", "s", "sub", "sup", "h1", "h2", "h3", "h3", "h4", "h5", "h6"):
+        parser.add_formatter(tag, render_tags)
+    for align in ("left", "center", "right"):
+        parser.add_simple_formatter(align, f'<code class="bbcode bbcode_{align}">%(value)s</code>')
+
+    parser.add_simple_formatter("spoiler", '<span class="bbcode bbcode_spoiler">%(value)s</span>')
+    parser.add_simple_formatter("url", '<a class="auto_link named_link">%(value)s</a>')
+    parser.add_simple_formatter(
+        "iconusername",
+        f'<a class=iconusername href="/user/%(value)s">'
+        f'<img alt="%(value)s" title="%(value)s" src="//a.furaffinity.net/{datetime.now():%Y%m%d}/%(value)s.gif">'
+        f'%(value)s'
+        f'</a>'
+    )
+    parser.add_simple_formatter(
+        "usernameicon",
+        f'<a class=iconusername href="/user/%(value)s">'
+        f'<img alt="%(value)s" title="%(value)s" src="//a.furaffinity.net/{datetime.now():%Y%m%d}/%(value)s.gif">'
+        f'</a>'
+    )
+    parser.add_simple_formatter("linkusername", '<a class=linkusername href="/user/%(value)s">%(value)s</a>')
+    parser.add_simple_formatter("hr", "<hr>", standalone=True)
+
+    parser.add_formatter("url", render_url)
+    parser.add_formatter("color", render_color)
+    parser.add_formatter("quote", render_quote)
+    parser.add_formatter("tag", render_tag)
+
+    bbcode = re_sub(r"-{5,}", "[hr]", bbcode)
+
+    result_page: BeautifulSoup = parse_extra(BeautifulSoup(parser.format(bbcode), "lxml"))
+    return (result_page.select_one("html > body") or result_page).decode_contents()
 
 
 def clean_html(html: str) -> str:
@@ -181,7 +270,7 @@ def clean_html(html: str) -> str:
 
 
 def prepare_html(html: str, use_bbcode: bool) -> str:
-    return bbcode_to_html(html) if use_bbcode else clean_html(html)
+    return clean_html(bbcode_to_html(html)) if use_bbcode else clean_html(html)
 
 
 def serialise_entry(entry: Any, convert_datetime: bool = False, lowercase_keys: bool = True) -> Any:
