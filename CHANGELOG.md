@@ -9,6 +9,9 @@
       with [falocalrepo-database 5.4.0](https://pypi.org/project/falocalrepo-database/5.4.0)
     * Search is much more precise and does not return incorrect results (e.g. searching for "strong" would return all
       submissions that contained a `<strong>` tag)
+    * **Note:** the BBCode to HTML conversion is still a work in progress and some submissions may not render correctly
+      if they contain very unusual formatting, please open
+      an [issue](https://github.com/FurryCoders/falocalrepo-server/issues) if you encounter any error :)
 * Journal headers and footers
     * Display headers and footers of journals if they are present in the database
 
