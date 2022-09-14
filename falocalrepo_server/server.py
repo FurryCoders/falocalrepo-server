@@ -48,6 +48,7 @@ from fastapi.templating import Jinja2Templates
 from htmlmin import minify
 from pydantic import BaseModel
 from pydantic import BaseSettings
+from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn import run
 from uvicorn.config import LOGGING_CONFIG
 
@@ -825,7 +826,7 @@ def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = Non
     if authentication:
         settings.username = authentication.split(":")[0]
         settings.password = authentication.split(":", 1)[1] if ":" in authentication else ""
-        app.middleware("http")(auth_middleware)
+        app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 
     if ssl_cert and ssl_key:
         settings.ssl_cert, settings.ssl_key = Path(ssl_cert), Path(ssl_key)
