@@ -818,24 +818,30 @@ def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = Non
            browser: bool = True):
     if redirect_port:
         return run_redirect(host, port, redirect_port)
+
     settings.precache = precache
     settings.open_browser = browser
+
     if authentication:
         settings.username = authentication.split(":")[0]
         settings.password = authentication.split(":", 1)[1] if ":" in authentication else ""
         app.middleware("http")(auth_middleware)
-    run_args: dict[str, Any] = {}
+
     if ssl_cert and ssl_key:
         settings.ssl_cert, settings.ssl_key = Path(ssl_cert), Path(ssl_key)
         if not settings.ssl_cert.is_file():
             raise FileNotFoundError(f"SSL certificate {settings.ssl_cert}")
         elif not settings.ssl_key.is_file():
             raise FileNotFoundError(f"SSL private key {settings.ssl_key}")
-        run_args |= {"port": port or 443, "ssl_certfile": settings.ssl_cert, "ssl_keyfile": settings.ssl_key}
+        port = port or 443
+
     settings.address = f"{'https' if settings.ssl_cert else 'http'}://" \
                        f"{'localhost' if host == '0.0.0.0' else host}" \
                        f"{f':{port}' if port else ''}"
-    run_args |= {"port": run_args.get("port", port) or 80}
+
     with Database(Path(database_path).resolve(), logger) as settings.database:
         search_settings.load(settings.database.load_settings("SEARCH"))
-        run(app, host=host, **run_args, log_config=LOGGING_CONFIG)
+        run(app, host=host, port=port,
+            ssl_certfile=settings.ssl_cert,
+            ssl_keyfile=str(settings.ssl_key) if settings.ssl_key else None,
+            log_config=LOGGING_CONFIG)
