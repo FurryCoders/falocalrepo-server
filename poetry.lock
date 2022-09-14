@@ -16,6 +16,14 @@ test = ["contextlib2", "coverage[toml] (>=4.5)", "hypothesis (>=4.0)", "mock (>=
 trio = ["trio (>=0.16)"]
 
 [[package]]
+name = "bbcode"
+version = "1.1.0"
+description = "A pure python bbcode parser and formatter."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.11.1"
 description = "Screen-scraping library"
@@ -264,12 +272,16 @@ standard = ["colorama (>=0.4)", "httptools (>=0.4.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "91dba86950263bd6f7897bfdbe6d28c5f258cf813c034df2daac5274d7ca2329"
+content-hash = "761188f1e946109b0389762d20ed73c34e903fa3680e11cce1588a6b34a3a71c"
 
 [metadata.files]
 anyio = [
     {file = "anyio-3.6.1-py3-none-any.whl", hash = "sha256:cb29b9c70620506a9a8f87a309591713446953302d7d995344d0d7c6c0c9a7be"},
     {file = "anyio-3.6.1.tar.gz", hash = "sha256:413adf95f93886e442aea925f3ee43baa5a765a64a0f52c6081894f9992fdd0b"},
+]
+bbcode = [
+    {file = "bbcode-1.1.0-py2.py3-none-any.whl", hash = "sha256:83802f4b40c92426841a98350bd6ff9ea8fdf8f9b37df1968a88c5864fd225fa"},
+    {file = "bbcode-1.1.0.tar.gz", hash = "sha256:eac4fb1d0f6c7ce5c41e4b5c0522562b15a1ac036fb9131adc59e9a28c7dc1d0"},
 ]
 beautifulsoup4 = [
     {file = "beautifulsoup4-4.11.1-py3-none-any.whl", hash = "sha256:58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30"},

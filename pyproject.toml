@@ -37,6 +37,7 @@ click-help-colors = "^0.9.1"
 htmlmin = "^0.1.12"
 beautifulsoup4 = "^4.11.1"
 lxml = "^4.9.1"
+bbcode = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
 
