@@ -232,7 +232,8 @@ async def auth_middleware(request: Request, call_next: Callable[[Request], Corou
 @app.on_event("startup")
 def log_settings():
     logger.info(f"Version: {__version__}")
-    logger.info(f"Using database: {settings.database.path} ({settings.database.version})")
+    logger.info(f"Using database: {settings.database.path} ({settings.database.version})" +
+                (" (BBCode)" if settings.database.use_bbcode() else ""))
     logger.info(f"Using SSL certificate: {settings.ssl_cert}") if settings.ssl_cert else None
     logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
     logger.info(f"Using HTTP Basic authentication") if settings.username or settings.password else None
