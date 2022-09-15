@@ -31,7 +31,7 @@
 ### Dependencies
 
 * Use [falocalrepo-database ~5.4.0](https://pypi.org/project/falocalrepo-database/5.4.0)
-* Use [fastapi ^0.83.0](https://pypi.org/project/fastapi/0.83.0)
+* Use [fastapi ^0.84.0](https://pypi.org/project/fastapi/0.84.0)
 * Use [uvicorn ^0.18.3](https://pypi.org/project/uvicorn/0.18.3)
 * Use [jinja2 ^3.1.2](https://pypi.org/project/jinja2/3.1.2)
 * Use [click ^8.1.3](https://pypi.org/project/click/8.1.3)
