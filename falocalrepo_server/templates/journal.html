@@ -12,6 +12,23 @@
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/style.css">
     <style>
+        #content[data-bbcode=true] #content_html,
+        #content[data-bbcode=true] #header_html,
+        #content[data-bbcode=true] #footer_html {
+            display: none;
+        }
+
+        #content[data-bbcode=false] #content_bbcode,
+        #content[data-bbcode=false] #header_bbcode,
+        #content[data-bbcode=false] #footer_bbcode {
+            display: none;
+        }
+
+        #content[data-bbcode=true] #bbcode_button {
+            background: var(--bs-info) !important;
+            color: var(--bs-btn-active-color) !important;
+        }
+
         @media (max-width: 991px) {
             .fit-height {
                 max-height: none;
@@ -26,18 +43,45 @@
 <div class="container mt-3 mt-lg-4 ">
     <div class="row align-middle">
         <div class="col-12 col-lg-8 mt-3 mt-lg-0 order-last order-lg-first">
-            <div class="border rounded p-2 overflow-scroll fit-height h-100">
+            <div class="border rounded p-2 overflow-scroll fit-height h-100" id="content" data-bbcode="false">
+                <div class="w-100 text-end">
+                    <button class="btn btn-sm btn-outline-info text-secondary border" id="bbcode_button"
+                            onclick="const d = document.getElementById('content'); d.dataset.bbcode = d.dataset.bbcode === 'true' ? 'false' : 'true'">
+                        [BBCode]
+                    </button>
+                </div>
                 {% if journal.HEADER %}
-                <div class="journal-header">
+                <div class="journal-header" id="header_html">
                     {% autoescape false %}{{ journal.HEADER }}{% endautoescape %}
                     <hr class="mx-2"/>
                 </div>
                 {% endif %}
-                {% autoescape false %}{{ journal.CONTENT }}{% endautoescape %}
+                {% if journal.HEADER_BBCODE != None %}
+                <div class="journal-header" id="header_bbcode">
+                    {% autoescape false %}{{ journal.HEADER_BBCODE.replace("\n", "<br>") }}{% endautoescape %}
+                    <hr class="mx-2"/>
+                </div>
+                {% endif %}
+
+                {% if journal.CONTENT_BBCODE != None %}
+                <div id="content_bbcode">
+                    {% autoescape false %}{{ journal.CONTENT_BBCODE.replace("\n", "<br>") }}{% endautoescape %}
+                </div>
+                {% endif %}
+                <div id="content_html">
+                    {% autoescape false %}{{ journal.CONTENT }}{% endautoescape %}
+                </div>
+
                 {% if journal.FOOTER %}
-                <div class="journal-footer">
+                <div class="journal-footer" id="footer_html">
                     <hr class="mx-2"/>
                     {% autoescape false %}{{ journal.FOOTER }}{% endautoescape %}
+                </div>
+                {% endif %}
+                {% if journal.FOOTER_BBCODE != None %}
+                <div class="journal-footer" id="footer_bbcode">
+                    <hr class="mx-2"/>
+                    {% autoescape false %}{{ journal.FOOTER_BBCODE.replace("\n", "<br>") }}{% endautoescape %}
                 </div>
                 {% endif %}
             </div>

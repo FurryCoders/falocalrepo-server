@@ -57,6 +57,21 @@
             height: 100%;
         }
 
+        #description[data-bbcode=true] #description_html,
+        #description[data-bbcode=true] #footer_html {
+            display: none;
+        }
+
+        #description[data-bbcode=false] #description_bbcode,
+        #description[data-bbcode=false] #footer_bbcode {
+            display: none;
+        }
+
+        #description[data-bbcode=true] #bbcode_button {
+            background: var(--bs-info) !important;
+            color: var(--bs-btn-active-color) !important;
+        }
+
         @media (min-width: 992px) {
             #file-container.zoomed {
                 width: 100%;
@@ -442,9 +457,23 @@
             </div>
         </div>
 
-        <div class="col-12 mt-3" id="description">
-            <div class="card">
-                <div class="card-body col-12 col-lg-9 mx-auto">
+        <div class="col-12 mt-3" id="description" data-bbcode="false">
+            <div class="card position-relative">
+                {% if submission.DESCRIPTION_BBCODE != None %}
+                <div class="w-100 text-end">
+                    <button class="btn btn-sm btn-outline-info text-secondary border border-top-0 border-end-0" id="bbcode_button"
+                            style="border-bottom-right-radius: 0; border-top-left-radius: 0"
+                            onclick="const d = document.getElementById('description'); d.dataset.bbcode = d.dataset.bbcode === 'true' ? 'false' : 'true'">
+                        [BBCode]
+                    </button>
+                </div>
+                <div class="card-body col-12 col-lg-9 mx-auto" id="description_bbcode">
+                    <div class="card-text text-wrap overflow-hidden">
+                        {% autoescape false %}{{ submission.DESCRIPTION_BBCODE.replace("\n", "<br>") }}{% endautoescape %}
+                    </div>
+                </div>
+                {% endif %}
+                <div class="card-body col-12 col-lg-9 mx-auto" id="description_html">
                     <div class="card-text text-wrap overflow-hidden">
                         {% autoescape false %}{{ submission.DESCRIPTION }}{% endautoescape %}
                     </div>
@@ -453,7 +482,12 @@
                 <div class="submission-footer">
                     <hr class="mx-2"/>
                     <div class="card-body col-12 col-lg-9 mx-auto">
-                        <div class="card-text text-wrap overflow-hidden">
+                        {% if submission.FOOTER_BBCODE != None %}
+                        <div class="card-text text-wrap overflow-hidden" id="footer_bbcode">
+                            {% autoescape false %}{{ submission.FOOTER_BBCODE.replace("\n", "<br>") }}{% endautoescape %}
+                        </div>
+                        {% endif %}
+                        <div class="card-text text-wrap overflow-hidden" id="footer_html">
                             {% autoescape false %}{{ submission.FOOTER }}{% endautoescape %}
                         </div>
                     </div>
