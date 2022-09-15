@@ -460,9 +460,8 @@
         <div class="col-12 mt-3" id="description" data-bbcode="false">
             <div class="card position-relative">
                 {% if submission.DESCRIPTION_BBCODE != None %}
-                <div class="w-100 text-end">
-                    <button class="btn btn-sm btn-outline-info text-secondary border border-top-0 border-end-0" id="bbcode_button"
-                            style="border-bottom-right-radius: 0; border-top-left-radius: 0"
+                <div class="w-100 text-end pt-2 pe-2">
+                    <button class="btn btn-sm btn-outline-info text-secondary border" id="bbcode_button"
                             onclick="const d = document.getElementById('description'); d.dataset.bbcode = d.dataset.bbcode === 'true' ? 'false' : 'true'">
                         [BBCode]
                     </button>
