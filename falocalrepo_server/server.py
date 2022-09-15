@@ -608,11 +608,13 @@ async def serve_submission(request: Request, id_: int):
         "submission": sub | {
             "DESCRIPTION": prepare_html(sub["DESCRIPTION"], settings.database.use_bbcode()),
             "FOOTER": prepare_html(sub["FOOTER"], settings.database.use_bbcode()),
+            "DESCRIPTION_BBCODE": sub["DESCRIPTION"].strip() or None if settings.database.use_bbcode() else None,
+            "FOOTER_BBCODE": sub["FOOTER"].strip() or None if settings.database.use_bbcode() else None,
         },
         "files_text": [
             bbcode_to_html(fs[i].read_text(detect_encoding(fs[i].read_bytes())["encoding"], "ignore"))
             if ext.lower() == "txt" else ""
-            for i, ext in enumerate(sub['FILEEXT'])] if fs else [],
+            for i, ext in enumerate(sub['FILEEXT']) if fs[i].is_file()] if fs else [],
         "filenames": [f"submission{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
         "filenames_id": [f"{sub['ID']:010d}{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
         "comments": prepare_comments(settings.database.load_submission_comments(id_), settings.database.use_bbcode()),
@@ -717,6 +719,9 @@ async def serve_journal(request: Request, id_: int):
             "CONTENT": prepare_html(jrnl["CONTENT"], settings.database.use_bbcode()),
             "HEADER": prepare_html(jrnl["HEADER"], settings.database.use_bbcode()),
             "FOOTER": prepare_html(jrnl["FOOTER"], settings.database.use_bbcode()),
+            "CONTENT_BBCODE": jrnl["CONTENT"].strip() or None if settings.database.use_bbcode() else None,
+            "HEADER_BBCODE": jrnl["HEADER"].strip() or None if settings.database.use_bbcode() else None,
+            "FOOTER_BBCODE": jrnl["FOOTER"].strip() or None if settings.database.use_bbcode() else None,
         },
         "comments": prepare_comments(settings.database.load_journal_comments(id_), settings.database.use_bbcode()),
         "prev": p,
