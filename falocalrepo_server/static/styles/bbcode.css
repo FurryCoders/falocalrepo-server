@@ -2,6 +2,11 @@ code.bbcode {
     font-family: inherit !important;
     font-style: inherit !important;
     display: block !important;
+    color: inherit !important;
+}
+
+code.bbcode + br {
+    display: none;
 }
 
 .bbcode.bbcode_left {
