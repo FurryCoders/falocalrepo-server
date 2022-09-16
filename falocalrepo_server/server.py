@@ -539,6 +539,15 @@ async def serve_user(request: Request, username: str):
         remove_comments=True))
 
 
+@app.get("/user/{username}/icon/")
+@app.get("/user/{username}/thumbnail/")
+async def serve_user_thumbnail(request: Request, username: str):
+    if username != (username_clean := clean_username(username)):
+        return RedirectResponse(app.url_path_for(serve_user_thumbnail.__name__, username=username_clean))
+
+    return RedirectResponse(f"https://a.furaffinity.net/{datetime.now():%Y%m%d}/{username}.gif")
+
+
 @app.get("/search/{table}/", response_class=HTMLResponse)
 async def serve_search(request: Request, table: str, title: str = None, args: dict[str, str] = None):
     if (table := table.upper()) not in (submissions_table, journals_table, users_table):
@@ -580,7 +589,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
         "sort": sort,
         "order": order,
         "view": view,
-        "thumbnails": table == submissions_table,
+        "thumbnails": table in (submissions_table, users_table),
         "columns_table": columns_table,
         "columns_results": columns_results,
         "columns_list": columns_list,
