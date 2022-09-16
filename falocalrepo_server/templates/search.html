@@ -299,9 +299,6 @@
                         {% elif table == "users" %}
                             <div class="card-body overflow-hidden text-center p-1">
                                 <h6 class="card-title small mt-0 mb-0 text-body">{{ item.USERNAME }}</h6>
-                                {% if not item.ACTIVE %}
-                                    <span class="badge bg-danger w-100">Inactive</span>
-                                {% endif %}
                             </div>
                         {% endif %}
                     </a>
@@ -321,6 +318,9 @@
                     {% elif table == "users" %}
                         <a href="/user/{{ item.USERNAME }}" class="text-decoration-none w-100">
                             <div class="card-footer text-center p-1 pb-0 small">
+                                {% if not item.ACTIVE %}
+                                    <span class="badge bg-danger w-100 text-truncate">Inactive</span>
+                                {% endif %}
                                 {% for folder in item.FOLDERS|sort %}
                                     <span title="{{ folder }}" class="badge bg-info w-100 text-truncate">
                                             {{ folder }}
