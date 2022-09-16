@@ -107,6 +107,16 @@ body {
         /* fallbacks */ "Helvetica Neue", sans-serif;
 }
 
+a.iconusername > img, img.iconusername {
+    height: 2.5rem;
+    width: auto;
+    border-radius: .250rem;
+}
+
+a.iconusername {
+    text-decoration: none;
+}
+
 blockquote {
     padding-left: .5rem;
     border-left: .125rem solid var(--color-tertiary);
