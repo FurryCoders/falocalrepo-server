@@ -444,3 +444,16 @@ the comment is a reply, its parent comments.
 The button furthest to the left (arrow pointing up and to the left) links to the first comment in a reply chain. The
 middle button (bent arrow pointing to the left) links to the previous comment in the reply chain. The link button
 furthest to the right is a link to that specific comment.
+
+### BBCode
+
+When the database is in BBCode mode a new buttons appears along submission descriptions, journal contents, and user
+profiles to switch between the rendered HTML and the BBCode stored in the database.
+
+<div align="center">
+<img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-bbcode.png" width="120">
+</div>
+
+_Note:_ the BBCode to HTML conversion is still a work in progress and some content may be rendered incorrectly; please
+open
+an [issue](https://github.com/FurryCoders/falocalrepo-server/issues) if you encounter any error :)
