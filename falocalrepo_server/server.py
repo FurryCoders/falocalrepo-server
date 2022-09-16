@@ -166,10 +166,10 @@ def bbcode_to_html(bbcode: str) -> str:
         while has_match:
             has_match = False
             for child in [c for e in page.select("*:not(a)") for c in e.children if isinstance(c, NavigableString)]:
-                if m_ := match(r"(.*)(https?://((?:[\w/%#\[\]@*-]|[.,?!'()&~:;=](?! ))+))(.*)", child):
+                if m_ := match(r"(.*)(https?://(?:www\.)?((?:[\w/%#\[\]@*-]|[.,?!'()&~:;=](?! ))+))(.*)", child):
                     has_match = True
                     child_new = Tag(name="a", attrs={"class": f"auto_link_shortened", "href": m_[2]})
-                    child_new.insert(0, m_[3])
+                    child_new.insert(0, m_[3].split("?", 1)[0])
                     child.replaceWith(m_[1], child_new, m_[4])
                 elif m_ := match(rf"(.*):({'|'.join(icons)}):(.*)", child):
                     has_match = True
