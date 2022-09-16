@@ -123,6 +123,8 @@ _Note:_ All the following paths are meant as paths from `<host>:<port>`.
 | `/search/users/`                               | Search & browse users                                                                   |
 | `/settings/`                                   | Change default search settings                                                          |
 | `/user/<username>/`                            | Show information regarding a specific user                                              |
+| `/user/<username>/icon/`                       | Redirect to username's icon on Fur Affinity                                             |
+| `/user/<username>/thumbnail/`                  | Redirect to username's icon on Fur Affinity                                             |
 | `/gallery/<username>/`                         | Browse & search a user's gallery submissions                                            |
 | `/scraps/<username>/`                          | Browse & search a user's scraps submissions                                             |
 | `/submissions/<username>/`                     | Browse & search a user's gallery & scraps submissions                                   | 
