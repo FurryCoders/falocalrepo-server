@@ -184,9 +184,10 @@ def bbcode_to_html(bbcode: str) -> str:
                     has_match = True
                     user: str = m_[2] or m_[3] or ""
                     child_new = Tag(name="a", attrs={"class": "iconusername", "href": f"/user/{user}"})
-                    child_new_img: Tag = Tag(name="img",
-                                             attrs={"alt": user, "title": user,
-                                                    "src": f"//a.furaffinity.net/{datetime.now():%Y%m%d}/{user}.gif"})
+                    child_new_img: Tag = Tag(
+                        name="img",
+                        attrs={"alt": user, "title": user,
+                               "src": f"//a.furaffinity.net/{datetime.now():%Y%m%d}/{clean_username(user)}.gif"})
                     child_new.insert(0, child_new_img)
                     if m_[2]:
                         child_new.insert(1, f"\xA0{m_[2]}")
@@ -276,7 +277,7 @@ def clean_html(html: str) -> str:
 
 
 def prepare_html(html: str, use_bbcode: bool) -> str:
-    return clean_html(bbcode_to_html(html)) if use_bbcode else clean_html(html)
+    return bbcode_to_html(html) if use_bbcode else clean_html(html)
 
 
 def serialise_entry(entry: Any, convert_datetime: bool = False, lowercase_keys: bool = True) -> Any:
