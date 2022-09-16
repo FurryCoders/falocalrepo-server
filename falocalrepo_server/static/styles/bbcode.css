@@ -1,6 +1,8 @@
 code.bbcode {
     font-family: inherit !important;
     font-style: inherit !important;
+    font-size: inherit !important;
+    word-wrap: inherit !important;
     display: block !important;
     color: inherit !important;
 }
