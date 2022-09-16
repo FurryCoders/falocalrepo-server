@@ -4,7 +4,7 @@
 
 ### New Features
 
-* \[BBCode\]!
+* \[BBCode\]
     * Support BBCode databases introduced
       with [falocalrepo-database 5.4.0](https://pypi.org/project/falocalrepo-database/5.4.0)
       and [falocalrepo 4.4.0](https://pypi.org/project/falocalrepo/4.4.0)
@@ -13,6 +13,10 @@
     * **Note:** the BBCode to HTML conversion is still a work in progress and some submissions may not render correctly
       if they contain very unusual formatting, please open
       an [issue](https://github.com/FurryCoders/falocalrepo-server/issues) if you encounter any error :)
+* User icons 🦊
+    * User icons are now displayed like on Fur Affinity instead of being converted to @username links.
+    * Icons are loaded from Fur Affinity and will not display if the client is not online
+    * Icons are displayed in all HTML and BBCode elements, and will also show up in the users search page
 * Journal headers and footers
     * Display headers and footers of journals if they are present in the database
 
