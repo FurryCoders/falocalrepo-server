@@ -268,9 +268,8 @@ def bbcode_to_html(bbcode: str) -> str:
 def clean_html(html: str) -> str:
     html_parsed: BeautifulSoup = BeautifulSoup(html, "lxml")
     for icon in html_parsed.select("a.iconusername > img"):
-        parent: Tag = icon.parent
-        parent.clear()
-        parent.insert(0, f"@{icon.attrs['title']}")
+        icon.attrs["hidden"] = "true"
+        icon.attrs["onload"] = "this.hidden = false"
     for link in html_parsed.select("a[href*='furaffinity.net']"):
         link["href"] = "/" + fa_link.sub("", link.attrs["href"]).strip("/")
     return str(html_parsed)
