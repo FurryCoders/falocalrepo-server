@@ -277,7 +277,7 @@ def clean_html(html: str) -> str:
 
 
 def prepare_html(html: str, use_bbcode: bool) -> str:
-    return bbcode_to_html(html) if use_bbcode else clean_html(html)
+    return clean_html(bbcode_to_html(html)) if use_bbcode else clean_html(html)
 
 
 def serialise_entry(entry: Any, convert_datetime: bool = False, lowercase_keys: bool = True) -> Any:
