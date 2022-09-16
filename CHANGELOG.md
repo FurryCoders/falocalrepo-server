@@ -30,6 +30,7 @@
 
 ### Dependencies
 
+* Use [bootstrap 5.2.1](https://blog.getbootstrap.com/2022/09/07/bootstrap-5-2-1/)
 * Use [falocalrepo-database ~5.4.0](https://pypi.org/project/falocalrepo-database/5.4.0)
 * Use [fastapi ^0.84.0](https://pypi.org/project/fastapi/0.84.0)
 * Use [uvicorn ^0.18.3](https://pypi.org/project/uvicorn/0.18.3)
