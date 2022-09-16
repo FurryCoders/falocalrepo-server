@@ -531,6 +531,7 @@ async def serve_user(request: Request, username: str):
         "mentions_length": user_stats["mentions"],
         "journals_length": user_stats["journals"],
         "userpage": prepare_html(user_entry.get("USERPAGE", ""), settings.database.use_bbcode()),
+        "userpage_bbcode": user_entry.get("USERPAGE", None) if settings.database.use_bbcode() else None,
         "in_database": bool(user_entry),
         "prev": p,
         "next": n,
