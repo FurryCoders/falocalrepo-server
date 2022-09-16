@@ -7,10 +7,6 @@ code.bbcode {
     color: inherit !important;
 }
 
-code.bbcode + br {
-    display: none;
-}
-
 .bbcode.bbcode_left {
     text-align: left;
 }
