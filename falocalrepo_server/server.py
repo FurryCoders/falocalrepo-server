@@ -532,6 +532,7 @@ async def serve_user(request: Request, username: str):
         "journals_length": user_stats["journals"],
         "userpage": prepare_html(user_entry.get("USERPAGE", ""), settings.database.use_bbcode()),
         "userpage_bbcode": user_entry.get("USERPAGE", None) if settings.database.use_bbcode() else None,
+        "icon": f"//a.furaffinity.net/{datetime.now():%Y%m%d}/{clean_username(username)}.gif",
         "in_database": bool(user_entry),
         "prev": p,
         "next": n,
