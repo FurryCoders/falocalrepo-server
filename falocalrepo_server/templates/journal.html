@@ -55,13 +55,13 @@
                 {% if journal.HEADER %}
                 <div class="journal-header" id="header_html">
                     {% autoescape false %}{{ journal.HEADER }}{% endautoescape %}
-                    <hr class="mx-2"/>
+                    <hr class="mx-2 my-3"/>
                 </div>
                 {% endif %}
                 {% if journal.HEADER_BBCODE != None %}
                 <div class="journal-header" id="header_bbcode">
                     {% autoescape false %}{{ journal.HEADER_BBCODE.replace("\n", "<br>") }}{% endautoescape %}
-                    <hr class="mx-2"/>
+                    <hr class="mx-2 my-3"/>
                 </div>
                 {% endif %}
 
@@ -76,13 +76,13 @@
 
                 {% if journal.FOOTER %}
                 <div class="journal-footer" id="footer_html">
-                    <hr class="mx-2"/>
+                    <hr class="mx-2 my-3"/>
                     {% autoescape false %}{{ journal.FOOTER }}{% endautoescape %}
                 </div>
                 {% endif %}
                 {% if journal.FOOTER_BBCODE != None %}
                 <div class="journal-footer" id="footer_bbcode">
-                    <hr class="mx-2"/>
+                    <hr class="mx-2 my-3"/>
                     {% autoescape false %}{{ journal.FOOTER_BBCODE.replace("\n", "<br>") }}{% endautoescape %}
                 </div>
                 {% endif %}
