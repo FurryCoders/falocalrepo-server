@@ -231,6 +231,10 @@ hr {
     font-size: 90%;
 }
 
+p:last-child {
+    margin-bottom: 0 !important;
+}
+
 img.zoom {
     cursor: zoom-in;
 }
