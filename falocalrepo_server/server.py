@@ -542,7 +542,7 @@ async def serve_user(request: Request, username: str):
 
 @app.get("/user/{username}/icon/")
 @app.get("/user/{username}/thumbnail/")
-async def serve_user_thumbnail(request: Request, username: str):
+async def serve_user_thumbnail(username: str):
     if username != (username_clean := clean_username(username)):
         return RedirectResponse(app.url_path_for(serve_user_thumbnail.__name__, username=username_clean))
 
