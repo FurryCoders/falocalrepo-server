@@ -460,20 +460,20 @@
         <div class="col-12 mt-3" id="description" data-bbcode="false">
             <div class="card position-relative">
                 {% if submission.DESCRIPTION_BBCODE != None %}
-                <div class="w-100 text-end pt-2 pe-2">
-                    <button class="btn btn-sm btn-outline-info text-secondary border" id="bbcode_button"
-                            onclick="const d = document.getElementById('description'); d.dataset.bbcode = d.dataset.bbcode === 'true' ? 'false' : 'true'">
-                        [BBCode]
-                    </button>
-                </div>
-                <div class="card-body col-12 col-lg-9 mx-auto" id="description_bbcode">
-                    <div class="card-text text-wrap overflow-hidden">
+                    <div class="w-100 text-end pt-2 pe-2">
+                        <button class="btn btn-sm btn-outline-info text-secondary border" id="bbcode_button"
+                                onclick="const d = document.getElementById('description'); d.dataset.bbcode = d.dataset.bbcode === 'true' ? 'false' : 'true'">
+                            [BBCode]
+                        </button>
+                    </div>
+                {% endif %}
+                <div class="card-body col-12 col-lg-9 mx-auto">
+                    {% if submission.DESCRIPTION_BBCODE != None %}
+                    <div class="card-text text-wrap overflow-hidden" id="description_bbcode">
                         {% autoescape false %}{{ submission.DESCRIPTION_BBCODE.replace("\n", "<br>") }}{% endautoescape %}
                     </div>
-                </div>
-                {% endif %}
-                <div class="card-body col-12 col-lg-9 mx-auto" id="description_html">
-                    <div class="card-text text-wrap overflow-hidden">
+                    {% endif %}
+                    <div class="card-text text-wrap overflow-hidden" id="description_html">
                         {% autoescape false %}{{ submission.DESCRIPTION }}{% endautoescape %}
                     </div>
                 </div>
