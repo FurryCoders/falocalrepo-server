@@ -44,12 +44,14 @@
     <div class="row align-middle">
         <div class="col-12 col-lg-8 mt-3 mt-lg-0 order-last order-lg-first">
             <div class="border rounded p-2 overflow-scroll fit-height h-100" id="content" data-bbcode="false">
-                <div class="w-100 text-end">
-                    <button class="btn btn-sm btn-outline-info text-secondary border" id="bbcode_button"
-                            onclick="const d = document.getElementById('content'); d.dataset.bbcode = d.dataset.bbcode === 'true' ? 'false' : 'true'">
-                        [BBCode]
-                    </button>
-                </div>
+                {% if journal.CONTENT_BBCODE != None %}
+                    <div class="w-100 text-end">
+                        <button class="btn btn-sm btn-outline-info text-secondary border" id="bbcode_button"
+                                onclick="const d = document.getElementById('content'); d.dataset.bbcode = d.dataset.bbcode === 'true' ? 'false' : 'true'">
+                            [BBCode]
+                        </button>
+                    </div>
+                {% endif %}
                 {% if journal.HEADER %}
                 <div class="journal-header" id="header_html">
                     {% autoescape false %}{{ journal.HEADER }}{% endautoescape %}
