@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timezone
+from datetime import timedelta
 from io import BytesIO
 from json import dumps
 from logging import Logger
@@ -545,7 +546,8 @@ async def serve_user_thumbnail(request: Request, username: str):
     if username != (username_clean := clean_username(username)):
         return RedirectResponse(app.url_path_for(serve_user_thumbnail.__name__, username=username_clean))
 
-    return RedirectResponse(f"https://a.furaffinity.net/{datetime.now():%Y%m%d}/{username}.gif")
+    server_time: datetime = datetime.now(timezone(timedelta(hours=-8)))
+    return RedirectResponse(f"https://a.furaffinity.net/{server_time:%Y%m%d}/{username}.gif")
 
 
 @app.get("/search/{table}/", response_class=HTMLResponse)
