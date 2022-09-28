@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.3.1
+
+### Fixes
+
+* Fix margins around horizontal bars in journal headers and footers
+* Fix BBCode button appearing for journals even in HTML databases
+* Fix uneven margins at the bottom of descriptions and journals
+* Fix user icons not appearing when the server's timezone was too far ahead of Fur Affinity's
+
 ## v3.3.0
 
 ### New Features
