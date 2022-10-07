@@ -97,6 +97,7 @@ class Database(_Database):
         self._load_journal_comments_cached.cache_clear()
         self._load_prev_next_cached.cache_clear()
         self._load_search_cached.cache_clear()
+        self._load_search_aux.cache_clear()
         self._load_files_folder_cached.cache_clear()
         self._load_info_cached.cache_clear()
         self.logger.info(f"Clearing cache for new m_time {datetime.fromtimestamp(_m_time)}")
@@ -298,9 +299,17 @@ class Database(_Database):
         self.clear_cache(self.m_time)
         return self._load_prev_next_cached(table, item_id)
 
+    @cache
+    def _load_search_aux(self, table: str, query: str, sort: str, order: str):
+        if order.startswith("asc"):
+            return self._load_search_cached(table.lower(), query.lower(), sort.lower(), order.lower())
+        else:
+            results, *rest, _ = self._load_search_cached(table.lower(), query.lower(), sort.lower(), "asc")
+            return list(reversed(results)), *rest, order
+
     def load_search(self, table: str, query: str, sort: str, order: str):
         self.clear_cache(self.m_time)
-        return self._load_search_cached(table.lower(), query.lower(), sort.lower(), order.lower())
+        return self._load_search_aux(table.lower(), query.lower(), sort.lower(), order.lower())
 
     def load_files_folder(self) -> Path:
         self.clear_cache(self.m_time)
