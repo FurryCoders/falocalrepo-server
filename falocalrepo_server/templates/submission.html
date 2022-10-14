@@ -170,15 +170,7 @@
         </a>
     </video>
     {% elif ext in ["swf"] %}
-    <div class="flash-file">
-        <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 error" hidden>
-            <span class="badge bg-danger">Ruffle error</span>
-        </div>
-        <div class="mt-2 mb-2 mt-lg-5 pt-lg-5 loading">
-            <span class="spinner spinner-border spinner-border-sm" role="status"></span>
-        </div>
-        <div class="fit-height mx-auto flash-container" hidden></div>
-    </div>
+    <div class="fit-height mx-auto flash-container loaded"></div>
     {% elif ext in ["txt"] %}
     <div class="border rounded text-start overflow-scroll fit-height">
         <div class="col-12 text-center mt-2">
@@ -588,28 +580,16 @@
     <!--suppress JSUnresolvedFunction, JSUnusedLocalSymbols, JSUnresolvedVariable -->
     <script>
         window.RufflePlayer = window.RufflePlayer || {};
-        window.addEventListener("load", (event) => {
+        window.RufflePlayer.config = {scale: "showAll", showSwfDownload: true}
+        window.onload = () => {
             if (window.RufflePlayer.newest === undefined) return alert("Ruffle is not loaded")
-            document
-                .querySelectorAll("#file-container .flash-file")
-                .forEach((flashFile) => {
-                    const player = window.RufflePlayer.newest().createPlayer();
-                    player.config = {scale: "showAll"}
-                    flashFile.querySelector(".flash-container").appendChild(player);
-                    player.addEventListener("loadeddata", () => {
-                        flashFile.querySelector(".loading").hidden = true
-                        flashFile.querySelector(".flash-container").hidden = false
-                    })
-                    player.load("/submission/{{ submission.ID }}/file")
-                        .then()
-                        .catch((e) => {
-                            if (e !== undefined) console.error(e)
-                            flashFile.querySelector(`.loading`).hidden = true
-                            flashFile.querySelector(`.error`).hidden = false
-                            flashFile.querySelector(`.flash-container`).hidden = true
-                        });
-                })
-        });
+            document.querySelectorAll("#file-container .flash-container").forEach((container) => {
+                container.appendChild(window.RufflePlayer.newest().createPlayer())
+                    .load("/submission/{{ submission.ID }}/file")
+                    .then()
+                    .catch((e) => e && console.error(e));
+            })
+        }
     </script>
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 {% endif %}
