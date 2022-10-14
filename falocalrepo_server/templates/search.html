@@ -270,24 +270,21 @@
         {% for item in results %}
         {% set thumbnail_block %}
         {% if thumbnails %}
-            <div class="card-header text-center p-0">
-                <span class="spinner spinner-border spinner-border-sm" role="status"></span>
-                <span class="error fw-bold text-muted" style="font-size: .75rem" hidden>
-                    Thumbnail not found
-                </span>
-                <div class="p-1 position-relative" hidden>
+            <div class="card-header text-center p-1">
+                <div class="loader position-relative d-flex align-items-center justify-content-center"
+                     data-error="{{ "Thumbnail not found" if table != "users" }}">
                     <!--suppress RequiredAttributes -->
-                    <img class="card-img mw-100 w-auto"
+                    <img class="card-img mw-100 w-auto loaded"
                             {{ 'src=/{0}/{1}/thumbnail/'.format(table_short, item[column_id]) if view == "grid" }}
                          data-src="/{{ table_short }}/{{ item[column_id] }}/thumbnail/"
-                         onload="this.parentNode.hidden = false; this.parentNode.parentNode.querySelector('.spinner').hidden = true"
-                         onerror="const p = this.parentNode.parentNode; p.querySelector('.spinner').hidden = true; p.querySelector('.error').hidden = false"
+                         onload="this.dataset.loaded = 'true'"
+                         onerror="this.dataset.error = 'true'"
                          alt="" style="max-height: 150px">
                     {% if table == "submissions" and item.FILEEXT|length > 1 %}
                         <span class="badge bg-body text-body border position-absolute"
                               title="{{ item.FILEEXT|join(", ") }}"
                               style="top: .125rem; right: .125rem; padding: .175rem .325rem">
-                                            {{ item.FILEEXT|length }}
+                            {{ item.FILEEXT|length }}
                         </span>
                     {% endif %}
                 </div>
@@ -400,7 +397,7 @@
     {% if thumbnails %}
         let loadThumbnails = (container) => {
             if (container.hidden) return
-            container.querySelectorAll("img").forEach(img => img.src = img.dataset.src)
+            container.querySelectorAll("img[data-src]:not([data-loaded])").forEach(img => img.src = img.dataset.src)
         }
         window.onpageshow = () => loadThumbnails(document.getElementById('grid_view'))
     {% endif %}

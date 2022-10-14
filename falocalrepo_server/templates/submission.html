@@ -114,20 +114,14 @@
 </div>
 {% elif submission.FILESAVED == 1 %}
 <div class="text-center position-relative bg-body bg-opacity-75 mx-auto" id="thumbnail" style="width: fit-content">
-    <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 error" hidden>
-        <span class="badge bg-danger">Thumbnail not found</span>
+    <div class="loader" data-error="Thumbnail not found">
+        <img class="img-fluid mx-auto fit-height zoom loaded"
+             alt="" data-scroll="0"
+             src="/submission/{{ submission.ID }}/thumbnail/{{ "{0:010d}".format(submission.ID) }}-thumbnail.jpg"
+             onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
+             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
     </div>
-    <div class="mt-2 mb-2 mt-lg-5 pt-lg-5 loading">
-        <span class="spinner spinner-border spinner-border-sm" role="status"></span>
-    </div>
-    <img class="img-fluid mx-auto fit-height zoom"
-         alt="" data-scroll="0"
-         src="/submission/{{ submission.ID }}/thumbnail/{{ "{0:010d}".format(submission.ID) }}-thumbnail.jpg"
-         onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
-         onload="document.querySelector('#thumbnail .error').hidden = document.querySelector('#thumbnail .loading').hidden = true; document.getElementById('button-sticky').hidden = this.hidden = document.querySelector('#thumbnail .thumbnail-badge').hidden = false"
-         onerror="document.querySelector('#thumbnail .loading').hidden = true; document.querySelector('#thumbnail .error').hidden = false"
-         hidden>
-    <div class="btn-toolbar mt-1 justify-content-center thumbnail-badge" hidden>
+    <div class="text-center mt-1">
         <span class="badge bg-warning">Thumbnail</span>
     </div>
 </div>
@@ -136,55 +130,40 @@
 <div class="text-center position-relative bg-body bg-opacity-75 mx-auto {{ "pb-1" if submission.FILEEXT|length > 1 or ext in ["mp4", "mov", "webm", "ogg", "3gp"] }}"
      data-scroll="0" id="file-{{ loop.index0 }}" style="width: fit-content" {{ "hidden" if not loop.first }}>
     {% if ext in ["jpg", "jpeg", "png", "gif"] %}
-    <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 error" hidden>
-        <span class="badge bg-danger">Image not found</span>
+    <div class="loader" data-error="Image not found">
+        <img class="img-fluid mx-auto fit-height zoom loaded"
+             alt="" data-scroll="0"
+             src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
+             onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
+             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
     </div>
-    <div class="mt-2 mb-2 mt-lg-5 pt-lg-5 loading">
-        <span class="spinner spinner-border spinner-border-sm" role="status"></span>
-    </div>
-    <img class="img-fluid mx-auto fit-height zoom"
-         alt="" data-scroll="0"
-         src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
-         onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
-         onload="document.querySelector('#file-{{ loop.index0 }} .error').hidden = document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; this.hidden = false"
-         onerror="document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; document.querySelector('#file-{{ loop.index0 }} .error').hidden = false"
-         hidden>
     {% elif ext in ["mp4", "mov", "webm", "ogg", "3gp"] %}
-    <div class="mt-1 mb-2 mt-lg-5 pt-lg-5 error" hidden>
-        <span class="badge bg-danger">Video not found</span>
+    <div class="loader" data-error="Video not found">
+        <video class="mx-auto fit-height zoom d-block loaded"
+               style="max-width: 100%" data-scroll="0"
+               src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
+               poster="/submission/{{ submission.ID }}/thumbnail/"
+               preload="metadata"
+               onloadedmetadata="this.dataset.loaded = 'true'"
+               onerror="this.dataset.error = 'true'"
+               controls>
+            <a class="btn btn-sm btn-primary mt-2"
+               href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
+                {{ filenames[loop.index0]|title }}
+            </a>
+        </video>
     </div>
-    <div class="mt-2 mb-2 mt-lg-5 pt-lg-5 loading">
-        <span class="spinner spinner-border spinner-border-sm" role="status"></span>
-    </div>
-    <video class="mx-auto fit-height zoom d-block"
-           style="max-width: 100%" data-scroll="0"
-           src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
-           poster="/submission/{{ submission.ID }}/thumbnail/"
-           preload="metadata"
-           onloadedmetadata="document.querySelector('#file-{{ loop.index0 }} .error').hidden = document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; this.hidden = false"
-           onerror="document.querySelector('#file-{{ loop.index0 }} .loading').hidden = true; document.querySelector('#file-{{ loop.index0 }} .error').hidden = false"
-           hidden controls>
-        <a class="btn btn-sm btn-primary mt-2"
-           href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
-            {{ filenames[loop.index0]|title }}
-        </a>
-    </video>
     {% elif ext in ["swf"] %}
     <div class="fit-height mx-auto flash-container loaded"></div>
     {% elif ext in ["txt"] %}
-    <div class="border rounded text-start overflow-scroll fit-height">
-        <div class="col-12 text-center mt-2">
-            <span class="badge bg-danger error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
-            <span class="spinner spinner-border spinner-border-sm loading" role="status"
-                  style="margin-top: calc(60px - .5rem)"></span>
-            <img class="img-fluid rounded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
+    <div class="border rounded text-start overflow-scroll fit-height p-2 bg-body">
+        <div class="col-12 text-center loader mb-2" data-error="Thumbnail not found">
+            <img class="img-fluid rounded loaded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
                  style="max-height: 120px"
-                 onload="this.parentNode.querySelector('.loading').hidden = true; this.hidden = false"
-                 onerror="this.parentNode.querySelector('.loading').hidden = true; this.parentNode.querySelector('.error').hidden = false"
-                 hidden>
+                 onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
         </div>
         {% if files_text[loop.index0] %}
-        <div class="font-monospace small p-2 text-wrap">
+        <div class="font-monospace small text-wrap">
             {% autoescape false %}{{ files_text[loop.index0].strip() }}{% endautoescape %}
         </div>
         {% else %}
@@ -192,18 +171,11 @@
         {% endif %}
     </div>
     {% elif ext in ["mp3", "wav", "mid"] %}
-    <div class="col-12 text-center">
-        <span class="badge bg-danger error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
-        <span class="spinner spinner-border spinner-border-sm loading" role="status"
-              style="margin-top: calc(60px - .5rem)"></span>
-        <img class="img-fluid rounded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
-             style="max-height: 120px"
-             onload="this.parentNode.querySelector('.loading').hidden = true; this.hidden = false"
-             onerror="this.parentNode.querySelector('.loading').hidden = true; this.parentNode.querySelector('.error').hidden = false"
-             hidden>
+    <div class="col-12 text-center loader" data-error="File not found">
+        <img class="img-fluid rounded loaded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
+             style="max-height: 120px" onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
     </div>
     <div class="mt-2">
-        <span class="badge bg-danger error" hidden>File not found</span>
         <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
                onerror="this.hidden = true; this.parentNode.querySelector('.error').hidden = false"
                controls>
