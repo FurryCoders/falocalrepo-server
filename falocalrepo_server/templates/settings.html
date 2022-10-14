@@ -3,13 +3,7 @@
 <html lang="en">
 <head>
     <title>{{ title }} · {{ app }}</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="icon" href="/touch-icon.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
-    <link rel="stylesheet" href="/static/styles/style.css">
+    {% include "head.html" %}
     <style>
         .transparent {
             opacity: 0;
