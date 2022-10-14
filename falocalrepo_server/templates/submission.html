@@ -12,12 +12,22 @@
     <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
     <link rel="stylesheet" href="/static/styles/style.css">
     <style>
-        #file-container [data-scroll] {
-            transition: border-radius 250ms;
+        #file-container {
+            transition: transform 250ms;
+            transform: translateY(0);
         }
 
-        #file-container.sticky-top [data-scroll="1"] {
+        #file-container [data-sticky] {
+            transition: border-radius 250ms, box-shadow 250ms, padding 250ms;
+        }
+
+        #file-container.sticky-top {
+            transform: translateY(.25rem);
+        }
+
+        #file-container.sticky-top [data-sticky] {
             border-radius: .375rem;
+            box-shadow: 0 0 .25rem .125rem rgba(0, 0, 0, .175) !important;
         }
 
         #file-container.sticky-top ~ #button-sticky {
@@ -113,13 +123,12 @@
     <span class="badge bg-danger">Submission has no file</span>
 </div>
 {% elif submission.FILESAVED == 1 %}
-<div class="text-center position-relative bg-body bg-opacity-75 mx-auto" id="thumbnail" style="width: fit-content">
+<div class="text-center position-relative bg-body mx-auto" id="thumbnail" style="width: fit-content">
     <div class="loader" data-error="Thumbnail not found">
         <img class="img-fluid mx-auto fit-height zoom loaded"
-             alt="" data-scroll="0"
-             src="/submission/{{ submission.ID }}/thumbnail/{{ "{0:010d}".format(submission.ID) }}-thumbnail.jpg"
+             alt="" src="/submission/{{ submission.ID }}/thumbnail/{{ "{0:010d}".format(submission.ID) }}-thumbnail.jpg"
              onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
-             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
+             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'" data-sticky>
     </div>
     <div class="text-center mt-1">
         <span class="badge bg-warning">Thumbnail</span>
@@ -127,26 +136,25 @@
 </div>
 {% else %}
 {% for ext in submission.FILEEXT|map("lower") %}
-<div class="text-center position-relative bg-body bg-opacity-75 mx-auto {{ "pb-1" if submission.FILEEXT|length > 1 or ext in ["mp4", "mov", "webm", "ogg", "3gp"] }}"
-     data-scroll="0" id="file-{{ loop.index0 }}" style="width: fit-content" {{ "hidden" if not loop.first }}>
+<div class="text-center position-relative bg-body mx-auto {{ "pb-1" if submission.FILEEXT|length > 1 or ext in ["mp4", "mov", "webm", "ogg", "3gp"] }}"
+     id="file-{{ loop.index0 }}" style="width: fit-content" {{ "hidden" if not loop.first }} data-sticky>
     {% if ext in ["jpg", "jpeg", "png", "gif"] %}
     <div class="loader" data-error="Image not found">
         <img class="img-fluid mx-auto fit-height zoom loaded"
-             alt="" data-scroll="0"
-             src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
+             alt="" src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
              onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
-             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
+             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'" data-sticky>
     </div>
     {% elif ext in ["mp4", "mov", "webm", "ogg", "3gp"] %}
     <div class="loader" data-error="Video not found">
         <video class="mx-auto fit-height zoom d-block loaded"
-               style="max-width: 100%" data-scroll="0"
+               style="max-width: 100%"
                src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
                poster="/submission/{{ submission.ID }}/thumbnail/"
                preload="metadata"
                onloadedmetadata="this.dataset.loaded = 'true'"
                onerror="this.dataset.error = 'true'"
-               controls>
+               controls data-sticky>
             <a class="btn btn-sm btn-primary mt-2"
                href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
                 {{ filenames[loop.index0]|title }}
@@ -242,7 +250,7 @@
 {% endif %}
 {% endset %}
 
-<body class="mb-4" data-scroll="0">
+<body class="mb-4">
 
 {% include "navbar.html" %}
 
