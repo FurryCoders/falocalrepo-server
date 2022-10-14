@@ -243,8 +243,58 @@ img.zoom.zoomed, .zoomed img.zoom {
     cursor: zoom-out;
 }
 
-.loading, .loading * {
-    cursor: wait !important;
+div.loader {
+    min-height: 1.25rem;
+}
+
+div.loader .loaded:not([data-loaded]) {
+    display: none;
+}
+
+div.loader:has(.loaded:not([data-loaded]):not([data-error]))::after {
+    --bs-spinner-width: 1rem;
+    --bs-spinner-height: 1rem;
+    --bs-spinner-border-width: 0.2em;
+    --bs-spinner-vertical-align: -0.125em;
+    --bs-spinner-animation-speed: 0.75s;
+    --bs-spinner-animation-name: spinner-border;
+    content: "";
+    display: inline-block;
+    width: var(--bs-spinner-width);
+    height: var(--bs-spinner-height);
+    vertical-align: var(--bs-spinner-vertical-align);
+    border-radius: 50%;
+    -webkit-animation: var(--bs-spinner-animation-speed) linear infinite var(--bs-spinner-animation-name);
+    animation: var(--bs-spinner-animation-speed) linear infinite var(--bs-spinner-animation-name);
+    border: var(--bs-spinner-border-width) solid currentcolor;
+    border-right-color: transparent;
+}
+
+div.loader[data-error]:has(.loaded[data-error])::after {
+    content: attr(data-error) !important;
+}
+
+div.loader:not([data-error=""]):has(.loaded[data-error])::after {
+    --bs-badge-padding-x: 0.65em;
+    --bs-badge-padding-y: 0.35em;
+    --bs-badge-font-size: 0.75em;
+    --bs-badge-font-weight: 700;
+    --bs-badge-color: #fff;
+    --bs-badge-border-radius: 0.375rem;
+    --bs-bg-opacity: 1;
+    content: "Error";
+    display: inline-block;
+    padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+    font-size: var(--bs-badge-font-size);
+    font-weight: var(--bs-badge-font-weight);
+    line-height: 1;
+    color: var(--bs-badge-color);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--bs-badge-border-radius);
+    background-color: rgba(var(--bs-danger-rgb), var(--bs-bg-opacity)) !important;
+    user-select: none;
 }
 
 .loading button, .loading select, .loading input {
