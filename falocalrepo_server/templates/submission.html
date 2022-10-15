@@ -8,7 +8,6 @@
         #file-container {
             position: -webkit-sticky;
             position: sticky;
-            top: -100%;
             transition: top 250ms;
         }
 
@@ -258,7 +257,7 @@
 {% include "navbar.html" %}
 
 <div class="container mt-3 mt-lg-4">
-    <div class="row align-middle">
+    <div class="row align-middle position-relative">
         <div class="col-12 col-lg-8" style="z-index: 1 !important" id="file-container">{{ file }}</div>
 
         <div class="col-12 col-lg-4 mt-3 mt-lg-0 mx-auto" id="metadata">
