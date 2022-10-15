@@ -6,9 +6,8 @@
     {% include "head.html" %}
     <style>
         #file-container {
-            position: -webkit-sticky;
-            position: sticky;
-            transition: top 250ms;
+            transform: translateY(0);
+            transition: transform 250ms;
         }
 
         #file-container [data-sticky] {
@@ -20,7 +19,7 @@
         }
 
         #file-container.sticky-top {
-            top: .25rem !important;
+            transform: translateY(.25rem);
         }
 
         #file-container.sticky-top [data-sticky] {
@@ -124,12 +123,12 @@
     <span class="badge bg-danger">Submission has no file</span>
 </div>
 {% elif submission.FILESAVED == 1 %}
-<div class="text-center position-relative bg-body mx-auto" id="thumbnail" style="width: fit-content">
+<div class="text-center position-relative bg-body mx-auto w-100" id="thumbnail" style="width: fit-content" data-sticky data-sticky-shadow>
     <div class="loader" data-error="Thumbnail not found">
         <img class="img-fluid mx-auto fit-height zoom loaded"
              alt="" src="/submission/{{ submission.ID }}/thumbnail/{{ "{0:010d}".format(submission.ID) }}-thumbnail.jpg"
              onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
-             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'" data-sticky>
+             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
     </div>
     <div class="text-center mt-1">
         <span class="badge bg-warning">Thumbnail</span>
@@ -145,7 +144,7 @@
         <img class="img-fluid mx-auto fit-height zoom loaded"
              alt="" src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
              onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
-             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'" data-sticky>
+             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
     </div>
     {% elif ext in ["mp4", "mov", "webm", "ogg", "3gp"] %}
     <div class="loader" data-error="Video not found">
@@ -156,7 +155,7 @@
                preload="metadata"
                onloadedmetadata="this.dataset.loaded = 'true'"
                onerror="this.dataset.error = 'true'"
-               controls data-sticky>
+               controls>
             <a class="btn btn-sm btn-primary mt-2"
                href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
                 {{ filenames[loop.index0]|title }}
