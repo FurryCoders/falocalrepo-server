@@ -10,7 +10,7 @@
             transition: transform 250ms;
         }
 
-        #file-container [data-sticky-rounde] {
+        #file-container [data-sticky-round] {
             transition: border-radius 250ms;
         }
 
@@ -145,7 +145,7 @@
         <img class="img-fluid mx-auto fit-height zoom loaded"
              alt="" src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
              onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}"
-             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
+             onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'" data-sticky-round>
     </div>
     {% elif ext in ["mp4", "mov", "webm", "ogg", "3gp"] %}
     <div class="loader" data-error="Video not found">
@@ -156,7 +156,7 @@
                preload="metadata"
                onloadedmetadata="this.dataset.loaded = 'true'"
                onerror="this.dataset.error = 'true'"
-               controls>
+               controls data-sticky-round>
             <a class="btn btn-sm btn-primary mt-2"
                href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
                 {{ filenames[loop.index0]|title }}
@@ -208,7 +208,7 @@
     </a>
     {% endif %}
     {% if submission.FILEEXT|length > 1 %}
-        <div class="btn-toolbar mt-1 justify-content-center" style="height: 1.5rem">
+        <div class="btn-toolbar mt-1 justify-content-center file-switcher" style="height: 1.5rem">
             <div class="btn-group btn-separator bg-body">
                 <button class="btn btn-xs btn-primary file-switcher-prev"
                         onclick="switchFile(document.getElementById('file-{{ loop.index0 }}'), document.getElementById('file-{{ loop.index0|int - 1 }}'))"
