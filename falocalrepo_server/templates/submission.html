@@ -10,7 +10,7 @@
             transition: transform 250ms;
         }
 
-        #file-container [data-sticky] {
+        #file-container [data-sticky-rounde] {
             transition: border-radius 250ms;
         }
 
@@ -22,7 +22,7 @@
             transform: translateY(.25rem);
         }
 
-        #file-container.sticky-top [data-sticky] {
+        #file-container.sticky-top [data-sticky-round] {
             border-radius: .375rem;
         }
 
@@ -123,7 +123,8 @@
     <span class="badge bg-danger">Submission has no file</span>
 </div>
 {% elif submission.FILESAVED == 1 %}
-<div class="text-center position-relative bg-body mx-auto w-100" id="thumbnail" style="width: fit-content" data-sticky data-sticky-shadow>
+<div class="text-center position-relative bg-body mx-auto w-100" id="thumbnail" style="width: fit-content"
+     data-sticky-round data-sticky-shadow>
     <div class="loader" data-error="Thumbnail not found">
         <img class="img-fluid mx-auto fit-height zoom loaded"
              alt="" src="/submission/{{ submission.ID }}/thumbnail/{{ "{0:010d}".format(submission.ID) }}-thumbnail.jpg"
@@ -138,7 +139,7 @@
 {% for ext in submission.FILEEXT|map("lower") %}
 <div class="text-center position-relative bg-body mx-auto w-100 {{ "pb-1" if submission.FILEEXT|length > 1 or ext in ["mp4", "mov", "webm", "ogg", "3gp"] }}"
      id="file-{{ loop.index0 }}" style="width: fit-content" {{ "hidden" if not loop.first }}
-     data-sticky data-sticky-shadow>
+     data-sticky-round data-sticky-shadow>
     {% if ext in ["jpg", "jpeg", "png", "gif"] %}
     <div class="loader" data-error="Image not found">
         <img class="img-fluid mx-auto fit-height zoom loaded"
