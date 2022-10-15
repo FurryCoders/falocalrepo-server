@@ -6,16 +6,22 @@
     {% include "head.html" %}
     <style>
         #file-container {
-            transition: transform 250ms;
-            transform: translateY(0);
+            position: -webkit-sticky;
+            position: sticky;
+            top: -100%;
+            transition: top 250ms;
         }
 
         #file-container [data-sticky] {
-            transition: border-radius 250ms, box-shadow 250ms, padding 250ms;
+            transition: border-radius 250ms;
+        }
+
+        #file-container [data-sticky-shadow] {
+            transition: box-shadow 250ms;
         }
 
         #file-container.sticky-top {
-            transform: translateY(.25rem);
+            top: .25rem !important;
         }
 
         #file-container.sticky-top [data-sticky] {
