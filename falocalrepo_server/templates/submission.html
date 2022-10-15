@@ -211,7 +211,8 @@
     {% if submission.FILEEXT|length > 1 %}
         <div class="btn-toolbar mt-1 justify-content-center" style="height: 1.5rem">
             <div class="btn-group btn-separator bg-body">
-                <button class="btn btn-xs btn-primary file-switcher-prev" onclick="prevSubmission({{ loop.index0 }})" {{ "disabled" if loop.first }}>
+                <button class="btn btn-xs btn-primary file-switcher-prev"
+                        onclick="prevSubmission({{ loop.index0 }})" {{ "disabled" if loop.first }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          class="bi bi-caret-left-fill" viewBox="0 0 16 16">
                         <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"></path>
@@ -220,7 +221,8 @@
                 <button class="btn btn-xs btn-primary" style="width: 4rem" disabled>
                     <span class="file-switcher-count">{{ loop.index }}</span>/{{ submission.FILEEXT|length }}
                 </button>
-                <button class="btn btn-xs btn-primary file-switcher-next" onclick="nextSubmission({{ loop.index0 }})" {{ "disabled" if loop.last }}>
+                <button class="btn btn-xs btn-primary file-switcher-next"
+                        onclick="nextSubmission({{ loop.index0 }})" {{ "disabled" if loop.last }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          class="bi bi-caret-right-fill" viewBox="0 0 16 16">
                         <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"></path>
