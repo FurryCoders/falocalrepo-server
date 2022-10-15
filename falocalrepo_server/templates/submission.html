@@ -188,14 +188,10 @@
     </div>
     {% else %}
     <div class="col-12 text-center">
-        <span class="badge bg-danger error" style="margin-top: calc(60px - .5rem)" hidden>Thumbnail not found</span>
-        <span class="spinner spinner-border spinner-border-sm loading" role="status"
-              style="margin-top: calc(60px - .5rem)"></span>
-        <img class="img-fluid rounded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
-             style="max-height: 120px"
-             onload="this.parentNode.querySelector('.loading').hidden = true; this.hidden = false"
-             onerror="this.parentNode.querySelector('.loading').hidden = true; this.parentNode.querySelector('.error').hidden = false"
-             hidden>
+        <div class="loader" data-error="Thumbnail not found">
+            <img class="img-fluid rounded loaded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
+                 style="max-height: 120px" onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
+        </div>
     </div>
     <a class="btn btn-sm btn-primary mt-2"
        href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
