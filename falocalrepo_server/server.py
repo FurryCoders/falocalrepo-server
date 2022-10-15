@@ -189,7 +189,7 @@ def bbcode_to_html(bbcode: str) -> str:
                     child_new_img: Tag = Tag(
                         name="img",
                         attrs={"alt": user, "title": user,
-                               "src": f"//a.furaffinity.net/{datetime.now():%Y%m%d}/{clean_username(user)}.gif"})
+                               "src": f"/user/{clean_username(user)}/icon"})
                     child_new.insert(0, child_new_img)
                     if m_[2]:
                         child_new.insert(1, f"\xA0{m_[2]}")
@@ -243,14 +243,14 @@ def bbcode_to_html(bbcode: str) -> str:
     parser.add_simple_formatter(
         "iconusername",
         f'<a class=iconusername href="/user/%(value)s">'
-        f'<img alt="%(value)s" title="%(value)s" src="//a.furaffinity.net/{datetime.now():%Y%m%d}/%(value)s.gif">'
+        f'<img alt="%(value)s" title="%(value)s" src="/user/%(value)s/icon">'
         f'%(value)s'
         f'</a>'
     )
     parser.add_simple_formatter(
         "usernameicon",
         f'<a class=iconusername href="/user/%(value)s">'
-        f'<img alt="%(value)s" title="%(value)s" src="//a.furaffinity.net/{datetime.now():%Y%m%d}/%(value)s.gif">'
+        f'<img alt="%(value)s" title="%(value)s" src="/user/%(value)s/icon">'
         f'</a>'
     )
     parser.add_simple_formatter("linkusername", '<a class=linkusername href="/user/%(value)s">%(value)s</a>')
@@ -534,7 +534,7 @@ async def serve_user(request: Request, username: str):
         "journals_length": user_stats["journals"],
         "userpage": prepare_html(user_entry.get("USERPAGE", ""), settings.database.use_bbcode()),
         "userpage_bbcode": user_entry.get("USERPAGE", None) if settings.database.use_bbcode() else None,
-        "icon": f"//a.furaffinity.net/{datetime.now():%Y%m%d}/{clean_username(username)}.gif",
+        "icon": f"/user/{username}/icon",
         "in_database": bool(user_entry),
         "prev": p,
         "next": n,
