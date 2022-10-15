@@ -272,6 +272,7 @@ def clean_html(html: str) -> str:
     for icon in html_parsed.select("a.iconusername > img"):
         icon.attrs["hidden"] = "true"
         icon.attrs["onload"] = "this.hidden = false"
+        icon.attrs["src"] = f"/user/{clean_username(icon.attrs['title'])}/icon/"
     for link in html_parsed.select("a[href*='furaffinity.net']"):
         link["href"] = "/" + fa_link.sub("", link.attrs["href"]).strip("/")
     return str(html_parsed)
