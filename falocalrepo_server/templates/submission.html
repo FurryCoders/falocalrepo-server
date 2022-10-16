@@ -512,15 +512,6 @@
     </script>
 {% endif %}
 
-<script>
-    window.onscroll = () => {
-        document
-            .querySelectorAll("[data-scroll]")
-            .forEach((elem) =>
-                elem.dataset.scroll = String(elem.getBoundingClientRect().top <= 1 ? 1 : 0))
-    }
-</script>
-
 {% if "swf" in submission.FILEEXT|map("lower")|list %}
     <!--suppress JSUnresolvedFunction, JSUnusedLocalSymbols, JSUnresolvedVariable -->
     <script>
