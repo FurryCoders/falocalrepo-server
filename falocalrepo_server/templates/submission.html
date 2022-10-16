@@ -6,8 +6,8 @@
     {% include "head.html" %}
     <style>
         #file-container {
-            transform: translateY(0);
-            transition: transform 250ms;
+            top: 0;
+            transition: top 250ms;
         }
 
         #file-container .file-container {
@@ -16,7 +16,7 @@
         }
 
         #file-container.sticky-top {
-            transform: translateY(.25rem);
+            top: .25rem !important;
         }
 
         #file-container.sticky-top .file-container {
