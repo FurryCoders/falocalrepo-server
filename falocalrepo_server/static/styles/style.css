@@ -34,6 +34,10 @@
     }
 }
 
+body {
+    touch-action: pan-x pan-y pinch-zoom;
+}
+
 body.light-mode {
     --background-color: white !important;
     --bs-body-bg: var(--background-color) !important;
