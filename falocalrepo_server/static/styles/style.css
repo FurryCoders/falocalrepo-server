@@ -212,7 +212,7 @@ hr {
 
 @media (min-width: 992px) {
     .fit-height {
-        max-height: 90vh;
+        max-height: calc(90vh - 27px - 2rem);
     }
 }
 
