@@ -278,7 +278,7 @@ div.loader[data-error]:has(.loaded[data-error]:not([data-loaded]))::after {
     content: attr(data-error) !important;
 }
 
-div.loader:has(.loaded[data-error]:not([data-loaded]))::after {
+div.loader:not([data-error=""]):has(.loaded[data-error]:not([data-loaded]))::after {
     --bs-badge-padding-x: 0.65em;
     --bs-badge-padding-y: 0.35em;
     --bs-badge-font-size: 0.75em;
