@@ -10,18 +10,69 @@
             transition: top 250ms;
         }
 
-        #file-container .file-container {
-            overflow: hidden;
-            transition: border-radius 250ms, box-shadow 250ms;
-        }
-
         #file-container.sticky-top {
             top: .25rem !important;
         }
 
+        #file-container .file-container {
+            overflow: hidden;
+        }
+
+        #file-container.grid #file-container-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: .5rem;
+            padding: .5rem .5rem;
+            max-height: 67vh;
+            overflow: scroll;
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: .365rem;
+        }
+
+        #file-container.grid .file-container,
         #file-container.sticky-top .file-container {
+            transition: border-radius 250ms, box-shadow 250ms;
+        }
+
+        #file-container.sticky-top.grid #file-container-inner,
+        #file-container:not(.grid).sticky-top .file-container {
             border-radius: .375rem;
-            box-shadow: 0 0 .25rem .125rem rgba(var(--color-primary-rgb), .175) !important;
+            box-shadow: 0 0 .25rem .125rem rgba(var(--color-primary-rgb), .175);
+        }
+
+        @media (pointer: fine) {
+            #file-container.grid .file-container:hover {
+                border-radius: .375rem;
+                box-shadow: 0 0 .25rem .125rem rgba(var(--color-primary-rgb), .175) !important;
+            }
+        }
+
+        #file-container.grid .file-container:has(.loaded[data-error]) {
+            padding-bottom: .25rem;
+        }
+
+        #file-container.grid .file-container:not([hidden]) {
+            border-radius: .375rem;
+            box-shadow: 0 0 0 .125rem rgba(var(--bs-primary-rgb), .75) !important;
+        }
+
+        #file-container.grid .file-container .zoom {
+            pointer-events: none !important;
+            cursor: inherit !important;
+        }
+
+        #file-container.grid .file-container .file-switcher {
+            display: none !important;
+        }
+
+        #file-container.grid .fit-height {
+            max-height: 200px !important;
+        }
+
+        #file-container.grid .file-container {
+            display: inline-block !important;
+            cursor: pointer;
         }
 
         #file-container.sticky-top ~ #button-sticky {
@@ -76,7 +127,18 @@
             color: var(--bs-btn-active-color) !important;
         }
 
+        @media (pointer: fine) {
+            body:has(#file-container.grid:hover) {
+                overflow: hidden !important;
+            }
+        }
+
         @media (min-width: 992px) {
+            #file-container.grid #file-container-inner {
+                grid-template-columns: 1fr 1fr 1fr;
+                max-height: calc(90vh - 27px - 2rem);
+            }
+
             #file-container.zoomed {
                 width: 100%;
                 margin-bottom: 1rem;
@@ -130,8 +192,9 @@
 </div>
 {% else %}
 {% for ext in submission.FILEEXT|map("lower") %}
-<div class="text-center position-relative bg-body mx-auto w-100 file-container {{ "pb-1" if submission.FILEEXT|length > 1 or ext in ["mp4", "mov", "webm", "ogg", "3gp"] }}"
-     id="file-{{ loop.index0 }}" {{ "hidden" if not loop.first }}>
+<div class="text-center position-relative bg-body mx-auto w-100 file-container" id="file-{{ loop.index0 }}"
+     onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('grid')) {fc.classList.remove('grid'); switchFile(this)}"
+        {{ "hidden" if not loop.first }}>
     {% if ext in ["jpg", "jpeg", "png", "gif"] %}
     <div class="loader overflow-hidden" data-error="Image not found">
         <img class="img-fluid mx-auto fit-height zoom loaded border-primary"
@@ -191,7 +254,8 @@
     <div class="col-12 text-center">
         <div class="loader" data-error="Thumbnail not found">
             <img class="img-fluid rounded loaded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
-                 style="max-height: 120px" onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
+                 loading="{{ "eager" if loop.first else "lazy" }}" style="max-height: 120px"
+                 onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
         </div>
     </div>
     <a class="btn btn-sm btn-primary mt-2"
@@ -200,10 +264,10 @@
     </a>
     {% endif %}
     {% if submission.FILEEXT|length > 1 %}
-        <div class="btn-toolbar mt-1 justify-content-center file-switcher" style="height: 1.5rem">
+        <div class="btn-toolbar mt-1 justify-content-center file-switcher mb-1" style="height: 1.5rem;">
             <div class="btn-group btn-separator bg-body">
                 <button class="btn btn-xs btn-primary file-switcher-prev"
-                        onclick="switchFile(document.getElementById('file-{{ loop.index0 }}'), document.getElementById('file-{{ loop.index0|int - 1 }}'))"
+                        onclick="switchFile(document.getElementById('file-{{ loop.index0|int - 1 }}'))"
                         {{ "disabled" if loop.first }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          class="bi bi-caret-left-fill" viewBox="0 0 16 16">
@@ -213,8 +277,15 @@
                 <button class="btn btn-xs btn-primary" style="width: 4rem" disabled>
                     <span class="file-switcher-count">{{ loop.index }}</span>/{{ submission.FILEEXT|length }}
                 </button>
+                <button class="btn btn-xs btn-primary"
+                        onclick="arguments[0].stopPropagation(); document.getElementById('file-container').classList.add('grid')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         viewBox="0 0 16 16">
+                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"></path>
+                    </svg>
+                </button>
                 <button class="btn btn-xs btn-primary file-switcher-next"
-                        onclick="switchFile(document.getElementById('file-{{ loop.index0 }}'), document.getElementById('file-{{ loop.index0|int + 1 }}'))"
+                        onclick="switchFile(document.getElementById('file-{{ loop.index0|int + 1 }}'))"
                         {{ "disabled" if loop.last }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          class="bi bi-caret-right-fill" viewBox="0 0 16 16">
@@ -231,7 +302,7 @@
             {% endif %}
         </div>
     {% elif ext in ["mp4", "mov", "webm", "ogg", "3gp"] %}
-        <div class="btn-toolbar mt-1 justify-content-center" style="height: 1.5rem">
+        <div class="btn-toolbar mt-1 justify-content-center mb-1" style="height: 1.5rem">
             <button class="btn btn-xs btn-primary"
                     style="max-height: 1.5rem"
                     onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}">
@@ -250,7 +321,9 @@
 
 <div class="container mt-3 mt-lg-4">
     <div class="row align-middle position-relative">
-        <div class="col-12 col-lg-8" style="z-index: 1 !important" id="file-container">{{ file }}</div>
+        <div class="col-12 col-lg-8" style="z-index: 1 !important" id="file-container">
+            <div id="file-container-inner">{{ file }}</div>
+        </div>
 
         <div class="col-12 col-lg-4 mt-3 mt-lg-0 mx-auto" id="metadata">
             <div class="card">
@@ -498,15 +571,13 @@
 
 {% if submission.FILEEXT|length > 1 %}
     <script>
-        const switchFile = (current, next) => {
-            if (current) {
-                current.hidden = true
-                current.querySelector("video")?.pause()
-                current.querySelector("ruffle-player")?.pause()
-            }
-            if (next) {
-                next.hidden = false
-            }
+        const switchFile = (next) => {
+            document.querySelectorAll(`#file-container .file-container:not(#${next.id})`).forEach(fc => {
+                fc.hidden = true
+                fc.querySelector("video")?.pause()
+                fc.querySelector("ruffle-player")?.pause()
+            })
+            next.hidden = false
         }
     </script>
 {% endif %}
