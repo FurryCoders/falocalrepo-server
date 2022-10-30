@@ -266,7 +266,7 @@
         {% if thumbnails %}
             <div class="card-header text-center p-1">
                 <div class="loader position-relative d-flex align-items-center justify-content-center"
-                     data-error="{{ "Thumbnail not found" if table != "users" }}" style="min-height: {{ 150 if table == "submissions" else 100 }}px;">
+                     data-error="{{ "No thumbnail" if table != "users" }}" style="min-height: {{ 150 if table == "submissions" else 100 }}px;">
                     <!--suppress RequiredAttributes -->
                     <img class="card-img mw-100 w-auto loaded"
                             {{ 'src=/{0}/{1}/thumbnail/'.format(table_short, item[column_id]) if view == "grid" }}
