@@ -1,5 +1,38 @@
 # Changelog
 
+## v3.3.2
+
+### New Features
+
+* Grid view for submissions with multiple files 📱
+    * New button added to the file switcher that toggles a grid view showing all the files for a submission, regardless
+      of type
+    * Flash files are not minimized because of the way they are drawn, making it impossible to have the size change
+      responsively, a "SWF" tag is shown in their place instead
+
+### Changes
+
+* Add subtle animations and shadow effects to sticky files
+* Improve loading animations and "not found" badges
+* Update theme-color to match dark/light mode
+    * Support dynamic toolbar tinting on browsers that support it
+* Disable double-tap to zoom on mobile devices
+    * Avoids issues with buttons on some browsers causing unintentional zoom
+    * Pinch to zoom is still available
+* Reduce height of non-expanded submission files on desktop
+* Improve caching behaviour by storing reverse order in advance
+
+### Fixes
+
+* Fix user icons not showing up properly in submissions, journals, and user profiles
+* Fix ruffle errors not showing up
+    * Ruffle does not elevate its errors to the client so they cannot be caught and displayed in the like other errors
+* Fix "Thumbnail not found" error badges overflowing
+
+### Dependencies
+
+* Use [fastapi ^0.85.1](https://pypi.org/project/fastapi/0.85.1)
+
 ## v3.3.1
 
 ### Fixes
