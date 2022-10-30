@@ -227,7 +227,7 @@
     <div class="grid-show">{{ ext|upper }}</div>
     <div class="fit-height mx-auto flash-container loaded grid-hide"></div>
     {% elif ext in ["txt"] %}
-    <div class="border rounded text-start overflow-scroll fit-height p-2 bg-body">
+    <div class="border rounded text-start overflow-scroll fit-height p-2 bg-body scroll-capture">
         <div class="col-12 text-center loader mb-2" data-error="Thumbnail not found">
             <img class="img-fluid rounded loaded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
                  style="max-height: 120px"

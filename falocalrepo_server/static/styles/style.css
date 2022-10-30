@@ -226,6 +226,10 @@ hr {
     cursor: pointer;
 }
 
+body:has(.scroll-capture:hover) {
+    overflow: hidden !important;
+}
+
 .text-body {
     color: var(--color-primary) !important;
 }
