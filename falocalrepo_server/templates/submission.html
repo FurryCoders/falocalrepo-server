@@ -246,16 +246,15 @@
         <img class="img-fluid rounded loaded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
              style="max-height: 120px" onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
     </div>
-    <div class="mt-2">
-        <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
-               onerror="this.hidden = true; this.parentNode.querySelector('.error').hidden = false"
-               controls>
-            <a class="btn btn-sm btn-primary mt-2"
-               href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
-                {{ filenames[loop.index0]|title }}
-            </a>
-        </audio>
-    </div>
+    <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}"
+           class="mt-2 mw-100"
+           onerror="this.hidden = true; this.parentNode.querySelector('.error').hidden = false"
+           controls>
+        <a class="btn btn-sm btn-primary mt-2"
+           href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ filenames_id[loop.index0] }}">
+            {{ filenames[loop.index0]|title }}
+        </a>
+    </audio>
     {% else %}
     <div class="col-12 text-center">
         <div class="loader" data-error="Thumbnail not found">
