@@ -8,3 +8,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
 <link rel="stylesheet" href="/static/styles/style.css">
+<!-- Disable double click behaviour on touchscreen devices -->
+<script>
+    if (window.matchMedia("(pointer: coarse)").matches) document.ondblclick = e => e.preventDefault()
+</script>
