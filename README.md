@@ -353,7 +353,7 @@ display a link to open them. Clicking on image files will enlarge them to fill t
 viewing. Video files can be enlarged by using the zoom button under them.
 
 When a submission has two or more files, a toolbar appears below the file section with buttons to switch between the
-different files.
+different files, show the files in a grid view, and enlarge non-image files (text, video, etc.).
 
 <div align="center">
 <img alt="" src="https://raw.githubusercontent.com/FurryCoders/falocalrepo-server/master/doc/buttons-file-switcher.png" width="200">
