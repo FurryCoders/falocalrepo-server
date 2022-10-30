@@ -66,6 +66,11 @@
             display: none !important;
         }
 
+        #file-container.grid .grid-hide,
+        #file-container:not(.grid) .grid-show {
+            display: none;
+        }
+
         #file-container.grid .fit-height {
             max-height: 200px !important;
         }
@@ -219,7 +224,8 @@
         </video>
     </div>
     {% elif ext in ["swf"] %}
-    <div class="fit-height mx-auto flash-container loaded"></div>
+    <div class="grid-show">{{ ext|upper }}</div>
+    <div class="fit-height mx-auto flash-container loaded grid-hide"></div>
     {% elif ext in ["txt"] %}
     <div class="border rounded text-start overflow-scroll fit-height p-2 bg-body">
         <div class="col-12 text-center loader mb-2" data-error="Thumbnail not found">
