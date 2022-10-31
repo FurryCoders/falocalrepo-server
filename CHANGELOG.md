@@ -31,6 +31,7 @@
 
 ### Dependencies
 
+* Use [bootstrap 5.2.2](https://blog.getbootstrap.com/2022/10/03/bootstrap-5-2-2/)
 * Use [fastapi ^0.85.1](https://pypi.org/project/fastapi/0.85.1)
 
 ## v3.3.1
