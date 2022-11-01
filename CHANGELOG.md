@@ -17,7 +17,7 @@
 * Update theme-color to match dark/light mode
     * Support dynamic toolbar tinting on browsers that support it
 * Disable double-tap to zoom on mobile devices
-    * Avoids issues with buttons on some browsers causing unintentional zoom
+    * Avoid issues with buttons on some browsers causing unintentional zoom
     * Pinch to zoom is still available
 * Reduce height of non-expanded submission files on desktop
 * Improve caching behaviour by storing reverse order in advance
