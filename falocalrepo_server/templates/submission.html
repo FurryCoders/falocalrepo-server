@@ -259,8 +259,7 @@
     <div class="col-12 text-center">
         <div class="loader" data-error="Thumbnail not found">
             <img class="img-fluid rounded loaded" src="/submission/{{ submission.ID }}/thumbnail/" alt=""
-                 loading="{{ "eager" if loop.first else "lazy" }}" style="max-height: 120px"
-                 onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
+                 style="max-height: 120px" onload="this.dataset.loaded = 'true'" onerror="this.dataset.error = 'true'">
         </div>
     </div>
     <a class="btn btn-sm btn-primary mt-2"
