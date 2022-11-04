@@ -297,7 +297,7 @@
                     </svg>
                 </button>
             </div>
-            {% if ext not in ["jpg", "jpeg", "png", "gif"] %}
+            {% if ext in ["mp4", "mov", "webm", "ogg", "3gp"] %}
                 <button class="btn btn-xs btn-primary ms-1"
                         style="max-height: 1.5rem"
                         onclick="const fc = document.getElementById('file-container'); if (fc.classList.contains('zoomed')) {fc.classList.remove('zoomed')} else {fc.classList.add('zoomed')}">
