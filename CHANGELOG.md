@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.3.3
+
+### Fixes
+
+* Fix thumbnails for non-media files being stuck in infinite loading when more than one file was present
+* Fix zoom button showing up for non-visual files when more than one file was present
+
 ## v3.3.2
 
 ### New Features
