@@ -7,6 +7,13 @@
 * Fix thumbnails for non-media files being stuck in infinite loading when more than one file was present
 * Fix zoom button showing up for non-visual files when more than one file was present
 
+### Dependencies
+
+* Use [falocalrepo-database ~5.4.3](https://pypi.org/project/falocalrepo-database/5.4.3)
+* Use [fastapi ^0.87.0](https://pypi.org/project/fastapi/0.87.0)
+* Use [uvicorn ^0.19.0](https://pypi.org/project/uvicorn/0.19.0)
+* Use [Pillow ^9.3.0](https://pypi.org/project/pillow/9.3.0)
+
 ## v3.3.2
 
 ### New Features
