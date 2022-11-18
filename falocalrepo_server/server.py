@@ -328,7 +328,7 @@ async def auth_middleware(request: Request, call_next: Callable[[Request], Corou
 
 
 @app.on_event("startup")
-def log_settings():
+def app_startup():
     logger.info(f"Version: {__version__}")
     logger.info(f"Using database: {settings.database.path} ({settings.database.version})" +
                 (" (BBCode)" if settings.database.use_bbcode() else ""))
