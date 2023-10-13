@@ -22,15 +22,15 @@ from falocalrepo_database.tables import UsersColumns
 from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
-from falocalrepo_database.util import compare_version
+from falocalrepo_database.util import compare_version, clean_username as _clean_username
 
 default_sort: dict[str, str] = {submissions_table: "date", journals_table: "date", users_table: "username"}
 default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
 
 
 @cache
-def clean_username(username: str, exclude: str = "") -> str:
-    return sub(rf"[^a-zA-Z\d\-.~{exclude}]", "", username.lower().strip())
+def clean_username(username: str) -> str:
+    return _clean_username(username)
 
 
 def format_value(value: str, *, like: bool = False) -> str:
