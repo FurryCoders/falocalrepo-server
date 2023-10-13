@@ -485,6 +485,7 @@ async def serve_home(request: Request):
 @app.get("/settings/")
 async def serve_settings(request: Request):
     return HTMLResponse(minify(templates.get_template("settings.html").render({
+        "version": __version__,
         "app": app_title,
         "title": "Search Settings",
         "tables": [users_table, submissions_table, journals_table],
@@ -523,6 +524,7 @@ async def serve_user(request: Request, username: str):
     p, n = settings.database.load_prev_next(users_table, username) if user_entry else (0, 0)
 
     return HTMLResponse(minify(templates.get_template("user.html").render({
+        "version": __version__,
         "app": app_title,
         "title": username,
         "user": username,
@@ -586,6 +588,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
         page = ceil(len(results) / limit) or 1
 
     return HTMLResponse(minify(templates.get_template("search.html").render({
+        "version": __version__,
         "app": app_title,
         "title": title or f"Search {table.title()}",
         "action": request.url.path,
@@ -619,6 +622,7 @@ async def serve_submission(request: Request, id_: int):
         fs, _ = settings.database.load_submission_files(id_)
     p, n = settings.database.load_prev_next(submissions_table, id_)
     return HTMLResponse(minify(templates.get_template("submission.html").render({
+        "version": __version__,
         "app": app_title,
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
         "submission": sub | {
@@ -729,6 +733,7 @@ async def serve_journal(request: Request, id_: int):
 
     p, n = settings.database.load_prev_next(journals_table, id_)
     return HTMLResponse(minify(templates.get_template("journal.html").render({
+        "version": __version__,
         "app": app_title,
         "title": f"{jrnl['TITLE']} by {jrnl['AUTHOR']}",
         "journal": jrnl | {
