@@ -26,7 +26,7 @@ from PIL import Image
 from PIL import UnidentifiedImageError
 from bbcode import Parser as BBCodeParser
 from bs4 import BeautifulSoup
-from bs4 import NavigableString
+from bs4.element import NavigableString
 from bs4.element import Tag
 from chardet import detect as detect_encoding
 from falocalrepo_database.tables import JournalsColumns
