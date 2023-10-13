@@ -1,5 +1,23 @@
 # Changelog
 
+## v3.3.4
+
+### Dependencies
+
+* [falocalrepo-database ~5.4.5](https://pypi.org/project/falocalrepo-database/5.4.5/)
+* [chardet ^5.2.0](https://pypi.org/project/chardet/5.2.0/)
+* [pillow ^10.0.1](https://pypi.org/project/pillow/10.0.1/)
+  * Fix [CVE-2023-4863](https://cve.report/CVE-2023-4863)
+* [fastapi ^0.103.2](https://pypi.org/project/fastapi/0.103.2/)
+  * Fix [CVE-2023-29159](https://cve.report/CVE-2023-29159)
+  * Fix [CVE-2023-30798](https://cve.report/CVE-2023-30798)
+  * Fix [GHSA-74m5-2c7w-9w3x](https://github.com/advisories/GHSA-74m5-2c7w-9w3x)
+* [uvicorn ^0.23.2](https://pypi.org/project/uvicorn/0.23.2/)
+* [click ^8.1.7](https://pypi.org/project/click/8.1.7/)
+* [click-help-colors ^0.9.2](https://pypi.org/project/click-help-colors/0.9.2/)
+* [beautifulsoup4 ^4.12.2](https://pypi.org/project/beautifulsoup4/4.12.2/)
+* [lxml ^4.9.3](https://pypi.org/project/lxml/4.9.3/)
+
 ## v3.3.3
 
 ### Fixes
