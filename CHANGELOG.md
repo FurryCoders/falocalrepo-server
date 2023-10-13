@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.3.5
+
+### Fixes
+
+* Fix square brackets [] being removed from usernames 
+
 ## v3.3.4
 
 ### Fixes
