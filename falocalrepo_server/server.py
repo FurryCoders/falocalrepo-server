@@ -107,10 +107,11 @@ logger: Logger = getLogger("uvicorn")
 LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
     '%(levelprefix)s %(asctime)s %(client_addr)s - %(request_line)s %(status_code)s %(msecs).0fms'
 
+app_title: str = "FurAffinity Local Repo"
 fa_base_url: str = "https://www.furaffinity.net"
 fa_link: Pattern = re_compile(r"(https?://)?(www.)?furaffinity.net", flags=IGNORECASE)
 root: Path = Path(__file__).resolve().parent
-app: FastAPI = FastAPI(title="FurAffinity Local Repo", openapi_url=None)
+app: FastAPI = FastAPI(title=app_title, openapi_url=None)
 templates: Jinja2Templates = Jinja2Templates(str(root / "templates"))
 settings: Settings = Settings(static_folder=root / "static")
 search_settings: SearchSettings = SearchSettings()
@@ -299,7 +300,7 @@ def serialise_entry(entry: Any, convert_datetime: bool = False, lowercase_keys: 
 def error_response(request: Request, code: int, message: str = None, buttons: list[tuple[str, str]] = None) -> Response:
     return templates.TemplateResponse(
         "error.html",
-        {"app": app.title,
+        {"app": app_title,
          "title": f"Error {code}",
          "code": code,
          "message": message,
@@ -469,7 +470,7 @@ async def serve_home(request: Request):
     usr_n, sub_n, jrn_n, version = settings.database.load_info()
     hist = settings.database.history.select(order=[f"{settings.database.history.key.name} DESC"])
     return HTMLResponse(minify(templates.get_template("info.html").render({
-        "app": app.title,
+        "app": app_title,
         "title": "",
         "submissions_total": sub_n,
         "journals_total": jrn_n,
@@ -484,7 +485,7 @@ async def serve_home(request: Request):
 @app.get("/settings/")
 async def serve_settings(request: Request):
     return HTMLResponse(minify(templates.get_template("settings.html").render({
-        "app": app.title,
+        "app": app_title,
         "title": "Search Settings",
         "tables": [users_table, submissions_table, journals_table],
         "columns": {users_table: [c.name for c in UsersColumns.as_list()],
@@ -522,7 +523,7 @@ async def serve_user(request: Request, username: str):
     p, n = settings.database.load_prev_next(users_table, username) if user_entry else (0, 0)
 
     return HTMLResponse(minify(templates.get_template("user.html").render({
-        "app": app.title,
+        "app": app_title,
         "title": username,
         "user": username,
         "folders": user_entry.get("FOLDERS", []),
@@ -585,7 +586,7 @@ async def serve_search(request: Request, table: str, title: str = None, args: di
         page = ceil(len(results) / limit) or 1
 
     return HTMLResponse(minify(templates.get_template("search.html").render({
-        "app": app.title,
+        "app": app_title,
         "title": title or f"Search {table.title()}",
         "action": request.url.path,
         "table": table.lower(),
@@ -618,7 +619,7 @@ async def serve_submission(request: Request, id_: int):
         fs, _ = settings.database.load_submission_files(id_)
     p, n = settings.database.load_prev_next(submissions_table, id_)
     return HTMLResponse(minify(templates.get_template("submission.html").render({
-        "app": app.title,
+        "app": app_title,
         "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
         "submission": sub | {
             "DESCRIPTION": prepare_html(sub["DESCRIPTION"], settings.database.use_bbcode()),
@@ -728,7 +729,7 @@ async def serve_journal(request: Request, id_: int):
 
     p, n = settings.database.load_prev_next(journals_table, id_)
     return HTMLResponse(minify(templates.get_template("journal.html").render({
-        "app": app.title,
+        "app": app_title,
         "title": f"{jrnl['TITLE']} by {jrnl['AUTHOR']}",
         "journal": jrnl | {
             "CONTENT": prepare_html(jrnl["CONTENT"], settings.database.use_bbcode()),
