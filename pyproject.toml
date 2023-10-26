@@ -38,6 +38,7 @@ htmlmin = "^0.1.12"
 beautifulsoup4 = "^4.12.2"
 lxml = "^4.9.3"
 bbcode = "^1.1.0"
+pydantic-settings = "^2.0.3"
 
 [tool.poetry.dev-dependencies]
 
