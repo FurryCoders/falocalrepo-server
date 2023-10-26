@@ -16,7 +16,7 @@
 
 ### Fixes
 
-* Fix square brackets [] being removed from usernames 
+* Fix square brackets [] being removed from usernames
 
 ## v3.3.4
 
