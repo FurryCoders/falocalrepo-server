@@ -1,5 +1,17 @@
 # Changelog
 
+## v3.3.6
+
+### Fixes
+
+* Fix crash at startup when the program was installed from scratch instead of upgraded
+    * The new 2.x version of Pydantic introduced breaking changes from version 1.x which falocalrepo-server was based
+      upon
+
+### Dependencies
+
+* [pydantic-settings ^2.0.3](https://pypi.org/project/pydantic-settings/2.0.3/)
+
 ## v3.3.5
 
 ### Fixes
