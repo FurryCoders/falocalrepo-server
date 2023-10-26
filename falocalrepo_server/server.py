@@ -49,7 +49,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from htmlmin import minify
 from pydantic import BaseModel
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn import run
 from uvicorn.config import LOGGING_CONFIG
@@ -84,15 +84,15 @@ class SearchSettings(BaseSettings):
 
 
 class Settings(BaseSettings):
-    database: Database = None
+    database: Database | None = None
     static_folder: Path = None
-    ssl_cert: Path = None
-    ssl_key: Path = None
+    ssl_cert: Path | None = None
+    ssl_key: Path | None = None
     precache: bool = False
     open_browser: bool = True
-    address: str = None
-    username: str = None
-    password: str = None
+    address: str | None = None
+    username: str | None = None
+    password: str | None = None
 
 
 class SearchQuery(BaseModel):
@@ -509,7 +509,7 @@ async def save_settings(request: Request):
         return Response("Database is read only, settings will be reset on restart",
                         status_code=status.HTTP_403_FORBIDDEN)
 
-    settings.database.save_settings("SEARCH", search_settings.dict())
+    settings.database.save_settings("SEARCH", search_settings.model_dump())
 
     return Response("Settings saved", status_code=200)
 
