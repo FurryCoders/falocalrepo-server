@@ -221,6 +221,10 @@ def decode_search_id(encoded_search_id: str) -> tuple[str | None, tuple[str, str
             search_id = search_index_
 
         t, q, s, o = loads(b64decode(search_id))
+        assert isinstance(t, str)
+        assert isinstance(q, str)
+        assert isinstance(s, str)
+        assert isinstance(o, str)
         search_terms = (t, q, s, o)
     except BaseException:
         return None, None, None
