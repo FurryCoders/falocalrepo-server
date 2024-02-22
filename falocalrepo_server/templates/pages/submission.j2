@@ -138,7 +138,12 @@
 
                 > .thumbnail {
                     width: 6rem;
+                    min-width: 6rem;
                 }
+            }
+
+            #modal-files .file-selector br {
+                display: none;
             }
 
             #modal-files .file-selector:hover {
@@ -226,21 +231,18 @@
                                             {% if mime and mime.startswith("image/") %}
                                                 <img src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ "{:010d}-{}{}".format(submission.ID, loop.index0, file.suffix) }}"
                                                      alt=""
-                                                     class="loading-spinner loading-error-hide mh-100 mw-100 rounded"
-                                                     loading="lazy" onload="this.classList.add('loaded')"
-                                                     onerror="this.classList.add('loading-error')">
-                                            {% else %}
-                                                <img src="/submission/{{ submission.ID }}/thumbnail"
-                                                     alt=""
-                                                     class="loading-spinner loading-error-hide mh-100 mw-100 rounded"
+                                                     class="loading-element loading-error-hide mh-100 mw-100 rounded"
                                                      loading="lazy" onload="this.classList.add('loaded')"
                                                      onerror="this.classList.add('loading-error')">
                                             {% endif %}
+                                            <div class="loading-onerror rounded bg-body-secondary h-100"
+                                                 style="aspect-ratio: 1 / 1"></div>
                                         </div>
-                                        <div class="ps-2 d-flex flex-column justify-content-between">
-                                            <div>{{ file.name }}</div>
+                                        <div class="ps-2 d-flex flex-column justify-content-between overflow-hidden">
+                                            <div>File {{ loop.index }} {{ file.suffix.removeprefix(".").upper() }}</div>
                                             {% if text %}
-                                                <div class="font-monospace small text-nowrap text-truncate overflow-hidden">
+                                                <div class="font-monospace text-truncate text-wrap overflow-hidden fst-italic pt-2"
+                                                     style="font-size: smaller;">
                                                     {{ text[:200]|safe }}
                                                 </div>
                                             {% endif %}
