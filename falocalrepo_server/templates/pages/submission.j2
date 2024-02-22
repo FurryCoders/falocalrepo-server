@@ -133,7 +133,7 @@
 
             #modal-files .file-selector {
                 height: 6rem;
-                transition: outline 150ms;
+                transition: box-shadow 150ms;
                 cursor: pointer;
 
                 > .thumbnail {
@@ -142,11 +142,11 @@
             }
 
             #modal-files .file-selector:hover {
-                outline: 2px solid rgba(var(--bs-primary-rgb), .5) !important;
+                box-shadow: 0 0 0 2px rgba(var(--bs-primary-rgb), .5) !important;
             }
 
             #modal-files .file-selector[data-selected=true] {
-                outline: 2px solid rgba(var(--bs-info-rgb), .5);
+                box-shadow: 0 0 0 2px rgba(var(--bs-info-rgb), .5);
             }
         {% endif %}
     </style>
