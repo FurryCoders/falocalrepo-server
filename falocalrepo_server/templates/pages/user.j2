@@ -1,0 +1,104 @@
+<!--suppress HtmlDeprecatedAttribute -->
+{% extends "base.j2" %}
+
+{% block title %}{{ user.USERNAME if user else "{} Not Found".format(username) }}{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-12 col-lg-5 col-xl-4 order-first order-lg-last">
+            <div class="properties-card">
+                <div class="title d-flex align-items-center column-gap-3">
+                    <img src="/user/{{ username }}/icon" alt=""
+                         class="loading-element loading-error-hide rounded fade"
+                         height="50" style="height: 50px !important; min-width: 50px"
+                         onerror="this.classList.add('loading-error')" onload="this.classList.add('loaded')">
+                    <div class="loading-pulse rounded" style="height: 50px"></div>
+                    <div class="loading-onerror rounded bg-body-secondary"
+                         style="height: 50px; aspect-ratio: 1 / 1"></div>
+                    <h4 class="my-0 d-inline-block">{{ user.USERNAME or username }}</h4>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="property" data-key="Submissions">
+                    <a href="/submissions/{{ username }}" class="btn btn-xs btn-primary w-100">
+                        {{ (stats.gallery or 0) + (stats.scraps or 0) }}
+                    </a>
+                </div>
+                <div class="property" data-key="Gallery">
+                    <a href="/gallery/{{ username }}" class="btn btn-xs btn-primary w-100">
+                        {{ stats.gallery or 0 }}
+                    </a>
+                </div>
+                <div class="property" data-key="Scraps">
+                    <a href="/scraps/{{ username }}" class="btn btn-xs btn-primary w-100">
+                        {{ stats.scraps or 0 }}
+                    </a>
+                </div>
+                <div class="property" data-key="Journals">
+                    <a href="/journals/{{ username }}" class="btn btn-xs btn-primary w-100">
+                        {{ stats.journals }}
+                    </a>
+                </div>
+                <div class="property" data-key="Favorites">
+                    <a href="/favorites/{{ username }}" class="btn btn-xs btn-primary w-100">
+                        {{ stats.favorites }}
+                    </a>
+                </div>
+                <div class="property" data-key="Comments">
+                    <a href="/comments/{{ username }}" class="btn btn-xs btn-primary w-100">
+                        {{ stats.comments }}
+                    </a>
+                </div>
+                <div class="property d-flex flex-wrap column-gap-2 row-gap-1" data-key="Folders">
+                    {% for folder in user.FOLDERS %}
+                        <span class="badge bg-info">{{ folder }}</span>
+                    {% endfor %}
+                    {% if not user.FOLDERS %}
+                        <span class="badge bg-secondary w-100">No folders</span>
+                    {% endif %}
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="controls">
+                    {% if user.ACTIVE or not user %}
+                        <button class="btn btn-sm btn-primary position-relative w-100">
+                            <a href="https://furaffinity.net/user/{{ username }}" class="stretched-link"></a>
+                            FA
+                        </button>
+                    {% else %}
+                        <button class="btn btn-sm btn-danger position-relative w-100">
+                            <a href="https://furaffinity.net/user/{{ username }}" class="stretched-link"></a>
+                            User Is Not Active
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-7 col-xl-8 order-last mt-3 mt-lg-0 order-lg-first">
+            <div class="border rounded p-2 overflow-scroll text-wrap">
+                {% if user %}
+                    {% if user.USERPAGE_BBCODE %}
+                        <div class="mb-2 text-end">
+                            <button class="btn btn-sm btn-outline-info py-0 px-1"
+                                    onclick="const b = document.getElementById('description_bbcode').hidden = !(document.getElementById('description_html').hidden = !document.getElementById('description_html').hidden); b ? this.classList.add('active') : this.classList.remove('active')">
+                                BBCode
+                            </button>
+                        </div>
+                        <div id="description_bbcode" hidden>{{ user.USERPAGE_BBCODE|safe }}</div>
+                    {% endif %}
+                    <div id="description_html">
+                        {% if user.USERPAGE %}
+                            {{ user.USERPAGE|safe }}
+                        {% else %}
+                            <em>No profile</em>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <em>No user profile available</em>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

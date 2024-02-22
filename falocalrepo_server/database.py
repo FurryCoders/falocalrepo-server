@@ -1,36 +1,77 @@
-from datetime import datetime
-from functools import cache
-from json import dumps
-from json import loads
-from logging import Logger
-from os import W_OK
-from os import access
+from collections import namedtuple
+from functools import lru_cache
+from os import PathLike
 from pathlib import Path
 from re import match
 from re import split
 from re import sub
-from sqlite3 import DatabaseError
+from sqlite3 import Cursor
+from sqlite3 import Row
+from types import GenericAlias
+from typing import Any
+from typing import Callable
+from typing import TypeVar
+from typing import TypedDict
+from typing import get_origin
 
-from falocalrepo_database import Column
-from falocalrepo_database import Database as _Database
+from chardet import detect as detect_encoding
+from falocalrepo_database import Database as FADatabase
 from falocalrepo_database import Table
-from falocalrepo_database.selector import Selector
-from falocalrepo_database.selector import SelectorBuilder as Sb
+from falocalrepo_database.tables import CommentsColumns
 from falocalrepo_database.tables import JournalsColumns
 from falocalrepo_database.tables import SubmissionsColumns
 from falocalrepo_database.tables import UsersColumns
+from falocalrepo_database.tables import comments_table
 from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
-from falocalrepo_database.util import compare_version, clean_username as _clean_username
+from falocalrepo_database.util import clean_username
+from filetype import guess_mime
+from orjson import dumps
+from orjson import loads
 
-default_sort: dict[str, str] = {submissions_table: "date", journals_table: "date", users_table: "username"}
-default_order: dict[str, str] = {submissions_table: "desc", journals_table: "desc", users_table: "asc"}
+from falocalrepo_server.functions import bbcode_to_html
+from falocalrepo_server.functions import clean_html
+from falocalrepo_server.functions import prepare_html
+
+R = TypeVar("R")
+SearchResults = namedtuple(
+    "SearchResults",
+    [
+        "rows",
+        "column_id",
+        "columns_table",
+        "columns_results",
+        "columns_lists",
+        "sort",
+        "order",
+    ],
+)
+
+default_sort: dict[str, str] = {
+    submissions_table: "date",
+    journals_table: "date",
+    users_table: "username",
+    comments_table: "date",
+}
+default_order: dict[str, str] = {
+    submissions_table: "desc",
+    journals_table: "desc",
+    users_table: "asc",
+    comments_table: "desc",
+}
 
 
-@cache
-def clean_username(username: str) -> str:
-    return _clean_username(username)
+class Settings(TypedDict):
+    view: dict[str, str]
+    limit: dict[str, int]
+    sort: dict[str, str]
+    order: dict[str, str]
+
+
+@lru_cache
+def clean_username_cached(username: str) -> str:
+    return clean_username(username)
 
 
 def format_value(value: str, *, like: bool = False) -> str:
@@ -40,8 +81,13 @@ def format_value(value: str, *, like: bool = False) -> str:
     return value
 
 
-def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliases: dict[str, str] = None,
-                 score: bool = False) -> tuple[str, list[str]]:
+def query_to_sql(
+    query: str,
+    default_field: str,
+    likes: list[str] = None,
+    aliases: dict[str, str] = None,
+    score: bool = False,
+) -> tuple[str, list[str]]:
     if not query:
         return "", []
     likes, aliases = likes or [], aliases or {}
@@ -52,302 +98,429 @@ def query_to_sql(query: str, default_field: str, likes: list[str] = None, aliase
     query = sub(r"( *[&|])+(?= *[&|] *[@()])", "", query)
 
     field, prev = default_field, ""
-    for elem in filter(bool, map(str.strip, split(r'((?<!\\)(?:"|!")(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|]| +)', query))):
-        if m := match(r"^@(\w+)$", elem):
+    negation: bool = False
+    tokens: list[str] = [t for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|!]|\s+)', query) if t.strip()]
+    for token in tokens:
+        if m := match(r"^@(\w+)$", token):
             field = m.group(1).lower()
             continue
-        elif elem == "&":
+        elif token == "!":
+            token = prev
+            negation = True
+        elif token == "&":
             sql_elements.append("and" if not score else "*")
-        elif elem == "|":
+            negation = False
+        elif token == "|":
             sql_elements.append("or" if not score else "+")
-        elif elem in ("(", ")"):
-            sql_elements.append("and") if elem == "(" and prev not in ("", "&", "|", "(") else None
-            sql_elements.append(elem)
-        elif elem:
-            not_, elem = match(r"^(!)?(.*)$", elem).groups()
-            if not elem:
-                continue
+            negation = False
+        elif token in ("(", ")"):
+            sql_elements.append("and") if token == "(" and prev not in ("", "&", "|", "(") else None
+            sql_elements.append(token)
+            negation = False
+        elif token:
             sql_elements.append("and" if not score else "*") if prev not in ("", "&", "|", "(") else None
-            sql_elements.append(f"({aliases.get(field, field)}{' not' * bool(not_)} like ? escape '\\')")
-            values.append(format_value(elem, like=field in likes))
-        prev = elem
+            sql_elements.append(f"({aliases.get(field, field)}{' not' * negation} like ? escape '\\')")
+            values.append(format_value(token, like=field in likes))
+            negation = False
+        prev = token
 
     return " ".join(sql_elements), values
 
 
-class Database(_Database):
-    def __init__(self, database_path: Path, logger: Logger):
-        _Database.check_connection(database_path)
-        super().__init__(database_path, read_only=not access(database_path, W_OK), check_version=False)
-        if not self.is_formatted:
-            raise DatabaseError("Database not formatted")
-        elif err := compare_version(self.version, patch=False):
-            raise err
-        self.logger: Logger = logger
+def replies_count(comment: dict[str, Any]) -> int:
+    return sum(map(replies_count, comment["REPLIES"]), len(comment["REPLIES"]))
 
-    @cache
-    def clear_cache(self, _m_time: float = None):
-        self.use_bbcode.cache_clear()
-        self._load_user_cached.cache_clear()
-        self._load_user_stats_cached.cache_clear()
-        self._load_submission_cached.cache_clear()
-        self._load_submission_files_cached.cache_clear()
-        self._load_submission_comments_cached.cache_clear()
-        self._load_journal_cached.cache_clear()
-        self._load_journal_comments_cached.cache_clear()
-        self._load_prev_next_cached.cache_clear()
-        self._load_search_cached.cache_clear()
-        self._load_search_aux.cache_clear()
-        self._load_files_folder_cached.cache_clear()
-        self._load_info_cached.cache_clear()
-        self.logger.info(f"Clearing cache for new m_time {datetime.fromtimestamp(_m_time)}")
 
-    @property
-    def m_time(self) -> float:
-        return self.path.stat().st_mtime
+def set_replies_count(comment: dict[str, Any]) -> dict[str, Any]:
+    return comment | {
+        "REPLIES": list(map(set_replies_count, comment["REPLIES"])),
+        "REPLIES_COUNT": replies_count(comment),
+    }
 
-    @cache
-    def use_bbcode(self) -> bool:
-        return self.settings.bbcode
 
-    @cache
-    def _load_user_cached(self, user: str) -> dict | None:
-        return self.users[user]
+# noinspection DuplicatedCode,PyProtectedMember
+class Database:
+    def __init__(self, path: str | PathLike | None = None, use_cache: bool = True):
+        self.path: Path | None = Path(path) if path else None
+        self.use_cache: bool = use_cache
+        self.database: FADatabase | None = None
 
-    @cache
-    def _load_user_stats_cached(self, user: str) -> dict[str, int]:
+    def __enter__(self):
+        self.connect()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    def connect(self, path: str | PathLike | None = None):
+        if self.database and self.database.is_open:
+            return
+        del self.database
+        if path:
+            self.path = self.path
+        self.database = FADatabase(self.path)
+        return self.database
+
+    def close(self):
+        if self.database and self.database.is_open:
+            self.database.close()
+        del self.database
+        self.database = None
+
+    def call_cached_method(self, func: Callable[..., R], *args: Any) -> R:
+        # noinspection PyUnresolvedReferences
+        return func(*args) if self.use_cache else func.__wrapped__(self, *args)
+
+    def clear_cache(self):
+        self._clear_cache(self.path.stat().st_mtime)
+
+    @lru_cache(1)
+    def _clear_cache(self, _mtime: Any):
+        for attr_name in dir(self):
+            if hasattr(getattr(self, attr_name), "cache_clear"):
+                self.__getattribute__(attr_name).cache_clear()
+
+    @lru_cache
+    def _settings(self) -> Settings | None:
+        settings: dict[str, dict[str, str | int]] = loads(self.database.settings["SERVER.SEARCH"] or "{}")
+
+        if not settings:
+            return None
+
         return {
-            "gallery": self.submissions.select(
-                Sb() & [Sb("replace(lower(author), '_', '')").__eq__(user), Sb("folder").__eq__("gallery")],
-                columns=[Column("count(ID)", int)]
-            ).cursor.fetchone()[0],
-            "scraps": self.submissions.select(
-                Sb() & [Sb("replace(lower(author), '_', '')").__eq__(user), Sb("folder").__eq__("scraps")],
-                columns=[Column("count(ID)", int)]
-            ).cursor.fetchone()[0],
-            "favorites": self.submissions.select(
-                Sb("favorite") % f"%|{user}|%", columns=[Column("count(ID)", int)]
-            ).cursor.fetchone()[0],
-            "mentions": self.submissions.select(
-                Sb("mentions") % f"%|{user}|%", columns=[Column("count(ID)", int)]
-            ).cursor.fetchone()[0],
-            "journals": self.journals.select(
-                Sb("replace(lower(author), '_', '')").__eq__(user), columns=[Column("count(ID)", int)]
-            ).cursor.fetchone()[0]
+            "view": settings["view"],
+            "limit": settings["limit"],
+            "sort": settings["sort"],
+            "order": settings["order"],
         }
 
-    @cache
-    def _load_submission_cached(self, submission_id: int) -> dict | None:
-        return self.submissions[submission_id]
+    @lru_cache
+    def _stats(self) -> tuple[int, int, int, int]:
+        return (
+            len(self.database.users),
+            len(self.database.submissions),
+            len(self.database.journals),
+            len(self.database.comments),
+        )
 
-    @cache
-    def _load_submission_files_cached(self, submission_id: int
-                                      ) -> tuple[list[Path] | None, Path | None]:
-        return self.submissions.get_submission_files(submission_id)
+    @lru_cache
+    def _bbcode(self) -> bool:
+        return bool(self.database.settings.bbcode)
 
-    @cache
-    def _load_submission_comments_cached(self, submission_id: int) -> list[dict]:
-        return self.comments.get_comments_tree(submissions_table, submission_id)
+    @lru_cache
+    def _search(
+        self,
+        table_name: str,
+        query: str,
+        sort: str,
+        order: str,
+    ) -> SearchResults:
+        cols_results: list[str]
+        default_column: str = "any"
+        sort = sort or default_sort[table_name]
+        order = order or default_order[table_name]
+        actual_sort: str = sort
+        table: Table
 
-    @cache
-    def _load_journal_cached(self, journal_id: int) -> dict | None:
-        return self.journals[journal_id]
-
-    @cache
-    def _load_journal_comments_cached(self, journal_id: int) -> list[dict]:
-        return self.comments.get_comments_tree(journals_table, journal_id)
-
-    @cache
-    def _load_prev_next_cached(self, table: str, item_id: int | str) -> tuple[int, int]:
-        db_table: Table = self[table]
-
-        if table in (submissions_table, journals_table):
-            if not (item := db_table[item_id]):
-                return 0, 0
-
-            query: Selector = Sb("AUTHOR").__eq__(item["AUTHOR"])
-            query = Sb() & [query, Sb("FOLDER").__eq__(item["FOLDER"])] if table.upper() == submissions_table else query
-            return db_table.select(
-                query,
-                columns=[Column("LAG(ID, 1, 0) over (order by ID)", int),
-                         Column("LEAD(ID, 1, 0) over (order by ID)", int)],
-                order=[f"ABS(ID - {item_id})"],
-                limit=1
-            ).cursor.fetchone()
-        elif table == users_table:
-            if not (item := db_table[item_id]):
-                return 0, 0
-
-            query1: Selector = Sb("USERNAME").__gt__(item["USERNAME"])
-            query2: Selector = Sb("USERNAME").__lt__(item["USERNAME"])
-            return (
-                next(db_table.select(query1, columns=["USERNAME"], order=["USERNAME ASC"], limit=1).cursor, [0])[0],
-                next(db_table.select(query2, columns=["USERNAME"], order=["USERNAME DESC"], limit=1).cursor, [0])[0]
-            )
+        if (table_name := table_name.upper()) == users_table.upper():
+            default_column = "username"
+            cols_results = [
+                UsersColumns.USERNAME.name,
+                UsersColumns.FOLDERS.name,
+                UsersColumns.ACTIVE.name,
+            ]
+            table = self.database.users
+        elif table_name == submissions_table.upper():
+            cols_results = [
+                SubmissionsColumns.ID.name,
+                SubmissionsColumns.AUTHOR.name,
+                SubmissionsColumns.DATE.name,
+                SubmissionsColumns.TITLE.name,
+                SubmissionsColumns.FILEEXT.name,
+            ]
+            table = self.database.submissions
+            actual_sort = SubmissionsColumns.ID.name if sort.lower() == SubmissionsColumns.DATE.name.lower() else sort
+        elif table_name == journals_table.upper():
+            cols_results = [
+                JournalsColumns.ID.name,
+                JournalsColumns.AUTHOR.name,
+                JournalsColumns.DATE.name,
+                JournalsColumns.TITLE.name,
+            ]
+            table = self.database.journals
+            actual_sort = JournalsColumns.ID.name if sort.lower() == JournalsColumns.DATE.name.lower() else sort
+        elif table_name == comments_table:
+            cols_results = [
+                CommentsColumns.ID.name,
+                CommentsColumns.PARENT_TABLE.name,
+                CommentsColumns.PARENT_ID.name,
+                CommentsColumns.REPLY_TO.name,
+                CommentsColumns.AUTHOR.name,
+                CommentsColumns.DATE.name,
+                CommentsColumns.TEXT.name,
+            ]
+            table = self.database.comments
         else:
-            raise KeyError(f"Unknown table {table!r}")
+            raise KeyError(f"Unknown table {table_name!r}")
 
-    @cache
-    def _load_search_cached(self, table: str, query: str, sort: str, order: str):
-        cols_results: list[Column]
-        default_field: str = "any"
-        sort = sort or default_sort[table]
-        order = order or default_order[table]
-        db_table: Table
-
-        if (table := table.upper()) == submissions_table.upper():
-            cols_results = [SubmissionsColumns.ID, SubmissionsColumns.AUTHOR,
-                            SubmissionsColumns.DATE, SubmissionsColumns.TITLE,
-                            SubmissionsColumns.FILEEXT]
-            db_table = self.submissions
-        elif table == journals_table.upper():
-            cols_results = [JournalsColumns.ID, JournalsColumns.AUTHOR,
-                            JournalsColumns.DATE, JournalsColumns.TITLE]
-            db_table = self.journals
-        else:
-            default_field = "username"
-            cols_results = [UsersColumns.USERNAME, UsersColumns.FOLDERS, UsersColumns.ACTIVE]
-            db_table = self.users
-
-        cols_table: list[str] = [c.name for c in db_table.columns]
-        cols_list: list[str] = [c.name for c in db_table.columns if c.type in (list, set)]
-        col_id: Column = db_table.key
+        col_id: str = table.key.name
+        cols_results = [c.lower() for c in cols_results]
+        cols_table: list[str] = [c.name.lower() for c in table.columns]
+        cols_list: list[str] = [
+            c.name.lower()
+            for c in table.columns
+            if (get_origin(c.type) if type(c.type) is GenericAlias else c.type) in (list, set)
+        ]
 
         sql, values = query_to_sql(
             query,
-            default_field,
-            [*map(str.lower,
-                  {*cols_table, "any", "keywords", "message", "filename"} -
-                  {"ID", "FILESAVED", "USERUPDATE", "ACTIVE"})],
-            {"author": "replace(author, '_', '')",
-             "lower": "replace(author, '_', '')",
-             "keywords": "tags",
-             "message": "description",
-             "filename": "fileurl",
-             "any": "(" +
-                    '||'.join(set(cols_table) - {'FAVORITE', 'FILESAVED', 'USERUPDATE', 'ACTIVE'}) +
-                    ")"},
-            score=sort.lower() == "relevance")
-
-        results: list[dict]
-        if sort.lower() == "relevance":
-            results = [
-                dict(zip([c.name for c in cols_results] + ["RELEVANCE"], s)) for s in
-                db_table.select_sql(f"RELEVANCE > 0", values,
-                                    columns=[*cols_results, Column(f"({sql if sql else 1}) as RELEVANCE", int)],
-                                    order=[f"{sort} {order}", f"{default_sort[table]} {default_order[table]}"]).tuples]
-        else:
-            results = list(db_table.select_sql(sql, values, columns=cols_results, order=[f"{sort} {order}"]))
-        return (
-            results,
-            cols_table + ["RELEVANCE"],
-            [c.name for c in cols_results] + (["RELEVANCE"] if sort == "relevance" else []),
-            cols_list,
-            col_id.name,
-            sort,
-            order
+            default_column,
+            [
+                c.lower()
+                for c in {*cols_table, "any", "keywords", "message", "filename"}
+                - {"id", "filesaved", "userupdate", "active", "gender"}
+            ],
+            {
+                "author": "replace(author, '_', '')",
+                "lower": "replace(author, '_', '')",
+                "keywords": "tags",
+                "message": "description",
+                "filename": "fileurl",
+                "any": "(" + "||".join(set(cols_table) - {"FAVORITE", "FILESAVED", "USERUPDATE", "ACTIVE"}) + ")",
+            },
+            score=sort.lower() == "relevance",
         )
 
-    @cache
-    def _load_files_folder_cached(self) -> Path:
-        return self.settings.files_folder.resolve()
+        cursor: Cursor
 
-    @cache
-    def _load_info_cached(self) -> tuple[int, int, int, str]:
-        return len(self.users), len(self.submissions), len(
-            self.journals), self.version
-
-    def save_settings(self, name: str, settings: dict):
-        if self.read_only:
-            return
-
-        self.settings[f"SERVER.{name}"] = dumps(settings)
-        self.commit()
-
-    def load_settings(self, name: str) -> dict:
-        return loads(self.settings[f"SERVER.{name}"] or "{}")
-
-    def load_user(self, user: str) -> dict | None:
-        self.clear_cache(self.m_time)
-        return self._load_user_cached(user)
-
-    def load_user_stats(self, user: str) -> dict[str, int]:
-        self.clear_cache(self.m_time)
-        return self._load_user_stats_cached(user)
-
-    def load_submission(self, submission_id: int) -> dict | None:
-        self.clear_cache(self.m_time)
-        return self._load_submission_cached(submission_id)
-
-    def load_submission_files(self, submission_id: int) -> tuple[list[Path] | None, Path | None]:
-        self.clear_cache(self.m_time)
-        return self._load_submission_files_cached(submission_id)
-
-    def load_submission_comments(self, submission_id: int) -> list[dict]:
-        self.clear_cache(self.m_time)
-        return self._load_submission_comments_cached(submission_id)
-
-    def load_journal(self, journal_id: int) -> dict | None:
-        self.clear_cache(self.m_time)
-        return self._load_journal_cached(journal_id)
-
-    def load_journal_comments(self, journal_id: int) -> list[dict]:
-        self.clear_cache(self.m_time)
-        return self._load_journal_comments_cached(journal_id)
-
-    def load_prev_next(self, table: str, item_id: int | str) -> tuple[int, int]:
-        self.clear_cache(self.m_time)
-        return self._load_prev_next_cached(table, item_id)
-
-    @cache
-    def _load_search_aux(self, table: str, query: str, sort: str, order: str):
-        if order.startswith("asc"):
-            return self._load_search_cached(table.lower(), query.lower(), sort.lower(), order.lower())
+        if sort.lower() == "relevance":
+            cursor = table.select_sql(
+                f"RELEVANCE > 0",
+                values,
+                [*cols_results, f"({sql if sql else 1}) as RELEVANCE"],
+                [f"{actual_sort} {order}", f"{default_sort[table_name]} {default_order[table_name]}"],
+            ).cursor
+            cols_results.append("RELEVANCE")
         else:
-            results, *rest, _ = self._load_search_cached(table.lower(), query.lower(), sort.lower(), "asc")
-            return list(reversed(results)), *rest, order
+            cursor = table.select_sql(sql, values, cols_results, [f"{actual_sort} {order}"]).cursor
 
-    def load_search(self, table: str, query: str, sort: str, order: str):
-        self.clear_cache(self.m_time)
-        return self._load_search_aux(table.lower(), query.lower(), sort.lower(), order.lower())
+        cursor.row_factory = Row
+        return SearchResults(
+            cursor.fetchall(),
+            col_id,
+            cols_table + ["RELEVANCE"],
+            cols_results,
+            cols_list,
+            sort,
+            order,
+        )
 
-    def load_files_folder(self) -> Path:
-        self.clear_cache(self.m_time)
-        return self._load_files_folder_cached()
+    @lru_cache
+    def _user(self, username: str):
+        bbcode = self.bbcode()
+        user = self.database.users[clean_username(username)]
+        if user:
+            user["USERPAGE"] = prepare_html(user["USERPAGE"], bbcode)
+            user["USERPAGE_BBCODE"] = user["USERPAGE"].strip() or None if bbcode else None
+        return user
 
-    def load_info(self) -> tuple[int, int, int, str]:
-        self.clear_cache(self.m_time)
-        return self._load_info_cached()
+    @lru_cache
+    def _user_stats(self, username: str) -> dict[str, int]:
+        username = clean_username(username)
+        stats: dict[str, int] = {}
+        cur = self.database.execute(
+            "select FOLDER, count(*) from SUBMISSIONS where replace(lower(AUTHOR), '_', '') = ? group by FOLDER",
+            (username,),
+        )
+        stats |= dict(cur.fetchall())
+        cur = self.database.execute(
+            "select count(*) from JOURNALS where replace(lower(AUTHOR), '_', '') = ?", (username,)
+        )
+        stats["journals"] = cur.fetchone()[0]
+        cur = self.database.execute(
+            "select count(*) from SUBMISSIONS where FAVORITE like '%|' || ? || '|%'",
+            (username,),
+        )
+        stats["favorites"] = cur.fetchone()[0]
+        cur = self.database.execute(
+            "select count(*) from COMMENTS where replace(lower(AUTHOR), '_', '') = ?",
+            (username,),
+        )
+        stats["comments"] = cur.fetchone()[0]
+        return stats
 
-    def load_user_uncached(self, user: str) -> dict | None:
-        return self._load_user_cached.__wrapped__(self, user)
+    @lru_cache
+    def _submission(self, submission_id: int) -> dict[str, Any] | None:
+        bbcode = self.bbcode()
+        submission = self.database.submissions[submission_id]
+        if submission:
+            submission["DESCRIPTION_BBCODE"] = submission["DESCRIPTION"].strip() or None if bbcode else None
+            submission["FOOTER_BBCODE"] = submission["FOOTER"].strip() or None if bbcode else None
+            submission["DESCRIPTION"] = prepare_html(submission["DESCRIPTION"], bbcode)
+            submission["FOOTER"] = prepare_html(submission["FOOTER"], bbcode)
+        return submission
 
-    def load_user_stats_uncached(self, user: str) -> dict[str, int]:
-        return self._load_user_stats_cached.__wrapped__(self, user)
+    @lru_cache
+    def _submission_files(self, submission_id: int) -> tuple[list[Path] | None, Path | None]:
+        return self.database.submissions.get_submission_files(submission_id)
 
-    def load_submission_uncached(self, submission_id: int) -> dict | None:
-        return self._load_submission_cached.__wrapped__(self, submission_id)
+    @lru_cache
+    def _submission_files_text(self, *files: Path) -> dict[int, str | None]:
+        return {
+            i: (
+                bbcode_to_html(f.read_text(detect_encoding(f.read_bytes())["encoding"], "ignore"))
+                if f.suffix == ".txt"
+                else ""
+            )
+            for i, f in enumerate(files)
+        }
 
-    def load_submission_comments_uncached(self, submission_id: int) -> list[dict]:
-        return self._load_submission_comments_cached.__wrapped__(self, submission_id)
+    @lru_cache
+    def _submission_files_mime(self, *files: Path) -> dict[int, str | None]:
+        return {i: guess_mime(f) if f.is_file() else None for i, f in enumerate(files)}
 
-    def load_submission_files_uncached(self, submission_id: int) -> tuple[list[Path] | None, Path | None]:
-        return self._load_submission_files_cached.__wrapped__(self, submission_id)
+    @lru_cache
+    def _submission_comments(self, submission_id: int) -> list[dict[str, Any]]:
+        bbcode = self.bbcode()
+        comments = self.database.comments.get_comments(submissions_table, submission_id)
+        comments = self.database.comments._make_comments_tree([c for c in comments if not c["REPLY_TO"]], comments)
+        return [
+            set_replies_count(c | {"TEXT": bbcode_to_html(c["TEXT"]) if bbcode else clean_html(c["TEXT"])})
+            for c in comments
+        ]
 
-    def load_journal_uncached(self, journal_id: int) -> dict | None:
-        return self._load_journal_cached.__wrapped__(self, journal_id)
+    @lru_cache
+    def _submission_prev_next(
+        self,
+        submission_id: int,
+        submission_author: str,
+        submission_folder: str,
+    ) -> tuple[str | int | None, str | int | None]:
+        cur = self.database.execute(
+            """
+        select *
+        from (select ID from SUBMISSIONS where ID > ? and AUTHOR = ? and FOLDER = ? order by ID limit 1)
+        
+        union
+        
+        select *
+        from (select ID from SUBMISSIONS where ID < ? and AUTHOR = ? and FOLDER = ? order by ID desc limit 1);
+        """,
+            [submission_id, submission_author, submission_folder, submission_id, submission_author, submission_folder],
+        )
+        if not (ids := sorted(i for [i] in cur.fetchall())):
+            return None, None
+        return ids[0] if ids[0] < submission_id else None, ids[-1] if ids[-1] > submission_id else None
 
-    def load_journal_comments_uncached(self, journal_id: int) -> list[dict]:
-        return self._load_journal_comments_cached.__wrapped__(self, journal_id)
+    @lru_cache
+    def _journal(self, journal_id: int) -> dict[str, Any] | None:
+        bbcode = self.bbcode()
+        journal = self.database.journals[journal_id]
+        if journal:
+            journal["CONTENT_BBCODE"] = journal["CONTENT"].strip() or None if bbcode else None
+            journal["FOOTER_BBCODE"] = journal["FOOTER"].strip() or None if bbcode else None
+            journal["CONTENT"] = prepare_html(journal["CONTENT"], bbcode)
+            journal["FOOTER"] = prepare_html(journal["FOOTER"], bbcode)
+        return journal
 
-    def load_prev_next_uncached(self, table: str, item_id: int | str) -> tuple[int, int]:
-        return self._load_prev_next_cached.__wrapped__(self, table, item_id)
+    @lru_cache
+    def _journal_comments(self, journal_id: int) -> list[dict[str, Any]]:
+        bbcode = self.bbcode()
+        comments = self.database.comments.get_comments(journals_table, journal_id)
+        comments = self.database.comments._make_comments_tree([c for c in comments if not c["REPLY_TO"]], comments)
+        return [
+            set_replies_count(c | {"TEXT": bbcode_to_html(c["TEXT"]) if bbcode else clean_html(c["TEXT"])})
+            for c in comments
+        ]
 
-    def load_search_uncached(self, table: str, query: str, sort: str, order: str):
-        return self._load_search_cached.__wrapped__(self, table, query, sort, order)
+    @lru_cache
+    def _journal_prev_next(self, journal_id: int, journal_author: str) -> tuple[str | int | None, str | int | None]:
+        cur = self.database.execute(
+            """
+        select *
+        from (select ID from JOURNALS where ID > ? and AUTHOR = ? order by ID limit 1)
+        
+        union
+        
+        select *
+        from (select ID from JOURNALS where ID < ? and AUTHOR = ? order by ID desc limit 1);
+        """,
+            [journal_id, journal_author, journal_id, journal_author],
+        )
+        if not (ids := sorted(i for [i] in cur.fetchall())):
+            return None, None
+        return ids[0] if ids[0] < journal_id else None, ids[-1] if ids[-1] > journal_id else None
 
-    def load_files_folder_uncached(self) -> Path:
-        return self._load_files_folder_cached.__wrapped__(self, )
+    def settings(self) -> Settings | None:
+        return self.call_cached_method(self._settings)
 
-    def load_info_uncached(self) -> tuple[int, int, int, str]:
-        return self._load_info_cached.__wrapped__(self, )
+    def save_settings(self, settings: Settings):
+        if self._settings.__wrapped__(self) != settings:
+            self.database.settings["SERVER.SEARCH"] = dumps(settings).decode("utf-8")
+            self.database.commit()
+            self._settings.cache_clear()
+
+    def stats(self) -> tuple[int, int, int, int]:
+        return self.call_cached_method(self._stats)
+
+    def bbcode(self) -> bool:
+        return self.call_cached_method(self._bbcode)
+
+    def search(self, table: str, query: str, sort: str, order: str) -> SearchResults:
+        table, query, sort, order = (
+            table.lower().strip(),
+            query.lower().strip(),
+            sort.lower().strip(),
+            order.lower().strip(),
+        )
+        if order == "desc":
+            return self.call_cached_method(self._search, table, query, sort, order)
+        else:
+            results = self.call_cached_method(self._search, table, query, sort, "desc")
+            return SearchResults(
+                list(reversed(results.rows)),
+                results.column_id,
+                results.columns_table,
+                results.columns_results,
+                results.columns_lists,
+                results.sort,
+                order,
+            )
+
+    def user(self, username: str) -> dict[str, Any] | None:
+        return self.call_cached_method(self._user, username)
+
+    def user_stats(self, username: str) -> dict[str, int]:
+        return self.call_cached_method(self._user_stats, username)
+
+    def submission(self, submission_id: int) -> dict[str, Any] | None:
+        return self.call_cached_method(self._submission, submission_id)
+
+    def submission_files(self, submission_id: int) -> tuple[list[Path] | None, Path | None]:
+        return self.call_cached_method(self._submission_files, submission_id)
+
+    def submission_files_text(self, *files: Path) -> dict[int, str | None]:
+        return self.call_cached_method(self._submission_files_text, *files)
+
+    def submission_files_mime(self, *files: Path) -> dict[int, str | None]:
+        return self.call_cached_method(self._submission_files_mime, *files)
+
+    def submission_comments(self, submission_id: int) -> list[dict[str, Any]]:
+        return self.call_cached_method(self._submission_comments, submission_id)
+
+    def submission_prev_next(
+        self,
+        submission_id: int,
+        submission_author: str,
+        submission_folder: str,
+    ) -> tuple[int | None, int | None]:
+        return self.call_cached_method(self._submission_prev_next, submission_id, submission_author, submission_folder)
+
+    def journal(self, journal_id: int) -> dict[str, Any] | None:
+        return self.call_cached_method(self._journal, journal_id)
+
+    def journal_comments(self, journal_id: int) -> list[dict[str, Any]]:
+        return self.call_cached_method(self._journal_comments, journal_id)
+
+    def journal_prev_next(self, journal_id: int, journal_author: str) -> tuple[int | None, int | None]:
+        return self.call_cached_method(self._journal_prev_next, journal_id, journal_author)

@@ -14,11 +14,10 @@ from click.core import ParameterSource
 from click_help_colors import HelpColorsCommand
 from falocalrepo_database import Database
 
-from . import __name__ as __prog__name__
 from .__version__ import __version__
 from .server import server
 
-__prog__name__ = __prog__name__.replace("_", "-")
+__prog__name__ = __package__.replace("_", "-")
 _yellow: str = "\x1b[33m"
 _reset: str = "\x1b[0m"
 
@@ -67,29 +66,85 @@ def docstring_format(*args, **kwargs):
 
 # noinspection HttpUrlsUsage
 @command(__prog__name__, cls=CustomHelpColorsCommand, no_args_is_help=True)
-@argument("database", callback=database_callback, required=False, default=None,
-          type=PathClick(exists=True, dir_okay=False, resolve_path=True, path_type=Path))
+@argument(
+    "database",
+    callback=database_callback,
+    required=False,
+    default=None,
+    type=PathClick(exists=True, dir_okay=False, resolve_path=True, path_type=Path),
+)
 @option("--host", metavar="HOST", type=str, default="0.0.0.0", show_default=True, help="Server host.")
-@option("--port", metavar="PORT", type=str, default="80, 443", show_default=True, callback=port_callback,
-        help="Server port.")
-@option("--ssl-cert", type=PathClick(exists=True, dir_okay=False, path_type=Path), default=None,
-        help="Path to SSL certificate file for HTTPS")
-@option("--ssl-key", type=PathClick(exists=True, dir_okay=False, path_type=Path), default=None,
-        help="Path to SSL key file for HTTPS")
-@option("--redirect-http", metavar="PORT2", type=int, default=None, callback=port_callback, is_eager=True,
-        help=f"Redirect all traffic from http://HOST:{_yellow}PORT{_reset} to "
-             f"https://HOST:{_yellow}PORT2{_reset}")
-@option("--auth", metavar="USERNAME:PASSWORD", type=str, default=None,
-        help=f"Enable HTTP Basic authentication.")
-@option("--precache", is_flag=True, default=False, help="Cache tables on startup.")
-@option("--no-browser", "browser", is_flag=True, default=True, help="Do not browser on startup.")
-@option("--color/--no-color", is_flag=True, is_eager=True, default=None, expose_value=False,
-        callback=color_callback, help="Toggle ANSI colors.")
+@option(
+    "--port",
+    metavar="PORT",
+    type=str,
+    default="80, 443",
+    show_default=True,
+    callback=port_callback,
+    help="Server port.",
+)
+@option(
+    "--ssl-cert",
+    type=PathClick(exists=True, dir_okay=False, path_type=Path),
+    default=None,
+    help="Path to SSL certificate file for HTTPS",
+)
+@option(
+    "--ssl-key",
+    type=PathClick(exists=True, dir_okay=False, path_type=Path),
+    default=None,
+    help="Path to SSL key file for HTTPS",
+)
+@option(
+    "--redirect-http",
+    metavar="PORT2",
+    type=int,
+    default=None,
+    callback=port_callback,
+    is_eager=True,
+    help=f"Redirect all traffic from http://HOST:{_yellow}PORT{_reset} to " f"https://HOST:{_yellow}PORT2{_reset}",
+)
+@option(
+    "--auth",
+    metavar="<USERNAME PASSWORD>",
+    type=(str, str),
+    default=None,
+    help=f"Enable HTTP Basic authentication.",
+)
+@option(
+    "--auth-ignore",
+    metavar="<IP>",
+    type=str,
+    multiple=True,
+    help=f"Ignore authentication for IP addresses. [multiple]",
+)
+@option("--cache/--no-cache", is_flag=True, default=True, help="Use cache.")
+@option("--browser/--no-browser", "browser", is_flag=True, default=True, help="Open browser on startup.")
+@option(
+    "--color/--no-color",
+    is_flag=True,
+    is_eager=True,
+    default=None,
+    expose_value=False,
+    callback=color_callback,
+    help="Toggle ANSI colors.",
+)
 @help_option("--help", "-h", is_eager=True, help="Show help message and exit.")
 @pass_context
 @docstring_format(server_name=__prog__name__, server_version=__version__)
-def main(ctx: Context, database: Path | None, host: str, port: int | None, ssl_cert: Path | None, ssl_key: Path | None,
-         redirect_http: int | None, auth: str | None, precache: bool, browser: bool):
+def main(
+    ctx: Context,
+    database: Path | None,
+    host: str,
+    port: int | None,
+    ssl_cert: Path | None,
+    ssl_key: Path | None,
+    redirect_http: int | None,
+    auth: tuple[str, str] | None,
+    auth_ignore: tuple[str, ...],
+    cache: bool,
+    browser: bool,
+):
     """
     Start a server at {yellow}HOST{reset}:{yellow}PORT{reset} to navigate the database at {yellow}DATABASE{reset}. The
     {yellow}--ssl-cert{reset} and {yellow}--ssl-cert{reset} options allow serving with HTTPS. Setting
@@ -103,17 +158,36 @@ def main(ctx: Context, database: Path | None, host: str, port: int | None, ssl_c
     For more details on usage see https://pypi.org/project/{server_name}/{server_version}.
     """
     if ssl_cert and not ssl_key:
-        raise BadParameter(f"'--ssl-cert' and '--ssl-key' must be set together.", ctx,
-                           next(_p for _p in ctx.command.params if _p.name == 'ssl_key'))
+        raise BadParameter(
+            f"'--ssl-cert' and '--ssl-key' must be set together.",
+            ctx,
+            next(_p for _p in ctx.command.params if _p.name == "ssl_key"),
+        )
     elif ssl_key and not ssl_cert:
-        raise BadParameter(f"'--ssl-cert' and '--ssl-key' must be set together.", ctx,
-                           next(_p for _p in ctx.command.params if _p.name == 'ssl_cert'))
+        raise BadParameter(
+            f"'--ssl-cert' and '--ssl-key' must be set together.",
+            ctx,
+            next(_p for _p in ctx.command.params if _p.name == "ssl_cert"),
+        )
     elif port is not None and port == redirect_http:
-        raise BadParameter("PORT and PORT2 cannot be identical.", ctx,
-                           next(_p for _p in ctx.command.params if _p.name == "redirect_http"))
+        raise BadParameter(
+            "PORT and PORT2 cannot be identical.",
+            ctx,
+            next(_p for _p in ctx.command.params if _p.name == "redirect_http"),
+        )
 
-    server(database or Path(), host, port, ssl_cert, ssl_key, redirect_http, precache, auth, browser)
+    server(
+        database or Path(),
+        host,
+        port,
+        ssl_cert,
+        ssl_key,
+        auth,
+        auth_ignore,
+        cache,
+        browser,
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

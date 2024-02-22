@@ -1,0 +1,67 @@
+<!--suppress HtmlFormInputWithoutLabel -->
+{% extends "base.j2" %}
+{% block main %}
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <form action="{{ request.url.path }}" method="post" class="border rounded p-3">
+                <h5>Search Settings</h5>
+
+                {% for table, columns in tables.items() %}
+                    <div class="form-group mt-3">
+                        <h6>{{ table|title }}</h6>
+                        <div class="input-group">
+                            <span class="input-group-text" style="width: 4.4rem">Sort</span>
+                            <select name="sort.{{ table }}" class="form-select">
+                                {% for col in columns|map("lower") %}
+                                    <option value="{{ col }}" {{ "selected" if settings.sort[table]|lower == col }}>
+                                        {% for word in col.replace("_", " ").strip().split(" ") %}
+                                            {{ word|title if word|length > 2 else word|upper }}
+                                        {% endfor %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <select name="order.{{ table }}" class="form-select">
+                                <option value="asc" {{ "selected" if settings.order[table]|lower == "asc" }}>
+                                    Ascending
+                                </option>
+                                <option value="desc" {{ "selected" if settings.order[table]|lower == "desc" }}>
+                                    Descending
+                                </option>
+                            </select>
+                        </div>
+                        <div class="input-group mt-1">
+                            <span class="input-group-text" style="width: 4.4rem">View</span>
+                            <select class="form-select" name="view.{{ table }}">
+                                <option value="grid" {{ "selected" if settings.view[table]|lower == "grid" }}>
+                                    Grid
+                                </option>
+                                <option value="list" {{ "selected" if settings.view[table]|lower == "list" }}>
+                                    List
+                                </option>
+                            </select>
+                            <select class="form-select" name="limit.{{ table }}">
+                                <option value="12" {{ "selected" if settings.limit[table] == 12 }}>
+                                    12
+                                </option>
+                                <option value="24" {{ "selected" if settings.limit[table] == 24 }}>
+                                    24
+                                </option>
+                                <option value="48" {{ "selected" if settings.limit[table] == 48 }}>
+                                    48
+                                </option>
+                                <option value="96" {{ "selected" if settings.limit[table] == 96 }}>
+                                    96
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="mt-4 text-center">
+                    <button class="btn btn-secondary" type="button" onclick="window.location.reload()">Reset</button>
+                    <button class="btn btn-primary ms-4">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

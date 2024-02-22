@@ -1,0 +1,256 @@
+{% extends "base.j2" %}
+{% from "components/pagination.j2" import Pagination %}
+{% from "components/cards.j2" import UserCard, SubmissionCard %}
+{% from "components/tables.j2" import Table %}
+
+{% set pagination = Pagination("search_form", results, offset, limit, page) %}
+
+{% block title %}{{ title or "Search {}".format(table.title()) }}{% endblock %}
+
+{% block main %}
+    <!--suppress HtmlFormInputWithoutLabel -->
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <form action="{{ action }}" class="rounded border p-3" id="search_form">
+                <div class="d-flex align-items-center">
+                    <h5 class="m-0">{{ title }}</h5>
+
+                    <a class="btn btn-sm btn-outline-secondary ms-auto" href="/settings">
+                        <svg width="12" height="12" viewBox="0 0 16 16" style="fill: var(--bs-body-color)">
+                            <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"></path>
+                        </svg>
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary ms-1" type="button"
+                            onclick="const h = document.getElementById('help'); h.hidden = !h.hidden;">
+                        <svg width="12" height="12" viewBox="0 0 16 16" style="fill: var(--bs-body-color)">
+                            <path d="M4.475 5.458c-.284 0-.514-.237-.47-.517C4.28 3.24 5.576 2 7.825 2c2.25 0 3.767 1.36 3.767 3.215 0 1.344-.665 2.288-1.79 2.973-1.1.659-1.414 1.118-1.414 2.01v.03a.5.5 0 0 1-.5.5h-.77a.5.5 0 0 1-.5-.495l-.003-.2c-.043-1.221.477-2.001 1.645-2.712 1.03-.632 1.397-1.135 1.397-2.028 0-.979-.758-1.698-1.926-1.698-1.009 0-1.71.529-1.938 1.402-.066.254-.278.461-.54.461h-.777ZM7.496 14c.622 0 1.095-.474 1.095-1.09 0-.618-.473-1.092-1.095-1.092-.606 0-1.087.474-1.087 1.091S6.89 14 7.496 14Z"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="mt-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="query" name="query" placeholder="Search"
+                               value="{{ query }}" oninput="enableSearch()">
+                        <select class="form-select form-select-sm" id="queryAdd"
+                                oninput="addToInput(document.getElementById('query'), '@' + this.value); this.options[0].selected = true;"
+                                style="max-width: 5rem; background-color: #E9ECEF">
+                            <option selected disabled class="d-none disabled">Field</option>
+                            <option value="any">Any</option>
+                            {% for col in results.columns_table if col.lower() != 'relevance' %}
+                                <option value="{{ col.lower() }}">
+                                    {{ col.replace("_", " ").title() if col|length > 2 else col.replace("_", " ").upper() }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <div class="input-group">
+                        <span class="input-group-text" style="width: 4.4rem">Sort</span>
+                        <select class="form-select form-select-sm" id="sort" name="sort" oninput="enableSearch()">
+                            {% for col in results.columns_table %}
+                                <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">
+                                    {{ col.replace("_", " ").title() if col|length > 2 else col.replace("_", " ").upper() }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <select class="form-select form-select-sm" id="order" name="order" oninput="enableSearch()">
+                            <option {{ "selected" if results.order == "asc" }} value="asc">Ascending</option>
+                            <option {{ "selected" if results.order == "desc" }} value="desc">Descending</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <div class="input-group">
+                        <span class="input-group-text" style="width: 4.4rem">View</span>
+                        <select class="form-select form-select-sm" name="view"
+                                oninput="changeView(this.value)" {{ "disabled" if not change_view }}>
+                            <option value="grid" {{ "selected" if view == "grid" }}>Grid</option>
+                            <option value="list"{{ "selected" if view == "list" }}>List</option>
+                        </select>
+                        <select class="form-select form-select-sm" name="limit"
+                                oninput="enableSearch()">
+                            <option value="12" {{ "selected" if limit == 12 }}>12</option>
+                            <option value="24" {{ "selected" if limit == 24 }}>24</option>
+                            <option value="48" {{ "selected" if limit == 48 }}>48</option>
+                            <option value="72" {{ "selected" if limit == 72 }}>72</option>
+                            <option value="96" {{ "selected" if limit == 96 }}>96</option>
+                            <option value="120" {{ "selected" if limit == 120 }}>120</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="border-top border-bottom pt-2 mt-3" id="help" hidden>
+                    <p>The query language used for this server is based on and improves the search syntax currently used
+                        by the Fur Affinity website. Its basic elements are:</p>
+                    <ul>
+                        <li>
+                            <code>@&lt;field&gt;</code> field specifier (e.g. <code>@title</code>), all database columns
+                            can be searched. Click on the <em>Field</em> menu for a list of the available search fields.
+                        </li>
+                        <li>
+                            <code>()</code> parentheses, they can be used for better logic operations
+                        </li>
+                        <li>
+                            <code>&amp;</code> <em>AND</em> logic operator, used between search terms
+                        </li>
+                        <li>
+                            <code>|</code> <em>OR</em> logic operator, used between search terms
+                        </li>
+                        <li>
+                            <code>!</code> <em>NOT</em> logic operator, used as prefix of search terms
+                        </li>
+                        <li>
+                            <code>""</code> quotes, allow searching for literal strings without needing to escape
+                        </li>
+                        <li>
+                            <code>%</code> match 0 or more characters
+                        </li>
+                        <li>
+                            <code>_</code> match exactly 1 character
+                        </li>
+                        <li>
+                            <code>^</code> start of field, when used at the start of a search term, it matches the
+                            beginning of the field
+                        </li>
+                        <li>
+                            <code>$</code> end of field, when used at the end of a search term, it matches the end of
+                            the field
+                        </li>
+                    </ul>
+                    <p>All other strings are considered search terms.</p>
+                    <p>The search uses the <code>@any</code> field by default, allowing to do general searches without
+                        specifying a field.</p>
+                    <p>Search terms that are not separated by a logic operator are considered <em>AND</em> terms (i.e.
+                        <code>a b c</code> -&gt; <code>a &amp; b &amp; c</code>).</p>
+                    <p>Except for the <code>ID</code>, <code>AUTHOR</code>, and <code>USERNAME</code> fields, all search
+                        terms are searched through the whole content of the
+                        various fields: i.e. <code>@description cat</code> will match any item whose description field
+                        contains "cat". To match items that contain only "cat" (or start with, end with, etc.), the
+                        <code>%</code>, <code>_</code>, <code>^</code>, and <code>$</code> operators need to be used (
+                        e.g. <code>@description ^cat</code>).</p>
+                    <p>Search terms for <code>ID</code>, <code>AUTHOR</code>, and <code>USERNAME</code> are matched
+                        exactly as they are: i.e. <code>@author tom</code> will match only items whose author field is
+                        exactly equal to "tom", to match items that contain "tom" the <code>%</code>, <code>_</code>,
+                        <code>^</code>, and <code>$</code> operators need to be used (e.g. <code>@author %tom%</code>).
+                    </p>
+                </div>
+
+                <div class="row text-center mt-3">
+                    <div class="col-4 ms-auto">
+                        <button type="submit" id="search_submit" class="btn btn-primary w-100" disabled>Search</button>
+                    </div>
+                    <div class="col-4 me-auto">
+                        <button type="submit" class="btn btn-primary w-100"
+                                onclick="document.getElementById('query').value = ''">
+                            Browse
+                        </button>
+                    </div>
+                    {% if table == "submissions" %}
+                        <div class="col-4">
+                            <button type="button" class="btn btn-info w-100" onclick="convertToFAQuery()">
+                                FA
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if not results.rows and query %}
+        <div class="text-center mt-5">There are no {{ table }} for this query 😢</div>
+    {% elif not results.rows %}
+        <div class="text-center mt-5">There are no {{ table }} 😢</div>
+    {% else %}
+        <div class="row">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-4 mx-auto">
+                {{ pagination }}
+            </div>
+        </div>
+
+        <div class="row row-gap-3 my-3" id="grid_view" {{ "hidden" if view != "grid" }}>
+            {% for item in results.rows[offset:offset + limit] %}
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    {% if table == "users" %}
+                        {{ UserCard(item, "{}.{}".format(offset + loop.index0, search_id) if search_id else "") }}
+                    {% elif table == "submissions" %}
+                        {{ SubmissionCard(item, "{}.{}".format(offset + loop.index0, search_id) if search_id else "") }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="row my-3" id="list_view" {{ "hidden" if view != "list" }}>
+            <div class="col-12 col-lg-10 mx-auto">
+                <div class="table-responsive border rounded p-1">
+                    {% if table == "users" %}
+                        {{ Table(results, offset, limit, [], ["active"], [], "/user/{USERNAME}", "search_form", sort, order, None) }}
+                    {% elif table == "submissions" %}
+                        {{ Table(results, offset, limit, ["date"], ["filesaved", "userupdate"], ["id", "fileext"], "/submission/{ID}", "search_form", sort, order, search_id) }}
+                    {% elif table == "journals" %}
+                        {{ Table(results, offset, limit, ["date"], [], ["id"], "/journal/{ID}", "search_form", sort, order, search_id) }}
+                    {% elif table == "comments" %}
+                        {{ Table(results, offset, limit, ["date"], [], ["id"], "/comment/{PARENT_TABLE}/{PARENT_ID}/{ID}", "search_form", sort, order, None) }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-4 mx-auto">
+                {{ pagination }}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    <script>
+        {% if change_view %}
+            const changeView = (view) => {
+                const grid = document.getElementById("grid_view")
+                document.getElementById("list_view").hidden = !(grid.hidden = view.toLowerCase() !== "grid")
+                const url = new URL(window.location.href)
+                url.searchParams.set("view", view)
+                window.history.replaceState({}, '', url.href)
+            }
+        {% endif %}
+
+        let enableSearch = () => {
+            document.getElementById("search_submit").disabled = false
+            enableSearch = () => null
+        }
+
+        const addToInput = (input, value) => {
+            const selectStart = input.selectionStart, selectEnd = input.selectionEnd
+            const a = input.value.substring(0, selectStart), b = input.value.substring(selectEnd)
+            const addition = selectStart === selectEnd ? `${value} ` : `(${value} ${input.value.substring(selectStart, selectEnd)})`
+            input.value = a + addition + (!!b ? " " : "") + b
+            input.focus()
+            input.setSelectionRange(selectStart + addition.length, selectStart + addition.length)
+        }
+
+        {% if table == "submissions" %}
+            const convertToFAQuery = () => {
+                const url = new URL("https://furaffinity.net/search/")
+                const query = document.getElementById("query").value
+                    .replace(/@(?!(tags|author|description|fileurl|fileext|title))[^@ ]+ ?/ig, "")
+                    .replace(/@tags/ig, "@keywords")
+                    .replace(/@author/ig, "@lower")
+                    .replace(/@description/ig, "@message")
+                    .replace(/@(fileurl|fileext)/ig, "@filename")
+                    .trim()
+                url.searchParams.set("q", query)
+                if (document.getElementById("sort").value.match(/date|id/i)) {
+                    url.searchParams.set("order-by", "date")
+                    url.searchParams.set("order-direction", document.getElementById("order").value)
+                }
+                window.location = url.href
+            }
+        {% endif %}
+    </script>
+{% endblock %}

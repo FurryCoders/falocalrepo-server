@@ -1,61 +1,68 @@
+from base64 import b64decode
+from base64 import b64encode
+from contextlib import asynccontextmanager
+from copy import deepcopy
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
+from hashlib import sha256
 from io import BytesIO
-from json import dumps
 from logging import Logger
 from logging import getLogger
 from math import ceil
 from os import PathLike
 from pathlib import Path
 from re import IGNORECASE
+from re import MULTILINE
 from re import Pattern
 from re import compile as re_compile
-from re import match
-from re import sub as re_sub
 from secrets import compare_digest
-from sqlite3 import DatabaseError
-from sqlite3 import OperationalError
+from traceback import format_exc
 from typing import Any
-from typing import Callable
-from typing import Coroutine
 from webbrowser import open as open_browser
 from zipfile import ZipFile
 
 from PIL import Image
 from PIL import UnidentifiedImageError
-from bbcode import Parser as BBCodeParser
-from bs4 import BeautifulSoup
-from bs4.element import NavigableString
-from bs4.element import Tag
-from chardet import detect as detect_encoding
-from falocalrepo_database.tables import JournalsColumns
-from falocalrepo_database.tables import SubmissionsColumns
-from falocalrepo_database.tables import UsersColumns
-from fastapi import FastAPI
-from fastapi import Request
-from fastapi import Response
-from fastapi import status
-from fastapi.exceptions import HTTPException
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse
-from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
-from fastapi.responses import RedirectResponse
-from fastapi.responses import StreamingResponse
-from fastapi.security import HTTPBasic
-from fastapi.security import HTTPBasicCredentials
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from htmlmin import minify
-from pydantic import BaseModel
-from pydantic_settings import BaseSettings
+from baize.asgi import FileResponse
+
+# noinspection PyProtectedMember
+from falocalrepo_database import __package__ as __package_database__
+from falocalrepo_database import __version__ as __version_database__
+from falocalrepo_database.tables import comments_table
+from orjson import dumps
+from orjson import loads
+from starlette import status
+from starlette.applications import Starlette
+from starlette.authentication import AuthCredentials
+from starlette.authentication import AuthenticationBackend
+from starlette.authentication import AuthenticationError
+from starlette.authentication import SimpleUser
+from starlette.authentication import requires
+from starlette.convertors import StringConvertor
+from starlette.convertors import register_url_convertor
+from starlette.exceptions import HTTPException
+from starlette.middleware import Middleware
+from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import RequestResponseEndpoint
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.requests import HTTPConnection
+from starlette.requests import Request
+from starlette.responses import RedirectResponse
+from starlette.responses import Response
+from starlette.responses import StreamingResponse
+from starlette.routing import BaseRoute
+from starlette.routing import Mount
+from starlette.routing import Route
+from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
+from starlette.types import ExceptionHandler
 from uvicorn import run
-from uvicorn.config import LOGGING_CONFIG
 
 from .__version__ import __version__
 from .database import Database
+from .database import Settings
 from .database import clean_username
 from .database import default_order
 from .database import default_sort
@@ -63,627 +70,447 @@ from .database import journals_table
 from .database import submissions_table
 from .database import users_table
 
-
-class SearchSettings(BaseSettings):
-    view: dict[str, str] = {users_table: "grid", submissions_table: "grid", journals_table: "grid"}
-    limit: dict[str, str] = {users_table: "48", submissions_table: "48", journals_table: "48"}
-    sort: dict[str, str] = default_sort
-    order: dict[str, str] = default_order
-
-    def reset(self):
-        self.view = {users_table: "grid", submissions_table: "grid", journals_table: "grid"}
-        self.limit = {users_table: "48", submissions_table: "48", journals_table: "48"}
-        self.sort = default_sort
-        self.order = default_order
-
-    def load(self, obj: dict):
-        self.view = obj.get("view", self.view)
-        self.limit = obj.get("limit", self.limit)
-        self.sort = obj.get("sort", self.sort)
-        self.order = obj.get("order", self.order)
-
-
-class Settings(BaseSettings):
-    database: Database | None = None
-    static_folder: Path = None
-    ssl_cert: Path | None = None
-    ssl_key: Path | None = None
-    precache: bool = False
-    open_browser: bool = True
-    address: str | None = None
-    username: str | None = None
-    password: str | None = None
-
-
-class SearchQuery(BaseModel):
-    query: str = ""
-    limit: int = 48
-    offset: int = 0
-    sort: str = ""
-    order: str = ""
-
-
+default_search_settings: Settings = {
+    "view": {users_table: "grid", submissions_table: "grid", journals_table: "list", comments_table: "list"},
+    "limit": {users_table: 48, submissions_table: 48, journals_table: 48, comments_table: 48},
+    "sort": default_sort,
+    "order": default_order,
+}
+mobile_user_agent_pattern_a = re_compile(
+    r"(android|bb\\d+|meego).+mobile|avantgo|bada\\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|"
+    r"ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)"
+    r"\\/|plucker|pocket|psp|series([46])0|symbian|treo|up\\.(browser|link)|vodafone|wap|windows ce|xda|xiino",
+    IGNORECASE | MULTILINE,
+)
+mobile_user_agent_pattern_b = re_compile(
+    r"1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)"
+    r"|aptu|ar(ch|go)|as(te|us)|attw|au(di|\\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br([ev])w|bumb|bw\\-([nu])"
+    r"|c55\\/|capi|ccwa|cdm\\-|cell|chtm|cldc|cmd\\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\\-s|devi|dica|dmob|do([cp])o|"
+    r"ds(12|\\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\\-|_)|g1 u|g560|gene|gf\\-5|g\\-mo"
+    r"|go(\\.w|od)|gr(ad|un)|haie|hcit|hd\\-([mpt])|hei\\-|hi(pt|ta)|hp( i|ip)|hs\\-c|ht(c(\\-| |_|a|g|p|s|t)|tp)|"
+    r"hu(aw|tc)|i\\-(20|go|ma)|i230|iac( |\\-|\\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja([tv])a|jbro|jemu|jigs|"
+    r"kddi|keji|kgt( |\\/)|klon|kpt |kwc\\-|kyo([ck])|le(no|xi)|lg( g|\\/([klu])|50|54|\\-[a-w])|libw|lynx|m1\\-w|m3ga|"
+    r"m50\\/|ma(te|ui|xo)|mc(01|21|ca)|m\\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\\-| |o|v)|zz)|"
+    r"mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30([02])|n50([025])|n7(0([01])|10)|ne(([cm])\\-|on|tf|wf|wg|wt)|"
+    r"nok([6i])|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan([adt])|pdxg|pg(13|\\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\\-2|"
+    r"po(ck|rt|se)|prox|psio|pt\\-g|qa\\-a|qc(07|12|21|32|60|\\-[2-7]|i\\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\\/|"
+    r"sa(ge|ma|mm|ms|ny|va)|sc(01|h\\-|oo|p\\-)|sdk\\/|se(c(\\-|0|1)|47|mc|nd|ri)|sgh\\-|shar|sie(\\-|m)|sk\\-0|"
+    r"sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\\-|v\\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\\-|"
+    r"tdg\\-|tel([im])|tim\\-|t\\-mo|to(pl|sh)|ts(70|m\\-|m3|m5)|tx\\-9|up(\\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|"
+    r"vk(40|5[0-3]|\\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|"
+    r"x700|yas\\-|your|zeto|zte\\-",
+    IGNORECASE | MULTILINE,
+)
 logger: Logger = getLogger("uvicorn")
-LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
-    '%(levelprefix)s %(asctime)s %(client_addr)s - %(request_line)s %(status_code)s %(msecs).0fms'
-
-app_title: str = "FurAffinity Local Repo"
-fa_base_url: str = "https://www.furaffinity.net"
-fa_link: Pattern = re_compile(r"(https?://)?(www.)?furaffinity.net", flags=IGNORECASE)
 root: Path = Path(__file__).resolve().parent
-app: FastAPI = FastAPI(title=app_title, openapi_url=None)
-templates: Jinja2Templates = Jinja2Templates(str(root / "templates"))
-settings: Settings = Settings(static_folder=root / "static")
-search_settings: SearchSettings = SearchSettings()
-security: HTTPBasic = HTTPBasic()
-
-icons: list[str] = ["crying", "derp", "dunno", "embarrassed", "evil", "gift", "huh", "lmao", "love", "nerd", "note",
-                    "oooh", "pleased", "rollingeyes", "sad", "sarcastic", "serious", "sleepy", "smile", "teeth",
-                    "tongue", "veryhappy", "wink", "yelling", "zipped", "angel", "badhairday", "cd", "coffee", "cool",
-                    "whatever"]
-
-app.mount("/static", StaticFiles(directory=settings.static_folder), "static")
+templates: Jinja2Templates = Jinja2Templates(
+    str(root / "templates"),
+    context_processors=[
+        lambda r: {
+            "version": __version__,
+            "is_mobile": is_request_mobile(r),
+        },
+    ],
+)
 
 
-def flatten_comments(comments: list[dict]) -> list[dict]:
-    return [*{c["ID"]: c for c in [r for c in comments for r in [c, *flatten_comments(c["REPLIES"])]]}.values()]
-
-
-def comments_depth(comments: list[dict], depth: int = 0, root_comment: int = None) -> list[dict]:
-    return [com | {"DEPTH": depth,
-                   "REPLIES": comments_depth(com.get("REPLIES", []), depth + 1, root_comment or com["ID"]),
-                   "ROOT": root_comment}
-            for com in comments]
-
-
-def prepare_comments(comments: list[dict], use_bbcode: bool) -> list[dict]:
-    return [c | {"TEXT": bbcode_to_html(c["TEXT"]) if use_bbcode else clean_html(c["TEXT"])}
-            for c in flatten_comments(comments_depth(comments, 0))]
-
-
-def bbcode_to_html(bbcode: str) -> str:
-    def render_url(_tag_name, value: str, options: dict[str, str], _parent, _context) -> str:
-        return f'<a class="auto_link named_url" href="{options.get("url", "#")}">{value}</a>'
-
-    def render_color(_tag_name, value, options, _parent, _context) -> str:
-        return f'<span class=bbcode style="color:{options.get("color", "inherit")};">{value}</span>'
-
-    def render_quote(_tag_name, value: str, options: dict[str, str], _parent, _context) -> str:
-        author: str = options.get("quote", "")
-        author = f"<span class=bbcode_quote_name>{author} wrote:</span>" if author else ""
-        return f'<span class="bbcode bbcode_quote">{author}{value}</span>'
-
-    def render_tags(tag_name: str, value: str, options: dict[str, str], _parent, _context) -> str:
-        if not options and tag_name.islower():
-            return f"<{tag_name}>{value}</{tag_name}>"
-        return f"[{tag_name} {' '.join(f'{k}={v}' if v else k for k, v in options.items())}]{value}"
-
-    def render_tag(_tag_name, value: str, options: dict[str, str], _parent, _context) -> str:
-        name, *classes = options["tag"].split(".")
-        return f'<{name} class="{" ".join(classes)}">{value}</{name}>'
-
-    def parse_extra(page: BeautifulSoup) -> BeautifulSoup:
-        child: NavigableString
-        child_new: Tag
-        has_match: bool = True
-        while has_match:
-            has_match = False
-            for child in [c for e in page.select("*:not(a)") for c in e.children if isinstance(c, NavigableString)]:
-                if m_ := match(r"(.*)(https?://(?:www\.)?((?:[\w/%#\[\]@*-]|[.,?!'()&~:;=](?! ))+))(.*)", child):
-                    has_match = True
-                    child_new = Tag(name="a", attrs={"class": f"auto_link_shortened", "href": m_[2]})
-                    child_new.insert(0, m_[3].split("?", 1)[0])
-                    child.replaceWith(m_[1], child_new, m_[4])
-                elif m_ := match(rf"(.*):({'|'.join(icons)}):(.*)", child):
-                    has_match = True
-                    child_new = Tag(name="i", attrs={"class": f"smilie {m_[2]}"})
-                    child.replaceWith(m_[1], child_new, m_[3])
-                elif m_ := match(r"(.*)(?:@([a-zA-Z0-9.~_-]+)|:link([a-zA-Z0-9.~_-]+):)(.*)", child):
-                    has_match = True
-                    child_new = Tag(name="a", attrs={"class": "linkusername", "href": f"/user/{m_[2] or m_[3]}"})
-                    child_new.insert(0, m_[2] or m_[3])
-                    child.replaceWith(m_[1], child_new, m_[4])
-                elif m_ := match(r"(.*):(?:icon([a-zA-Z0-9.~_-]+)|([a-zA-Z0-9.~_-]+)icon):(.*)", child):
-                    has_match = True
-                    user: str = m_[2] or m_[3] or ""
-                    child_new = Tag(name="a", attrs={"class": "iconusername", "href": f"/user/{user}"})
-                    child_new_img: Tag = Tag(
-                        name="img",
-                        attrs={"alt": user, "title": user,
-                               "src": f"/user/{clean_username(user)}/icon"})
-                    child_new.insert(0, child_new_img)
-                    if m_[2]:
-                        child_new.insert(1, f"\xA0{m_[2]}")
-                    child.replaceWith(m_[1], child_new, m_[4])
-                elif m_ := match(r"(.*)\[ *(?:(\d+)|-)?, *(?:(\d+)|-)? *, *(?:(\d+)|-)? *](.*)", child):
-                    has_match = True
-                    child_new = Tag(name="span", attrs={"class": "parsed_nav_links"})
-                    child_new_1: Tag | str = "<<<\xA0PREV"
-                    child_new_2: Tag | str = "FIRST"
-                    child_new_3: Tag | str = "NEXT\xA0>>>"
-                    if m_[2]:
-                        child_new_1 = Tag(name="a", attrs={"href": f"/view/{m_[2]}"})
-                        child_new_1.insert(0, "<<<\xA0PREV")
-                    if m_[3]:
-                        child_new_2 = Tag(name="a", attrs={"href": f"/view/{m_[3]}"})
-                        child_new_2.insert(0, "<<<\xA0FIRST")
-                    if m_[4]:
-                        child_new_3 = Tag(name="a", attrs={"href": f"/view/{m_[4]}"})
-                        child_new_3.insert(0, "NEXT\xA0>>>")
-                    child_new.insert(0, child_new_1)
-                    child_new.insert(1, "\xA0|\xA0")
-                    child_new.insert(2, child_new_2)
-                    child_new.insert(3, "\xA0|\xA0")
-                    child_new.insert(4, child_new_3)
-                    child.replaceWith(m_[1], child_new, m_[5])
-
-        for p in page.select("p"):
-            p.replaceWith(*p.children)
-
-        return page
-
-    parser: BBCodeParser = BBCodeParser(install_defaults=False, replace_links=False, replace_cosmetic=True)
-    parser.REPLACE_ESCAPE = (
-        ("&", "&amp;"),
-        ("<", "&lt;"),
-        (">", "&gt;"),
-    )
-    parser.REPLACE_COSMETIC = (
-        ("(c)", "&copy;"),
-        ("(r)", "&reg;"),
-        ("(tm)", "&trade;"),
-    )
-
-    for tag in ("i", "b", "u", "s", "sub", "sup", "h1", "h2", "h3", "h3", "h4", "h5", "h6"):
-        parser.add_formatter(tag, render_tags)
-    for align in ("left", "center", "right"):
-        parser.add_simple_formatter(align, f'<code class="bbcode bbcode_{align}">%(value)s</code>')
-
-    parser.add_simple_formatter("spoiler", '<span class="bbcode bbcode_spoiler">%(value)s</span>')
-    parser.add_simple_formatter("url", '<a class="auto_link named_link">%(value)s</a>')
-    parser.add_simple_formatter(
-        "iconusername",
-        f'<a class=iconusername href="/user/%(value)s">'
-        f'<img alt="%(value)s" title="%(value)s" src="/user/%(value)s/icon">'
-        f'%(value)s'
-        f'</a>'
-    )
-    parser.add_simple_formatter(
-        "usernameicon",
-        f'<a class=iconusername href="/user/%(value)s">'
-        f'<img alt="%(value)s" title="%(value)s" src="/user/%(value)s/icon">'
-        f'</a>'
-    )
-    parser.add_simple_formatter("linkusername", '<a class=linkusername href="/user/%(value)s">%(value)s</a>')
-    parser.add_simple_formatter("hr", "<hr>", standalone=True)
-
-    parser.add_formatter("url", render_url)
-    parser.add_formatter("color", render_color)
-    parser.add_formatter("quote", render_quote)
-    parser.add_formatter("tag", render_tag)
-
-    bbcode = re_sub(r"-{5,}", "[hr]", bbcode)
-
-    result_page: BeautifulSoup = parse_extra(BeautifulSoup(parser.format(bbcode), "lxml"))
-    return (result_page.select_one("html > body") or result_page).decode_contents()
-
-
-def clean_html(html: str) -> str:
-    html_parsed: BeautifulSoup = BeautifulSoup(html, "lxml")
-    for icon in html_parsed.select("a.iconusername > img"):
-        icon.attrs["hidden"] = "true"
-        icon.attrs["onload"] = "this.hidden = false"
-        icon.attrs["src"] = f"/user/{clean_username(icon.attrs['title'])}/icon/"
-    for link in html_parsed.select("a[href*='furaffinity.net']"):
-        link["href"] = "/" + fa_link.sub("", link.attrs["href"]).strip("/")
-    return str(html_parsed)
-
-
-def prepare_html(html: str, use_bbcode: bool) -> str:
-    return clean_html(bbcode_to_html(html)) if use_bbcode else clean_html(html)
-
-
-def serialise_entry(entry: Any, convert_datetime: bool = False, lowercase_keys: bool = True) -> Any:
-    if isinstance(entry, dict):
-        return {(k.lower() if lowercase_keys else k): serialise_entry(v, convert_datetime, lowercase_keys)
-                for k, v in entry.items()}
-    elif isinstance(entry, (list, tuple)):
-        return [serialise_entry(e, convert_datetime, lowercase_keys) for e in entry]
-    elif isinstance(entry, set):
-        return sorted((serialise_entry(e, convert_datetime, lowercase_keys) for e in entry))
-    elif isinstance(entry, datetime) and convert_datetime:
-        return str(entry)
-    else:
-        return entry
-
-
-def error_response(request: Request, code: int, message: str = None, buttons: list[tuple[str, str]] = None) -> Response:
-    return templates.TemplateResponse(
-        "error.html",
-        {"app": app_title,
-         "title": f"Error {code}",
-         "code": code,
-         "message": message,
-         "buttons": buttons,
-         "request": request},
-        code
+def is_request_mobile(request: Request) -> bool | None:
+    user_agent: str | None = request.headers.get("user-agent")
+    return (
+        None
+        if not user_agent
+        else bool(mobile_user_agent_pattern_a.search(user_agent) or mobile_user_agent_pattern_b.search(user_agent[:4]))
     )
 
 
-async def auth_middleware(request: Request, call_next: Callable[[Request], Coroutine[Any, Any, Response]]) -> Response:
-    if request.url.path.startswith("/static"):
+class CacheMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        request.state.database.clear_cache()
         return await call_next(request)
 
+
+class NoAuthBackend(AuthenticationBackend):
+    async def authenticate(self, conn: HTTPConnection):
+        return AuthCredentials(["authenticated"]), SimpleUser("")
+
+
+class BasicAuthBackend(AuthenticationBackend):
+    def __init__(self, auth: tuple[str, str] | None, allowed_ips: tuple[str, ...] | None):
+        username, password = auth or (None, None)
+        self.username: str | None = username
+        self.password: str | None = password
+        self.allowed_ips: list[Pattern] = [
+            re_compile(ip.replace(".", r"\.").replace("*", r".*")) for ip in allowed_ips or []
+        ]
+        super().__init__()
+
+    @staticmethod
+    def on_auth_error(_req: Request, exc: Exception):
+        return Response(
+            ". ".join(map(str, exc.args)),
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
+    async def authenticate(self, conn: HTTPConnection):
+        if self.username is None and self.password is None:
+            return AuthCredentials(["authenticated"]), SimpleUser("")
+        elif any(ip.match(conn.client.host) for ip in self.allowed_ips):
+            return AuthCredentials(["authenticated"]), SimpleUser("")
+
+        if not (auth := conn.headers.get("Authorization", conn.session.get("auth"))):
+            raise AuthenticationError("Missing credentials")
+
+        try:
+            scheme, credentials = auth.split()
+            if scheme.lower() != "basic":
+                return
+            decoded = b64decode(credentials).decode("ascii")
+        except Exception:
+            raise AuthenticationError("Invalid basic auth credentials")
+
+        username, _, password = decoded.partition(":")
+
+        if compare_digest(username, self.username or "") and compare_digest(password, self.password or ""):
+            conn.session.update(auth=auth)
+            return AuthCredentials(["authenticated"]), SimpleUser(username)
+        else:
+            conn.session.pop("auth", None)
+            raise AuthenticationError("Invalid basic auth credentials")
+
+
+class TableConvertor(StringConvertor):
+    regex = f"({'|'.join([users_table, submissions_table, journals_table, comments_table])})".lower()
+
+
+def merge_settings(a: Settings, b: dict[str, dict[str | int]]) -> Settings:
+    return {
+        "view": a["view"] | b.get("view", {}),
+        "limit": a["limit"] | b.get("limit", {}),
+        "sort": a["sort"] | b.get("sort", {}),
+        "order": a["order"] | b.get("order", {}),
+    }
+
+
+def is_mobile(request: Request):
+    user_agent: str | None = request.headers.get("user-agent")
+    if not user_agent:
+        request.state.is_mobile = None
+    request.state.is_mobile = (
+        mobile_user_agent_pattern_a.search(user_agent) or mobile_user_agent_pattern_b.search(user_agent[:4]),
+    )
+
+
+def encode_search_id(table_name: str, query: str, sort: str, order: str) -> str:
+    return b64encode(dumps([table_name, query, sort, order])).decode()
+
+
+def decode_search_id(encoded_search_id: str) -> tuple[str | None, tuple[str, str, str, str] | None, int | None]:
+    search_terms: tuple[str, str, str, str] | None
+    search_id: str | None
+    search_index: int | None = None
+
+    search_index_, sep, search_id = encoded_search_id.partition(".")
+
+    if sep and search_index_.isdigit():
+        search_index = int(search_index_)
+    elif not sep and search_index_:
+        search_id = search_index_
+
     try:
-        creds: HTTPBasicCredentials = await security(request)
-        if compare_digest(creds.username, settings.username) and compare_digest(creds.password, settings.password):
-            return await call_next(request)
-    except HTTPException as err:
-        if err.status_code != status.HTTP_401_UNAUTHORIZED:
-            return error_response(request, err.status_code, err.detail)
+        t, q, s, o = loads(b64decode(search_id))
+        search_terms = (t, q, s, o)
+    except ValueError:
+        return None, None, None
 
-    return Response(
-        error_response(request, status.HTTP_401_UNAUTHORIZED, "Incorrect username or password",
-                       [("Retry", str(request.url))]).body,
-        status.HTTP_401_UNAUTHORIZED, {"WWW-Authenticate": "Basic"})
+    return search_id, search_terms, search_index
 
 
-@app.on_event("startup")
-def app_startup():
-    logger.info(f"Version: {__version__}")
-    logger.info(f"Using database: {settings.database.path} ({settings.database.version})" +
-                (" (BBCode)" if settings.database.use_bbcode() else ""))
-    logger.info(f"Using SSL certificate: {settings.ssl_cert}") if settings.ssl_cert else None
-    logger.info(f"Using SSL private key: {settings.ssl_key}") if settings.ssl_key else None
-    logger.info(f"Using HTTP Basic authentication") if settings.username or settings.password else None
-    settings.database.clear_cache(settings.database.m_time)
-    if settings.precache:
-        for table, order in [
-            (t, o)
-            for t in (settings.database.users, settings.database.submissions, settings.database.journals)
-            for o in ("asc", "desc")
-        ]:
-            logger.info("Caching " + f"{table.name}:{(sort := search_settings.sort[table.name])}:{order}".upper())
-            settings.database.load_search(table.name, "", "id" if sort.lower() == "date" else sort, order)
-    if settings.open_browser:
-        open_browser(settings.address)
+def make_lifespan(database_path: Path, use_cache: bool, address: str, ssl: bool, authentication: bool, browser: bool):
+    @asynccontextmanager
+    async def _lifespan(_app: Starlette):
+        logger.info(f"Using {__package__.replace('_', '-')}: {__version__}")
+        logger.info(f"Using {__package_database__.replace('_', '-')}: {__version_database__}")
+        with Database(database_path, use_cache) as database:
+            logger.info(
+                f"Using database: {database_path} ({database.database.version})"
+                + (" (cache)" if use_cache else "")
+                + (" (BBCode)" if database.database.settings.bbcode else "")
+            )
+            if ssl:
+                logger.info("Using HTTPS")
+            if authentication:
+                logger.info("Using HTTP Basic authentication")
+            if browser:
+                open_browser(address)
+            yield {"database": database}
+
+    return _lifespan
 
 
-@app.on_event("shutdown")
-def close_database():
-    if settings.database.is_open:
-        settings.database.close()
+@requires(["authenticated"])
+async def home(request: Request):
+    database: Database = request.state.database
+    stats = database.stats()
+    return templates.TemplateResponse(
+        request,
+        "pages/home.j2",
+        {
+            "users_total": stats[0],
+            "submissions_total": stats[1],
+            "journals_total": stats[2],
+            "comments_total": stats[3],
+            "last_update": datetime.fromtimestamp(database.path.stat().st_mtime),
+        },
+    )
 
 
-@app.get("/favicon.ico", response_class=FileResponse)
-async def serve_favicon():
-    return RedirectResponse("/static/favicon.ico", 301)
+# noinspection PyTypedDict
+@requires(["authenticated"])
+async def settings(request: Request):
+    database: Database = request.state.database
+    search_settings: Settings = merge_settings(default_search_settings, database.settings() or {})
+    tables: dict[str, list[str]] = {
+        users_table: [c.name for c in database.database.users.columns],
+        submissions_table: [c.name for c in database.database.submissions.columns],
+        journals_table: [c.name for c in database.database.journals.columns],
+        comments_table: [c.name for c in database.database.comments.columns],
+    }
 
-
-@app.get("/icon.png", response_class=FileResponse)
-@app.get("/touch-icon.png", response_class=FileResponse)
-@app.get("/apple-touch-icon.png", response_class=FileResponse)
-@app.get("/apple-touch-icon-precomposed.png", response_class=FileResponse)
-async def serve_touch_icon():
-    return RedirectResponse("/static/touch-icon.png", 301)
-
-
-@app.exception_handler(HTTPException)
-async def error_unknown(request: Request, err: HTTPException):
-    logger.error(repr(err))
     if request.method == "POST":
-        return JSONResponse({"errors": [{err.__class__.__name__: err.detail}]}, err.status_code)
-    return error_response(request, err.status_code, err.detail or None)
+        form = await request.form()
+        new_settings = deepcopy(search_settings)
+        for key, value in form.items():
+            setting, _, table = key.partition(".")
+            if setting in search_settings and table in search_settings.get(setting):
+                new_settings[setting][table] = type(search_settings[setting][table])(value)
+        if new_settings != search_settings:
+            database.save_settings(new_settings)
+            search_settings = new_settings
+
+    return templates.TemplateResponse(request, "pages/settings.j2", {"settings": search_settings, "tables": tables})
 
 
-@app.exception_handler(404)
-async def error_not_found(request: Request, err: HTTPException):
-    if request.method == "POST":
-        return JSONResponse({"errors": [{err.__class__.__name__: err.detail}]}, err.status_code)
-    return error_response(request, err.status_code, err.detail or "Not found")
+async def search_response(request: Request, table_name: str, query_prefix: str = "", title: str = ""):
+    if (table_name := table_name.upper()) not in (
+        users_table,
+        submissions_table,
+        journals_table,
+        comments_table,
+    ):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"Table {table_name!r} not found.")
+
+    database: Database = request.state.database
+    search_settings: Settings = merge_settings(default_search_settings, database.settings() or {})
+
+    query: str = request.query_params.get("query", request.query_params.get("q", "")).strip()
+    page: int = p if (p := int(request.query_params.get("page", 1))) > 0 else 1
+    limit: int = l_ if (l_ := int(request.query_params.get("limit", search_settings["limit"][table_name]))) > 0 else 48
+    sort: str = request.query_params.get("sort", search_settings["sort"][table_name]).lower()
+    order: str = request.query_params.get("order", search_settings["order"][table_name]).lower()
+
+    if table_name in (users_table, submissions_table):
+        view: str = (
+            v
+            if (v := request.query_params.get("view", search_settings["view"].get(table_name, "")).lower())
+            in ("list", "grid")
+            else "grid"
+        )
+    else:
+        view = default_search_settings["view"][table_name]
+
+    sql_query: str = query
+    if query and query_prefix:
+        sql_query = f"({query_prefix}) & ({query})"
+    elif query_prefix:
+        sql_query = query_prefix
+
+    results = database.search(table_name, sql_query, sort, order)
+
+    if (page - 1) * limit > len(results.rows):
+        page = ceil(len(results.rows) / limit) or 1
+
+    return templates.TemplateResponse(
+        request,
+        "pages/search.j2",
+        {
+            "title": title,
+            "action": request.url.path,
+            "table": table_name.lower(),
+            "query": query,
+            "sort": sort,
+            "order": order,
+            "view": view,
+            "change_view": table_name in (users_table, submissions_table),
+            "thumbnails": table_name in (users_table, submissions_table),
+            "results": results,
+            "page": page,
+            "offset": (page - 1) * limit,
+            "limit": limit,
+            "search_id": encode_search_id(table_name, query, sort, order) if query and database.use_cache else "",
+        },
+    )
 
 
-@app.exception_handler(422)
-@app.exception_handler(RequestValidationError)
-async def error_not_found(request: Request, err: RequestValidationError):
-    logger.error(f"{err.__class__.__name__} {err.errors()}")
-    if request.method == "POST":
-        return JSONResponse({"errors": err.errors()}, 422)
-    return error_response(request, 422, err.errors()[0].get("msg", None) or err.__class__.__name__)
+@requires(["authenticated"])
+async def search(request: Request):
+    if search_id := request.query_params.get("sid"):
+        table, query, sort, order = loads(b64decode(search_id))
+        return RedirectResponse(
+            request.url_for("search", table=table).include_query_params(
+                query=query,
+                sort=sort,
+                order=order,
+            )
+        )
+    return await search_response(request, request.path_params["table"])
 
 
-@app.exception_handler(DatabaseError)
-@app.exception_handler(OperationalError)
-async def error_database(request: Request, err: DatabaseError | OperationalError):
-    logger.error(repr(err))
-    if request.method == "POST":
-        return JSONResponse({"errors": [{err.__class__.__name__: err.args}]}, 500)
-    return error_response(request, 500, "<br/>".join([err.__class__.__name__, *map(str, err.args)]))
+@requires(["authenticated"])
+async def user(request: Request):
+    database: Database = request.state.database
+    usr = database.user(request.path_params["username"])
+    stats = database.user_stats(request.path_params["username"])
+    return templates.TemplateResponse(
+        request,
+        "pages/user.j2",
+        {
+            "username": request.path_params["username"],
+            "user": usr,
+            "stats": stats,
+        },
+    )
 
 
-@app.exception_handler(FileNotFoundError)
-async def error_database_not_found(request: Request, err: FileNotFoundError):
-    logger.error(repr(err))
-    if request.method == "POST":
-        return JSONResponse({"errors": [{err.__class__.__name__: err.args}]}, status.HTTP_503_SERVICE_UNAVAILABLE)
-    return error_response(request, 500, "Database not found")
-
-
-@app.get("/view/{id_}/", response_class=HTMLResponse)
-@app.get("/full/{id_}/", response_class=HTMLResponse)
-async def redirect_submission(id_: int):
-    return RedirectResponse(app.url_path_for(serve_submission.__name__, id_=str(id_)),
-                            status.HTTP_301_MOVED_PERMANENTLY)
-
-
-@app.get("/gallery/{username}/", response_class=HTMLResponse)
-@app.get("/search/gallery/{username}/", response_class=HTMLResponse)
-async def serve_user_gallery(request: Request, username: str):
-    return await serve_search(request, "submissions", f"Gallery {username}",
-                              {"query": f'@author ^{clean_username(username)}$ @folder "gallery"'})
-
-
-@app.get("/scraps/{username}/", response_class=HTMLResponse)
-@app.get("/search/scraps/{username}/", response_class=HTMLResponse)
-async def serve_user_scraps(request: Request, username: str):
-    return await serve_search(request, "submissions", f"Scraps {username}",
-                              {"query": f'@author ^{clean_username(username)}$ @folder "scraps"'})
-
-
-@app.get("/submissions/{username}/", response_class=HTMLResponse)
-@app.get("/search/submissions/{username}/", response_class=HTMLResponse)
-async def serve_user_submissions(request: Request, username: str):
-    return await serve_search(request, "submissions", f"Submissions {username}",
-                              {"query": f'@author ^{clean_username(username)}$'})
-
-
-@app.get("/journals/{username}/", response_class=HTMLResponse)
-@app.get("/search/journals/{username}/", response_class=HTMLResponse)
-async def serve_user_journals(request: Request, username: str):
-    return await serve_search(request, "journals", f"Journals {username}",
-                              {"query": f'@author ^{clean_username(username)}$'})
-
-
-@app.get("/favorites/{username}/", response_class=HTMLResponse)
-@app.get("/search/favorites/{username}/", response_class=HTMLResponse)
-async def serve_user_favorites(request: Request, username: str):
-    return await serve_search(request, "submissions", f"Favorites {username}",
-                              {"query": f'@favorite "|{clean_username(username)}|"'})
-
-
-@app.get("/mentions/{username}/", response_class=HTMLResponse)
-@app.get("/search/mentions/{username}/", response_class=HTMLResponse)
-async def serve_user_mentions(request: Request, username: str):
-    return await serve_search(request, "submissions", f"Mentions {username}",
-                              {"query": f'@mentions "|{clean_username(username)}|"'})
-
-
-@app.get("/search/")
-async def server_search_default(request: Request):
-    return RedirectResponse(app.url_path_for(serve_search.__name__, table=submissions_table.lower()) +
-                            "?" + request.url.query,
-                            status.HTTP_301_MOVED_PERMANENTLY)
-
-
-@app.get("/", response_class=HTMLResponse)
-async def serve_home(request: Request):
-    usr_n, sub_n, jrn_n, version = settings.database.load_info()
-    hist = settings.database.history.select(order=[f"{settings.database.history.key.name} DESC"])
-    return HTMLResponse(minify(templates.get_template("info.html").render({
-        "app": app_title,
-        "title": "",
-        "submissions_total": sub_n,
-        "journals_total": jrn_n,
-        "users_total": usr_n,
-        "version_db": version,
-        "version": __version__,
-        "m_time": next(hist.tuples, [datetime.fromtimestamp(settings.database.m_time)])[0],
-        "request": request}),
-        remove_comments=True))
-
-
-@app.get("/settings/")
-async def serve_settings(request: Request):
-    return HTMLResponse(minify(templates.get_template("settings.html").render({
-        "version": __version__,
-        "app": app_title,
-        "title": "Search Settings",
-        "tables": [users_table, submissions_table, journals_table],
-        "columns": {users_table: [c.name for c in UsersColumns.as_list()],
-                    submissions_table: [c.name for c in SubmissionsColumns.as_list()] + ["relevance"],
-                    journals_table: [c.name for c in JournalsColumns.as_list()]},
-        "settings": search_settings,
-        "default_sort": default_sort,
-        "default_order": default_order,
-        "request": request}),
-        remove_comments=True))
-
-
-@app.get("/settings/set/")
-async def save_settings(request: Request):
-    for param, value in request.query_params.items():
-        table, setting = param.split(".")
-        search_settings.__setattr__(setting, search_settings.__getattribute__(setting) | {table.upper(): value})
-
-    if settings.database.read_only:
-        return Response("Database is read only, settings will be reset on restart",
-                        status_code=status.HTTP_403_FORBIDDEN)
-
-    settings.database.save_settings("SEARCH", search_settings.model_dump())
-
-    return Response("Settings saved", status_code=200)
-
-
-@app.get("/user/{username}/", response_class=HTMLResponse)
-async def serve_user(request: Request, username: str):
-    if username != (username_clean := clean_username(username)):
-        return RedirectResponse(app.url_path_for(serve_user.__name__, username=username_clean))
-
-    user_entry: dict = settings.database.load_user(username) or {}
-    user_stats: dict[str, int] = settings.database.load_user_stats(username)
-    p, n = settings.database.load_prev_next(users_table, username) if user_entry else (0, 0)
-
-    return HTMLResponse(minify(templates.get_template("user.html").render({
-        "version": __version__,
-        "app": app_title,
-        "title": username,
-        "user": username,
-        "folders": user_entry.get("FOLDERS", []),
-        "active": user_entry.get("ACTIVE", True),
-        "gallery_length": user_stats["gallery"],
-        "scraps_length": user_stats["scraps"],
-        "favorites_length": user_stats["favorites"],
-        "mentions_length": user_stats["mentions"],
-        "journals_length": user_stats["journals"],
-        "userpage": prepare_html(user_entry.get("USERPAGE", ""), settings.database.use_bbcode()),
-        "userpage_bbcode": user_entry.get("USERPAGE", None) if settings.database.use_bbcode() else None,
-        "icon": f"/user/{username}/icon",
-        "in_database": bool(user_entry),
-        "prev": p,
-        "next": n,
-        "request": request}),
-        remove_comments=True))
-
-
-@app.get("/user/{username}/icon/")
-@app.get("/user/{username}/thumbnail/")
-async def serve_user_thumbnail(username: str):
-    if username != (username_clean := clean_username(username)):
-        return RedirectResponse(app.url_path_for(serve_user_thumbnail.__name__, username=username_clean))
-
+@requires(["authenticated"])
+async def user_icon(request: Request):
+    username: str = clean_username(request.path_params["username"])
+    if not username:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
     server_time: datetime = datetime.now(timezone(timedelta(hours=-8)))
     return RedirectResponse(f"https://a.furaffinity.net/{server_time:%Y%m%d}/{username}.gif")
 
 
-@app.get("/search/{table}/", response_class=HTMLResponse)
-async def serve_search(request: Request, table: str, title: str = None, args: dict[str, str] = None):
-    if (table := table.upper()) not in (submissions_table, journals_table, users_table):
-        raise HTTPException(404, f"Table {table.lower()} not found.")
-
-    args = {k.lower(): v for k, v in (args or {}).items()}
-    args_req = {k.lower(): v for k, v in request.query_params.items()}
-    query: str = " & ".join([f"({q})" for args_ in (args_req, args) if (q := args_.get("query", args_.get("q", None)))])
-    args |= args_req
-
-    page: int = p if (p := int(args.get("page", 1))) > 0 else 1
-    limit: int = l if (l := int(args.get("limit", search_settings.limit[table]))) > 0 else 48
-    sort: str = args.get("sort", search_settings.sort[table]).lower()
-    order: str = args.get("order", search_settings.order[table]).lower()
-    view: str = v if (v := args.get("view", search_settings.view[table]).lower()) in ("list", "grid") else "grid"
-
-    results: list[dict]
-    columns_table: list[str]
-    columns_results: list[str]
-    columns_list: list[str]
-    column_id: str
-
-    results, columns_table, columns_results, columns_list, column_id, _, order = settings.database.load_search(
-        table,
-        query.lower().strip(),
-        "id" if sort == "date" else sort,
-        order
+# noinspection DuplicatedCode
+@requires(["authenticated"])
+async def user_submissions(request: Request):
+    return await search_response(
+        request,
+        submissions_table,
+        f"@author ^{request.path_params['username']}$",
+        f"Submissions by {request.path_params['username']}",
     )
 
-    if (page - 1) * limit > len(results):
-        page = ceil(len(results) / limit) or 1
 
-    return HTMLResponse(minify(templates.get_template("search.html").render({
-        "version": __version__,
-        "app": app_title,
-        "title": title or f"Search {table.title()}",
-        "action": request.url.path,
-        "table": table.lower(),
-        "query": args_req.get("query", args_req.get("q", "")),
-        "sort": sort,
-        "order": order,
-        "view": view,
-        "thumbnails": table in (submissions_table, users_table),
-        "columns_table": columns_table,
-        "columns_results": columns_results,
-        "columns_list": columns_list,
-        "column_id": column_id,
-        "limit": limit,
-        "page": page,
-        "offset": (offset := (page - 1) * limit),
-        "results": results[offset:offset + limit],
-        "results_total": len(results),
-        "request": request}),
-        remove_comments=True))
+# noinspection DuplicatedCode
+@requires(["authenticated"])
+async def user_gallery(request: Request):
+    return await search_response(
+        request,
+        submissions_table,
+        f"@author ^{request.path_params['username']}$ & @folder gallery",
+        f"Gallery by {request.path_params['username']}",
+    )
 
 
-@app.get("/submission/{id_}/", response_class=HTMLResponse)
-async def serve_submission(request: Request, id_: int):
-    if (sub := settings.database.load_submission(id_)) is None:
-        return error_response(request, 404, "Submission not found",
-                              [("Open on Fur Affinity", f"{fa_base_url}/view/{id_}")])
+# noinspection DuplicatedCode
+@requires(["authenticated"])
+async def user_scraps(request: Request):
+    return await search_response(
+        request,
+        submissions_table,
+        f"@author ^{request.path_params['username']}$ & @folder scraps",
+        f"Scraps by {request.path_params['username']}",
+    )
 
-    fs: list[Path] | None = None
-    if "txt" in sub["FILEEXT"] and sub["FILESAVED"] & 0b10:
-        fs, _ = settings.database.load_submission_files(id_)
-    p, n = settings.database.load_prev_next(submissions_table, id_)
-    return HTMLResponse(minify(templates.get_template("submission.html").render({
-        "version": __version__,
-        "app": app_title,
-        "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
-        "submission": sub | {
-            "DESCRIPTION": prepare_html(sub["DESCRIPTION"], settings.database.use_bbcode()),
-            "FOOTER": prepare_html(sub["FOOTER"], settings.database.use_bbcode()),
-            "DESCRIPTION_BBCODE": sub["DESCRIPTION"].strip() or None if settings.database.use_bbcode() else None,
-            "FOOTER_BBCODE": sub["FOOTER"].strip() or None if settings.database.use_bbcode() else None,
+
+@requires(["authenticated"])
+async def user_journals(request: Request):
+    return await search_response(
+        request,
+        journals_table,
+        f"@author ^{request.path_params['username']}$",
+        f"Journals by {request.path_params['username']}",
+    )
+
+
+@requires(["authenticated"])
+async def user_favorites(request: Request):
+    return await search_response(
+        request,
+        submissions_table,
+        f'@favorite "|{clean_username(request.path_params["username"])}|"',
+        f"Favorites of {request.path_params['username']}",
+    )
+
+
+@requires(["authenticated"])
+async def user_comments(request: Request):
+    return await search_response(
+        request,
+        comments_table,
+        f"@author ^{request.path_params['username']}$",
+        f"Comments by {request.path_params['username']}",
+    )
+
+
+@requires(["authenticated"])
+async def submission(request: Request):
+    database: Database = request.state.database
+
+    if not (sub := database.submission(request.path_params["id"])):
+        return error_response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            "The submission is not in the database 😢",
+            [("Open on FA", f"https://furaffinity.net/view/{request.path_params['id']}")],
+        )
+
+    fs, t = database.submission_files(sub["ID"])
+    fst = database.submission_files_text(*fs) if fs else {}
+    fsm = database.submission_files_mime(*fs) if fs else {}
+    cs = database.submission_comments(sub["ID"])
+    p, n = database.submission_prev_next(sub["ID"], sub["AUTHOR"], sub["FOLDER"])
+    sp, sn = None, None
+    search_id: str | None = None
+    search_index: int = 0
+
+    if search_id_param := request.query_params.get("sid"):
+        search_id, search_terms, search_index = decode_search_id(search_id_param)
+        if search_terms and search_index is not None:
+            results = database.search(*search_terms)
+            print(len(results.rows))
+            sp = results.rows[search_index - 1]["ID"] if search_index > 0 else None
+            sn = results.rows[search_index + 1]["ID"] if search_index < len(results.rows) - 1 else None
+
+    return templates.TemplateResponse(
+        request,
+        "pages/submission.j2",
+        {
+            "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
+            "submission": sub,
+            "thumbnail": t,
+            "files": list(zip(fs, fsm.values(), fst.values())) if fs else [],
+            "comments": cs,
+            "prev": p,
+            "next": n,
+            "search_id": search_id,
+            "search_index": search_index,
+            "search_prev": sp,
+            "search_next": sn,
         },
-        "files_text": [
-            bbcode_to_html(fs[i].read_text(detect_encoding(fs[i].read_bytes())["encoding"], "ignore"))
-            if ext.lower() == "txt" else ""
-            for i, ext in enumerate(sub['FILEEXT']) if fs[i].is_file()] if fs else [],
-        "filenames": [f"submission{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
-        "filenames_id": [f"{sub['ID']:010d}{('.' + ext) * bool(ext)}" for ext in sub['FILEEXT']],
-        "comments": prepare_comments(settings.database.load_submission_comments(id_), settings.database.use_bbcode()),
-        "prev": p,
-        "next": n,
-        "request": request}),
-        remove_comments=True))
+    )
 
 
-@app.get("/submission/{id_}/file/")
-@app.get("/submission/{id_}/file/{n}")
-@app.get("/submission/{id_}/file/{n}/{_filename}")
-async def serve_submission_file(id_: int, n: int = 0, _filename=None):
-    if (fs := settings.database.load_submission_files(id_)[0]) is None or not fs[n].is_file():
-        return Response(status_code=404)
-    return FileResponse(fs[n])
-
-
-@app.get("/submission/{id_}/files/")
-@app.get("/submission/{id_}/files/{_filename}")
-@app.get("/submission/{id_}/files/{n1}-{n2}")
-@app.get("/submission/{id_}/files/{n1}-{n2}/{_filename}")
-async def serve_submission_zip(id_: int, n1: int = 0, n2: int = None, _filename=None):
-    if id_ not in settings.database.submissions:
-        raise HTTPException(404)
-
-    sub_files, _ = settings.database.load_submission_files(id_)
-
-    with ZipFile(f_obj := BytesIO(), "w") as z:
-        for sub_file in sub_files[n1:(n2 + 1) if n2 is not None else None]:
-            z.writestr(sub_file.name, sub_file.read_bytes())
-
-    f_obj.seek(0)
-    return StreamingResponse(f_obj, media_type="application/zip")
-
-
-@app.get("/submission/{id_}/thumbnail/")
-@app.get("/submission/{id_}/thumbnail/{_filename}")
-@app.get("/submission/{id_}/thumbnail/{x}x/")
-@app.get("/submission/{id_}/thumbnail/{x}x/{_filename}")
-@app.get("/submission/{id_}/thumbnail/x{y}/")
-@app.get("/submission/{id_}/thumbnail/x{y}/{_filename}")
-@app.get("/submission/{id_}/thumbnail/{x}x{y}>/")
-@app.get("/submission/{id_}/thumbnail/{x}x{y}>/{_filename}")
-async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _filename=None):
-    fs, t = settings.database.load_submission_files(id_)
+@requires(["authenticated"])
+async def submission_thumbnail(request: Request):
+    id_ = request.path_params["id"]
+    x, y = request.path_params.get("x"), request.path_params.get("y")
+    database: Database = request.state.database
+    fs, t = database.database.submissions.get_submission_files(id_)
     if t is not None and t.is_file():
         if not x and not y:
-            return FileResponse(t)
+            return FileResponse(str(t))
         with Image.open(t) as img:
             img.thumbnail((x or y, y or x))
             img.save(f_obj := BytesIO(), img.format, quality=95)
@@ -697,178 +524,284 @@ async def serve_submission_thumbnail(id_: int, x: int = None, y: int = None, _fi
                 f_obj.seek(0)
                 return StreamingResponse(f_obj, 201, media_type=f"image/{img.format}".lower())
         except UnidentifiedImageError:
-            raise HTTPException(404)
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
     else:
-        raise HTTPException(404)
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
 
 
-@app.get("/submission/{id_}/zip/")
-@app.get("/submission/{id_}/zip/{_filename}")
-async def serve_submission_zip(id_: int, _filename=None):
-    if (sub := settings.database.load_submission(id_)) is None:
-        raise HTTPException(404)
+@requires(["authenticated"])
+async def submission_file(request: Request):
+    database: Database = request.state.database
+    n = request.path_params.get("n", 0)
+    fs, _ = database.database.submissions.get_submission_files(request.path_params["id"])
+    if not fs or n > len(fs) - 1:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    return FileResponse(str(fs[n]))
 
-    sub_files, sub_thumb = settings.database.load_submission_files(id_)
+
+@requires(["authenticated"])
+async def submission_zip(request: Request):
+    database: Database = request.state.database
+    if not (sub := database.submission(request.path_params["id"])):
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    fs, t = database.submission_files(request.path_params["id"])
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
-        for sub_file in sub_files:
-            z.writestr(sub_file.name, sub_file.read_bytes())
-        z.writestr(sub_thumb.name, sub_thumb.read_bytes()) if sub_thumb else None
-        z.writestr("description.txt" if settings.database.use_bbcode() else "description.html",
-                   sub["DESCRIPTION"].encode())
-        z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(sub, convert_datetime=True).items()
-                                           if k != "description"}).encode())
-        z.writestr("comments.json", dumps([serialise_entry(c, convert_datetime=True)
-                                           for c in settings.database.load_submission_comments(id_)]).encode())
+        for f in fs:
+            if f.is_file():
+                z.writestr(f.name, f.read_bytes())
+        if t and t.is_file():
+            z.writestr(t.name, t.read_bytes())
+        z.writestr("description.txt" if database.bbcode else "description.html", sub["DESCRIPTION"].encode())
+        z.writestr("metadata.json", dumps(sub, default=lambda o: list(o) if isinstance(o, set) else str(o)))
+        z.writestr("comments.json", dumps(database.submission_comments(request.path_params["id"])))
 
     f_obj.seek(0)
+
     return StreamingResponse(f_obj, media_type="application/zip")
 
 
-@app.get("/journal/{id_}/", response_class=HTMLResponse)
-async def serve_journal(request: Request, id_: int):
-    if (jrnl := settings.database.load_journal(id_)) is None:
-        return error_response(request, 404, "Journal not found",
-                              [("Open on Fur Affinity", f"{fa_base_url}/journal/{id_}")])
+@requires(["authenticated"])
+async def journal(request: Request):
+    database: Database = request.state.database
+    if not (jrn := database.journal(request.path_params["id"])):
+        return error_response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            "The journal is not in the database 😢",
+            [("Open on FA", f"https://furaffinity.net/journal/{request.path_params['id']}")],
+        )
 
-    p, n = settings.database.load_prev_next(journals_table, id_)
-    return HTMLResponse(minify(templates.get_template("journal.html").render({
-        "version": __version__,
-        "app": app_title,
-        "title": f"{jrnl['TITLE']} by {jrnl['AUTHOR']}",
-        "journal": jrnl | {
-            "CONTENT": prepare_html(jrnl["CONTENT"], settings.database.use_bbcode()),
-            "HEADER": prepare_html(jrnl["HEADER"], settings.database.use_bbcode()),
-            "FOOTER": prepare_html(jrnl["FOOTER"], settings.database.use_bbcode()),
-            "CONTENT_BBCODE": jrnl["CONTENT"].strip() or None if settings.database.use_bbcode() else None,
-            "HEADER_BBCODE": jrnl["HEADER"].strip() or None if settings.database.use_bbcode() else None,
-            "FOOTER_BBCODE": jrnl["FOOTER"].strip() or None if settings.database.use_bbcode() else None,
+    cs = database.journal_comments(jrn["ID"])
+    p, n = database.journal_prev_next(jrn["ID"], jrn["AUTHOR"])
+    sp, sn = None, None
+    search_id: str | None = None
+    search_index: int = 0
+
+    if search_id_param := request.query_params.get("sid"):
+        search_id, search_terms, search_index = decode_search_id(search_id_param)
+        if search_terms and search_index is not None:
+            results = database.search(*search_terms)
+            sp = results.rows[search_index - 1]["ID"] if search_index > 0 else None
+            sn = results.rows[search_index + 1]["ID"] if search_index < len(results.rows) - 1 else None
+
+    return templates.TemplateResponse(
+        request,
+        "pages/journal.j2",
+        {
+            "title": f"{jrn['TITLE']} by {jrn['AUTHOR']}",
+            "journal": jrn,
+            "comments": cs,
+            "prev": p,
+            "next": n,
+            "search_id": search_id,
+            "search_index": search_index,
+            "search_prev": sp,
+            "search_next": sn,
         },
-        "comments": prepare_comments(settings.database.load_journal_comments(id_), settings.database.use_bbcode()),
-        "prev": p,
-        "next": n,
-        "request": request}),
-        remove_comments=True))
+    )
 
 
-@app.get("/journal/{id_}/zip/")
-@app.get("/journal/{id_}/zip/{filename}")
-async def serve_journal_zip(id_: int, _filename=None):
-    if (jrnl := settings.database.load_journal(id_)) is None:
-        raise HTTPException(404)
+@requires(["authenticated"])
+async def journal_zip(request: Request):
+    database: Database = request.state.database
+    if not (jrn := database.submission(request.path_params["id"])):
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
-        z.writestr("content.txt" if settings.database.use_bbcode() else "content.html", jrnl["CONTENT"].encode())
-        z.writestr("metadata.json", dumps({k: v for k, v in serialise_entry(jrnl, convert_datetime=True).items()
-                                           if k != "content"}).encode())
-        z.writestr("comments.json", dumps([serialise_entry(c, convert_datetime=True)
-                                           for c in settings.database.load_journal_comments(id_)]).encode())
+        z.writestr("content.txt" if database.bbcode else "content.html", jrn["CONTENT"].encode())
+        z.writestr("metadata.json", dumps(jrn, default=lambda o: list(o) if isinstance(o, set) else str(o)))
+        z.writestr("comments.json", dumps(database.submission_comments(request.path_params["id"])))
 
     f_obj.seek(0)
+
     return StreamingResponse(f_obj, media_type="application/zip")
 
 
-@app.get("/json/search/{table}/", response_class=JSONResponse)
-@app.post("/json/search/{table}/", response_class=JSONResponse)
-async def serve_search_json(request: Request, table: str, query_data: SearchQuery = None):
-    if query_data is None:
-        query_data = SearchQuery()
-        query_data.query = request.query_params.get("query", query_data.query)
-        query_data.offset = int(request.query_params.get("offset", query_data.offset))
-        query_data.limit = int(request.query_params.get("limit", query_data.limit))
-        query_data.sort = request.query_params.get("sort", query_data.sort)
-        query_data.order = request.query_params.get("order", query_data.order)
-
-    results, cols_table, cols_results, cols_list, col_id, sort, order = settings.database.load_search_uncached(
-        table := table.upper(),
-        query_data.query.lower().strip(),
-        query_data.sort,
-        query_data.order
+@requires(["authenticated"])
+async def comment(request: Request):
+    parent_table, parent_id, comment_id = (
+        request.path_params["parent_table"].lower(),
+        request.path_params["parent_id"],
+        request.path_params["comment_id"],
     )
 
-    return {"table": table.lower(),
-            "query": query_data.query,
-            "sort": query_data.sort,
-            "order": query_data.order,
-            "columns_table": cols_table,
-            "columns_results": cols_results,
-            "columns_list": cols_list,
-            "column_id": col_id,
-            "limit": query_data.limit,
-            "offset": query_data.offset,
-            "results": serialise_entry(results[query_data.offset:query_data.offset + query_data.limit]),
-            "results_total": len(results)}
-
-
-@app.get("/json/submission/{id_}/", response_class=JSONResponse)
-@app.post("/json/submission/{id_}/", response_class=JSONResponse)
-async def serve_submission_json(id_: int):
-    if not (s := settings.database.load_submission_uncached(id_)):
-        raise HTTPException(404)
+    if parent_table == submissions_table.lower():
+        return RedirectResponse(str(request.url_for("submission", id=parent_id)) + f"#cid:{comment_id}")
+    elif parent_table == journals_table.lower():
+        return RedirectResponse(str(request.url_for("journal", id=parent_id)) + f"#cid:{comment_id}")
     else:
-        return serialise_entry(s | {"comments": settings.database.load_submission_comments_uncached(id_)})
+        return error_response(request, status.HTTP_404_NOT_FOUND, f"{parent_table.title()!r} is not a page 😢")
 
 
-@app.get("/json/journal/{id_}/", response_class=JSONResponse)
-@app.post("/json/journal/{id_}/", response_class=JSONResponse)
-async def serve_journal_json(id_: int):
-    if not (j := settings.database.load_journal_uncached(id_)):
-        raise HTTPException(404)
-    else:
-        return serialise_entry(j | {"comments": settings.database.load_journal_comments_uncached(id_)})
-
-
-@app.get("/json/user/{username}/", response_class=JSONResponse)
-@app.post("/json/user/{username}/", response_class=JSONResponse)
-async def serve_user_json(username: str):
-    username = clean_username(username)
-    user_entry: dict = settings.database.load_user_uncached(username) or {}
-    user_stats: dict[str, int] = settings.database.load_user_stats_uncached(username)
-
-    return serialise_entry({"username": username, "length": user_stats} | user_entry)
-
-
-def run_redirect(host: str, port_listen: int, port_redirect: int):
-    redirect_app: FastAPI = FastAPI()
-    redirect_app.add_event_handler("startup", lambda: logger.info(f"Redirecting target https://{host}:{port_redirect}"))
-    redirect_app.add_route(
-        "/{__:path}",
-        lambda r, *_: RedirectResponse(f"https://{r.url.hostname}:{port_redirect}{r.url.path}?{r.url.query}"),
-        ["GET"]
+def error_response(
+    request: Request,
+    status_code: int,
+    message: str | None = None,
+    buttons: list[tuple[str, str]] | None = None,
+    traceback: str | None = None,
+):
+    return templates.TemplateResponse(
+        request,
+        "pages/error.j2",
+        {
+            "code": status_code,
+            "message": message,
+            "buttons": buttons,
+            "traceback": traceback,
+        },
+        status_code,
     )
-    run(redirect_app, host=host, port=port_listen, log_config=LOGGING_CONFIG)
 
 
-def server(database_path: str | PathLike, host: str = "0.0.0.0", port: int = None,
-           ssl_cert: str | PathLike | None = None, ssl_key: str | PathLike | None = None,
-           redirect_port: int = None, precache: bool = False, authentication: str = None,
-           browser: bool = True):
-    if redirect_port:
-        return run_redirect(host, port, redirect_port)
+@requires(["authenticated"])
+async def http_error(request: Request, exc: HTTPException):
+    return error_response(request, exc.status_code, exc.detail)
 
-    settings.precache = precache
-    settings.open_browser = browser
+
+@requires(["authenticated"])
+async def general_error(request: Request, exc: Exception):
+    return error_response(
+        request,
+        500,
+        f"{exc.__class__.__name__}{':' if exc.args else ''} " + " ".join(exc.args),
+        None,
+        format_exc(),
+    )
+
+
+def server(
+    database_path: str | PathLike,
+    host: str = "0.0.0.0",
+    port: int = None,
+    ssl_cert: Path | None = None,
+    ssl_key: Path | None = None,
+    authentication: tuple[str, str] | None = None,
+    authentication_ignore: tuple[str, ...] | None = None,
+    use_cache: bool = True,
+    browser: bool = True,
+):
+    register_url_convertor("table", TableConvertor())
+
+    routes: list[BaseRoute] = [
+        Route("/", home),
+        Route("/settings", settings, methods=["GET", "POST"]),
+        Route("/user/{username}", user),
+        Route("/user/{username}/icon", user_icon),
+        Route("/user/{username}/icon/{filename}", user_icon),
+        Route(
+            "/user/{username}/thumbnail",
+            lambda r: RedirectResponse(r.url_for("user_icon", **r.path_params)),
+        ),
+        Route(
+            "/user/{username}/thumbnail/{filename}",
+            lambda r: RedirectResponse(r.url_for("user_icon", **r.path_params)),
+        ),
+        Route("/submissions/{username}", user_submissions),
+        Route("/gallery/{username}", user_gallery),
+        Route("/scraps/{username}", user_scraps),
+        Route("/favorites/{username}", user_favorites),
+        Route("/journals/{username}", user_journals),
+        Route("/comments/{username}/", user_comments),
+        Route(
+            "/view/{id:int}",
+            lambda r: RedirectResponse(r.url_for("submission", **r.path_params).include_query_params(**r.query_params)),
+        ),
+        Route(
+            "/full/{id:int}",
+            lambda r: RedirectResponse(r.url_for("submission", **r.path_params).include_query_params(**r.query_params)),
+        ),
+        Route("/submission/{id:int}", submission),
+        Route("/submission/{id:int}/file", submission_file),
+        Route("/submission/{id:int}/file/{n:int}", submission_file),
+        Route("/submission/{id:int}/file/{n:int}/{filename}", submission_file),
+        Route("/submission/{id:int}/thumbnail", submission_thumbnail),
+        Route("/submission/{id:int}/thumbnail/{filename}", submission_thumbnail),
+        Route("/submission/{id:int}/thumbnail/x{y:int}", submission_thumbnail),
+        Route("/submission/{id:int}/thumbnail/x{y:int}/{filename}", submission_thumbnail),
+        Route("/submission/{id:int}/thumbnail/{y:int}x", submission_thumbnail),
+        Route("/submission/{id:int}/thumbnail/{y:int}x/{filename}", submission_thumbnail),
+        Route("/submission/{id:int}/thumbnail/{x:int}x{y:int}", submission_thumbnail),
+        Route("/submission/{id:int}/thumbnail/{x:int}x{y:int}/{filename}", submission_thumbnail),
+        Route("/submission/{id:int}/zip", submission_zip),
+        Route("/submission/{id:int}/zip/{filename}", submission_zip),
+        Route("/journal/{id:int}", journal),
+        Route("/journal/{id:int}/zip", journal_zip),
+        Route("/journal/{id:int}/zip/{filename}", journal_zip),
+        Route("/comment/{parent_table}/{parent_id:int}/{comment_id:int}", comment),
+        Route(
+            "/search",
+            lambda r: RedirectResponse(r.url_for("search", table="submissions").include_query_params(**r.query_params)),
+        ),
+        Route(
+            "/search/{table}",
+            lambda r: RedirectResponse(r.url_for("search", **r.path_params).include_query_params(**r.query_params)),
+        ),
+        Route("/{table:table}", search),
+        Mount("/static", app=StaticFiles(directory=Path(__file__).parent / "static")),
+    ]
+    middleware: list[Middleware] = []
+    # noinspection PyTypeChecker
+    exception_handlers: dict[Any, ExceptionHandler] = {
+        HTTPException: http_error,
+        Exception: general_error,
+    }
 
     if authentication:
-        settings.username = authentication.split(":")[0]
-        settings.password = authentication.split(":", 1)[1] if ":" in authentication else ""
-        app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
+        # noinspection PyTypeChecker
+        middleware.extend(
+            [
+                Middleware(
+                    SessionMiddleware,
+                    session_cookie=__package__,
+                    secret_key=sha256("\0".join(":".join(a) for a in authentication).encode()).hexdigest(),
+                ),
+                Middleware(
+                    AuthenticationMiddleware,
+                    backend=BasicAuthBackend(authentication, authentication_ignore),
+                    on_error=BasicAuthBackend.on_auth_error,
+                ),
+            ]
+        )
+    else:
+        # noinspection PyTypeChecker
+        middleware.append(Middleware(AuthenticationMiddleware, backend=NoAuthBackend()))
+
+    if use_cache:
+        # noinspection PyTypeChecker
+        middleware.append(Middleware(CacheMiddleware))
 
     if ssl_cert and ssl_key:
-        settings.ssl_cert, settings.ssl_key = Path(ssl_cert), Path(ssl_key)
-        if not settings.ssl_cert.is_file():
-            raise FileNotFoundError(f"SSL certificate {settings.ssl_cert}")
-        elif not settings.ssl_key.is_file():
-            raise FileNotFoundError(f"SSL private key {settings.ssl_key}")
+        if not ssl_cert or not ssl_cert.is_file():
+            raise FileNotFoundError(f"SSL certificate {ssl_cert}")
+        elif not ssl_key or not ssl_key.is_file():
+            raise FileNotFoundError(f"SSL private key {ssl_key}")
         port = port or 443
 
-    settings.address = f"{'https' if settings.ssl_cert else 'http'}://" \
-                       f"{'localhost' if host == '0.0.0.0' else host}" \
-                       f"{f':{port}' if port else ''}"
+    database_path = Path(database_path).resolve()
+    address: str = (
+        f"{'https' if ssl_cert and ssl_key else 'http'}://"
+        f"{'localhost' if host == '0.0.0.0' else host}"
+        f"{f':{port}' if port else ''}"
+    )
 
-    with Database(Path(database_path).resolve(), logger) as settings.database:
-        search_settings.load(settings.database.load_settings("SEARCH"))
-        run(app, host=host, port=port,
-            ssl_certfile=settings.ssl_cert,
-            ssl_keyfile=str(settings.ssl_key) if settings.ssl_key else None,
-            log_config=LOGGING_CONFIG)
+    run(
+        Starlette(
+            routes=routes,
+            middleware=middleware,
+            exception_handlers=exception_handlers,
+            lifespan=make_lifespan(
+                database_path,
+                use_cache,
+                address,
+                bool(ssl_cert and ssl_key),
+                bool(authentication),
+                browser,
+            ),
+        ),
+        host=host,
+        port=port,
+        ssl_certfile=str(ssl_cert) if ssl_cert and ssl_key else None,
+        ssl_keyfile=str(ssl_key) if ssl_cert and ssl_key else None,
+    )

@@ -9,138 +9,140 @@ i.zoom.zoomed:after, .zoomed i.zoom:after {
 }
 
 i.smilie {
+    --scale: calc(16 / 23);
     display: inline-block;
     background: url(sprite_smilies.png) no-repeat;
-    width: 26px;
-    height: 23px;
+    background-size: calc(134px * var(--scale)) calc(175px * var(--scale));
+    width: calc(26px * var(--scale));
+    height: calc(23px * var(--scale));
 }
 
 i.smilie.crying {
-    background-position: -27px -147px
+    background-position: calc(-27px * var(--scale)) calc(-147px * var(--scale))
 }
 
 i.smilie.derp {
-    background-position: -108px -123px
+    background-position: calc(-108px * var(--scale)) calc(-123px * var(--scale))
 }
 
 i.smilie.dunno {
-    background-position: -81px -123px
+    background-position: calc(-81px * var(--scale)) calc(-123px * var(--scale))
 }
 
 i.smilie.embarrassed {
-    background-position: -54px -123px
+    background-position: calc(-54px * var(--scale)) calc(-123px * var(--scale))
 }
 
 i.smilie.evil {
-    background-position: 0 -147px;
-    height: 28px
+    background-position: 0 calc(-147px * var(--scale));
+    height: calc(28px * var(--scale))
 }
 
 i.smilie.gift {
-    background-position: -27px -123px
+    background-position: calc(-27px * var(--scale)) calc(-123px * var(--scale))
 }
 
 i.smilie.huh {
-    background-position: 0 -123px
+    background-position: 0 calc(-123px * var(--scale))
 }
 
 i.smilie.lmao {
-    background-position: -108px -99px
+    background-position: calc(-108px * var(--scale)) calc(-99px * var(--scale))
 }
 
 i.smilie.love {
-    background-position: -81px -99px
+    background-position: calc(-81px * var(--scale)) calc(-99px * var(--scale))
 }
 
 i.smilie.nerd {
-    background-position: -54px -99px
+    background-position: calc(-54px * var(--scale)) calc(-99px * var(--scale))
 }
 
 i.smilie.note {
-    background-position: -55px -148px;
-    width: 22px
+    background-position: calc(-55px * var(--scale)) calc(-148px * var(--scale));
+    width: calc(22px * var(--scale))
 }
 
 i.smilie.oooh {
-    background-position: -27px -99px
+    background-position: calc(-27px * var(--scale)) calc(-99px * var(--scale))
 }
 
 i.smilie.pleased {
-    background-position: 0 -99px
+    background-position: 0 calc(-99px * var(--scale))
 }
 
 i.smilie.rollingeyes {
-    background-position: -108px -75px
+    background-position: calc(-108px * var(--scale)) calc(-75px * var(--scale))
 }
 
 i.smilie.sad {
-    background-position: -81px -75px
+    background-position: calc(-81px * var(--scale)) calc(-75px * var(--scale))
 }
 
 i.smilie.sarcastic {
-    background-position: -54px -75px
+    background-position: calc(-54px * var(--scale)) calc(-75px * var(--scale))
 }
 
 i.smilie.serious {
-    background-position: -27px -75px
+    background-position: calc(-27px * var(--scale)) calc(-75px * var(--scale))
 }
 
 i.smilie.sleepy {
-    background-position: 0 -75px
+    background-position: 0 calc(-75px * var(--scale))
 }
 
 i.smilie.smile {
-    background-position: -108px -47px
+    background-position: calc(-108px * var(--scale)) calc(-47px * var(--scale))
 }
 
 i.smilie.teeth {
-    background-position: -81px -47px
+    background-position: calc(-81px * var(--scale)) calc(-47px * var(--scale))
 }
 
 i.smilie.tongue {
-    background-position: -54px -47px
+    background-position: calc(-54px * var(--scale)) calc(-47px * var(--scale))
 }
 
 i.smilie.veryhappy {
-    background-position: -108px -24px
+    background-position: calc(-108px * var(--scale)) calc(-24px * var(--scale))
 }
 
 i.smilie.wink {
-    background-position: -81px -24px
+    background-position: calc(-81px * var(--scale)) calc(-24px * var(--scale))
 }
 
 i.smilie.yelling {
-    background-position: -54px -24px
+    background-position: calc(-54px * var(--scale)) calc(-24px * var(--scale))
 }
 
 i.smilie.zipped {
-    background-position: -27px -24px
+    background-position: calc(-27px * var(--scale)) calc(-24px * var(--scale))
 }
 
 i.smilie.angel {
-    background-position: -27px -47px;
-    height: 28px
+    background-position: calc(-27px * var(--scale)) calc(-47px * var(--scale));
+    height: calc(28px * var(--scale))
 }
 
 i.smilie.badhairday {
-    background-position: 0 -47px;
-    height: 27px
+    background-position: 0 calc(-47px * var(--scale));
+    height: calc(27px * var(--scale))
 }
 
 i.smilie.cd {
-    background-position: 0 -24px;
-    height: 22px
+    background-position: 0 calc(-24px * var(--scale));
+    height: calc(22px * var(--scale))
 }
 
 i.smilie.coffee {
-    background-position: -27px 0;
-    height: 20px
+    background-position: calc(-27px * var(--scale)) 0;
+    height: calc(20px * var(--scale))
 }
 
 i.smilie.cool {
-    background-position: 0 0
+    background-position: 0 0;
 }
 
 i.smilie.whatever {
-    background-position: -79px -148px
+    background-position: calc(-79px * var(--scale)) calc(-148px * var(--scale));
 }

@@ -1,0 +1,52 @@
+{% macro Table(results, offset, limit, columns_dates, columns_bool, columns_exclude, link_format, form, sort, order, search_id) %}
+    <table class="table table-striped {{ "table-hover" if link_format }} m-0">
+        <thead>
+        {% for col in results.columns_results if col not in columns_exclude %}
+            <th style="max-width: 20rem">
+                {% if form %}
+                    <button class="btn btn-outline-info border-0 w-100 px-1 py-0 text-nowrap text-start"
+                            style="font-weight: inherit; color: inherit" form="{{ form }}"
+                            {{ 'name=order value={}'.format("desc" if order.lower() == "asc" else "asc") if col.lower() == sort.lower() else 'name=sort value={}'.format(col.lower()) }}>
+                        {% if col.lower() == sort.lower() %}{{ "↑" if order.lower() == "asc" else "↓" }}{% endif %}
+                        {% for word in col.replace("_", " ").strip().split(" ") %}
+                            {{ word.title() if word|length > 2 else word.upper() }}
+                        {% endfor %}
+                    </button>
+                {% else %}
+                    {% if col.lower() == sort.lower() %}{{ "↑" if order.lower() == "asc" else "↓" }}{% endif %}
+                    {% for word in col.replace("_", " ").strip().split(" ") %}
+                        {{ word.title() if word|length > 2 else word.upper() }}
+                    {% endfor %}
+                {% endif %}
+            </th>
+        {% endfor %}
+        </thead>
+        <tbody>
+        {% for item in results.rows[offset:offset + limit] %}
+            {% set sid = "?sid={}.{}".format(loop.index0, search_id|urlencode) if search_id else "" %}
+            <tr>
+                {% for col in results.columns_results if col not in columns_exclude %}
+                    <td class="text-nowrap text-truncate position-relative" style="max-width: 20rem">
+                        {% if link_format %}
+                            <a href="{{ link_format.format(**item)|lower }}{{ sid }}" class="stretched-link"></a>
+                        {% endif %}
+                        {% if col in results.columns_lists %}
+                            {% for subitem in item[col].strip("|").split("||") %}
+                                <span class="badge bg-info {{ "ms-1" if loop.index0 }}">{{ subitem }}</span>
+                            {% endfor %}
+                        {% elif col in columns_dates %}
+                            {{ item[col]|replace("T", " ") }}
+                        {% elif col in columns_bool %}
+                            <span class="badge {{ "bg-success" if item[col] else "bg-danger" }}">
+                                {{ "Yes" if item[col] else "No" }}
+                            </span>
+                        {% else %}
+                            {{ item[col]|safe }}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

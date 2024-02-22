@@ -1,0 +1,32 @@
+{% macro Pagination(form, results, offset, limit, page) %}
+    {% set total = results.rows|length %}{# offset : offset + limit #}
+    <div class="card w-100">
+        <div class="card-header p-1 text-center small">
+            Page {{ page }} of {{ (total / limit)|round(0, 'ceil')|int }} ({{ total }})
+        </div>
+        <div class="card-body text-center row p-1" style="height: 2rem">
+            <div class="btn-toolbar justify-content-between">
+                <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="{{ form }}" name="page"
+                        value="1" {{ 'disabled' if page == 1 }}
+                        style="width: calc(25% - .5rem)">
+                    First
+                </button>
+                <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="{{ form }}" name="page"
+                        value="{{ page - 1 }}" {{ 'disabled' if page == 1 }}
+                        style="width: calc(25% - .5rem)">
+                    Prev
+                </button>
+                <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="{{ form }}" name="page"
+                        value="{{ page + 1 }}" {{ 'disabled' if offset + limit >= total }}
+                        style="width: calc(25% - .5rem)">
+                    Next
+                </button>
+                <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="{{ form }}" name="page"
+                        value="{{ (total / limit)|round(0, 'ceil')|int }}" {{ 'disabled' if offset + limit >= total }}
+                        style="width: calc(25% - .5rem)">
+                    Last
+                </button>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

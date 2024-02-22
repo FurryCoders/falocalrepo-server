@@ -1,0 +1,48 @@
+{% extends "base.j2" %}
+{% block main %}
+    <div class="row">
+        <div class="col-12 text-center align-middle h-100">
+            <img src="/static/logo.png" alt="Stylized animal paw with an orange stylized server" class="img-fluid"
+                 style="max-width: 250px">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 mx-auto">
+            <div class="properties-card">
+                <div class="property" data-key="Users">
+                    <a class="btn btn-xs btn-primary w-100 overflow-hidden text-decoration-none"
+                       href='/users/'>
+                        {{ users_total }}
+                    </a>
+                </div>
+                <div class="property" data-key="Submissions">
+                    <a class="btn btn-xs btn-primary w-100 overflow-hidden text-decoration-none"
+                       href='/submissions/'>
+                        {{ submissions_total }}
+                    </a>
+                </div>
+                <div class="property" data-key="Journals">
+                    <a class="btn btn-xs btn-primary w-100 overflow-hidden text-decoration-none"
+                       href='/journals/'>
+                        {{ journals_total }}
+                    </a>
+                </div>
+                <div class="property" data-key="Comments">
+                    <a class="btn btn-xs btn-primary w-100 overflow-hidden text-decoration-none"
+                       href='/comments/'>
+                        {{ comments_total }}
+                    </a>
+                </div>
+                <div class="property" data-key="Last Update">
+                    <span class="badge bg-info w-100 overflow-hidden">
+                        {{ last_update.strftime("%Y-%m-%d %H:%M") }}
+                    </span>
+                </div>
+                <div class="controls justify-content-between mt-3" style="font-size: smaller;">
+                    <span>Version {{ version }}</span> <a href="https://github.com/FurryCoders/falocalrepo/">falocalrepo@GitHub</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

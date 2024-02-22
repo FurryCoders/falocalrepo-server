@@ -1,0 +1,39 @@
+{% extends "base.j2" %}
+
+{% block title %}{{ title or "An Error Occurred" }}{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col col-12 col-md-8 col-lg-6 col-xl-5 mx-auto mt-5">
+            <h5>Error {{ code }}</h5>
+            <p class="mt-4">
+                {{ message or "An error occurred" }}
+            </p>
+
+            {% if buttons %}
+                <div class="d-flex justify-content-center column-gap-2">
+                    {% for text, link in buttons %}
+                        <button class="btn btn-primary position-relative">
+                            <a href="{{ link }}" class="stretched-link"></a>
+                            {{ text }}
+                        </button>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if traceback %}
+        <div class="row mt-4">
+            <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+                <div class="border rounded p-2 position-relative">
+                    <button class="btn btn-sm btn-outline-info position-absolute top-0 end-0 mt-2 me-2"
+                            onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText)">
+                        Copy Traceback
+                    </button>
+                    <pre class="overflow-scroll" style="white-space: pre-wrap">{{ traceback }}</pre>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

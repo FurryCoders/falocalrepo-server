@@ -1,0 +1,52 @@
+<!--suppress HtmlDeprecatedAttribute -->
+{% macro Comment(comment) %}
+    <div class="comment" data-replies="{{ "true" if comment.REPLIES }}">
+        <div class="comment-body" id="cid:{{ comment.ID }}">
+            <div class="comment-header">
+                <img src="/user/{{ comment.AUTHOR }}/icon" alt=""
+                     class="loading-element loading-error-hide rounded fade"
+                     height="30" loading="lazy" onerror="this.classList.add('loading-error')"
+                     onload="this.classList.add('loaded')">
+                <div class="loading-pulse rounded" style="height: 30px"></div>
+                <div class="d-inline-block loading-onerror rounded bg-body-secondary"
+                     style="height: 30px; aspect-ratio: 1 / 1"></div>
+                <a class="nav-link ms-2 pointer" href="/user/{{ comment.AUTHOR }}">{{ comment.AUTHOR }}</a>
+                <div class="text-secondary ms-auto" style="font-size: smaller;">
+                    {{ comment.DATE.strftime("%Y-%m-%d %H:%M") }}
+                </div>
+                <div class="replies-close-toggle ms-2 nav-link"
+                     onclick="this.parentElement.parentElement.parentElement.classList.add('replies-closed')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor">
+                        <path fill-rule="evenodd" d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"></path>
+                    </svg>
+                </div>
+                <div class="replies-open-toggle ms-2 nav-link"
+                     onclick="this.parentElement.parentElement.parentElement.classList.remove('replies-closed')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="comment-text">{{ comment.TEXT|safe }}</div>
+        </div>
+
+        {% if comment.REPLIES %}
+            <div class="replies">
+                <div class="replies-border" data-cid="{{ comment.ID }}"
+                     onclick="this.parentElement.parentElement.classList.add('replies-closed'); document.getElementById(`cid:${this.dataset.cid}`).scrollIntoView()">
+                </div>
+                {% for reply in comment.REPLIES %}{{ Comment(reply) }}{% endfor %}
+            </div>
+            <div class="replies-counter" data-replies="{{ comment.REPLIES_COUNT }}"
+                 onclick="this.parentElement.classList.remove('replies-closed')">
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro Comments(comments, class, id) %}
+    <div class="d-flex flex-column row-gap-2 {{ class or "" }}" {{ "id={}".format(id) if id }}>
+        {% for comment in comments %}{{ Comment(comment) }}{% endfor %}
+    </div>
+{% endmacro %}

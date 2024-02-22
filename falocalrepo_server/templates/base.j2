@@ -1,0 +1,46 @@
+{% from "components/navbar.j2" import Navbar with context %}
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %} FALocalRepo</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+    <meta name="theme-color">
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/static/touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" href="/static/touch-icon.png">
+    <link rel="stylesheet" href="/static/styles/style.css?v={{ version }}">
+    <script>
+        const onResize = []
+
+        const updateColorScheme = (darkMode) => {
+            if (darkMode) {
+                document.body.dataset.bsTheme = "dark"
+                document.head.querySelector('meta[name="theme-color"]').content = "#1C1C1E"
+            } else {
+                document.body.dataset.bsTheme = "light"
+                document.head.querySelector('meta[name="theme-color"]').content = "#FFFFFF"
+            }
+            window.sessionStorage.setItem("darkMode", String(!!darkMode))
+        }
+
+        <!-- Disable double click behaviour on touchscreen devices -->
+        if (window.matchMedia("(pointer: coarse)").matches) document.ondblclick = e => e.preventDefault()
+
+        window.onresize = (ev) => onResize.forEach(c => c(ev))
+    </script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+<script>
+    if (window.sessionStorage.getItem("darkMode")) updateColorScheme(window.sessionStorage.getItem("darkMode") === "true")
+    else updateColorScheme(window.matchMedia("(prefers-color-scheme: dark)").matches)
+    window.matchMedia("(prefers-color-scheme: dark)").onchange = ({matches}) => updateColorScheme(matches)
+</script>
+{{ Navbar() }}
+
+<main class="container mt-3 mb-4">{% block main %}{% endblock %}</main>
+
+{% block script %}{% endblock %}
+</body>
+</html>
