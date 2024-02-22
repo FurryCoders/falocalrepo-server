@@ -30,6 +30,7 @@ from baize.asgi import FileResponse
 from falocalrepo_database import __package__ as __package_database__
 from falocalrepo_database import __version__ as __version_database__
 from falocalrepo_database.tables import comments_table
+from orjson import JSONDecodeError
 from orjson import dumps
 from orjson import loads
 from starlette import status
@@ -210,17 +211,18 @@ def decode_search_id(encoded_search_id: str) -> tuple[str | None, tuple[str, str
     search_id: str | None
     search_index: int | None = None
 
-    search_index_, sep, search_id = encoded_search_id.partition(".")
-
-    if sep and search_index_.isdigit():
-        search_index = int(search_index_)
-    elif not sep and search_index_:
-        search_id = search_index_
-
+    # noinspection PyBroadException
     try:
+        search_index_, sep, search_id = encoded_search_id.partition(".")
+
+        if sep and search_index_:
+            search_index = int(search_index_)
+        elif not sep and search_index_:
+            search_id = search_index_
+
         t, q, s, o = loads(b64decode(search_id))
         search_terms = (t, q, s, o)
-    except ValueError:
+    except BaseException:
         return None, None, None
 
     return search_id, search_terms, search_index
