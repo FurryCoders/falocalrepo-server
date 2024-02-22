@@ -263,7 +263,7 @@
                 </div>
             {% elif not files and thumbnail %}
                 <div class="file-container overflow-scroll position-relative" data-file-index="0" data-selected="true">
-                    <img src="/submission/{{ submission.ID }}/thumbnail"
+                    <img src="/submission/{{ submission.ID }}/thumbnail/{{ "{:010d}-thumbnail{}".format(submission.ID, thumbnail.suffix) }}"
                          alt="" class="loading-element loading-error-hide" loading="lazy"
                          onload="this.classList.add('loaded')" onerror="this.classList.add('loading-error')"
                          onclick="modalImage(this)" style="height: calc(100% - 2rem)">
@@ -540,6 +540,12 @@
                                 File
                             </a>
                         {% endfor %}
+                        {% if not files and thumbnail %}
+                            <a class="btn btn-primary" data-file-index="0" data-selected="true"
+                               href="/submission/{{ submission.ID }}/thumbnail/{{ "{:010d}-thumbnail{}".format(submission.ID, thumbnail.suffix) }}">
+                                Thumbnail
+                            </a>
+                        {% endif %}
                         <a class="btn btn-primary"
                            href="/submission/{{ submission.ID }}/zip/{{ "{:010d}.zip".format(submission.ID) }}">
                             ZIP
