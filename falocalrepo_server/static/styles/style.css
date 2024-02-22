@@ -460,7 +460,11 @@ body.navbar-open nav.navbar {
 }
 
 .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment * .comment {
-    margin-left: 3px !important;
+    margin-left: 3px;
+}
+
+.comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment * .comment {
+    margin-left: 0;
 }
 
 .comment:not([data-replies=true]) {
