@@ -1,7 +1,7 @@
 {% macro Pagination(form, results, offset, limit, page) %}
     {% set total = results.rows|length %}{# offset : offset + limit #}
     <div class="card w-100">
-        <div class="card-header p-1 text-center small">
+        <div class="card-header bg-body p-1 text-center small">
             Page {{ page }} of {{ (total / limit)|round(0, 'ceil')|int }} ({{ total }})
         </div>
         <div class="card-body text-center row p-1" style="height: 2rem">
