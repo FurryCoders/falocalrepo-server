@@ -364,14 +364,14 @@
                         <div class="btn-group btn-group-sm">
                             <a class="btn btn-primary {{ "disabled" if not search_prev }}"
                                href="/submission/{{ search_prev }}?sid={{ search_index - 1 }}.{{ search_id|urlencode }}">
-                                «
+                                &laquo;
                             </a>
                             <a class="btn btn-primary" href="/submissions?sid={{ search_id|urlencode }}">
                                 Search
                             </a>
                             <a class="btn btn-primary {{ "disabled" if not search_next }}"
                                href="/submission/{{ search_next }}?sid={{ search_index + 1 }}.{{ search_id|urlencode }}">
-                                »
+                                &raquo;
                             </a>
                         </div>
                     </div>
@@ -382,7 +382,7 @@
                 <div class="controls">
                     <div class="btn-group btn-group-sm">
                         <a class="btn btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
-                            «
+                            &laquo;
                         </a>
                         <a class="btn btn-primary" href="/gallery/{{ submission.AUTHOR|urlencode }}">
                             Gallery
@@ -394,7 +394,7 @@
                             Scraps
                         </a>
                         <a class="btn btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
-                            »
+                            &raquo;
                         </a>
                     </div>
                 </div>
@@ -496,14 +496,14 @@
                         <div class="btn-group btn-group-sm">
                             <a class="btn btn-primary {{ "disabled" if not search_prev }}"
                                href="/submission/{{ search_prev }}?sid={{ search_index - 1 }}.{{ search_id|urlencode }}">
-                                «
+                                &laquo;
                             </a>
                             <a class="btn btn-primary" href="/submissions?sid={{ search_id|urlencode }}">
                                 Search
                             </a>
                             <a class="btn btn-primary {{ "disabled" if not search_next }}"
                                href="/submission/{{ search_next }}?sid={{ search_index + 1 }}.{{ search_id|urlencode }}">
-                                »
+                                &raquo;
                             </a>
                         </div>
                     </div>
@@ -512,7 +512,7 @@
                 <div class="controls d-none d-lg-flex">
                     <div class="btn-group btn-group-sm">
                         <a class="btn btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
-                            «
+                            &laquo;
                         </a>
                         <a class="btn btn-primary" href="/gallery/{{ submission.AUTHOR|urlencode }}">
                             Gallery
@@ -524,7 +524,7 @@
                             Scraps
                         </a>
                         <a class="btn btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
-                            »
+                            &raquo;
                         </a>
                     </div>
                 </div>
