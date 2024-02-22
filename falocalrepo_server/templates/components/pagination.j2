@@ -9,22 +9,22 @@
                 <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="{{ form }}" name="page"
                         value="1" {{ 'disabled' if page == 1 }}
                         style="width: calc(25% - .5rem)">
-                    First
+                    &laquo;&laquo;
                 </button>
                 <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="{{ form }}" name="page"
                         value="{{ page - 1 }}" {{ 'disabled' if page == 1 }}
                         style="width: calc(25% - .5rem)">
-                    Prev
+                    &laquo;
                 </button>
                 <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="{{ form }}" name="page"
                         value="{{ page + 1 }}" {{ 'disabled' if offset + limit >= total }}
                         style="width: calc(25% - .5rem)">
-                    Next
+                    &raquo;
                 </button>
                 <button type="submit" class="btn btn-sm btn-primary py-0 mx-1" form="{{ form }}" name="page"
                         value="{{ (total / limit)|round(0, 'ceil')|int }}" {{ 'disabled' if offset + limit >= total }}
                         style="width: calc(25% - .5rem)">
-                    Last
+                    &raquo;&raquo;
                 </button>
             </div>
         </div>
