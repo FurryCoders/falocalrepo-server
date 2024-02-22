@@ -34,7 +34,7 @@
                                value="{{ query }}">
                         <select class="form-select form-select-sm" id="queryAdd"
                                 oninput="addToInput(document.getElementById('query'), '@' + this.value); this.options[0].selected = true;"
-                                style="max-width: 5rem; background-color: #E9ECEF">
+                                style="max-width: 5rem;">
                             <option selected disabled class="d-none disabled">Field</option>
                             <option value="any">Any</option>
                             {% for col in results.columns_table if col.lower() != 'relevance' %}
