@@ -459,6 +459,10 @@ body.navbar-open nav.navbar {
     }
 }
 
+.comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment > .replies > .comment * .comment {
+    margin-left: 3px !important;
+}
+
 .comment:not([data-replies=true]) {
     > .comment-body {
         > .comment-header {
