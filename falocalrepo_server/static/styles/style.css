@@ -213,6 +213,10 @@ p:last-child {
     display: none !important;
 }
 
+.loading-element:not(.loaded) ~ .loading-onload {
+    display: none !important;
+}
+
 .loading-element.fade.loaded {
     -webkit-animation: fade-in 150ms forwards;
     -o-animation: fade-in 150ms forwards;
