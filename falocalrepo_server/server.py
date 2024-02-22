@@ -359,10 +359,10 @@ async def search_response(request: Request, table_name: str, query_prefix: str =
 
 @requires(["authenticated"])
 async def search(request: Request):
-    if search_id := request.query_params.get("sid"):
-        table, query, sort, order = loads(b64decode(search_id))
+    if search_terms := decode_search_id(request.query_params.get("sid", ""))[1]:
+        table, query, sort, order = search_terms
         return RedirectResponse(
-            request.url_for("search", table=table).include_query_params(
+            request.url_for("search", table=table.lower()).include_query_params(
                 query=query,
                 sort=sort,
                 order=order,
