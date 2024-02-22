@@ -31,7 +31,7 @@
                 <div class="mt-2">
                     <div class="input-group">
                         <input type="text" class="form-control" id="query" name="query" placeholder="Search"
-                               value="{{ query }}" oninput="enableSearch()">
+                               value="{{ query }}">
                         <select class="form-select form-select-sm" id="queryAdd"
                                 oninput="addToInput(document.getElementById('query'), '@' + this.value); this.options[0].selected = true;"
                                 style="max-width: 5rem; background-color: #E9ECEF">
@@ -49,14 +49,14 @@
                 <div class="mt-2">
                     <div class="input-group">
                         <span class="input-group-text" style="width: 4.4rem">Sort</span>
-                        <select class="form-select form-select-sm" id="sort" name="sort" oninput="enableSearch()">
+                        <select class="form-select form-select-sm" id="sort" name="sort">
                             {% for col in results.columns_table %}
                                 <option {{ "selected" if sort == col.lower() }} value="{{ col.lower() }}">
                                     {{ col.replace("_", " ").title() if col|length > 2 else col.replace("_", " ").upper() }}
                                 </option>
                             {% endfor %}
                         </select>
-                        <select class="form-select form-select-sm" id="order" name="order" oninput="enableSearch()">
+                        <select class="form-select form-select-sm" id="order" name="order">
                             <option {{ "selected" if results.order == "asc" }} value="asc">Ascending</option>
                             <option {{ "selected" if results.order == "desc" }} value="desc">Descending</option>
                         </select>
@@ -71,8 +71,7 @@
                             <option value="grid" {{ "selected" if view == "grid" }}>Grid</option>
                             <option value="list"{{ "selected" if view == "list" }}>List</option>
                         </select>
-                        <select class="form-select form-select-sm" name="limit"
-                                oninput="enableSearch()">
+                        <select class="form-select form-select-sm" name="limit">
                             <option value="12" {{ "selected" if limit == 12 }}>12</option>
                             <option value="24" {{ "selected" if limit == 24 }}>24</option>
                             <option value="48" {{ "selected" if limit == 48 }}>48</option>
@@ -139,22 +138,12 @@
                     </p>
                 </div>
 
-                <div class="row text-center mt-3">
-                    <div class="col-4 ms-auto">
-                        <button type="submit" id="search_submit" class="btn btn-primary w-100" disabled>Search</button>
-                    </div>
-                    <div class="col-4 me-auto">
-                        <button type="submit" class="btn btn-primary w-100"
-                                onclick="document.getElementById('query').value = ''">
-                            Browse
-                        </button>
-                    </div>
+                <div class="d-flex flex-row justify-content-between column-gap-2 mt-3">
+                    <button type="submit" id="search_submit" class="btn btn-primary">Search</button>
                     {% if table == "submissions" %}
-                        <div class="col-4">
-                            <button type="button" class="btn btn-info w-100" onclick="convertToFAQuery()">
-                                FA
-                            </button>
-                        </div>
+                        <button type="button" class="btn btn-info" onclick="convertToFAQuery()">
+                            FA
+                        </button>
                     {% endif %}
                 </div>
             </form>
@@ -219,11 +208,6 @@
                 window.history.replaceState({}, '', url.href)
             }
         {% endif %}
-
-        let enableSearch = () => {
-            document.getElementById("search_submit").disabled = false
-            enableSearch = () => null
-        }
 
         const addToInput = (input, value) => {
             const selectStart = input.selectionStart, selectEnd = input.selectionEnd
