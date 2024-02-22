@@ -30,7 +30,6 @@ from baize.asgi import FileResponse
 from falocalrepo_database import __package__ as __package_database__
 from falocalrepo_database import __version__ as __version_database__
 from falocalrepo_database.tables import comments_table
-from orjson import JSONDecodeError
 from orjson import dumps
 from orjson import loads
 from starlette import status
