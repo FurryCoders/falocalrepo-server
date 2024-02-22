@@ -326,7 +326,7 @@ async def search_response(request: Request, table_name: str, query_prefix: str =
 
     sql_query: str = query
     if query and query_prefix:
-        sql_query = f"({query_prefix}) & ({query})"
+        sql_query = f"({query_prefix}) & (@any {query})"
     elif query_prefix:
         sql_query = query_prefix
 
