@@ -13,7 +13,7 @@
         <div class="col-12 col-lg-8 mx-auto">
             <form action="{{ action }}" class="rounded border p-3" id="search_form">
                 <div class="d-flex align-items-center">
-                    <h5 class="m-0">{{ title }}</h5>
+                    <h5 class="m-0">{{ title or "Search {}".format(table|title) }}</h5>
 
                     <a class="btn btn-sm btn-outline-secondary ms-auto" href="/settings">
                         <svg width="12" height="12" viewBox="0 0 16 16" style="fill: var(--bs-body-color)">
