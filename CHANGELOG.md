@@ -29,10 +29,10 @@
 * [falocalrepo-database ~5.4.5](https://pypi.org/project/falocalrepo-database/5.4.5/)
 * [chardet ^5.2.0](https://pypi.org/project/chardet/5.2.0/)
 * [pillow ^10.0.1](https://pypi.org/project/pillow/10.0.1/)
-    * Fix [CVE-2023-4863](https://cve.report/CVE-2023-4863)
+    * Fix [CVE-2023-4863](https://www.cve.org/CVERecord?id=CVE-2023-4863)
 * [fastapi ^0.103.2](https://pypi.org/project/fastapi/0.103.2/)
-    * Fix [CVE-2023-29159](https://cve.report/CVE-2023-29159)
-    * Fix [CVE-2023-30798](https://cve.report/CVE-2023-30798)
+    * Fix [CVE-2023-29159](https://www.cve.org/CVERecord?id=CVE-2023-29159)
+    * Fix [CVE-2023-30798](https://www.cve.org/CVERecord?id=CVE-2023-30798)
     * Fix [GHSA-74m5-2c7w-9w3x](https://github.com/advisories/GHSA-74m5-2c7w-9w3x)
 * [uvicorn ^0.23.2](https://pypi.org/project/uvicorn/0.23.2/)
 * [click ^8.1.7](https://pypi.org/project/click/8.1.7/)
@@ -185,7 +185,7 @@
 ### Dependencies
 
 * Use [lxml ^4.9.1](https://pypi.org/project/lxml/4.9.1)
-    * Fix [CVE-2022-2309](https://cve.report/CVE-2022-2309.pdf) issue
+    * Fix [CVE-2022-2309](https://www.cve.org/CVERecord?id=CVE-2022-2309.pdf) issue
 * Use [falocalrepo-database ~5.3.7](https://pypi.org/project/falocalrepo-database/5.3.7)
 * Use [uvicorn ^0.18.2](https://pypi.org/project/uvicorn/0.18.2)
 * Use [chardet ^5.0.0](https://pypi.org/project/chardet/5.0.0)
