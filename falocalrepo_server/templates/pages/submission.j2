@@ -32,8 +32,8 @@
 
             > .file-container {
                 position: relative;
-                height: calc(100% - var(--pagination-height, 0));
-                min-height: calc(100% - var(--pagination-height, 0));
+                height: calc(100% - var(--pagination-height, 0rem));
+                min-height: calc(100% - var(--pagination-height, 0rem));
                 text-align: center;
 
                 > object {
@@ -173,6 +173,7 @@
             }
 
             const modalFiles = () => {
+                document.querySelectorAll("video").forEach(v => v.pause())
                 const modal = document.getElementById("modal-files")
                 if (modal.classList.contains("show")) {
                     modal.scrollTo({top: 0})
@@ -193,6 +194,7 @@
             }
 
             const selectFile = (index) => {
+                document.querySelectorAll("video").forEach(v => v.pause())
                 index = String(index)
                 document.querySelectorAll("[data-file-index]").forEach(e => e.dataset.selected = String(e.dataset.fileIndex === index))
                 document.querySelectorAll("[data-selected-index]").forEach(e => e.dataset.selectedIndex = String(Number(index) + 1))
@@ -293,13 +295,32 @@
                                  onload="this.classList.add('loaded')" onerror="this.classList.add('loading-error')"
                                  onclick="modalImage(this)">
                             <div class="loading-spinner mt-5"></div>
-                            <div class="loading-onerror d-inline-flex flex-column mt-4">
+                            <div class="loading-onerror mt-5">
                                 <span class="badge bg-danger">Image could not be loaded</span>
-                                <button class="btn btn-sm btn-primary position-relative mt-4">
-                                    <a href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}"
-                                       class="stretched-link" download="{{ name }}"></a>
-                                    Download {{ file.suffix.upper().strip(".") or "file" }}
-                                </button>
+                            </div>
+                        {% elif mime.startswith("audio/") %}
+                            <div class="mt-5 col-12 col-md-10 mx-auto" style="height: 3rem">
+                                <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}"
+                                       class="loading-element loading-error-hide w-100" preload="metadata"
+                                       onloadedmetadata="this.classList.add('loaded')"
+                                       onerror="this.classList.add('loading-error')" controls>
+                                </audio>
+                                <div class="loading-spinner"></div>
+                                <div class="loading-onerror">
+                                    <span class="badge bg-danger">Audio could not be loaded</span>
+                                </div>
+                            </div>
+                        {% elif mime.startswith("video/") %}
+                            <video class="loading-element loading-error-hide rounded mw-100 mh-100"
+                                   poster="/submission/{{ submission.ID }}/thumbnail"
+                                   preload="metadata" onloadedmetadata="this.classList.add('loaded')"
+                                   playsinline controls>
+                                <source src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}"
+                                        onerror="this.parentElement.classList.add('loading-error')"/>
+                            </video>
+                            <div class="loading-spinner mt-5"></div>
+                            <div class="loading-onerror mt-5">
+                                <span class="badge bg-danger">Video could not be loaded</span>
                             </div>
                         {% elif mime == "application/pdf" and not is_mobile %}
                             <div class="h-100 overflow-hidden rounded position-relative">
@@ -590,7 +611,8 @@
             </div>
         </div>
 
-        {% if comments %}{{ Comments(comments, "col col-12 col-lg-9 col-xl-8 col-xxl-7 mx-auto mt-4", "comments") }}{% endif %}
+        {% if comments %}
+            {{ Comments(comments, "col col-12 col-lg-9 col-xl-8 col-xxl-7 mx-auto mt-4", "comments") }}{% endif %}
     </div>
 
     {% if files or thumbnail or comments %}
