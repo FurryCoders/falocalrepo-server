@@ -405,6 +405,7 @@ body.navbar-open nav.navbar {
 
         > .comment-text {
             padding: .5rem;
+            overflow-wrap: break-word;
         }
     }
 
