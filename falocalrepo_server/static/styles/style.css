@@ -419,27 +419,17 @@ body.navbar-open nav.navbar {
             bottom: 0;
             width: 1px;
             background: var(--bs-border-color);
-            cursor: n-resize;
-        }
-
-        > .replies-border::before {
-            position: absolute;
-            content: "";
-            top: 0;
-            right: -2px;
-            bottom: 0;
-            left: -2px;
-        }
-
-        > .replies-border:hover,
-        > .replies-border:hover ~ .comment {
-            opacity: .5;
         }
 
 
         > .comment {
             margin-left: .5rem;
         }
+    }
+
+    > .replies-counter {
+        cursor: pointer;
+        width: fit-content;
     }
 
     > .replies-counter::before {
@@ -450,7 +440,6 @@ body.navbar-open nav.navbar {
         bottom: 0;
         width: 1px;
         border-left: 1px dashed var(--bs-border-color);
-        cursor: n-resize;
     }
 
     > .replies-counter::after {
@@ -459,7 +448,6 @@ body.navbar-open nav.navbar {
         font-style: italic;
         color: var(--bs-secondary);
         padding: 0 .5rem;
-        width: fit-content;
     }
 }
 
