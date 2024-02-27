@@ -570,7 +570,7 @@
                                     BBCode
                                 </button>
                             </div>
-                            <div id="description_bbcode" hidden>
+                            <div id="description_bbcode" class="overflow-wrap" hidden>
                                 {{ submission.DESCRIPTION_BBCODE|safe }}
                                 {% if submission.FOOTER_BBCODE %}
                                     <hr class="my-3"/>
@@ -578,7 +578,7 @@
                                 {% endif %}
                             </div>
                         {% endif %}
-                        <div id="description_html">
+                        <div id="description_html" class="overflow-wrap">
                             {{ submission.DESCRIPTION|safe }}
                             {% if submission.FOOTER %}
                                 <hr class="my-3"/>

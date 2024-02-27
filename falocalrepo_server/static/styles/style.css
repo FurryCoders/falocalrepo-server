@@ -284,6 +284,10 @@ p:last-child {
     opacity: 0;
 }
 
+.overflow-wrap {
+    overflow-wrap: break-word;
+}
+
 nav.navbar {
     position: absolute !important;
     top: 0;
