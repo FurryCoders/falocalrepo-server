@@ -40,9 +40,7 @@
 
         {% if comment.REPLIES %}
             <div class="replies">
-                <div class="replies-border" data-cid="{{ comment.ID }}"
-                     onclick="this.parentElement.parentElement.classList.add('replies-closed'); document.getElementById(`cid:${this.dataset.cid}`).scrollIntoView()">
-                </div>
+                <div class="replies-border"></div>
                 {% for reply in comment.REPLIES %}{{ Comment(reply) }}{% endfor %}
             </div>
             <div class="replies-counter" data-replies="{{ comment.REPLIES_COUNT }}"
