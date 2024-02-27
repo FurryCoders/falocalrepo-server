@@ -40,7 +40,7 @@ lxml = "^5.1.0"
 bbcode = "^1.1.0"
 pydantic-settings = "^2.0.3"
 itsdangerous = "^2.1.2"
-orjson = "^3.9.13"
+orjson = "^3.9.15"
 baize = "^0.20.8"
 python-multipart = "^0.0.9"
 
