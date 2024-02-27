@@ -21,13 +21,13 @@
                         <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"></path>
                     </svg>
                 </a>
-                <div class="replies-close-toggle ms-2 nav-link"
+                <div class="replies-close-toggle ms-2 nav-link" title="Hide {{ comment.REPLIES_COUNT }} replies"
                      onclick="this.parentElement.parentElement.parentElement.classList.add('replies-closed')">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor">
                         <path fill-rule="evenodd" d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"></path>
                     </svg>
                 </div>
-                <div class="replies-open-toggle ms-2 nav-link"
+                <div class="replies-open-toggle ms-2 nav-link" title="Show {{ comment.REPLIES_COUNT }} replies"
                      onclick="this.parentElement.parentElement.parentElement.classList.remove('replies-closed')">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor">
                         <path fill-rule="evenodd"
