@@ -430,6 +430,7 @@ body.navbar-open nav.navbar {
     > .replies-counter {
         cursor: pointer;
         width: fit-content;
+        padding: .125rem 0 0 0;
     }
 
     > .replies-counter::before {
