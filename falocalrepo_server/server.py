@@ -558,9 +558,10 @@ async def submission_zip(request: Request):
                 z.writestr(f.name, f.read_bytes())
         if t and t.is_file():
             z.writestr(t.name, t.read_bytes())
-        z.writestr("description.txt" if database.bbcode else "description.html", sub["DESCRIPTION"].encode())
-        z.writestr("metadata.json", dumps(sub, default=lambda o: list(o) if isinstance(o, set) else str(o)))
-        z.writestr("comments.json", dumps(database.submission_comments(request.path_params["id"])))
+        if request.query_params.get("files-only") is None:
+            z.writestr("description.txt" if database.bbcode else "description.html", sub["DESCRIPTION"].encode())
+            z.writestr("metadata.json", dumps(sub, default=lambda o: list(o) if isinstance(o, set) else str(o)))
+            z.writestr("comments.json", dumps(database.submission_comments(request.path_params["id"])))
 
     f_obj.seek(0)
 
