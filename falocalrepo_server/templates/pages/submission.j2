@@ -294,7 +294,7 @@
                                  onclick="modalImage(this)">
                             <div class="loading-spinner mt-5"></div>
                             <div class="loading-onerror d-inline-flex flex-column mt-4">
-                                <span class="badge bg-danger loading-onerror">Image could not be loaded</span>
+                                <span class="badge bg-danger">Image could not be loaded</span>
                                 <button class="btn btn-sm btn-primary position-relative mt-4">
                                     <a href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}"
                                        class="stretched-link" download="{{ name }}"></a>
@@ -562,7 +562,7 @@
         <div class="col col-12 mt-3" id="description">
             <div class="border rounded p-3">
                 <div class="row">
-                    <div class="col col-12 col-lg-9 mx-auto">
+                    <div class="col col-12 col-lg-9 col-xl-8 col-xxl-7 mx-auto">
                         {% if submission.DESCRIPTION_BBCODE %}
                             <div class="mb-2 text-end">
                                 <button class="btn btn-sm btn-outline-info py-0 px-1"
@@ -590,7 +590,7 @@
             </div>
         </div>
 
-        {% if comments %}{{ Comments(comments, "col col-12 col-lg-9 mx-auto mt-4", "comments") }}{% endif %}
+        {% if comments %}{{ Comments(comments, "col col-12 col-lg-9 col-xl-8 col-xxl-7 mx-auto mt-4", "comments") }}{% endif %}
     </div>
 
     {% if files or thumbnail or comments %}
