@@ -1,6 +1,7 @@
 <!--suppress HtmlUnknownTarget, CssUnusedSymbol, HtmlDeprecatedAttribute -->
 {% extends "base.j2" %}
 {% from "components/comments.j2" import Comments %}
+{% import "components/icons.j2" as icons %}
 
 {% block title %}{{ "{} by {}".format(submission.TITLE, submission.AUTHOR) }}{% endblock %}
 
@@ -222,21 +223,35 @@
                     <div class="modal-body">
                         <div class="row row-gap-2">
                             {% for file, mime, text in files %}
+                                {% set mime = mime or "" %}
                                 <div class="col col-12 col-lg-6 col-xl-4">
                                     <div class="border rounded p-1 d-flex flex-row file-selector no-hide"
                                          data-file-index="{{ loop.index0 }}"
                                          data-selected="{{ "true" if loop.first else "false" }}"
                                          onclick="selectFile(this.dataset.fileIndex)">
                                         <div class="position-relative d-flex justify-content-center align-items-center thumbnail">
-                                            {% if mime and mime.startswith("image/") %}
+                                            {% if mime.startswith("image/") %}
                                                 <img src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ "{:010d}-{}{}".format(submission.ID, loop.index0, file.suffix) }}"
                                                      alt=""
                                                      class="loading-element loading-error-hide mh-100 mw-100 rounded"
                                                      loading="lazy" onload="this.classList.add('loaded')"
                                                      onerror="this.classList.add('loading-error')">
+                                                {{ icons.Image(50, 50, "loading-onerror") }}
+                                            {% elif mime.startswith("audio/") %}
+                                                {{ icons.Headphones(50, 50) }}
+                                            {% elif mime.startswith("video/") %}
+                                                {{ icons.PlayBtn(50, 50) }}
+                                            {% elif mime == "application/pdf" %}
+                                                {{ icons.FileEarmarkPDF(50, 50) }}
+                                            {% elif mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" %}
+                                                {{ icons.FileEarmarkRichText(50, 50) }}
+                                            {% elif mime == "application/zip" %}
+                                                {{ icons.FileEarmarkZip(50, 50) }}
+                                            {% elif text %}
+                                                {{ icons.FileEarmarkText(50, 50) }}
+                                            {% else %}
+                                                {{ icons.FileEarmark(50, 50) }}
                                             {% endif %}
-                                            <div class="loading-onerror rounded bg-body-secondary h-100"
-                                                 style="aspect-ratio: 1 / 1"></div>
                                         </div>
                                         <div class="ps-2 d-flex flex-column justify-content-between overflow-hidden">
                                             <div>File {{ loop.index }} {{ file.suffix.removeprefix(".").upper() }}</div>
