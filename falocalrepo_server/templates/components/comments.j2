@@ -10,11 +10,11 @@
                 <div class="loading-pulse rounded" style="height: 30px"></div>
                 <div class="d-inline-block loading-onerror rounded bg-body-secondary"
                      style="height: 30px; aspect-ratio: 1 / 1"></div>
-                <a class="nav-link ms-2 pointer" href="/user/{{ comment.AUTHOR }}">{{ comment.AUTHOR }}</a>
-                <div class="text-secondary ms-auto" style="font-size: smaller;">
-                    {{ comment.DATE.strftime("%Y-%m-%d %H:%M") }}
+                <div class="ms-2">
+                    <a class="nav-link pointer d-block" href="/user/{{ comment.AUTHOR }}">{{ comment.AUTHOR }}</a>
+                    <span class="text-secondary" style="font-size: x-small;">{{ comment.DATE.strftime("%Y-%m-%d %H:%M") }}</span>
                 </div>
-                <a href="#cid:{{ comment.ID }}" class="text-decoration-none ms-2">
+                <a href="#cid:{{ comment.ID }}" class="text-decoration-none ms-auto">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
                          viewBox="0 0 16 16">
                         <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"></path>
