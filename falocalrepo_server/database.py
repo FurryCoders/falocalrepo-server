@@ -26,6 +26,7 @@ from falocalrepo_database.tables import journals_table
 from falocalrepo_database.tables import submissions_table
 from falocalrepo_database.tables import users_table
 from falocalrepo_database.util import clean_username
+from filetype import get_type
 from filetype import guess_mime
 from orjson import dumps
 from orjson import loads
@@ -369,7 +370,7 @@ class Database:
         return {
             i: (
                 bbcode_to_html(f.read_text(detect_encoding(f.read_bytes())["encoding"], "ignore"))
-                if f.suffix == ".txt"
+                if f.suffix == ".txt" and f.is_file()
                 else ""
             )
             for i, f in enumerate(files)
@@ -377,7 +378,10 @@ class Database:
 
     @lru_cache
     def _submission_files_mime(self, *files: Path) -> dict[int, str | None]:
-        return {i: guess_mime(f) if f.is_file() else None for i, f in enumerate(files)}
+        return {
+            i: guess_mime(f) if f.is_file() else t.mime if (t := get_type(ext=f.suffix.strip("."))) else None
+            for i, f in enumerate(files)
+        }
 
     @lru_cache
     def _submission_comments(self, submission_id: int) -> list[dict[str, Any]]:
