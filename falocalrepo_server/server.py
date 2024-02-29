@@ -671,7 +671,7 @@ async def general_error(request: Request, exc: Exception):
     return error_response(
         request,
         500,
-        f"{exc.__class__.__name__}{':' if exc.args else ''} " + " ".join(exc.args),
+        f"{exc.__class__.__name__}{':' if exc.args else ''} " + " ".join(map(str, exc.args)),
         None,
         format_exc(),
     )
