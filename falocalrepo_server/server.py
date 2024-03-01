@@ -296,7 +296,9 @@ async def settings(request: Request):
     return templates.TemplateResponse(request, "pages/settings.j2", {"settings": search_settings, "tables": tables})
 
 
-async def search_response(request: Request, table_name: str, query_prefix: str = "", title: str = ""):
+async def search_response(
+    request: Request, table_name: str, query_prefix: str = "", title: str = "", username: str = ""
+):
     if (table_name := table_name.upper()) not in (
         users_table,
         submissions_table,
@@ -340,6 +342,7 @@ async def search_response(request: Request, table_name: str, query_prefix: str =
         "pages/search.j2",
         {
             "title": title,
+            "username": username,
             "action": request.url.path,
             "table": table_name.lower(),
             "query": query,
@@ -404,6 +407,7 @@ async def user_submissions(request: Request):
         submissions_table,
         f"@author ^{clean_username(request.path_params['username'])}$",
         f"Submissions by {request.path_params['username']}",
+        request.path_params["username"],
     )
 
 
@@ -415,6 +419,7 @@ async def user_gallery(request: Request):
         submissions_table,
         f"@author ^{clean_username(request.path_params['username'])}$ & @folder gallery",
         f"Gallery by {request.path_params['username']}",
+        request.path_params["username"],
     )
 
 
@@ -426,6 +431,7 @@ async def user_scraps(request: Request):
         submissions_table,
         f"@author ^{clean_username(request.path_params['username'])}$ & @folder scraps",
         f"Scraps by {request.path_params['username']}",
+        request.path_params["username"],
     )
 
 
@@ -436,6 +442,7 @@ async def user_journals(request: Request):
         journals_table,
         f"@author ^{clean_username(request.path_params['username'])}$",
         f"Journals by {request.path_params['username']}",
+        request.path_params["username"],
     )
 
 
@@ -446,6 +453,7 @@ async def user_favorites(request: Request):
         submissions_table,
         f'@favorite "|{clean_username(request.path_params["username"])}|"',
         f"Favorites of {request.path_params['username']}",
+        request.path_params["username"],
     )
 
 
@@ -456,6 +464,7 @@ async def user_comments(request: Request):
         comments_table,
         f"@author ^{clean_username(request.path_params['username'])}$",
         f"Comments by {request.path_params['username']}",
+        request.path_params["username"],
     )
 
 
