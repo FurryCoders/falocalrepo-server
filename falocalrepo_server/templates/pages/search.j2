@@ -8,11 +8,23 @@
 {% block title %}{{ title or "Search {}".format(table.title()) }}{% endblock %}
 
 {% block main %}
-    <!--suppress HtmlFormInputWithoutLabel -->
+    <!--suppress HtmlFormInputWithoutLabel, HtmlDeprecatedAttribute -->
     <div class="row">
         <div class="col-12 col-lg-8 mx-auto">
             <form action="{{ action }}" class="rounded border p-3" id="search_form">
                 <div class="d-flex align-items-center">
+                    {% if username %}
+                        <div class="me-2 position-relative">
+                            <a href="/user/{{ username }}" class="stretched-link"></a>
+                            <img src="/user/{{ username }}/icon" alt=""
+                                 class="loading-element loading-error-hide rounded fade"
+                                 height="50" style="height: 50px !important; min-width: 50px"
+                                 onerror="this.classList.add('loading-error')" onload="this.classList.add('loaded')">
+                            <div class="loading-pulse rounded" style="height: 50px"></div>
+                            <div class="loading-onerror rounded bg-body-secondary"
+                                 style="height: 50px; aspect-ratio: 1 / 1"></div>
+                        </div>
+                    {% endif %}
                     <h5 class="m-0">{{ title or "Search {}".format(table|title) }}</h5>
 
                     <a class="btn btn-sm btn-outline-secondary ms-auto" href="/settings">
