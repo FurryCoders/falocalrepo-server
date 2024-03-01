@@ -352,7 +352,7 @@ async def search_response(request: Request, table_name: str, query_prefix: str =
             "page": page,
             "offset": (page - 1) * limit,
             "limit": limit,
-            "search_id": encode_search_id(table_name, query, sort, order) if query and database.use_cache else "",
+            "search_id": encode_search_id(table_name, sql_query, sort, order) if query and database.use_cache else "",
         },
     )
 
