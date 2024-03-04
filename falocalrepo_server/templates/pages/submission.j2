@@ -206,11 +206,11 @@
             <div class="modal-backdrop" onclick="modalFiles()"></div>
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header p-2 p-sm-3">
                         <h5 class="modal-title">Files</h5>
                         <button type="button" class="btn-close" onclick="modalFiles()"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body p-2 p-sm-3">
                         <div class="row row-gap-2">
                             {% for file, mime, text in files %}
                                 {% set mime = mime or "" %}
