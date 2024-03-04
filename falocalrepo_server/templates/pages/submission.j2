@@ -163,14 +163,14 @@
                 return !!img
             }
 
-            const modalFiles = () => {
+            const modalFiles = (toggle) => {
                 document.querySelectorAll("video").forEach(v => v.pause())
                 const modal = document.getElementById("modal-files")
-                if (modal.classList.contains("show")) {
+                if (toggle === false || modal.classList.contains("show")) {
                     modal.scrollTo({top: 0})
                     modal.classList.remove("show")
                     document.body.classList.remove("overflow-hidden")
-                } else {
+                } else if (toggle !== false) {
                     modal.classList.add("show")
                     document.body.classList.add("overflow-hidden")
                 }
@@ -218,7 +218,7 @@
                                     <div class="border rounded p-1 d-flex flex-row file-selector no-hide"
                                          data-file-index="{{ loop.index0 }}"
                                          data-selected="{{ "true" if loop.first else "false" }}"
-                                         onclick="selectFile(this.dataset.fileIndex)">
+                                         onclick="selectFile(this.dataset.fileIndex); modalFiles(false)">
                                         <div class="position-relative d-flex justify-content-center align-items-center thumbnail">
                                             {% if mime.startswith("image/") %}
                                                 <img src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ "{:010d}-{}{}".format(submission.ID, loop.index0, file.suffix) }}"
