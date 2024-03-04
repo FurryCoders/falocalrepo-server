@@ -235,6 +235,12 @@
                                                 {{ icons.FileEarmarkPDF(50, 50) }}
                                             {% elif mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" %}
                                                 {{ icons.FileEarmarkRichText(50, 50) }}
+                                            {% elif mime == "application/msword" %}
+                                                {{ icons.FileEarmarkRichText(50, 50) }}
+                                            {% elif mime == "application/vnd.oasis.opendocument.text" %}
+                                                {{ icons.FileEarmarkRichText(50, 50) }}
+                                            {% elif mime == "application/rtf" %}
+                                                {{ icons.FileEarmarkRichText(50, 50) }}
                                             {% elif mime == "application/zip" %}
                                                 {{ icons.FileEarmarkZip(50, 50) }}
                                             {% elif text %}
