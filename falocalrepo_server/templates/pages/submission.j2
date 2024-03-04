@@ -296,8 +296,11 @@
                          data-selected="{{ "true" if loop.first else "false" }}">
                         {% if text %}
                             <div class="border rounded h-100 overflow-scroll p-2 bg-body">
-                                <div class="text-start text-wrap font-monospace" style="font-size: smaller;">
-                                    {{ text|trim|safe }}
+                                <div class="col col-12 col-xl-10 mx-auto">
+                                    <div class="text-start text-wrap font-monospace text-file"
+                                         style="font-size: smaller;">
+                                        {{ text|trim|safe }}
+                                    </div>
                                 </div>
                             </div>
                         {% elif mime.startswith("image/") %}
