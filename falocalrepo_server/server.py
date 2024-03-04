@@ -394,7 +394,7 @@ async def user(request: Request):
 async def user_icon(request: Request):
     username: str = clean_username(request.path_params["username"])
     if not username:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "")
     server_time: datetime = datetime.now(timezone(timedelta(hours=-8)))
     return RedirectResponse(f"https://a.furaffinity.net/{server_time:%Y%m%d}/{username}.gif")
 
@@ -538,9 +538,9 @@ async def submission_thumbnail(request: Request):
                 f_obj.seek(0)
                 return StreamingResponse(f_obj, 201, media_type=f"image/{img.format}".lower())
         except UnidentifiedImageError:
-            raise HTTPException(status.HTTP_404_NOT_FOUND)
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "")
     else:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "")
 
 
 @requires(["authenticated"])
@@ -549,9 +549,9 @@ async def submission_file(request: Request):
     n = request.path_params.get("n", 0)
     fs, _ = database.database.submissions.get_submission_files(request.path_params["id"])
     if not fs or n > len(fs) - 1:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "")
     elif not fs[n].is_file():
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "")
     return FileResponse(str(fs[n]))
 
 
@@ -559,7 +559,7 @@ async def submission_file(request: Request):
 async def submission_zip(request: Request):
     database: Database = request.state.database
     if not (sub := database.submission(request.path_params["id"])):
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "")
 
     fs, t = database.submission_files(request.path_params["id"])
 
@@ -624,7 +624,7 @@ async def journal(request: Request):
 async def journal_zip(request: Request):
     database: Database = request.state.database
     if not (jrn := database.submission(request.path_params["id"])):
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "")
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
         z.writestr("content.txt" if database.bbcode else "content.html", jrn["CONTENT"].encode())
@@ -674,7 +674,10 @@ def error_response(
 
 @requires(["authenticated"])
 async def http_error(request: Request, exc: HTTPException):
-    return error_response(request, exc.status_code, exc.detail)
+    if exc.detail:
+        return error_response(request, exc.status_code, exc.detail)
+    else:
+        return Response(None, exc.status_code)
 
 
 @requires(["authenticated"])
