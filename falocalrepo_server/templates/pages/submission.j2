@@ -57,7 +57,7 @@
 
         {% if files|length > 1 %}
             > #files-pagination {
-                height: calc(var(--pagination-height) - .5rem);
+                height: calc(var(--pagination-height) - .25rem);
                 padding-top: .25rem;
                 margin: auto;
 
@@ -92,7 +92,7 @@
             position: sticky;
             top: .25rem;
             z-index: 800;
-            transform: translateY(.5rem);
+            transform: translateY(.25rem);
         }
 
         #files::before {
@@ -107,7 +107,7 @@
             content: "";
             top: -.5rem;
             right: 0;
-            bottom: -.25rem;
+            bottom: -.5rem;
             left: 0;
             border-radius: var(--bs-border-radius);
             background: rgba(var(--bs-body-color-rgb), .05);
