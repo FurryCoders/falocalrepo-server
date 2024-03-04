@@ -116,11 +116,6 @@
             animation: blur 250ms forwards;
         }
 
-        #modal-image {
-            text-align: center;
-            padding: .5rem;
-        }
-
         #modal-image-img {
             cursor: zoom-out;
             max-width: 100%;
@@ -203,8 +198,8 @@
 
 {% block main %}
     {% if files or thumbnail %}
-        <div class="modal fade blur bg-light bg-opacity-25" id="modal-image" onclick="modalImage()">
-            <img id="modal-image-img" src="" alt="" onclick="modalImage()">
+        <div class="modal fade blur text-center p-2" id="modal-image" onclick="modalImage()">
+            <img id="modal-image-img" src="" alt="">
         </div>
 
         <div class="modal fade blur" id="modal-files">
