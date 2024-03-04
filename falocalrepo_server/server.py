@@ -550,6 +550,8 @@ async def submission_file(request: Request):
     fs, _ = database.database.submissions.get_submission_files(request.path_params["id"])
     if not fs or n > len(fs) - 1:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
+    elif not fs[n].is_file():
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
     return FileResponse(str(fs[n]))
 
 
