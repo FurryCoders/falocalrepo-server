@@ -217,6 +217,7 @@ class Database:
         order: str,
     ) -> SearchResults:
         cols_results: list[str]
+        cols_any: list[str]
         default_column: str = "any"
         sort = sort or default_sort[table_name]
         order = order or default_order[table_name]
@@ -224,7 +225,8 @@ class Database:
         table: Table
 
         if (table_name := table_name.upper()) == users_table.upper():
-            default_column = "username"
+            default_column = UsersColumns.USERNAME.name
+            cols_any = [UsersColumns.USERNAME.name, UsersColumns.USERPAGE.name]
             cols_results = [
                 UsersColumns.USERNAME.name,
                 UsersColumns.FOLDERS.name,
@@ -232,6 +234,15 @@ class Database:
             ]
             table = self.database.users
         elif table_name == submissions_table.upper():
+            cols_any = [
+                SubmissionsColumns.AUTHOR.name,
+                SubmissionsColumns.DATE.name,
+                SubmissionsColumns.TITLE.name,
+                SubmissionsColumns.CATEGORY.name,
+                SubmissionsColumns.TAGS.name,
+                SubmissionsColumns.SPECIES.name,
+                SubmissionsColumns.DESCRIPTION.name,
+            ]
             cols_results = [
                 SubmissionsColumns.ID.name,
                 SubmissionsColumns.AUTHOR.name,
@@ -242,6 +253,12 @@ class Database:
             table = self.database.submissions
             actual_sort = SubmissionsColumns.ID.name if sort.lower() == SubmissionsColumns.DATE.name.lower() else sort
         elif table_name == journals_table.upper():
+            cols_any = [
+                JournalsColumns.AUTHOR.name,
+                JournalsColumns.DATE.name,
+                JournalsColumns.TITLE.name,
+                JournalsColumns.CONTENT.name,
+            ]
             cols_results = [
                 JournalsColumns.ID.name,
                 JournalsColumns.AUTHOR.name,
@@ -251,6 +268,10 @@ class Database:
             table = self.database.journals
             actual_sort = JournalsColumns.ID.name if sort.lower() == JournalsColumns.DATE.name.lower() else sort
         elif table_name == comments_table:
+            cols_any = [
+                CommentsColumns.AUTHOR.name,
+                CommentsColumns.TEXT.name,
+            ]
             cols_results = [
                 CommentsColumns.ID.name,
                 CommentsColumns.PARENT_TABLE.name,
@@ -287,7 +308,7 @@ class Database:
                 "keywords": "tags",
                 "message": "description",
                 "filename": "fileurl",
-                "any": "(" + "||".join(set(cols_table) - {"FAVORITE", "FILESAVED", "USERUPDATE", "ACTIVE"}) + ")",
+                "any": f"({'||'.join(cols_any)})",
             },
             score=sort.lower() == "relevance",
         )
