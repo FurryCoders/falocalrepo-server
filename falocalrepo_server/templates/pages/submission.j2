@@ -88,12 +88,6 @@
         {% endif %}
         }
 
-        #files::before {
-            border-radius: var(--bs-border-radius);
-            background: rgba(var(--bs-body-color-rgb), 0);
-            transition: all 250ms;
-        }
-
         #files.floating {
             position: sticky;
             top: .25rem;
@@ -101,16 +95,22 @@
             transform: translateY(.5rem);
         }
 
+        #files::before {
+            border-radius: var(--bs-border-radius);
+            background: rgba(var(--bs-body-color-rgb), 0);
+            transition: background 250ms;
+        }
+
         #files.floating::before {
             position: absolute;
             z-index: -1;
             content: "";
-            top: -.25rem;
+            top: -.5rem;
             right: 0;
             bottom: -.25rem;
             left: 0;
             border-radius: var(--bs-border-radius);
-            background: rgba(var(--bs-body-color-rgb), .25);
+            background: rgba(var(--bs-body-color-rgb), .05);
             -webkit-animation: blur 250ms forwards;
             -o-animation: blur 250ms forwards;
             animation: blur 250ms forwards;
