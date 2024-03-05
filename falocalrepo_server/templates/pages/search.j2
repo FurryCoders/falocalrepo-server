@@ -177,7 +177,7 @@
             {% for item in results.rows[offset:offset + limit] %}
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                     {% if table == "users" %}
-                        {{ UserCard(item, "{}.{}".format(offset + loop.index0, search_id) if search_id else "") }}
+                        {{ UserCard(item) }}
                     {% elif table == "submissions" %}
                         {{ SubmissionCard(item, "{}.{}".format(offset + loop.index0, search_id) if search_id else "") }}
                     {% endif %}
