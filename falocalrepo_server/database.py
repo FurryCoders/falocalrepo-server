@@ -85,6 +85,7 @@ def format_value(value: str, *, like: bool = False) -> str:
 def query_to_sql(
     query: str,
     default_field: str,
+    available_columns: list[str],
     likes: list[str] = None,
     aliases: dict[str, str] = None,
     score: bool = False,
@@ -104,6 +105,8 @@ def query_to_sql(
     for token in tokens:
         if m := match(r"^@(\w+)$", token):
             field = m.group(1).lower()
+            if field not in available_columns and field not in aliases:
+                field = default_field
             continue
         elif token == "!":
             token = prev
@@ -297,6 +300,7 @@ class Database:
         sql, values = query_to_sql(
             query,
             default_column,
+            [c.name.lower() for c in table.columns],
             [
                 c.lower()
                 for c in {*cols_table, "any", "keywords", "message", "filename"}
