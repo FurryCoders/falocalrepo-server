@@ -219,6 +219,7 @@ class Database:
         query: str,
         sort: str,
         order: str,
+        limit: int | None,
     ) -> SearchResults:
         cols_results: list[str]
         cols_any: list[str]
@@ -326,17 +327,11 @@ class Database:
                 values,
                 [*cols_results, f"({sql if sql else 1}) as RELEVANCE"],
                 [f"{actual_sort} {order}", f"{default_sort[table_name]} {default_order[table_name]}"],
-                self.max_results or None,
+                limit,
             ).cursor
             cols_results.append("RELEVANCE")
         else:
-            cursor = table.select_sql(
-                sql,
-                values,
-                cols_results,
-                [f"{actual_sort} {order}"],
-                self.max_results or None,
-            ).cursor
+            cursor = table.select_sql(sql, values, cols_results, [f"{actual_sort} {order}"], limit).cursor
 
         cursor.row_factory = Row
         return SearchResults(
@@ -504,16 +499,17 @@ class Database:
         return self.call_cached_method(self._bbcode)
 
     def search(self, table: str, query: str, sort: str, order: str) -> SearchResults:
-        table, query, sort, order = (
+        table, query, sort, order, limit = (
             table.lower().strip(),
             query.lower().strip(),
             sort.lower().strip(),
             order.lower().strip(),
+            self.max_results + 1 if self.max_results else None,
         )
         if order == "desc":
-            return self.call_cached_method(self._search, table, query, sort, order)
+            return self.call_cached_method(self._search, table, query, sort, order, limit)
         else:
-            results = self.call_cached_method(self._search, table, query, sort, "desc")
+            results = self.call_cached_method(self._search, table, query, sort, "desc", limit)
             return SearchResults(
                 list(reversed(results.rows)),
                 results.column_id,
