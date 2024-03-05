@@ -296,7 +296,7 @@ async def settings(request: Request):
         for key, value in form.items():
             setting, _, table = key.partition(".")
             if setting in search_settings and table in search_settings.get(setting):
-                new_settings[setting][table] = type(search_settings[setting][table])(value)
+                new_settings[setting][table] = type(default_search_settings[setting][table])(value)
         if new_settings != search_settings:
             database.save_settings(new_settings)
             search_settings = new_settings
