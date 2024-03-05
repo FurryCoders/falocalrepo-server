@@ -40,16 +40,16 @@
                                 </option>
                             </select>
                             <select class="form-select" name="limit.{{ table }}">
-                                <option value="12" {{ "selected" if settings.limit[table] == 12 }}>
+                                <option value="12" {{ "selected" if settings.limit[table]|int == 12 }}>
                                     12
                                 </option>
-                                <option value="24" {{ "selected" if settings.limit[table] == 24 }}>
+                                <option value="24" {{ "selected" if settings.limit[table]|int == 24 }}>
                                     24
                                 </option>
-                                <option value="48" {{ "selected" if settings.limit[table] == 48 }}>
+                                <option value="48" {{ "selected" if settings.limit[table]|int == 48 }}>
                                     48
                                 </option>
-                                <option value="96" {{ "selected" if settings.limit[table] == 96 }}>
+                                <option value="96" {{ "selected" if settings.limit[table]|int == 96 }}>
                                     96
                                 </option>
                             </select>
