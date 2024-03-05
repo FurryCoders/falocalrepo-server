@@ -183,7 +183,7 @@ class TableConvertor(StringConvertor):
     regex = f"({'|'.join([users_table, submissions_table, journals_table, comments_table])})".lower()
 
 
-def merge_settings(a: Settings, b: dict[str, dict[str | int]]) -> Settings:
+def merge_settings(a: Settings, b: dict[str, dict[str, str | int]]) -> Settings:
     return {
         "view": a["view"] | b.get("view", {}),
         "limit": a["limit"] | b.get("limit", {}),
@@ -293,6 +293,8 @@ async def settings(request: Request):
     if request.method == "POST":
         form = await request.form()
         new_settings = deepcopy(search_settings)
+        new_settings = merge_settings(new_settings, {"view": {journals_table: "list", comments_table: "list"}})
+
         for key, value in form.items():
             setting, _, table = key.partition(".")
             if setting in search_settings and table in search_settings.get(setting):
@@ -300,6 +302,8 @@ async def settings(request: Request):
         if new_settings != search_settings:
             database.save_settings(new_settings)
             search_settings = new_settings
+
+    search_settings = merge_settings(search_settings, {"view": {journals_table: "list", comments_table: "list"}})
 
     return templates.TemplateResponse(request, "pages/settings.j2", {"settings": search_settings, "tables": tables})
 
