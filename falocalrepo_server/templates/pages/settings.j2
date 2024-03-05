@@ -31,7 +31,7 @@
                         </div>
                         <div class="input-group mt-1">
                             <span class="input-group-text" style="width: 4.4rem">View</span>
-                            <select class="form-select" name="view.{{ table }}">
+                            <select class="form-select" name="view.{{ table }}" {{ "disabled" if table|lower in ["journals", "comments"] }}>
                                 <option value="grid" {{ "selected" if settings.view[table]|lower == "grid" }}>
                                     Grid
                                 </option>
