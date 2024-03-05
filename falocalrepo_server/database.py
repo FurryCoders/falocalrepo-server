@@ -75,10 +75,10 @@ def clean_username_cached(username: str) -> str:
     return clean_username(username)
 
 
-def format_value(value: str, *, like: bool = False) -> str:
+def format_value(value: str, *, substring: bool = False) -> str:
     value = sub(r"(?<!\\)((?:\\\\)+)?([%_^$])", r"\1\\\2", m.group(1)) if (m := match(r'^"(.*)"$', value)) else value
-    value = value.lstrip("^") if match(r"^[%^].*", value) else "%" + value if like else value
-    value = value.rstrip("$") if match(r".*(?<!\\)((?:\\\\)+)?[%$]$", value) else value + "%" if like else value
+    value = value.lstrip("^") if match(r"^[%^].*", value) else "%" + value if substring else value
+    value = value.rstrip("$") if match(r".*(?<!\\)((?:\\\\)+)?[%$]$", value) else value + "%" if substring else value
     return value
 
 
@@ -86,13 +86,13 @@ def query_to_sql(
     query: str,
     default_field: str,
     available_columns: list[str],
-    likes: list[str] = None,
+    substring_columns: list[str] = None,
     aliases: dict[str, str] = None,
     score: bool = False,
 ) -> tuple[str, list[str]]:
     if not query:
         return "", []
-    likes, aliases = likes or [], aliases or {}
+    substring_columns, aliases = substring_columns or [], aliases or {}
     sql_elements: list[str] = []
     values: list[str] = []
 
@@ -124,7 +124,7 @@ def query_to_sql(
         elif token:
             sql_elements.append("and" if not score else "*") if prev not in ("", "&", "|", "(") else None
             sql_elements.append(f"({aliases.get(field, field)}{' not' * negation} like ? escape '\\')")
-            values.append(format_value(token, like=field in likes))
+            values.append(format_value(token, substring=field in substring_columns))
             negation = False
         prev = token
 
