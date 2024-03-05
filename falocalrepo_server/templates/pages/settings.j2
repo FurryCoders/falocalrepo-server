@@ -3,7 +3,7 @@
 {% block main %}
     <div class="row">
         <div class="col-12 col-lg-8 mx-auto">
-            <form action="{{ request.url.path }}" method="post" class="border rounded p-3">
+            <form id="settings" action="{{ request.url.path }}" method="post" class="border rounded p-3">
                 <h5>Search Settings</h5>
 
                 {% for table, columns in tables.items() %}
@@ -31,7 +31,8 @@
                         </div>
                         <div class="input-group mt-1">
                             <span class="input-group-text" style="width: 4.4rem">View</span>
-                            <select class="form-select" name="view.{{ table }}" {{ "disabled" if table|lower in ["journals", "comments"] }}>
+                            <select class="form-select"
+                                    name="view.{{ table }}" {{ "disabled" if table|lower in ["journals", "comments"] }}>
                                 <option value="grid" {{ "selected" if settings.view[table]|lower == "grid" }}>
                                     Grid
                                 </option>
@@ -59,9 +60,39 @@
 
                 <div class="mt-4 text-center">
                     <button class="btn btn-secondary" type="button" onclick="window.location.reload()">Reset</button>
-                    <button class="btn btn-primary ms-4">Save</button>
+                    <button class="btn btn-primary ms-4 position-relative">
+                        <span id="save-button" class="loading-element loaded">Save</span>
+                        <span class="loading-onloading opacity-0">Save</span>
+                        <span class="loading-spinner position-absolute"
+                              style="height: 1.5rem; width: 1.5rem; left: calc(50% - .75rem)"></span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        document.getElementById("settings").onsubmit = (ev) => {
+            ev.stopPropagation()
+            ev.preventDefault()
+
+            const saveButton = document.getElementById("save-button")
+
+            saveButton.classList.remove("loaded")
+            saveButton.parentElement.disabled = true
+
+            const body = new FormData(ev.target)
+
+            fetch(ev.target.action, {method: ev.target.method, body})
+                .then(() => window.location.reload())
+                .finally(() => {
+                    saveButton.classList.add("loaded")
+                    saveButton.parentElement.disabled = false
+                })
+
+            return false
+        }
+    </script>
 {% endblock %}
