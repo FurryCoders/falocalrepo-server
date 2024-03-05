@@ -244,18 +244,18 @@ p:last-child {
 }
 
 .modal {
-    z-index: 1000;
+    z-index: 3000;
     overflow: scroll;
     backdrop-filter: brightness(.5);
     -webkit-backdrop-filter: brightness(.5);
 
     > .modal-dialog {
-        z-index: 1020;
+        z-index: 2920;
     }
 
     > .modal-backdrop {
         position: fixed;
-        z-index: 1010;
+        z-index: 2910;
         opacity: 0;
     }
 }
@@ -293,7 +293,7 @@ nav.navbar {
     top: 0;
     right: 0;
     left: 0;
-    z-index: 800;
+    z-index: 2000;
     height: fit-content !important;
     box-shadow: 0 0 0 0 transparent;
 }
@@ -319,7 +319,7 @@ body.navbar-open nav.navbar {
     right: 0;
     left: 0;
     height: calc(100vh - 100%);
-    z-index: 700;
+    z-index: 1900;
     -webkit-animation: blur 250ms ease-out forwards;
     -o-animation: blur 250ms ease-out forwards;
     animation: blur 250ms ease-out forwards;
