@@ -3,7 +3,7 @@
 {% from "components/cards.j2" import UserCard, SubmissionCard %}
 {% from "components/tables.j2" import Table %}
 
-{% set pagination = Pagination("search_form", results, offset, limit, page) %}
+{% set pagination = Pagination("search_form", results, offset, limit, page, max_results) %}
 
 {% block title %}{{ title or "Search {}".format(table.title()) }}{% endblock %}
 

@@ -363,6 +363,7 @@ async def search_response(
             "page": page,
             "offset": (page - 1) * limit,
             "limit": limit,
+            "max_results": database.max_results,
             "search_id": encode_search_id(table_name, sql_query, sort, order) if query and database.use_cache else "",
         },
     )
