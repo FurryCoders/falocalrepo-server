@@ -399,22 +399,22 @@ class Database:
         return self.database.submissions.get_submission_files(submission_id)
 
     @lru_cache
-    def _submission_files_text(self, *files: Path) -> dict[int, str | None]:
-        return {
-            i: (
+    def _submission_files_text(self, *files: Path) -> list[str | None]:
+        return [
+            (
                 bbcode_to_html(f.read_text(detect_encoding(f.read_bytes())["encoding"], "ignore"))
                 if f.suffix == ".txt" and f.is_file()
                 else ""
             )
-            for i, f in enumerate(files)
-        }
+            for f in files
+        ]
 
     @lru_cache
-    def _submission_files_mime(self, *files: Path) -> dict[int, str | None]:
-        return {
-            i: guess_mime(f) if f.is_file() else t.mime if (t := get_type(ext=f.suffix.strip("."))) else None
-            for i, f in enumerate(files)
-        }
+    def _submission_files_mime(self, *files: Path) -> list[str | None]:
+        return [
+            guess_mime(f) if f.is_file() else t.mime if (t := get_type(ext=f.suffix.strip("."))) else None
+            for f in files
+        ]
 
     @lru_cache
     def _submission_comments(self, submission_id: int) -> list[dict[str, Any]]:
@@ -536,10 +536,10 @@ class Database:
     def submission_files(self, submission_id: int) -> tuple[list[Path] | None, Path | None]:
         return self.call_cached_method(self._submission_files, submission_id)
 
-    def submission_files_text(self, *files: Path) -> dict[int, str | None]:
+    def submission_files_text(self, *files: Path) -> list[str | None]:
         return self.call_cached_method(self._submission_files_text, *files)
 
-    def submission_files_mime(self, *files: Path) -> dict[int, str | None]:
+    def submission_files_mime(self, *files: Path) -> list[str | None]:
         return self.call_cached_method(self._submission_files_mime, *files)
 
     def submission_comments(self, submission_id: int) -> list[dict[str, Any]]:

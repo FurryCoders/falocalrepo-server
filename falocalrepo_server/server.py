@@ -489,8 +489,8 @@ async def submission(request: Request):
         )
 
     fs, t = database.submission_files(sub["ID"])
-    fst = database.submission_files_text(*fs) if fs else {}
-    fsm = database.submission_files_mime(*fs) if fs else {}
+    fst = database.submission_files_text(*fs) if fs else []
+    fsm = database.submission_files_mime(*fs) if fs else []
     cs = database.submission_comments(sub["ID"])
     p, n = database.submission_prev_next(sub["ID"], sub["AUTHOR"], sub["FOLDER"])
     sp, sn = None, None
@@ -512,7 +512,7 @@ async def submission(request: Request):
             "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
             "submission": sub,
             "thumbnail": t,
-            "files": list(zip(fs, fsm.values(), fst.values())) if fs else [],
+            "files": list(zip(fs, fsm, fst)) if fs else [],
             "comments": cs,
             "prev": p,
             "next": n,
