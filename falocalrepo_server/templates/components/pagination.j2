@@ -1,8 +1,11 @@
-{% macro Pagination(form, results, offset, limit, page) %}
-    {% set total = results.rows|length %}{# offset : offset + limit #}
+{% macro Pagination(form, results, offset, limit, page, max_results) %}
+    {% set total = results.rows|length %}
+    {% set is_max = max_results and total > max_results %}
+    {% set total = (total - 1) if is_max else total  %}
     <div class="card w-100">
         <div class="card-header bg-body p-1 text-center small">
-            Page {{ page }} of {{ (total / limit)|round(0, 'ceil')|int }} ({{ total }})
+            Page {{ page }} of {{ (total / limit)|round(0, 'ceil')|int }}
+            ({{ total }}{{ "+" if is_max }})
         </div>
         <div class="card-body text-center row p-1" style="height: 2rem">
             <div class="btn-toolbar justify-content-between">
