@@ -99,7 +99,7 @@ def query_to_sql(
     query = sub(r"(^[&| ]+|((?<!\\)[&|]| )+$)", "", query)
     query = sub(r"( *[&|])+(?= *[&|] *[@()])", "", query)
 
-    field, prev = default_field, ""
+    field, prev = default_field.lower(), ""
     negation: bool = False
     tokens: list[str] = [t for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|!]|\s+)', query) if t.strip()]
     for token in tokens:
