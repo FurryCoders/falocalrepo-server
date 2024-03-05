@@ -2,6 +2,7 @@ from pathlib import Path
 
 from click import BadParameter
 from click import Context
+from click import IntRange
 from click import Parameter
 from click import Path as PathClick
 from click import UsageError
@@ -118,6 +119,7 @@ def docstring_format(*args, **kwargs):
     multiple=True,
     help=f"Ignore authentication for IP addresses. [multiple]",
 )
+@option("--max-results", type=IntRange(1000), default=None, help="Maximum number of results from queries.")
 @option("--cache/--no-cache", is_flag=True, default=True, help="Use cache.")
 @option("--browser/--no-browser", "browser", is_flag=True, default=True, help="Open browser on startup.")
 @option(
@@ -142,6 +144,7 @@ def main(
     redirect_http: int | None,
     auth: tuple[str, str] | None,
     auth_ignore: tuple[str, ...],
+    max_results: int | None,
     cache: bool,
     browser: bool,
 ):
@@ -184,6 +187,7 @@ def main(
         ssl_key,
         auth,
         auth_ignore,
+        max_results,
         cache,
         browser,
     )

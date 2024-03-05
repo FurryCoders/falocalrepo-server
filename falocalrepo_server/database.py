@@ -144,9 +144,10 @@ def set_replies_count(comment: dict[str, Any]) -> dict[str, Any]:
 
 # noinspection DuplicatedCode,PyProtectedMember
 class Database:
-    def __init__(self, path: str | PathLike | None = None, use_cache: bool = True):
+    def __init__(self, path: str | PathLike | None = None, use_cache: bool = True, max_results: int | None = None):
         self.path: Path | None = Path(path) if path else None
         self.use_cache: bool = use_cache
+        self.max_results: int | None = max_results
         self.database: FADatabase | None = None
 
     def __enter__(self):
@@ -325,10 +326,17 @@ class Database:
                 values,
                 [*cols_results, f"({sql if sql else 1}) as RELEVANCE"],
                 [f"{actual_sort} {order}", f"{default_sort[table_name]} {default_order[table_name]}"],
+                self.max_results or None,
             ).cursor
             cols_results.append("RELEVANCE")
         else:
-            cursor = table.select_sql(sql, values, cols_results, [f"{actual_sort} {order}"]).cursor
+            cursor = table.select_sql(
+                sql,
+                values,
+                cols_results,
+                [f"{actual_sort} {order}"],
+                self.max_results or None,
+            ).cursor
 
         cursor.row_factory = Row
         return SearchResults(

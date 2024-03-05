@@ -231,12 +231,20 @@ def decode_search_id(encoded_search_id: str) -> tuple[str | None, tuple[str, str
     return search_id, search_terms, search_index
 
 
-def make_lifespan(database_path: Path, use_cache: bool, address: str, ssl: bool, authentication: bool, browser: bool):
+def make_lifespan(
+    database_path: Path,
+    use_cache: bool,
+    max_results: int | None,
+    address: str,
+    ssl: bool,
+    authentication: bool,
+    browser: bool,
+):
     @asynccontextmanager
     async def _lifespan(_app: Starlette):
         logger.info(f"Using {__package__.replace('_', '-')}: {__version__}")
         logger.info(f"Using {__package_database__.replace('_', '-')}: {__version_database__}")
-        with Database(database_path, use_cache) as database:
+        with Database(database_path, use_cache, max_results) as database:
             logger.info(
                 f"Using database: {database_path} ({database.database.version})"
                 + (" (cache)" if use_cache else "")
@@ -699,6 +707,7 @@ def server(
     ssl_key: Path | None = None,
     authentication: tuple[str, str] | None = None,
     authentication_ignore: tuple[str, ...] | None = None,
+    max_results: int | None = None,
     use_cache: bool = True,
     browser: bool = True,
 ):
@@ -814,6 +823,7 @@ def server(
             lifespan=make_lifespan(
                 database_path,
                 use_cache,
+                max_results,
                 address,
                 bool(ssl_cert and ssl_key),
                 bool(authentication),
