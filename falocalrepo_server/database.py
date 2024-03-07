@@ -5,7 +5,7 @@ from pathlib import Path
 from re import match
 from re import split
 from re import sub
-from sqlite3 import Cursor
+from sqlite3 import Cursor, ProgrammingError
 from sqlite3 import Row
 from types import GenericAlias
 from typing import Any
@@ -100,35 +100,62 @@ def query_to_sql(
     query = sub(r"( *[&|])+(?= *[&|] *[@()])", "", query)
 
     field, prev = default_field.lower(), ""
+    exact: bool = False
     negation: bool = False
-    tokens: list[str] = [t for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|!]|\s+)', query) if t.strip()]
+    comparison: int = 0
+    tokens: list[str] = [
+        t for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|]|(?<![@\\])!|\s+)', query) if t and t.strip()
+    ]
+    print(tokens)
     for token in tokens:
-        if m := match(r"^@(\w+)$", token):
-            field = m.group(1).lower()
+        if m := match(r"^@([=!<>]=)?(\w+)$", token):
+            field = m.group(2).lower()
             if field not in available_columns and field not in aliases:
                 field = default_field
+            elif (g := m.group(1)) in ("!=", "==", "<=", ">="):
+                exact = True
+                negation = g.startswith("!")
+                comparison = -1 if g.startswith("<") else 1 if g.startswith(">") else 0
+            else:
+                exact = False
+                comparison = 0
             continue
         elif token == "!":
             token = prev
             negation = True
         elif token == "&":
             sql_elements.append("and" if not score else "*")
+            exact = False
             negation = False
+            comparison = 0
         elif token == "|":
             sql_elements.append("or" if not score else "+")
+            exact = False
             negation = False
+            comparison = 0
         elif token in ("(", ")"):
             sql_elements.append("and") if token == "(" and prev not in ("", "&", "|", "(") else None
             sql_elements.append(token)
+            exact = False
             negation = False
+            comparison = 0
         elif token:
             sql_elements.append("and" if not score else "*") if prev not in ("", "&", "|", "(") else None
-            sql_elements.append(f"({aliases.get(field, field)}{' not' * negation} like ? escape '\\')")
+            if comparison > 0:
+                sql_elements.append(f"({aliases.get(field, field)} {'<' if negation else '>='} ? escape '\\')")
+            elif comparison < 0:
+                sql_elements.append(f"({aliases.get(field, field)} {'>' if negation else '<='} ? escape '\\')")
+            elif exact:
+                sql_elements.append(f"({aliases.get(field, field)} {'!=' if negation else '=='} ? escape '\\')")
+            else:
+                sql_elements.append(f"({aliases.get(field, field)}{' not' * negation} like ? escape '\\')")
             values.append(format_value(token, substring=field in substring_columns))
             negation = False
         prev = token
 
-    return " ".join(sql_elements), values
+    sql = " ".join(sql_elements)
+
+    return sql, values
 
 
 def replies_count(comment: dict[str, Any]) -> int:
