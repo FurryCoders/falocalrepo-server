@@ -155,6 +155,9 @@ def query_to_sql(
 
     sql = " ".join(sql_elements)
 
+    if sql.count("(") != sql.count(")"):
+        raise ProgrammingError("Unmatched parentheses")
+
     return sql, values
 
 
