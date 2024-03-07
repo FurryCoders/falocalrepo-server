@@ -7,6 +7,15 @@
 
 {% block title %}{{ title or "Search {}".format(table.title()) }}{% endblock %}
 
+{% block head %}
+    <!--suppress HtmlFormInputWithoutLabel -->
+    <style>
+        #query-error:empty {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
 {% block main %}
     <!--suppress HtmlFormInputWithoutLabel, HtmlDeprecatedAttribute -->
     <div class="row">
@@ -43,7 +52,7 @@
                 <div class="mt-2">
                     <div class="input-group">
                         <input type="text" class="form-control" id="query" name="query" placeholder="Search"
-                               value="{{ query }}">
+                               value="{{ query }}" oninput="document.getElementById('query-error').innerText = ''">
                         <select class="form-select form-select-sm" id="queryAdd"
                                 oninput="addToInput(document.getElementById('query'), '@' + this.value); this.options[0].selected = true;"
                                 style="max-width: 5rem;">
@@ -158,6 +167,7 @@
                         </button>
                     {% endif %}
                 </div>
+                <div id="query-error" class="alert alert-danger py-1 px-2 mb-0 mt-2"></div>
             </form>
         </div>
     </div>
@@ -211,6 +221,17 @@
 
 {% block script %}
     <script>
+        document.getElementById("search_form").onsubmit = (ev) => {
+            const query = new FormData(ev.target).get("query")
+            if (!query) return true
+            const tokens = query.split(/(?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)([()&|])|(?<![@\\])!/g).filter(t => !!(t || "").trim())
+            if (tokens.filter(t => t === "(").length === tokens.filter(t => t === ")").length) return true
+            else {
+                document.getElementById("query-error").innerText = "Unmatched parentheses"
+                return false
+            }
+        }
+
         {% if change_view %}
             const changeView = (view) => {
                 const grid = document.getElementById("grid_view")
