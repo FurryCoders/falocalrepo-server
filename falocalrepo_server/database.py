@@ -106,7 +106,6 @@ def query_to_sql(
     tokens: list[str] = [
         t for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|]|(?<![@\\])!|\s+)', query) if t and t.strip()
     ]
-    print(tokens)
     for token in tokens:
         if m := match(r"^@([=!<>]=)?(\w+)$", token):
             field = m.group(2).lower()
