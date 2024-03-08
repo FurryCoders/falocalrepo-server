@@ -145,11 +145,11 @@ def query_to_sql(
         elif token:
             sql_elements.append("and" if not score else "*") if prev not in ("", "&", "|", "(") else None
             if comparison > 0:
-                sql_elements.append(f"({aliases.get(field, field)} {'<' if negation else '>='} ? escape '\\')")
+                sql_elements.append(f"({aliases.get(field, field)} {'<' if negation else '>='} ?)")
             elif comparison < 0:
-                sql_elements.append(f"({aliases.get(field, field)} {'>' if negation else '<='} ? escape '\\')")
+                sql_elements.append(f"({aliases.get(field, field)} {'>' if negation else '<='} ?)")
             elif exact:
-                sql_elements.append(f"({aliases.get(field, field)} {'!=' if negation else '=='} ? escape '\\')")
+                sql_elements.append(f"({aliases.get(field, field)} {'!=' if negation else '='} ?)")
             else:
                 sql_elements.append(f"({aliases.get(field, field)}{' not' * negation} like ? escape '\\')")
             values.append(format_value(token, substring=field in substring_columns))
