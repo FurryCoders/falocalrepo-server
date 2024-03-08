@@ -152,7 +152,7 @@ def query_to_sql(
                 sql_elements.append(f"({aliases.get(field, field)} {'!=' if negation else '='} ?)")
             else:
                 sql_elements.append(f"({aliases.get(field, field)}{' not' * negation} like ? escape '\\')")
-            values.append(format_value(token, substring=field in substring_columns))
+            values.append(format_value(token, substring=False if exact or comparison else field in substring_columns))
             negation = False
         prev = token
 
