@@ -418,7 +418,7 @@ async def user_submissions(request: Request):
     return await search_response(
         request,
         submissions_table,
-        f"@author ^{clean_username(request.path_params['username'])}$",
+        f"@==author {clean_username(request.path_params['username'])}",
         f"Submissions by {request.path_params['username']}",
         request.path_params["username"],
     )
@@ -430,7 +430,7 @@ async def user_gallery(request: Request):
     return await search_response(
         request,
         submissions_table,
-        f"@author ^{clean_username(request.path_params['username'])}$ & @folder gallery",
+        f"@==author {clean_username(request.path_params['username'])} & @==folder gallery",
         f"Gallery by {request.path_params['username']}",
         request.path_params["username"],
     )
@@ -442,7 +442,7 @@ async def user_scraps(request: Request):
     return await search_response(
         request,
         submissions_table,
-        f"@author ^{clean_username(request.path_params['username'])}$ & @folder scraps",
+        f"@==author {clean_username(request.path_params['username'])} & @==folder scraps",
         f"Scraps by {request.path_params['username']}",
         request.path_params["username"],
     )
@@ -453,7 +453,7 @@ async def user_journals(request: Request):
     return await search_response(
         request,
         journals_table,
-        f"@author ^{clean_username(request.path_params['username'])}$",
+        f"@==author {clean_username(request.path_params['username'])}",
         f"Journals by {request.path_params['username']}",
         request.path_params["username"],
     )
@@ -475,7 +475,7 @@ async def user_comments(request: Request):
     return await search_response(
         request,
         comments_table,
-        f"@author ^{clean_username(request.path_params['username'])}$",
+        f"@==author {clean_username(request.path_params['username'])}",
         f"Comments by {request.path_params['username']}",
         request.path_params["username"],
     )
