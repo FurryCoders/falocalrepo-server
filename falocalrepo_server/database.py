@@ -539,7 +539,9 @@ class Database:
             order.lower().strip(),
             self.max_results + 1 if self.max_results else 0,
         )
-        if order == "desc":
+        if self.max_results:
+            return self.call_cached_method(self._search, table, query, sort, order, limit)
+        elif order == "desc":
             return self.call_cached_method(self._search, table, query, sort, order, limit)
         else:
             results = self.call_cached_method(self._search, table, query, sort, "desc", limit)
