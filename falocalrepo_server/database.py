@@ -126,16 +126,12 @@ def query_to_sql(
             if prev in ("", "&", "|", "("):
                 continue
             sql_elements.append("and" if not score else "*")
-            exact = False
             negation = False
-            comparison = 0
         elif token == "|":
             if prev in ("", "&", "|", "("):
                 continue
             sql_elements.append("or" if not score else "+")
-            exact = False
             negation = False
-            comparison = 0
         elif token in ("(", ")"):
             if token == ")" and prev == "(":
                 sql_elements.pop()
@@ -145,9 +141,7 @@ def query_to_sql(
                 sql_elements.pop()
             sql_elements.append("and") if token == "(" and prev not in ("", "&", "|", "(") else None
             sql_elements.append(token)
-            exact = False
             negation = False
-            comparison = 0
         elif token:
             sql_elements.append("and" if not score else "*") if prev not in ("", "&", "|", "(") else None
             if comparison > 0:
