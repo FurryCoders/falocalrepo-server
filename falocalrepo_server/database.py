@@ -342,8 +342,8 @@ class Database:
                 - {"id", "filesaved", "userupdate", "active", "gender"}
             ],
             {
-                "author": "replace(author, '_', '')",
-                "lower": "replace(author, '_', '')",
+                "author": "replace(lower(author), '_', '')",
+                "lower": "replace(lower(author), '_', '')",
                 "keywords": "tags",
                 "message": "description",
                 "filename": "fileurl",
