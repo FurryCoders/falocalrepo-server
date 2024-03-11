@@ -137,7 +137,7 @@ def query_to_sql(
                 sql_elements.pop()
                 prev = token
                 continue
-            elif prev in ("&", "|"):
+            elif token == ")" and prev in ("&", "|"):
                 sql_elements.pop()
             sql_elements.append("and") if token == "(" and prev not in ("", "&", "|", "(") else None
             sql_elements.append(token)
