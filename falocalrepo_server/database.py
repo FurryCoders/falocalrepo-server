@@ -107,17 +107,15 @@ def query_to_sql(
         t for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|]|(?<![@\\])!|\s+)', query) if t and t.strip()
     ]
     for token in tokens:
-        if m := match(r"^@([=!<>]=)?(\w+)$", token):
+        if m := match(r"^@([=!]=?|[<>]=?)?(\w+)$", token):
             field = m.group(2).lower()
             if field not in available_columns and field not in aliases:
-                field = default_field
-            elif (g := m.group(1)) in ("!=", "==", "<=", ">="):
-                exact = True
-                negation = g.startswith("!")
+                field, exact, comparison = default_field, False, 0
+            elif g := m.group(1):
+                exact, negation = g.endswith("="), g.startswith("!")
                 comparison = -1 if g.startswith("<") else 1 if g.startswith(">") else 0
             else:
-                exact = False
-                comparison = 0
+                exact, comparison = False, 0
             continue
         elif token == "!":
             token = prev
@@ -145,9 +143,11 @@ def query_to_sql(
         elif token:
             sql_elements.append("and" if not score else "*") if prev not in ("", "&", "|", "(") else None
             if comparison > 0:
-                sql_elements.append(f"({aliases.get(field, field)} {'<' if negation else '>='} ?)")
+                sql_elements.append(f"({aliases.get(field, field)}"
+                                    f" {'<' if negation else '>'}{'=' if exact != negation else ''} ?)")
             elif comparison < 0:
-                sql_elements.append(f"({aliases.get(field, field)} {'>' if negation else '<='} ?)")
+                sql_elements.append(f"({aliases.get(field, field)}"
+                                    f" {'>' if negation else '<'}{'=' if exact != negation else ''} ?)")
             elif exact:
                 sql_elements.append(f"({aliases.get(field, field)} {'!=' if negation else '='} ?)")
             else:
