@@ -1,4 +1,5 @@
 {% extends "base.j2" %}
+<!--suppress HtmlFormInputWithoutLabel, HtmlDeprecatedAttribute -->
 {% from "components/pagination.j2" import Pagination %}
 {% from "components/cards.j2" import UserCard, SubmissionCard %}
 {% from "components/tables.j2" import Table %}
@@ -8,7 +9,6 @@
 {% block title %}{{ title or "Search {}".format(table.title()) }}{% endblock %}
 
 {% block head %}
-    <!--suppress HtmlFormInputWithoutLabel -->
     <style>
         #query-error:empty {
             display: none;
@@ -17,7 +17,6 @@
 {% endblock %}
 
 {% block main %}
-    <!--suppress HtmlFormInputWithoutLabel, HtmlDeprecatedAttribute -->
     <div class="row">
         <div class="col-12 col-lg-8 mx-auto">
             <form action="{{ action }}" class="rounded border p-3" id="search_form">
@@ -103,13 +102,26 @@
                     </div>
                 </div>
 
-                <div class="border-top border-bottom pt-2 mt-3" id="help" hidden>
+                <div class="border-top border-bottom py-2 mt-3" id="help" hidden>
                     <p>The query language used for this server is based on and improves the search syntax currently used
                         by the Fur Affinity website. Its basic elements are:</p>
                     <ul>
                         <li>
-                            <code>@&lt;field&gt;</code> field specifier (e.g. <code>@title</code>), all database columns
+                            <code>@field</code> field specifier (e.g. <code>@title</code>), all database columns
                             can be searched. Click on the <em>Field</em> menu for a list of the available search fields.
+                        </li>
+                        <li>
+                            <code>@==field</code> field specifier for exact matches (<code>%?^$</code> are matched
+                            literally)
+                        </li>
+                        <li>
+                            <code>@!=field</code> field specifier for negative exact matches (<code>%?^$</code> are
+                            matched literally)
+                        </li>
+                        <li>
+                            <code>@&gt;field</code> <code>@&gt;=field</code> <code>@&lt;field</code>
+                            <code>@&lt;=field</code> field specifier for comparison (greater- and lower-than) matches,
+                            can be used for both numbers and text.
                         </li>
                         <li>
                             <code>()</code> parentheses, they can be used for better logic operations
