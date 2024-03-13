@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport">
     <meta content="ie=edge" http-equiv="x-ua-compatible">
-    <meta name="theme-color">
+    <meta name="theme-color" content="#FAAF3A">
     <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/static/touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="/static/touch-icon.png">
@@ -14,13 +14,13 @@
         const onResize = []
 
         const updateColorScheme = (darkMode) => {
-            if (darkMode) {
-                document.body.dataset.bsTheme = "dark"
-                document.head.querySelector('meta[name="theme-color"]').content = "#1C1C1E"
-            } else {
-                document.body.dataset.bsTheme = "light"
-                document.head.querySelector('meta[name="theme-color"]').content = "#FFFFFF"
-            }
+            document.body.dataset.bsTheme = darkMode ? "dark" : "light"
+            document.head.querySelector('meta[name="theme-color"]').content = "#" + getComputedStyle(document.body)
+                .backgroundColor
+                .match(/rgb\((\d+), *(\d+), *(\d+)\)/i)
+                .slice(1)
+                .map(n => Number(n).toString(16))
+                .join("")
             window.sessionStorage.setItem("darkMode", String(!!darkMode))
         }
 
