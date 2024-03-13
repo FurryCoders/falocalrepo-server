@@ -661,3 +661,14 @@
         </div>
     {% endif %}
 {% endblock %}
+
+{% block script %}
+    <script id="highlight-comment-script">
+        window.onload = () => {
+            let element
+            if (!window.location.hash.match(/^#cid:\d+$/i) || !(element = document.getElementById(window.location.hash.substring(1)))) return
+            setTimeout(() => element.classList.add("highlight"), 250)
+            setTimeout(() => element.classList.remove("highlight"), 500)
+        }
+    </script>
+{% endblock %}
