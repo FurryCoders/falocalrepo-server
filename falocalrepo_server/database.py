@@ -87,6 +87,7 @@ def query_to_sql(
     default_field: str,
     available_columns: list[str],
     substring_columns: list[str] = None,
+    lower_columns: list[str] = None,
     aliases: dict[str, str] = None,
     score: bool = False,
 ) -> tuple[str, list[str]]:
@@ -142,16 +143,17 @@ def query_to_sql(
             negation = False
         elif token:
             sql_elements.append("and" if not score else "*") if prev not in ("", "&", "|", "(") else None
+            field_: str = aliases.get(field, field)
+            if (exact or comparison) and field in lower_columns:
+                field_ = f"lower({field_})"
             if comparison > 0:
-                sql_elements.append(f"({aliases.get(field, field)}"
-                                    f" {'<' if negation else '>'}{'=' if exact != negation else ''} ?)")
+                sql_elements.append(f"({field_} {'<' if negation else '>'}{'=' if exact != negation else ''} ?)")
             elif comparison < 0:
-                sql_elements.append(f"({aliases.get(field, field)}"
-                                    f" {'>' if negation else '<'}{'=' if exact != negation else ''} ?)")
+                sql_elements.append(f"({field_} {'>' if negation else '<'}{'=' if exact != negation else ''} ?)")
             elif exact:
-                sql_elements.append(f"({aliases.get(field, field)} {'!=' if negation else '='} ?)")
+                sql_elements.append(f"({field_} {'!=' if negation else '='} ?)")
             else:
-                sql_elements.append(f"({aliases.get(field, field)}{' not' * negation} like ? escape '\\')")
+                sql_elements.append(f"({field_}{' not' * negation} like ? escape '\\')")
             values.append(format_value(token, substring=False if exact or comparison else field in substring_columns))
             negation = False
         prev = token
@@ -256,6 +258,8 @@ class Database:
     ) -> SearchResults:
         cols_results: list[str]
         cols_any: list[str]
+        cols_lower: list[str]
+        cols_aliases: dict[str, str]
         default_column: str = "any"
         sort = sort or default_sort[table_name]
         order = order or default_order[table_name]
@@ -270,6 +274,14 @@ class Database:
                 UsersColumns.FOLDERS.name,
                 UsersColumns.ACTIVE.name,
             ]
+            cols_lower = [
+                UsersColumns.USERNAME.name,
+                UsersColumns.FOLDERS.name,
+            ]
+            cols_aliases = {
+                UsersColumns.USERNAME.name: f"lower({UsersColumns.USERNAME.name})",
+                UsersColumns.FOLDERS.name: f"lower({UsersColumns.FOLDERS.name})",
+            }
             table = self.database.users
         elif table_name == submissions_table.upper():
             cols_any = [
@@ -288,6 +300,35 @@ class Database:
                 SubmissionsColumns.TITLE.name,
                 SubmissionsColumns.FILEEXT.name,
             ]
+            cols_lower = [
+                SubmissionsColumns.AUTHOR.name,
+                SubmissionsColumns.TITLE.name,
+                SubmissionsColumns.DATE.name,
+                SubmissionsColumns.DESCRIPTION.name,
+                SubmissionsColumns.FOOTER.name,
+                SubmissionsColumns.TAGS.name,
+                SubmissionsColumns.CATEGORY.name,
+                SubmissionsColumns.SPECIES.name,
+                SubmissionsColumns.GENDER.name,
+                SubmissionsColumns.RATING.name,
+                SubmissionsColumns.TYPE.name,
+                SubmissionsColumns.FILEURL.name,
+                SubmissionsColumns.FILEEXT.name,
+                SubmissionsColumns.FAVORITE.name,
+                SubmissionsColumns.MENTIONS.name,
+                SubmissionsColumns.FOLDER.name,
+                "lower",
+                "keywords",
+                "message",
+                "filename",
+            ]
+            cols_aliases = {
+                SubmissionsColumns.AUTHOR.name: f"replace({SubmissionsColumns.AUTHOR.name}, '_', '')",
+                "lower": f"replace({SubmissionsColumns.AUTHOR.name}, '_', '')",
+                "keywords": SubmissionsColumns.TAGS.name,
+                "message": SubmissionsColumns.DESCRIPTION.name,
+                "filename": SubmissionsColumns.FILEURL.name,
+            }
             table = self.database.submissions
             actual_sort = SubmissionsColumns.ID.name if sort.lower() == SubmissionsColumns.DATE.name.lower() else sort
         elif table_name == journals_table.upper():
@@ -303,6 +344,22 @@ class Database:
                 JournalsColumns.DATE.name,
                 JournalsColumns.TITLE.name,
             ]
+            cols_lower = [
+                JournalsColumns.AUTHOR.name,
+                JournalsColumns.TITLE.name,
+                JournalsColumns.DATE.name,
+                JournalsColumns.CONTENT.name,
+                JournalsColumns.HEADER.name,
+                JournalsColumns.FOOTER.name,
+                JournalsColumns.MENTIONS.name,
+                "lower",
+                "message",
+            ]
+            cols_aliases = {
+                JournalsColumns.AUTHOR.name: f"replace({JournalsColumns.AUTHOR.name}, '_', '')",
+                "lower": f"replace({JournalsColumns.AUTHOR.name}, '_', '')",
+                "message": JournalsColumns.CONTENT.name,
+            }
             table = self.database.journals
             actual_sort = JournalsColumns.ID.name if sort.lower() == JournalsColumns.DATE.name.lower() else sort
         elif table_name == comments_table:
@@ -319,12 +376,26 @@ class Database:
                 CommentsColumns.DATE.name,
                 CommentsColumns.TEXT.name,
             ]
+            cols_lower = [
+                CommentsColumns.PARENT_TABLE.name,
+                CommentsColumns.AUTHOR.name,
+                CommentsColumns.DATE.name,
+                CommentsColumns.TEXT.name,
+                "lower",
+                "message",
+            ]
+            cols_aliases = {
+                CommentsColumns.AUTHOR.name: f"replace({CommentsColumns.AUTHOR.name}, '_', '')",
+                "lower": f"replace({CommentsColumns.AUTHOR.name}, '_', '')",
+                "message": CommentsColumns.TEXT.name,
+            }
             table = self.database.comments
         else:
             raise KeyError(f"Unknown table {table_name!r}")
 
         col_id: str = table.key.name
         cols_results = [c.lower() for c in cols_results]
+        cols_lower = [c.lower() for c in cols_lower]
         cols_table: list[str] = [c.name.lower() for c in table.columns]
         cols_list: list[str] = [
             c.name.lower()
@@ -339,15 +410,12 @@ class Database:
             [
                 c.lower()
                 for c in {*cols_table, "any", "keywords", "message", "filename"}
-                - {"id", "filesaved", "userupdate", "active", "gender"}
+                - {"id", "filesaved", "userupdate", "active", "gender", "parent_id"}
             ],
+            cols_lower,
             {
-                "author": "replace(lower(author), '_', '')",
-                "lower": "replace(lower(author), '_', '')",
-                "keywords": "tags",
-                "message": "description",
-                "filename": "fileurl",
                 "any": f"({'||'.join(cols_any)})",
+                **cols_aliases,
             },
             score=sort.lower() == "relevance",
         )
