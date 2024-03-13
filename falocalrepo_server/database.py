@@ -415,7 +415,7 @@ class Database:
             cols_lower,
             {
                 "any": f"({'||'.join(cols_any)})",
-                **cols_aliases,
+                **{c.lower(): a for c, a in cols_aliases.items()},
             },
             score=sort.lower() == "relevance",
         )
