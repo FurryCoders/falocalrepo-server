@@ -2,6 +2,11 @@
 @import "bbcode.css";
 @import "icons.css";
 
+[data-bs-theme="dark"] {
+    --bs-body-bg: #1C1C1E;
+    --bs-body-bg-rgb: 28, 28, 30;
+}
+
 
 @keyframes fade-in {
     from {
@@ -66,22 +71,6 @@ body.navbar-open {
 
 [hidden] {
     display: none !important;
-}
-
-.nav-link {
-    color: rgba(var(--bs-body-color-rgb), .55) !important;
-}
-
-.nav-link:focus, .nav-link:hover {
-    color: rgba(var(--bs-body-color-rgb), .9) !important;
-}
-
-.nav-link.disabled {
-    color: rgba(var(--bs-body-color-rgb), .3) !important;
-}
-
-.nav-link.active {
-    color: rgba(var(--bs-body-color-rgb), .9) !important;
 }
 
 a[href="/user/"], a[href="/submission/"], a[href="/journal/"] {
