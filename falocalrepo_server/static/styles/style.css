@@ -400,6 +400,8 @@ body.navbar-open nav.navbar {
     > .comment-body {
         border: 1px solid var(--bs-border-color);
         border-radius: var(--bs-border-radius);
+        transition: box-shadow 250ms;
+        box-shadow: 0 0 0 0 rgba(var(--bs-info-rgb), .5);
 
         > .comment-header {
             padding: .5rem;
@@ -417,6 +419,10 @@ body.navbar-open nav.navbar {
             padding: .5rem;
             overflow-wrap: break-word;
         }
+    }
+
+    > .comment-body.highlight {
+        box-shadow: 0 0 0 5px rgba(var(--bs-info-rgb), .5);
     }
 
     > .replies {
