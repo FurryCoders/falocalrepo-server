@@ -24,7 +24,6 @@
             window.sessionStorage.setItem("darkMode", String(!!darkMode))
         }
 
-        <!-- Disable double click behaviour on touchscreen devices -->
         if (window.matchMedia("(pointer: coarse)").matches) document.ondblclick = e => e.preventDefault()
 
         window.onresize = (ev) => onResize.forEach(c => c(ev))
