@@ -51,13 +51,15 @@
                     </a>
                 </div>
                 <div class="property" data-key="Mentions">
-                    {% for user in journal.MENTIONS %}
-                        <a class="btn btn-xs btn-primary text-truncate"
-                           href="/user/{{ user }}">{{ user }}</a>
-                    {% endfor %}
-                    {% if not journal.MENTIONS %}
-                        <span class="badge bg-secondary w-100 text-truncate">No mentions</span>
-                    {% endif %}
+                    <div class="d-flex flex-row flex-wrap column-gap-1 row-gap-1 text-truncate">
+                        {% for user in journal.MENTIONS %}
+                            <a class="btn btn-xs btn-primary"
+                               href="/user/{{ user }}">{{ user }}</a>
+                        {% endfor %}
+                        {% if not journal.MENTIONS %}
+                            <span class="badge bg-secondary w-100">No mentions</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="property" data-key="Comments">
                     <span class="badge bg-info w-100 text-truncate">
@@ -115,7 +117,8 @@
             </div>
         </div>
 
-        {% if comments %}{{ Comments(comments, "col col-12 col-lg-9 col-xl-8 col-xxl-7 mx-auto mt-4", "comments") }}{% endif %}
+        {% if comments %}
+            {{ Comments(comments, "col col-12 col-lg-9 col-xl-8 col-xxl-7 mx-auto mt-4", "comments") }}{% endif %}
     </div>
 
     {% if comments %}

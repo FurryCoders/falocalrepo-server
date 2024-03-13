@@ -490,33 +490,39 @@
                     </a>
                 </div>
                 <div class="property" data-key="Tags">
-                    {% for tag in submission.TAGS %}
-                        <a class="btn btn-xs btn-primary text-truncate"
-                           href='/search/submissions/?query=%40tags%20%22%7C{{ tag }}%7C%22'>
-                            {{ tag }}
-                        </a>
-                    {% endfor %}
-                    {% if not submission.TAGS %}
-                        <span class="badge bg-secondary w-100 text-truncate">No tags</span>
-                    {% endif %}
+                    <div class="d-flex flex-row flex-wrap column-gap-1 row-gap-1 text-truncate">
+                        {% for tag in submission.TAGS %}
+                            <a class="btn btn-xs btn-primary"
+                               href='/search/submissions/?query=%40tags%20%22%7C{{ tag }}%7C%22'>
+                                {{ tag }}
+                            </a>
+                        {% endfor %}
+                        {% if not submission.TAGS %}
+                            <span class="badge bg-secondary w-100">No tags</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="property" data-key="Favorites">
-                    {% for user in submission.FAVORITE %}
-                        <a class="btn btn-xs btn-primary text-truncate"
-                           href="/user/{{ user }}">{{ user }}</a>
-                    {% endfor %}
-                    {% if not submission.FAVORITE %}
-                        <span class="badge bg-secondary w-100 text-truncate">No favorites</span>
-                    {% endif %}
+                    <div class="d-flex flex-row flex-wrap column-gap-1 row-gap-1 text-truncate">
+                        {% for user in submission.FAVORITE %}
+                            <a class="btn btn-xs btn-primary"
+                               href="/user/{{ user }}">{{ user }}</a>
+                        {% endfor %}
+                        {% if not submission.FAVORITE %}
+                            <span class="badge bg-secondary w-100">No favorites</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="property" data-key="Mentions">
-                    {% for user in submission.MENTIONS %}
-                        <a class="btn btn-xs btn-primary text-truncate"
-                           href="/user/{{ user }}">{{ user }}</a>
-                    {% endfor %}
-                    {% if not submission.MENTIONS %}
-                        <span class="badge bg-secondary w-100 text-truncate">No mentions</span>
-                    {% endif %}
+                    <div class="d-flex flex-row flex-wrap column-gap-1 row-gap-1 text-truncate">
+                        {% for user in submission.MENTIONS %}
+                            <a class="btn btn-xs btn-primary"
+                               href="/user/{{ user }}">{{ user }}</a>
+                        {% endfor %}
+                        {% if not submission.MENTIONS %}
+                            <span class="badge bg-secondary w-100">No mentions</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="property" data-key="Comments">
                     <span class="badge bg-info w-100 text-truncate">
