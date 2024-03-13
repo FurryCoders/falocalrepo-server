@@ -2,9 +2,14 @@
 @import "bbcode.css";
 @import "icons.css";
 
+:root, [data-bs-theme="light"] {
+    --bs-border-color: #DEE2E6;
+}
+
 [data-bs-theme="dark"] {
     --bs-body-bg: #1C1C1E;
     --bs-body-bg-rgb: 28, 28, 30;
+    --bs-border-color: #3D4349;
 }
 
 
