@@ -160,6 +160,10 @@ hr {
     width: fit-content;
 }
 
+.card {
+    --bs-card-border-color: var(--bs-border-color);
+}
+
 p:last-child {
     margin-bottom: 0 !important;
 }
