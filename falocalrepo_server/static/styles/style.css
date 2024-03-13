@@ -290,6 +290,9 @@ nav.navbar {
     z-index: 2000;
     height: fit-content !important;
     box-shadow: 0 0 0 0 transparent;
+    border-bottom: 1px solid var(--bs-border-color);
+    background: var(--bs-body-bg);
+    padding: 0;
 }
 
 body.navbar-open nav.navbar {
