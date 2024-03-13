@@ -18,7 +18,7 @@ from re import Pattern
 from re import compile as re_compile
 from secrets import compare_digest
 from traceback import format_exc
-from typing import Any
+from typing import Any, Mapping
 from webbrowser import open as open_browser
 from zipfile import ZipFile
 
@@ -30,6 +30,7 @@ from baize.asgi import FileResponse
 from falocalrepo_database import __package__ as __package_database__
 from falocalrepo_database import __version__ as __version_database__
 from falocalrepo_database.tables import comments_table
+from htmlmin import minify
 from orjson import dumps
 from orjson import loads
 from starlette import status
@@ -39,6 +40,7 @@ from starlette.authentication import AuthenticationBackend
 from starlette.authentication import AuthenticationError
 from starlette.authentication import SimpleUser
 from starlette.authentication import requires
+from starlette.background import BackgroundTask
 from starlette.convertors import StringConvertor
 from starlette.convertors import register_url_convertor
 from starlette.exceptions import HTTPException
@@ -49,6 +51,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import HTTPConnection
 from starlette.requests import Request
+from starlette.responses import HTMLResponse
 from starlette.responses import RedirectResponse
 from starlette.responses import Response
 from starlette.responses import StreamingResponse
@@ -121,6 +124,22 @@ def is_request_mobile(request: Request) -> bool | None:
         if not user_agent
         else bool(mobile_user_agent_pattern_a.search(user_agent) or mobile_user_agent_pattern_b.search(user_agent[:4]))
     )
+
+
+class TemplateResponse(HTMLResponse):
+    def __init__(
+        self,
+        request: Request,
+        template_name: str,
+        context: dict[str, Any],
+        status_code: int = 200,
+        headers: Mapping[str, str] | None = None,
+        media_type: str | None = None,
+        background: BackgroundTask | None = None,
+    ):
+        content: str = templates.get_template(template_name).render({"request": request} | context)
+        content = minify(content, remove_comments=True)
+        super().__init__(content, status_code, headers, media_type, background)
 
 
 class CacheMiddleware(BaseHTTPMiddleware):
@@ -265,7 +284,7 @@ def make_lifespan(
 async def home(request: Request):
     database: Database = request.state.database
     stats = database.stats()
-    return templates.TemplateResponse(
+    return TemplateResponse(
         request,
         "pages/home.j2",
         {
@@ -305,7 +324,7 @@ async def settings(request: Request):
 
     search_settings = merge_settings(search_settings, {"view": {journals_table: "list", comments_table: "list"}})
 
-    return templates.TemplateResponse(request, "pages/settings.j2", {"settings": search_settings, "tables": tables})
+    return TemplateResponse(request, "pages/settings.j2", {"settings": search_settings, "tables": tables})
 
 
 async def search_response(
@@ -349,7 +368,7 @@ async def search_response(
     if (page - 1) * limit > len(results.rows):
         page = ceil(len(results.rows) / limit) or 1
 
-    return templates.TemplateResponse(
+    return TemplateResponse(
         request,
         "pages/search.j2",
         {
@@ -392,7 +411,7 @@ async def user(request: Request):
     database: Database = request.state.database
     usr = database.user(request.path_params["username"])
     stats = database.user_stats(request.path_params["username"])
-    return templates.TemplateResponse(
+    return TemplateResponse(
         request,
         "pages/user.j2",
         {
@@ -510,7 +529,7 @@ async def submission(request: Request):
             sp = results.rows[search_index - 1]["ID"] if search_index > 0 else None
             sn = results.rows[search_index + 1]["ID"] if search_index < len(results.rows) - 1 else None
 
-    return templates.TemplateResponse(
+    return TemplateResponse(
         request,
         "pages/submission.j2",
         {
@@ -616,7 +635,7 @@ async def journal(request: Request):
             sp = results.rows[search_index - 1]["ID"] if search_index > 0 else None
             sn = results.rows[search_index + 1]["ID"] if search_index < len(results.rows) - 1 else None
 
-    return templates.TemplateResponse(
+    return TemplateResponse(
         request,
         "pages/journal.j2",
         {
@@ -672,7 +691,7 @@ def error_response(
     buttons: list[tuple[str, str]] | None = None,
     traceback: str | None = None,
 ):
-    return templates.TemplateResponse(
+    return TemplateResponse(
         request,
         "pages/error.j2",
         {
