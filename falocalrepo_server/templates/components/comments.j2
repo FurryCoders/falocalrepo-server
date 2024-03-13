@@ -3,13 +3,15 @@
     <div class="comment" data-replies="{{ "true" if comment.REPLIES }}">
         <div class="comment-body" id="cid:{{ comment.ID }}">
             <div class="comment-header">
-                <img src="/user/{{ comment.AUTHOR }}/icon" alt=""
-                     class="loading-element loading-error-hide rounded fade"
-                     height="30" loading="lazy" onerror="this.classList.add('loading-error')"
-                     onload="this.classList.add('loaded')">
-                <div class="loading-pulse rounded" style="height: 30px"></div>
-                <div class="d-inline-block loading-onerror rounded bg-body-secondary"
-                     style="height: 30px; aspect-ratio: 1 / 1"></div>
+                <a href="/user/{{ comment.AUTHOR }}">
+                    <img src="/user/{{ comment.AUTHOR }}/icon" alt=""
+                         class="loading-element loading-error-hide rounded fade"
+                         height="30" loading="lazy" onerror="this.classList.add('loading-error')"
+                         onload="this.classList.add('loaded')">
+                    <div class="loading-pulse rounded" style="height: 30px"></div>
+                    <div class="d-inline-block loading-onerror rounded bg-body-secondary"
+                         style="height: 30px; aspect-ratio: 1 / 1"></div>
+                </a>
                 <div class="ms-2">
                     <a class="nav-link pointer d-block" href="/user/{{ comment.AUTHOR }}">{{ comment.AUTHOR }}</a>
                     <span class="text-secondary" style="font-size: x-small;">{{ comment.DATE.strftime("%Y-%m-%d %H:%M") }}</span>
