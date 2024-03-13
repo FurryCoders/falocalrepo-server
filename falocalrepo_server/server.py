@@ -5,6 +5,7 @@ from copy import deepcopy
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
+from functools import reduce
 from hashlib import sha256
 from io import BytesIO
 from logging import Logger
@@ -137,7 +138,8 @@ class TemplateResponse(HTMLResponse):
         media_type: str | None = None,
         background: BackgroundTask | None = None,
     ):
-        content: str = templates.get_template(template_name).render({"request": request} | context)
+        context |= reduce(lambda c, p: c | p(request), templates.context_processors, {}) | {"request": request}
+        content: str = templates.get_template(template_name).render(context)
         content = minify(content, remove_comments=True)
         super().__init__(content, status_code, headers, media_type, background)
 
