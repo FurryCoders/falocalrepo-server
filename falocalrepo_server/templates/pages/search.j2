@@ -174,9 +174,10 @@
                 <div class="d-flex flex-row justify-content-between column-gap-2 mt-3">
                     <button type="submit" id="search_submit" class="btn btn-primary">Search</button>
                     {% if table == "submissions" %}
-                        <button type="button" class="btn btn-info" onclick="convertToFAQuery()">
+                        <a href="https://furaffinity.net/search" class="btn btn-info text-decoration-none"
+                           onclick="this.href = convertToFAQuery(); setTimeout(() => this.href = 'https://furaffinity.net/search', 1)">
                             FA
-                        </button>
+                        </a>
                     {% endif %}
                 </div>
                 <div id="query-error" class="alert alert-danger py-1 px-2 mb-0 mt-2"></div>
@@ -278,7 +279,7 @@
                     url.searchParams.set("order-by", "date")
                     url.searchParams.set("order-direction", document.getElementById("order").value)
                 }
-                window.location = url.href
+                return url.href
             }
         {% endif %}
     </script>
