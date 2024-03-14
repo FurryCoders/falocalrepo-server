@@ -262,7 +262,7 @@ class Database:
         cols_aliases: dict[str, str]
         default_column: str = "any"
         sort = sort or default_sort[table_name]
-        order = order or default_order[table_name]
+        order = order if order in ("asc", "desc") else default_order[table_name]
         actual_sort: str = sort
         table: Table
 
@@ -402,11 +402,12 @@ class Database:
             for c in table.columns
             if (get_origin(c.type) if type(c.type) is GenericAlias else c.type) in (list, set)
         ]
+        sort = sort if sort.lower() in cols_table else default_sort[table_name]
 
         sql, values = query_to_sql(
             query,
             default_column,
-            [c.name.lower() for c in table.columns],
+            cols_table,
             [
                 c.lower()
                 for c in {*cols_table, "any", "keywords", "message", "filename"}
