@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="p-1 small fw-bold text-center text-truncate">
-            {{ (user.USERNAME or "&nbsp"|safe) }}
+            {{ user.USERNAME or ("&nbsp"|safe) }}
         </div>
         <div class="border-top bg-link text-center p-1 small position-relative d-flex flex-column row-gap-1">
             {% if not user.ACTIVE %}
@@ -54,7 +54,7 @@
             {% endif %}
         </div>
         <div class="p-1 small fw-bold text-center text-truncate text-wrap" style="min-height: 3rem; max-height: 3rem">
-            {{ (submission.TITLE or "&nbsp"|safe) }}
+            {{ submission.TITLE or ("&nbsp"|safe) }}
         </div>
         <div class="border-top bg-link text-center p-1 small position-relative">
             <a href="/user/{{ submission.AUTHOR }}" class="stretched-link" title="{{ submission.AUTHOR }}"></a>
