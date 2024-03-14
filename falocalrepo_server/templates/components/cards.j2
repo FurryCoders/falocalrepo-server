@@ -46,10 +46,10 @@
             <div class="loading-onerror rounded bg-body-secondary"
                  style="height: 100px; aspect-ratio: 1 / 1"></div>
             {% if "||" in submission.FILEEXT %}
+                {% set files = submission.FILEEXT.strip("|").split("||") %}
                 <div class="badge bg-body text-body border position-absolute"
-                     title="{{ submission.FILEEXT.strip("|").replace("||", ", ") }}"
                      style="top: .125rem; right: .125rem; padding: .175rem .325rem">
-                    {{ submission.FILEEXT.strip("|").split("||")|length }}
+                    {{ files|length }}
                 </div>
             {% endif %}
         </div>
