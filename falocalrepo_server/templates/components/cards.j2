@@ -47,7 +47,7 @@
                  style="height: 100px; aspect-ratio: 1 / 1"></div>
             {% if "||" in submission.FILEEXT %}
                 {% set files = submission.FILEEXT.strip("|").split("||") %}
-                <div class="badge text-body border position-absolute"
+                <div class="badge bg-body text-body border position-absolute"
                      style="top: .125rem; right: .125rem; padding: .175rem .325rem">
                     {{ files|length }}
                 </div>
