@@ -1,10 +1,10 @@
 <!--suppress HtmlDeprecatedAttribute -->
 
 {% macro UserCard(user, search_id = "") %}
-    <div class="card h-100 position-relative overflow-hidden">
+    <div class="border rounded position-relative">
         <a href="/user/{{ user.USERNAME }}{{ "?sid={}".format(search_id|urlencode) if search_id }}"
            class="stretched-link" title="{{ user.USERNAME }}"></a>
-        <div class="card-header bg-body p-1 position-relative d-flex align-items-center justify-content-center"
+        <div class="border-bottom p-1 position-relative d-flex align-items-center justify-content-center"
              style="height: calc(150px + .5rem)">
             <img class="rounded mw-100 loading-element loading-error-hide w-auto fade"
                  src="/user/{{ user.USERNAME }}/thumbnail" alt="" loading="lazy" style="max-height: 150px"
@@ -14,10 +14,10 @@
                  style="height: 100px; aspect-ratio: 1 / 1">
             </div>
         </div>
-        <div class="card-body h-100 p-1 small fw-bold text-center text-truncate">
+        <div class="p-1 small fw-bold text-center text-truncate">
             {{ (user.USERNAME or "&nbsp"|safe) }}
         </div>
-        <div class="card-footer bg-body bg-link text-center p-1 small position-relative d-flex flex-column row-gap-1">
+        <div class="border-top bg-link text-center p-1 small position-relative d-flex flex-column row-gap-1">
             {% if not user.ACTIVE %}
                 <div class="badge w-100 bg-danger text-truncate">
                     Inactive
@@ -33,10 +33,10 @@
 {% endmacro %}
 
 {% macro SubmissionCard(submission, search_id = "") %}
-    <div class="card h-100 position-relative overflow-hidden">
+    <div class="border rounded position-relative">
         <a href="/submission/{{ submission.ID }}{{ "?sid={}".format(search_id|urlencode) if search_id }}"
            class="stretched-link" title="{{ submission.TITLE }}"></a>
-        <div class="card-header bg-body p-1 position-relative d-flex align-items-center justify-content-center"
+        <div class="border-bottom p-1 position-relative d-flex align-items-center justify-content-center"
              style="height: calc(150px + .5rem)">
             <img class="rounded mw-100 w-auto loading-element loading-error-hide"
                  src="/submission/{{ submission.ID }}/thumbnail/{{ "{:010d}-thumbnail".format(submission.ID) }}" alt=""
@@ -47,16 +47,16 @@
                  style="height: 100px; aspect-ratio: 1 / 1"></div>
             {% if "||" in submission.FILEEXT %}
                 {% set files = submission.FILEEXT.strip("|").split("||") %}
-                <div class="badge bg-body text-body border position-absolute"
+                <div class="badge text-body border position-absolute"
                      style="top: .125rem; right: .125rem; padding: .175rem .325rem">
                     {{ files|length }}
                 </div>
             {% endif %}
         </div>
-        <div class="card-body h-100 p-1 small fw-bold text-center text-truncate text-wrap" style="min-height: 3rem; max-height: 3rem">
+        <div class="p-1 small fw-bold text-center text-truncate text-wrap" style="min-height: 3rem; max-height: 3rem">
             {{ (submission.TITLE or "&nbsp"|safe) }}
         </div>
-        <div class="card-footer bg-body bg-link text-center p-1 small position-relative">
+        <div class="border-top bg-link text-center p-1 small position-relative">
             <a href="/user/{{ submission.AUTHOR }}" class="stretched-link" title="{{ submission.AUTHOR }}"></a>
             <div class="badge w-100 bg-primary text-truncate">
                 {{ submission.AUTHOR }}
