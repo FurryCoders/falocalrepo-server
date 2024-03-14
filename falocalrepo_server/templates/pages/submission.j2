@@ -393,26 +393,6 @@
         </div>
 
         <div class="col col-12 col-lg-5 col-xl-4 mt-3 mt-lg-0 h-100" id="metadata">
-            {% if search_id %}
-                <div class="properties-card d-lg-none mb-2">
-                    <div class="controls">
-                        <div class="btn-group btn-group-sm">
-                            <a class="btn btn-primary {{ "disabled" if not search_prev }}"
-                               href="/submission/{{ search_prev }}?sid={{ search_index - 1 }}.{{ search_id|urlencode }}">
-                                &laquo;
-                            </a>
-                            <a class="btn btn-primary" href="/submissions?sid={{ search_id|urlencode }}">
-                                Search
-                            </a>
-                            <a class="btn btn-primary {{ "disabled" if not search_next }}"
-                               href="/submission/{{ search_next }}?sid={{ search_index + 1 }}.{{ search_id|urlencode }}">
-                                &raquo;
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
             <div class="properties-card d-lg-none mb-2">
                 <div class="controls">
                     <div class="btn-group btn-group-sm">
@@ -433,6 +413,24 @@
                         </a>
                     </div>
                 </div>
+
+                {% if search_id %}
+                    <div class="controls">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-primary {{ "disabled" if not search_prev }}"
+                               href="/submission/{{ search_prev }}?sid={{ search_index - 1 }}.{{ search_id|urlencode }}">
+                                &laquo;
+                            </a>
+                            <a class="btn btn-primary" href="/submissions?sid={{ search_id|urlencode }}">
+                                Search
+                            </a>
+                            <a class="btn btn-primary {{ "disabled" if not search_next }}"
+                               href="/submission/{{ search_next }}?sid={{ search_index + 1 }}.{{ search_id|urlencode }}">
+                                &raquo;
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
 
             <div class="properties-card">
@@ -532,44 +530,6 @@
 
                 <div class="separator"></div>
 
-                {% if search_id %}
-                    <div class="controls d-none d-lg-flex">
-                        <div class="btn-group btn-group-sm">
-                            <a class="btn btn-primary {{ "disabled" if not search_prev }}"
-                               href="/submission/{{ search_prev }}?sid={{ search_index - 1 }}.{{ search_id|urlencode }}">
-                                &laquo;
-                            </a>
-                            <a class="btn btn-primary" href="/submissions?sid={{ search_id|urlencode }}">
-                                Search
-                            </a>
-                            <a class="btn btn-primary {{ "disabled" if not search_next }}"
-                               href="/submission/{{ search_next }}?sid={{ search_index + 1 }}.{{ search_id|urlencode }}">
-                                &raquo;
-                            </a>
-                        </div>
-                    </div>
-                {% endif %}
-
-                <div class="controls d-none d-lg-flex">
-                    <div class="btn-group btn-group-sm">
-                        <a class="btn btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
-                            &laquo;
-                        </a>
-                        <a class="btn btn-primary" href="/gallery/{{ submission.AUTHOR|urlencode }}">
-                            Gallery
-                        </a>
-                        <a class="btn btn-primary" href="/submissions/{{ submission.AUTHOR|urlencode }}">
-                            All
-                        </a>
-                        <a class="btn btn-primary" href="/scraps/{{ submission.AUTHOR|urlencode }}">
-                            Scraps
-                        </a>
-                        <a class="btn btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
-                            &raquo;
-                        </a>
-                    </div>
-                </div>
-
                 <div class="controls">
                     <div class="btn-group btn-group-sm">
                         <a class="btn btn-secondary disabled" disabled>Download</a>
@@ -597,6 +557,44 @@
                         FA
                     </a>
                 </div>
+
+                <div class="controls d-none d-lg-flex">
+                    <div class="btn-group btn-group-sm">
+                        <a class="btn btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
+                            &laquo;
+                        </a>
+                        <a class="btn btn-primary" href="/gallery/{{ submission.AUTHOR|urlencode }}">
+                            Gallery
+                        </a>
+                        <a class="btn btn-primary" href="/submissions/{{ submission.AUTHOR|urlencode }}">
+                            All
+                        </a>
+                        <a class="btn btn-primary" href="/scraps/{{ submission.AUTHOR|urlencode }}">
+                            Scraps
+                        </a>
+                        <a class="btn btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
+                            &raquo;
+                        </a>
+                    </div>
+                </div>
+
+                {% if search_id %}
+                    <div class="controls d-none d-lg-flex">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-primary {{ "disabled" if not search_prev }}"
+                               href="/submission/{{ search_prev }}?sid={{ search_index - 1 }}.{{ search_id|urlencode }}">
+                                &laquo;
+                            </a>
+                            <a class="btn btn-primary" href="/submissions?sid={{ search_id|urlencode }}">
+                                Search
+                            </a>
+                            <a class="btn btn-primary {{ "disabled" if not search_next }}"
+                               href="/submission/{{ search_next }}?sid={{ search_index + 1 }}.{{ search_id|urlencode }}">
+                                &raquo;
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
 
