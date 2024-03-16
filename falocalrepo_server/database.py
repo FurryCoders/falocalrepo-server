@@ -107,11 +107,14 @@ def query_to_sql(
     comparison: int = 0
     tokens: list[str] = [
         t
-        for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)(?:[()&|]|[=!]=|[<>]=?|!)|\s+)', query)
+        for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)(?:[()&|]|%=|[=!]=|[<>]=?|!)|\s+)', query)
         if t and t.strip()
     ]
     for token in tokens:
         if token == prev:
+            continue
+        elif token == "%=":
+            exact, like, negation, comparison = False, True, False, 0
             continue
         elif token == "==":
             exact, like, negation, comparison = True, False, False, 0
