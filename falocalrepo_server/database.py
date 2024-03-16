@@ -102,25 +102,38 @@ def query_to_sql(
 
     field, prev = default_field.lower(), ""
     exact: bool = False
+    like: bool = default_field in substring_columns
     negation: bool = False
     comparison: int = 0
     tokens: list[str] = [
-        t for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)[()&|]|(?<![@\\])!|\s+)', query) if t and t.strip()
+        t
+        for t in split(r'((?<!\\)"(?:[^"]|(?<=\\)")*"|(?<!\\)(?:[()&|]|[=!]=|[<>]=?|!)|\s+)', query)
+        if t and t.strip()
     ]
     for token in tokens:
-        if m := match(r"^@([=!]=?|[<>]=?)?(\w+)$", token):
-            field = m.group(2).lower()
-            if field not in available_columns and field not in aliases:
-                field, exact, comparison = default_field, False, 0
-            elif g := m.group(1):
-                exact, negation = g.endswith("="), g.startswith("!")
-                comparison = -1 if g.startswith("<") else 1 if g.startswith(">") else 0
-            else:
-                exact, comparison = False, 0
+        if token == prev:
+            continue
+        elif token == "==":
+            exact, like, negation, comparison = True, False, False, 0
+            continue
+        elif token == "!=":
+            exact, like, negation, comparison = True, False, True, 0
+            continue
+        elif token == ">":
+            exact, like, negation, comparison = False, False, False, 1
+            continue
+        elif token == ">=":
+            exact, like, negation, comparison = True, False, False, 1
+            continue
+        elif token == "<":
+            exact, like, negation, comparison = False, False, False, -1
+            continue
+        elif token == "<=":
+            exact, like, negation, comparison = True, False, False, -1
             continue
         elif token == "!":
-            token = prev
             negation = True
+            continue
         elif token == "&":
             if prev in ("", "&", "|", "("):
                 continue
@@ -141,6 +154,12 @@ def query_to_sql(
             sql_elements.append("and") if token == "(" and prev not in ("", "&", "|", "(") else None
             sql_elements.append(token)
             negation = False
+        elif m := match(r"^@(\w+)$", token):
+            field = m.group(1).lower()
+            if field not in available_columns and field not in aliases:
+                field = default_field
+            exact, like, comparison = False, field in substring_columns, 0
+            continue
         elif token:
             sql_elements.append("and" if not score else "*") if prev not in ("", "&", "|", "(") else None
             field_: str = aliases.get(field, field)
@@ -154,8 +173,10 @@ def query_to_sql(
                 sql_elements.append(f"({field_} {'!=' if negation else '='} ?)")
             else:
                 sql_elements.append(f"({field_}{' not' * negation} like ? escape '\\')")
-            values.append(format_value(token, substring=False if exact or comparison else field in substring_columns))
+            values.append(format_value(token, substring=False if exact or comparison else like))
             negation = False
+        else:
+            continue
         prev = token
 
     sql = " ".join(sql_elements)
