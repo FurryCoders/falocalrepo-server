@@ -302,10 +302,7 @@ class Database:
                 UsersColumns.USERNAME.name,
                 UsersColumns.FOLDERS.name,
             ]
-            cols_aliases = {
-                UsersColumns.USERNAME.name: f"lower({UsersColumns.USERNAME.name})",
-                UsersColumns.FOLDERS.name: f"lower({UsersColumns.FOLDERS.name})",
-            }
+            cols_aliases = {}
             table = self.database.users
         elif table_name == submissions_table.upper():
             cols_any = [
