@@ -102,7 +102,7 @@ def query_to_sql(
 
     field, prev = default_field.lower(), ""
     exact: bool = False
-    like: bool = False
+    like: bool = default_field in substring_columns
     negation: bool = False
     comparison: int = 0
     tokens: list[str] = [
@@ -302,7 +302,10 @@ class Database:
                 UsersColumns.USERNAME.name,
                 UsersColumns.FOLDERS.name,
             ]
-            cols_aliases = {}
+            cols_aliases = {
+                UsersColumns.USERNAME.name: f"lower({UsersColumns.USERNAME.name})",
+                UsersColumns.FOLDERS.name: f"lower({UsersColumns.FOLDERS.name})",
+            }
             table = self.database.users
         elif table_name == submissions_table.upper():
             cols_any = [

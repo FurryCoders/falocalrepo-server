@@ -172,10 +172,10 @@
                 </div>
 
                 <div class="d-flex flex-row justify-content-between column-gap-2 mt-3">
-                    <button type="submit" id="search_submit" class="btn btn-primary">Search</button>
+                    <button type="submit" class="btn btn-primary">Search</button>
                     {% if table == "submissions" %}
-                        <a href="https://furaffinity.net/search" class="btn btn-info text-decoration-none"
-                           onclick="this.href = convertToFAQuery(); setTimeout(() => this.href = 'https://furaffinity.net/search', 1)">
+                        <a href="https://furaffinity.net/search" id="search_fa"
+                           class="btn btn-info text-decoration-none">
                             FA
                         </a>
                     {% endif %}
@@ -265,27 +265,33 @@
         }
 
         {% if table == "submissions" %}
-            const convertToFAQuery = () => {
-                const url = new URL("https://furaffinity.net/search/")
-                const query = document.getElementById("query").value
-                    .replace(/_/g, "?")
-                    .replace(/@(?!(tags|author|description|fileurl|fileext|title))[^@ ]+ ?/ig, "")
-                    .replace(/@tags/ig, "@keywords")
-                    .replace(/@author/ig, "@lower")
-                    .replace(/@description/ig, "@message")
-                    .replace(/@(fileurl|fileext)/ig, "@filename")
-                    .trim()
-                {% if username %}
-                    url.searchParams.set("q", (query ? `(${query}) ` : "") + `@lower {{ username }}`)
-                {% else %}
-                    url.searchParams.set("q", query)
-                {% endif %}
-                if (document.getElementById("sort").value.match(/date|id/i)) {
-                    url.searchParams.set("order-by", "date")
-                    url.searchParams.set("order-direction", document.getElementById("order").value)
-                }
-                return url.href
+            const faSearchButton = document.getElementById("search_fa")
+            const url = new URL(faSearchButton.href)
+            const query = document.getElementById("query").value
+                .replace(/_/g, "?")
+                .replace(/@(?!(tags|author|description|fileurl|fileext|title))[^@ ]+ ?/ig, "")
+                .replace(/@tags/ig, "@keywords")
+                .replace(/@author/ig, "@lower")
+                .replace(/@description/ig, "@message")
+                .replace(/@(fileurl|fileext)/ig, "@filename")
+                .trim()
+
+            url.searchParams.forEach((n) => url.searchParams.delete(n))
+
+            {% if username %}
+                url.searchParams.set("q", (query ? `(${query}) ` : "") + `@lower {{ username }}`)
+            {% else %}
+                url.searchParams.set("q", query)
+            {% endif %}
+
+            if (document.getElementById("sort").value.match(/date|id/i)) {
+                url.searchParams.set("order-by", "date")
+                url.searchParams.set("order-direction", document.getElementById("order").value)
             }
+
+            url.searchParams.set("range", "all")
+
+            faSearchButton.href = url.href
         {% endif %}
     </script>
 {% endblock %}
