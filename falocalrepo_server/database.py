@@ -282,6 +282,7 @@ class Database:
     ) -> SearchResults:
         cols_results: list[str]
         cols_any: list[str]
+        cols_substring: list[str]
         cols_lower: list[str]
         cols_aliases: dict[str, str]
         default_column: str = "any"
@@ -293,6 +294,11 @@ class Database:
         if (table_name := table_name.upper()) == users_table.upper():
             default_column = UsersColumns.USERNAME.name
             cols_any = [UsersColumns.USERNAME.name, UsersColumns.USERPAGE.name]
+            cols_substring = [
+                UsersColumns.USERNAME.name,
+                UsersColumns.FOLDERS.name,
+                UsersColumns.USERPAGE.name,
+            ]
             cols_results = [
                 UsersColumns.USERNAME.name,
                 UsersColumns.FOLDERS.name,
@@ -316,6 +322,25 @@ class Database:
                 SubmissionsColumns.TAGS.name,
                 SubmissionsColumns.SPECIES.name,
                 SubmissionsColumns.DESCRIPTION.name,
+            ]
+            cols_substring = [
+                SubmissionsColumns.AUTHOR.name,
+                SubmissionsColumns.TITLE.name,
+                SubmissionsColumns.DATE.name,
+                SubmissionsColumns.DESCRIPTION.name,
+                SubmissionsColumns.FOOTER.name,
+                SubmissionsColumns.TAGS.name,
+                SubmissionsColumns.CATEGORY.name,
+                SubmissionsColumns.SPECIES.name,
+                SubmissionsColumns.FILEURL.name,
+                SubmissionsColumns.FILEEXT.name,
+                SubmissionsColumns.FAVORITE.name,
+                SubmissionsColumns.MENTIONS.name,
+                SubmissionsColumns.FOLDER.name,
+                "lower",
+                "keywords",
+                "message",
+                "filename",
             ]
             cols_results = [
                 SubmissionsColumns.ID.name,
@@ -362,6 +387,17 @@ class Database:
                 JournalsColumns.TITLE.name,
                 JournalsColumns.CONTENT.name,
             ]
+            cols_substring = [
+                JournalsColumns.AUTHOR.name,
+                JournalsColumns.TITLE.name,
+                JournalsColumns.DATE.name,
+                JournalsColumns.CONTENT.name,
+                JournalsColumns.HEADER.name,
+                JournalsColumns.FOOTER.name,
+                JournalsColumns.MENTIONS.name,
+                "lower",
+                "message",
+            ]
             cols_results = [
                 JournalsColumns.ID.name,
                 JournalsColumns.AUTHOR.name,
@@ -391,6 +427,13 @@ class Database:
                 CommentsColumns.AUTHOR.name,
                 CommentsColumns.TEXT.name,
             ]
+            cols_substring = [
+                CommentsColumns.AUTHOR.name,
+                CommentsColumns.DATE.name,
+                CommentsColumns.TEXT.name,
+                "lower",
+                "message",
+            ]
             cols_results = [
                 CommentsColumns.ID.name,
                 CommentsColumns.PARENT_TABLE.name,
@@ -418,9 +461,11 @@ class Database:
             raise KeyError(f"Unknown table {table_name!r}")
 
         col_id: str = table.key.name
-        cols_results = [c.lower() for c in cols_results]
-        cols_lower = [c.lower() for c in cols_lower]
         cols_table: list[str] = [c.name.lower() for c in table.columns]
+        cols_any = [c.lower() for c in cols_any]
+        cols_substring = [c.lower() for c in cols_substring]
+        cols_lower = [c.lower() for c in cols_lower]
+        cols_results = [c.lower() for c in cols_results]
         cols_list: list[str] = [
             c.name.lower()
             for c in table.columns
@@ -432,11 +477,7 @@ class Database:
             query,
             default_column,
             cols_table,
-            [
-                c.lower()
-                for c in {*cols_table, "any", "keywords", "message", "filename"}
-                - {"id", "filesaved", "userupdate", "active", "gender", "parent_id"}
-            ],
+            cols_substring,
             cols_lower,
             {
                 "any": f"({'||'.join(cols_any)})",
