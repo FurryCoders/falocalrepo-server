@@ -474,8 +474,8 @@ class Database:
         sort = sort if sort.lower() in cols_table else default_sort[table_name]
 
         sql, values = query_to_sql(
-            query,
-            default_column,
+            query.lower(),
+            default_column.lower(),
             cols_table,
             cols_substring,
             cols_lower,
