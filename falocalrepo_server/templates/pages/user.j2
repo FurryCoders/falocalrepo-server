@@ -1,5 +1,6 @@
 <!--suppress HtmlDeprecatedAttribute -->
 {% extends "base.j2" %}
+{% from "components/tags.j2" import Tags %}
 
 {% block title %}{{ user.USERNAME if user else "{} Not Found".format(username) }}{% endblock %}
 
@@ -51,12 +52,7 @@
                     </a>
                 </div>
                 <div class="property d-flex flex-wrap column-gap-2 row-gap-1" data-key="Folders">
-                    {% for folder in user.FOLDERS %}
-                        <span class="badge bg-info">{{ folder }}</span>
-                    {% endfor %}
-                    {% if not user.FOLDERS %}
-                        <span class="badge bg-secondary w-100">No folders</span>
-                    {% endif %}
+                    {{ Tags(user.FOLDERS, None, "folders", "info", "secondary") }}
                 </div>
 
                 <div class="separator"></div>

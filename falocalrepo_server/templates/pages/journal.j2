@@ -1,6 +1,7 @@
 <!--suppress HtmlUnknownTarget -->
 {% extends "base.j2" %}
 {% from "components/comments.j2" import Comments %}
+{% from "components/tags.j2" import Tags %}
 
 {% block title %}{{ "{} by {}".format(journal.TITLE, journal.AUTHOR) }}{% endblock %}
 
@@ -51,15 +52,7 @@
                     </a>
                 </div>
                 <div class="property" data-key="Mentions">
-                    <div class="d-flex flex-row flex-wrap column-gap-1 row-gap-1 text-truncate">
-                        {% for user in journal.MENTIONS %}
-                            <a class="btn btn-xs btn-primary"
-                               href="/user/{{ user }}">{{ user }}</a>
-                        {% endfor %}
-                        {% if not journal.MENTIONS %}
-                            <span class="badge bg-secondary w-100">No mentions</span>
-                        {% endif %}
-                    </div>
+                    {{ Tags(journal.MENTIONS, "/user/{}", "mentions", "primary", "secondary") }}
                 </div>
                 <div class="property" data-key="Comments">
                     <span class="badge bg-info w-100 text-truncate">

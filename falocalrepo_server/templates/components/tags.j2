@@ -1,0 +1,14 @@
+{% macro Tags(tags, link, name, bg_tag, bg_empty) %}
+    <div class="d-flex flex-row flex-wrap column-gap-1 row-gap-1 text-truncate">
+        {% for tag in tags %}
+            {% if link %}
+                <a class="btn btn-xs btn-{{ bg_tag }}" href="{{ link.format(tag) }}">{{ tag }}</a>
+            {% else %}
+                <span class="badge bg-{{ bg_tag }}">{{ tag }}</span>
+            {% endif %}
+        {% endfor %}
+        {% if not tags %}
+            <span class="badge bg-{{ bg_empty }} w-100">No {{ name }}</span>
+        {% endif %}
+    </div>
+{% endmacro %}
