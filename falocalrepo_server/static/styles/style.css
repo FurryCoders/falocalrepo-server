@@ -246,6 +246,10 @@ p:last-child {
     white-space: nowrap;
 }
 
+.badge {
+    cursor: default;
+}
+
 .modal {
     z-index: 3000;
     overflow: scroll;
