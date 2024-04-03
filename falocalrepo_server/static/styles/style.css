@@ -46,6 +46,10 @@
     --bs-gradient: none
 }
 
+.btn.border:hover {
+    --bs-border-color: var(--bs-btn-hover-border-color);
+}
+
 @keyframes fade-in {
     from {
         opacity: 0;
