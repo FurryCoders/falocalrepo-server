@@ -471,6 +471,10 @@ class Database:
             for c in table.columns
             if (get_origin(c.type) if type(c.type) is GenericAlias else c.type) in (list, set)
         ]
+        cols_aliases = {c.lower(): a for c, a in cols_aliases.items()}
+        if cols_any:
+            cols_aliases["any"] = f"({'||'.join(cols_any)})"
+            cols_substring.append("any")
         sort = sort if sort.lower() in cols_table else default_sort[table_name]
 
         sql, values = query_to_sql(
@@ -479,10 +483,7 @@ class Database:
             cols_table,
             cols_substring,
             cols_lower,
-            {
-                "any": f"({'||'.join(cols_any)})",
-                **{c.lower(): a for c, a in cols_aliases.items()},
-            },
+            cols_aliases,
             score=sort.lower() == "relevance",
         )
 
