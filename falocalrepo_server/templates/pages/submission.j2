@@ -253,8 +253,8 @@
                                         <div class="ps-2 d-flex flex-column justify-content-between overflow-hidden">
                                             <div>File {{ loop.index }} {{ file.suffix.removeprefix(".").upper() }}</div>
                                             {% if text %}
-                                                <div class="font-monospace text-truncate text-wrap overflow-hidden fst-italic pt-2"
-                                                     style="font-size: smaller;">
+                                                <div class="font-monospace text-wrap fst-italic pt-2"
+                                                     style="font-size: 75%">
                                                     {{ text[:200]|clean_broken_tags|trim|safe }}
                                                 </div>
                                             {% endif %}
