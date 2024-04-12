@@ -164,20 +164,6 @@
                 return !!img
             }
 
-            const modalFiles = (toggle) => {
-                document.querySelectorAll("video").forEach(v => v.pause())
-                const modal = document.getElementById("modal-files")
-                if (toggle === false || modal.classList.contains("show")) {
-                    modal.scrollTo({top: 0})
-                    modal.classList.remove("show")
-                    document.body.classList.remove("overflow-hidden")
-                } else if (toggle !== false) {
-                    modal.classList.add("show")
-                    document.body.classList.add("overflow-hidden")
-                }
-                return modal.classList.contains("show")
-            }
-
             const floatingFiles = () => {
                 const files = document.getElementById("files")
                 if (files.classList.contains("floating")) files.classList.remove("floating")
@@ -185,20 +171,36 @@
                 return files.classList.contains("floating")
             }
 
-            const selectFile = (index) => {
-                document.querySelectorAll("video").forEach(v => v.pause())
-                index = String(index)
-                document.querySelectorAll("[data-file-index]").forEach(e => e.dataset.selected = String(e.dataset.fileIndex === index))
-                document.querySelectorAll("[data-selected-index]").forEach(e => e.dataset.selectedIndex = String(Number(index) + 1))
-                window.onresize(null)
-                document.getElementById("modal-files").classList.remove("show")
-            }
+            {% if files|length > 1 %}
+                const modalFiles = (toggle) => {
+                    document.querySelectorAll("video").forEach(v => v.pause())
+                    const modal = document.getElementById("modal-files")
+                    if (toggle === false || modal.classList.contains("show")) {
+                        modal.scrollTo({top: 0})
+                        modal.classList.remove("show")
+                        document.body.classList.remove("overflow-hidden")
+                    } else if (toggle !== false) {
+                        modal.classList.add("show")
+                        document.body.classList.add("overflow-hidden")
+                    }
+                    return modal.classList.contains("show")
+                }
+
+                const selectFile = (index) => {
+                    document.querySelectorAll("video").forEach(v => v.pause())
+                    index = String(index)
+                    document.querySelectorAll("[data-file-index]").forEach(e => e.dataset.selected = String(e.dataset.fileIndex === index))
+                    document.querySelectorAll("[data-selected-index]").forEach(e => e.dataset.selectedIndex = String(Number(index) + 1))
+                    window.onresize(null)
+                    document.getElementById("modal-files").classList.remove("show")
+                }
+            {% endif %}
         </script>
     {% endif %}
 {% endblock %}
 
 {% block main %}
-    {% if files or thumbnail %}
+    {% if files|length > 1 %}
         <div class="modal fade blur text-center p-2" id="modal-image" onclick="modalImage()">
             <img id="modal-image-img" src="" alt="">
         </div>
