@@ -203,7 +203,7 @@
             <img id="modal-image-img" src="" alt="">
         </div>
 
-        <div class="modal fade blur" id="modal-files">
+        <div class="modal fade blur show" id="modal-files">
             <div class="modal-backdrop" onclick="modalFiles()"></div>
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -255,7 +255,7 @@
                                             {% if text %}
                                                 <div class="font-monospace text-truncate text-wrap overflow-hidden fst-italic pt-2"
                                                      style="font-size: smaller;">
-                                                    {{ text[:200]|safe }}
+                                                    {{ text[:200]|clean_broken_tags|trim|safe }}
                                                 </div>
                                             {% endif %}
                                         </div>
