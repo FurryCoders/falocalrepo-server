@@ -200,11 +200,11 @@
 {% endblock %}
 
 {% block main %}
-    {% if files|length > 1 %}
-        <div class="modal fade blur text-center p-2" id="modal-image" onclick="modalImage()">
-            <img id="modal-image-img" src="" alt="">
-        </div>
+    <div class="modal fade blur text-center p-2" id="modal-image" onclick="modalImage()">
+        <img id="modal-image-img" src="" alt="">
+    </div>
 
+    {% if files|length > 1 %}
         <div class="modal fade blur" id="modal-files">
             <div class="modal-backdrop" onclick="modalFiles()"></div>
             <div class="modal-dialog modal-xl">
