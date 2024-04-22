@@ -659,7 +659,7 @@ async def journal(request: Request):
 @requires(["authenticated"])
 async def journal_zip(request: Request):
     database: Database = request.state.database
-    if not (jrn := database.submission(request.path_params["id"])):
+    if not (jrn := database.journal(request.path_params["id"])):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "")
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
