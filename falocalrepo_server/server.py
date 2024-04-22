@@ -606,7 +606,7 @@ async def submission_zip(request: Request):
         if t and t.is_file():
             z.writestr(t.name, t.read_bytes())
         if request.query_params.get("files-only") is None:
-            z.writestr("description.txt" if database.bbcode else "description.html", sub["DESCRIPTION"].encode())
+            z.writestr("description.txt" if database.bbcode() else "description.html", sub["DESCRIPTION"].encode())
             z.writestr("metadata.json", dumps(sub, default=lambda o: list(o) if isinstance(o, set) else str(o)))
             z.writestr("comments.json", dumps(database.submission_comments(request.path_params["id"])))
 
@@ -663,7 +663,7 @@ async def journal_zip(request: Request):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "")
 
     with ZipFile(f_obj := BytesIO(), "w") as z:
-        z.writestr("content.txt" if database.bbcode else "content.html", jrn["CONTENT"].encode())
+        z.writestr("content.txt" if database.bbcode() else "content.html", jrn["CONTENT"].encode())
         z.writestr("metadata.json", dumps(jrn, default=lambda o: list(o) if isinstance(o, set) else str(o)))
         z.writestr("comments.json", dumps(database.journal_comments(request.path_params["id"])))
 
