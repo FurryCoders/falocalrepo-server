@@ -17,7 +17,7 @@ from re import IGNORECASE
 from re import MULTILINE
 from re import Pattern
 from re import compile as re_compile
-from re import sub
+from re import sub as re_sub
 from secrets import compare_digest
 from traceback import format_exc
 from typing import Any, Mapping
@@ -117,7 +117,7 @@ templates: Jinja2Templates = Jinja2Templates(
         },
     ],
 )
-templates.env.filters["clean_broken_tags"] = lambda text: sub(r"<[^>]*$", "", text)
+templates.env.filters["clean_broken_tags"] = lambda text: re_sub(r"<[^>]*$", "", text)
 
 
 def is_request_mobile(request: Request) -> bool | None:
