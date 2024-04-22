@@ -665,7 +665,7 @@ async def journal_zip(request: Request):
     with ZipFile(f_obj := BytesIO(), "w") as z:
         z.writestr("content.txt" if database.bbcode else "content.html", jrn["CONTENT"].encode())
         z.writestr("metadata.json", dumps(jrn, default=lambda o: list(o) if isinstance(o, set) else str(o)))
-        z.writestr("comments.json", dumps(database.submission_comments(request.path_params["id"])))
+        z.writestr("comments.json", dumps(database.journal_comments(request.path_params["id"])))
 
     f_obj.seek(0)
 
