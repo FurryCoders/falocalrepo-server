@@ -180,7 +180,10 @@ class BasicAuthBackend(AuthenticationBackend):
         if any(ip.match(conn.client.host) for ip in self.allowed_ips):
             return AuthCredentials(["authenticated"]), SimpleUser("")
 
-        if not (auth := conn.headers.get("Authorization", conn.session.get("auth"))):
+        if conn.session.pop("logout", None):
+            conn.session.pop("auth", None)
+            raise AuthenticationError("Logged out")
+        elif not (auth := conn.headers.get("Authorization", conn.session.get("auth"))):
             raise AuthenticationError("Missing credentials")
 
         try:
@@ -281,6 +284,12 @@ def make_lifespan(
             yield {"database": database}
 
     return _lifespan
+
+
+@requires(["authenticated"], redirect="/")
+async def logout(request: Request):
+    request.session["logout"] = True
+    return RedirectResponse("/")
 
 
 @requires(["authenticated"])
@@ -795,6 +804,7 @@ def server(
             lambda r: RedirectResponse(r.url_for("search", **r.path_params).include_query_params(**r.query_params)),
         ),
         Route("/{table:table}", search),
+        Route("/logout", logout),
         Mount("/static", app=StaticFiles(directory=Path(__file__).parent / "static")),
     ]
     middleware: list[Middleware] = []
