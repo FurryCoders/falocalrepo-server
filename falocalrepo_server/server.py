@@ -161,10 +161,8 @@ class NoAuthBackend(AuthenticationBackend):
 
 
 class BasicAuthBackend(AuthenticationBackend):
-    def __init__(self, auth: tuple[str, str] | None, allowed_ips: tuple[str, ...] | None):
-        username, password = auth or (None, None)
-        self.username: str | None = username
-        self.password: str | None = password
+    def __init__(self, auth: tuple[tuple[str, str], ...], allowed_ips: tuple[str, ...] | None):
+        self.auth: dict[str, str] = dict(auth)
         self.allowed_ips: list[Pattern] = [
             re_compile(ip.replace(".", r"\.").replace("*", r".*")) for ip in allowed_ips or []
         ]
@@ -179,9 +177,7 @@ class BasicAuthBackend(AuthenticationBackend):
         )
 
     async def authenticate(self, conn: HTTPConnection):
-        if self.username is None and self.password is None:
-            return AuthCredentials(["authenticated"]), SimpleUser("")
-        elif any(ip.match(conn.client.host) for ip in self.allowed_ips):
+        if any(ip.match(conn.client.host) for ip in self.allowed_ips):
             return AuthCredentials(["authenticated"]), SimpleUser("")
 
         if not (auth := conn.headers.get("Authorization", conn.session.get("auth"))):
@@ -197,12 +193,12 @@ class BasicAuthBackend(AuthenticationBackend):
 
         username, _, password = decoded.partition(":")
 
-        if compare_digest(username, self.username or "") and compare_digest(password, self.password or ""):
+        if username in self.auth and compare_digest(password, self.auth[username]):
             conn.session.update(auth=auth)
             return AuthCredentials(["authenticated"]), SimpleUser(username)
-        else:
-            conn.session.pop("auth", None)
-            raise AuthenticationError("Invalid basic auth credentials")
+
+        conn.session.pop("auth", None)
+        raise AuthenticationError("Invalid basic auth credentials")
 
 
 class TableConvertor(StringConvertor):
@@ -736,7 +732,7 @@ def server(
     port: int = None,
     ssl_cert: Path | None = None,
     ssl_key: Path | None = None,
-    authentication: tuple[str, str] | None = None,
+    authentication: tuple[tuple[str, str], ...] | None = None,
     authentication_ignore: tuple[str, ...] | None = None,
     max_results: int | None = None,
     use_cache: bool = True,

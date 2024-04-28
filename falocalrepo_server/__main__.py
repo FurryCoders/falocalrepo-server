@@ -109,8 +109,8 @@ def docstring_format(*args, **kwargs):
     "--auth",
     metavar="<USERNAME PASSWORD>",
     type=(str, str),
-    default=None,
-    help=f"Enable HTTP Basic authentication.",
+    multiple=True,
+    help=f"Username and password for authentication. [multiple]",
 )
 @option(
     "--auth-ignore",
@@ -142,7 +142,7 @@ def main(
     ssl_cert: Path | None,
     ssl_key: Path | None,
     redirect_http: int | None,
-    auth: tuple[str, str] | None,
+    auth: tuple[tuple[str, str], ...],
     auth_ignore: tuple[str, ...],
     max_results: int | None,
     cache: bool,
