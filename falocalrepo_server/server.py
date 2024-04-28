@@ -8,25 +8,25 @@ from datetime import timezone
 from functools import reduce
 from hashlib import sha256
 from io import BytesIO
-from logging import Logger
 from logging import getLogger
+from logging import Logger
 from math import ceil
 from os import PathLike
 from pathlib import Path
+from re import compile as re_compile
 from re import IGNORECASE
 from re import MULTILINE
 from re import Pattern
-from re import compile as re_compile
 from re import sub as re_sub
 from secrets import compare_digest
 from traceback import format_exc
-from typing import Any, Mapping
+from typing import Any
+from typing import Mapping
 from webbrowser import open as open_browser
 from zipfile import ZipFile
 
-from PIL import Image
-from PIL import UnidentifiedImageError
 from baize.asgi import FileResponse
+from bs4 import BeautifulSoup
 
 # noinspection PyProtectedMember
 from falocalrepo_database import __package__ as __package_database__
@@ -35,16 +35,18 @@ from falocalrepo_database.tables import comments_table
 from htmlmin import minify
 from orjson import dumps
 from orjson import loads
+from PIL import Image
+from PIL import UnidentifiedImageError
 from starlette import status
 from starlette.applications import Starlette
 from starlette.authentication import AuthCredentials
 from starlette.authentication import AuthenticationBackend
 from starlette.authentication import AuthenticationError
-from starlette.authentication import SimpleUser
 from starlette.authentication import requires
+from starlette.authentication import SimpleUser
 from starlette.background import BackgroundTask
-from starlette.convertors import StringConvertor
 from starlette.convertors import register_url_convertor
+from starlette.convertors import StringConvertor
 from starlette.exceptions import HTTPException
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
@@ -66,12 +68,12 @@ from starlette.types import ExceptionHandler
 from uvicorn import run
 
 from .__version__ import __version__
-from .database import Database
-from .database import Settings
 from .database import clean_username
+from .database import Database
 from .database import default_order
 from .database import default_sort
 from .database import journals_table
+from .database import Settings
 from .database import submissions_table
 from .database import users_table
 
@@ -118,6 +120,7 @@ templates: Jinja2Templates = Jinja2Templates(
     ],
 )
 templates.env.filters["clean_broken_tags"] = lambda text: re_sub(r"<[^>]*$", "", text)
+templates.env.filters["prettify_html"] = lambda text: BeautifulSoup(text, "lxml").select_one("body").decode_contents()
 
 
 def is_request_mobile(request: Request) -> bool | None:
