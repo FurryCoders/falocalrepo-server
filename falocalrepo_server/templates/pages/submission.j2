@@ -257,7 +257,7 @@
                                             {% if text %}
                                                 <div class="font-monospace text-wrap fst-italic pt-2"
                                                      style="font-size: 75%">
-                                                    {{ text[:200]|clean_broken_tags|trim|safe }}
+                                                    {{ text[:200]|clean_broken_tags|striptags|trim|safe }}
                                                 </div>
                                             {% endif %}
                                         </div>
