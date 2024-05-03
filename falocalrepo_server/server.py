@@ -27,6 +27,7 @@ from zipfile import ZipFile
 
 from baize.asgi import FileResponse
 from bs4 import BeautifulSoup
+from chardet import detect as detect_encoding
 
 # noinspection PyProtectedMember
 from falocalrepo_database import __package__ as __package_database__
@@ -591,12 +592,17 @@ async def submission_thumbnail(request: Request):
 async def submission_file(request: Request):
     database: Database = request.state.database
     n = request.path_params.get("n", 0)
-    fs, _ = database.database.submissions.get_submission_files(request.path_params["id"])
+    fs, _ = database.submission_files(request.path_params["id"])
+    content_type: str | None = None
     if not fs or n > len(fs) - 1:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "")
     elif not fs[n].is_file():
         raise HTTPException(status.HTTP_404_NOT_FOUND, "")
-    return FileResponse(str(fs[n]))
+    if fs[n].suffix == ".txt" and database.submission_files_mime(fs[n])[0] in ("text/plain", None):
+        with fs[n].open("rb") as fh:
+            if encoding := detect_encoding(fh.read(1024))["encoding"]:
+                content_type = f"text/plain; charset={encoding}"
+    return FileResponse(str(fs[n]), content_type=content_type)
 
 
 @requires(["authenticated"])
