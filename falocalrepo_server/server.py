@@ -563,10 +563,9 @@ async def submission(request: Request):
 
 @requires(["authenticated"])
 async def submission_thumbnail(request: Request):
-    id_ = request.path_params["id"]
-    x, y = request.path_params.get("x"), request.path_params.get("y")
     database: Database = request.state.database
-    fs, t = database.database.submissions.get_submission_files(id_)
+    fs, t = database.submission_files(request.path_params["id"])
+    x, y = request.path_params.get("x"), request.path_params.get("y")
     if t is not None and t.is_file():
         if not x and not y:
             return FileResponse(str(t))
