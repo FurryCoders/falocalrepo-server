@@ -449,6 +449,50 @@ async def user(request: Request):
 
 
 @requires(["authenticated"])
+async def user_edit(request: Request):
+    if "editor" not in request.auth.scopes:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    elif request.path_params["username"] != (username := clean_username(request.path_params["username"])):
+        return RedirectResponse(request.url_for("user_edit", username=username))
+
+    database: Database = request.state.database
+    if not (usr := database.user(request.path_params["username"])):
+        return error_response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            "The user is not in the database 😢",
+            [("Open on FA", f"https://furaffinity.net/user/{clean_username(request.path_params['username'])}")],
+        )
+
+    return TemplateResponse(request, "pages/user_edit.j2", {"user": usr})
+
+
+@requires(["authenticated", "editor"])
+async def user_edit_save(request: Request):
+    database: Database = request.state.database
+    if not (usr := database.database.users[clean_username(request.path_params["username"])]):
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    new_usr = deepcopy(usr)
+
+    async with request.form() as form:
+        new_usr["USERPAGE"] = form.get("profile", "").strip()
+
+    database.database.users[new_usr["USERNAME"]] = new_usr
+    database.database.commit()
+
+    return Response()
+
+
+@requires(["authenticated", "editor"])
+async def user_edit_delete(request: Request):
+    database: Database = request.state.database
+    if not (usr := database.user(request.path_params["username"])):
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    del database.database.users[usr["USERNAME"]]
+    return Response()
+
+
+@requires(["authenticated"])
 async def user_icon(request: Request):
     username: str = clean_username(request.path_params["username"])
     if not username:
@@ -947,6 +991,9 @@ def server(
         Route("/", home),
         Route("/settings", settings, methods=["GET", "POST"]),
         Route("/user/{username}", user),
+        Route("/user/{username}/edit", user_edit),
+        Route("/user/{username}/edit", user_edit_save, methods=["POST"]),
+        Route("/user/{username}/edit", user_edit_delete, methods=["DELETE"]),
         Route("/user/{username}/icon", user_icon),
         Route("/user/{username}/icon/{filename}", user_icon),
         Route(
