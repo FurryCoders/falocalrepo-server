@@ -520,6 +520,9 @@
                             ZIP
                         </a>
                     </div>
+                    {% if "editor" in request.auth.scopes %}
+                        <a href="/submission/{{ submission.ID }}/edit" class="btn btn-sm btn-primary">Edit</a>
+                    {% endif %}
                     <a class="btn btn-sm btn-primary" href="https://furaffinity.net/view/{{ submission.ID }}"
                        target="_blank">
                         FA
