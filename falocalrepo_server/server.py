@@ -15,6 +15,7 @@ from os import PathLike
 from pathlib import Path
 from re import compile as re_compile
 from re import IGNORECASE
+from re import match
 from re import MULTILINE
 from re import Pattern
 from re import sub as re_sub
@@ -24,6 +25,7 @@ from typing import Any
 from typing import Mapping
 from webbrowser import open as open_browser
 from zipfile import ZipFile
+from shutil import copy2
 
 from baize.asgi import FileResponse
 from bs4 import BeautifulSoup
@@ -571,6 +573,127 @@ async def submission(request: Request):
 
 
 @requires(["authenticated"])
+async def submission_edit(request: Request):
+    if "editor" not in request.auth.scopes:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    database: Database = request.state.database
+    if not (sub := database.submission(request.path_params["id"])):
+        return error_response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            "The submission is not in the database 😢",
+            [("Open on FA", f"https://furaffinity.net/view/{request.path_params['id']}")],
+        )
+
+    fs, t = database.submission_files(request.path_params["id"])
+    fsm = database.submission_files_mime(*fs) if fs else []
+    cs = database.submission_comments(sub["ID"])
+
+    return TemplateResponse(
+        request,
+        "pages/submission_edit.j2",
+        {
+            "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
+            "submission": sub,
+            "thumbnail": t,
+            "files": list(zip(fs, fsm)) if fs else [],
+            "comments": cs,
+        },
+    )
+
+
+@requires(["authenticated", "editor"])
+async def submission_edit_save(request: Request):
+    database: Database = request.state.database
+    if not (sub := database.database.submissions[request.path_params["id"]]):
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+    fs, t = database.submission_files(sub["ID"])
+    new_sub = deepcopy(sub)
+
+    async with request.form() as form:
+        new_sub["AUTHOR"] = form.get("author", "").strip() or new_sub["AUTHOR"]
+        new_sub["TITLE"] = form.get("title", "").strip()
+        new_sub["DATE"] = datetime.fromisoformat(form.get("date")) if form.get("date") else new_sub["DATE"]
+        new_sub["FOLDER"] = form.get("folder", "").strip() or new_sub["FOLDER"]
+        new_sub["CATEGORY"] = form.get("category", "").strip() + " / " + form.get("theme", "").strip()
+        new_sub["SPECIES"] = form.get("species", "").strip()
+        new_sub["GENDER"] = form.get("gender", "").strip()
+        new_sub["RATING"] = form.get("rating", "").strip()
+        new_sub["TAGS"] = [t for t in form.get("tags", "").strip().split(" ") if t]
+        new_sub["FAVORITE"] = {u for f in form.get("tags", "").strip().split(" ") if (u := clean_username(f))}
+        new_sub["DESCRIPTION"] = form.get("description", "").strip()
+        new_sub["MENTIONS"] = {
+            u
+            for a in BeautifulSoup(new_sub["DESCRIPTION"], "lxml").select("a")
+            if (m := match(r"^(?:(?:https?://)?(?:www\.)?furaffinity\.net)?/user/([^/#]+).*$", a.attrs["href"]))
+            and (u := clean_username(m[1]))
+        }
+
+        form_files: dict[int, int | None] = {
+            int(m[1]): int(m[2]) if m[3] == "true" else None
+            for f in form.getlist("existing_file")
+            if (m := match(r"(\d+):(\d+):(true|false)", f))
+        }
+
+        if any(i != j for i, j in form_files.items()):
+            files: dict[Path, int | None] = {f: form_files.get(i, i) for i, f in enumerate(fs or [])}
+            for file, new_index in files.items():
+                if new_index is None:
+                    continue
+                copy2(file, file.with_stem(f".submission{new_index or ''}"))
+            for file, new_index in files.items():
+                file.unlink(missing_ok=True)
+                if new_index is not None:
+                    file.with_stem(f".submission{new_index or ''}").replace(
+                        file.with_stem(f"submission{new_index or ''}")
+                    )
+
+            new_sub["FILEEXT"] = [
+                f.suffix.strip(".") for f, i in sorted(files.items(), key=lambda fi: fi[1]) if i is not None
+            ]
+
+        if t and form.get("thumbnail") == "false":
+            t.unlink(missing_ok=True)
+            new_sub["FILESAVED"] &= ~0b1
+        if (t_new := form.get("new_thumbnail")) and t_new.size:
+            if t:
+                t.unlink(missing_ok=True)
+            database.database.submissions.save_submission_thumbnail(new_sub["ID"], await t_new.read())
+            new_sub["FILESAVED"] |= 0b1
+
+        for f_new in form.getlist("new_file"):
+            if not f_new.size:
+                continue
+            new_sub["FILEEXT"].append(
+                database.database.submissions.save_submission_file(
+                    new_sub["ID"], await f_new.read(), "submission", Path(f_new.filename).suffix.strip("."), len(files)
+                )
+            )
+
+    database.database.submissions[new_sub["ID"]] = new_sub
+    if new_sub["ID"] != sub["ID"]:
+        del database.database.submissions[sub["ID"]]
+
+    return Response()
+
+
+@requires(["authenticated", "editor"])
+async def submission_edit_delete(request: Request):
+    database: Database = request.state.database
+    if not (sub := database.submission(request.path_params["id"])):
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    fs, t = database.submission_files(sub["ID"])
+    for f in fs or []:
+        f.unlink(missing_ok=True)
+    if t:
+        t.unlink(missing_ok=True)
+    del database.database.submissions[sub["ID"]]
+    return Response()
+
+
+@requires(["authenticated"])
 async def submission_thumbnail(request: Request):
     database: Database = request.state.database
     fs, t = database.submission_files(request.path_params["id"])
@@ -793,6 +916,9 @@ def server(
             lambda r: RedirectResponse(r.url_for("submission", **r.path_params).include_query_params(**r.query_params)),
         ),
         Route("/submission/{id:int}", submission),
+        Route("/submission/{id:int}/edit", submission_edit),
+        Route("/submission/{id:int}/edit", submission_edit_save, methods=["POST"]),
+        Route("/submission/{id:int}/edit", submission_edit_delete, methods=["DELETE"]),
         Route("/submission/{id:int}/file", submission_file),
         Route("/submission/{id:int}/file/{n:int}", submission_file),
         Route("/submission/{id:int}/file/{n:int}/{filename}", submission_file),
