@@ -102,6 +102,9 @@
                             ZIP
                         </a>
                     </div>
+                    {% if "editor" in request.auth.scopes %}
+                        <a href="/journal/{{ journal.ID }}/edit" class="btn btn-sm btn-primary">Edit</a>
+                    {% endif %}
                     <a class="btn btn-sm btn-primary" href="https://furaffinity.net/journal/{{ journal.ID }}"
                        target="_blank">
                         FA
