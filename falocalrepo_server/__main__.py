@@ -119,6 +119,7 @@ def docstring_format(*args, **kwargs):
     multiple=True,
     help=f"Ignore authentication for IP addresses. [multiple]",
 )
+@option("--editor", type=str, multiple=True, help="Users with editing rights.")
 @option("--max-results", type=IntRange(1000), default=None, help="Maximum number of results from queries.")
 @option("--cache/--no-cache", is_flag=True, default=True, help="Use cache.")
 @option("--browser/--no-browser", "browser", is_flag=True, default=True, help="Open browser on startup.")
@@ -144,6 +145,7 @@ def main(
     redirect_http: int | None,
     auth: tuple[tuple[str, str], ...],
     auth_ignore: tuple[str, ...],
+    editor: tuple[str, ...],
     max_results: int | None,
     cache: bool,
     browser: bool,
@@ -187,6 +189,7 @@ def main(
         ssl_key,
         auth,
         auth_ignore,
+        editor,
         max_results,
         cache,
         browser,

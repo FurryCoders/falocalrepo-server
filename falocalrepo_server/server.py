@@ -158,15 +158,21 @@ class CacheMiddleware(BaseHTTPMiddleware):
 
 class NoAuthBackend(AuthenticationBackend):
     async def authenticate(self, conn: HTTPConnection):
-        return AuthCredentials(["authenticated"]), SimpleUser("")
+        return AuthCredentials(["authenticated", "editor"]), SimpleUser("")
 
 
 class BasicAuthBackend(AuthenticationBackend):
-    def __init__(self, auth: tuple[tuple[str, str], ...], allowed_ips: tuple[str, ...] | None):
+    def __init__(
+        self,
+        auth: tuple[tuple[str, str], ...],
+        allowed_ips: tuple[str, ...] | None,
+        editors: tuple[str, ...] | None,
+    ):
         self.auth: dict[str, str] = dict(auth)
         self.allowed_ips: list[Pattern] = [
             re_compile(ip.replace(".", r"\.").replace("*", r".*")) for ip in allowed_ips or []
         ]
+        self.editors: tuple[str, ...] | None = editors
         super().__init__()
 
     @staticmethod
@@ -199,7 +205,10 @@ class BasicAuthBackend(AuthenticationBackend):
 
         if username in self.auth and compare_digest(password, self.auth[username]):
             conn.session.update(auth=auth)
-            return AuthCredentials(["authenticated"]), SimpleUser(username)
+            credentials = AuthCredentials(["authenticated"])
+            if username in self.editors:
+                credentials.scopes.append("editor")
+            return credentials, SimpleUser(username)
 
         conn.session.pop("auth", None)
         raise AuthenticationError("Invalid basic auth credentials")
@@ -748,6 +757,7 @@ def server(
     ssl_key: Path | None = None,
     authentication: tuple[tuple[str, str], ...] | None = None,
     authentication_ignore: tuple[str, ...] | None = None,
+    editors: tuple[str, ...] | None = None,
     max_results: int | None = None,
     use_cache: bool = True,
     browser: bool = True,
@@ -830,7 +840,7 @@ def server(
                 ),
                 Middleware(
                     AuthenticationMiddleware,
-                    backend=BasicAuthBackend(authentication, authentication_ignore),
+                    backend=BasicAuthBackend(authentication, authentication_ignore, editors),
                     on_error=BasicAuthBackend.on_auth_error,
                 ),
             ]
