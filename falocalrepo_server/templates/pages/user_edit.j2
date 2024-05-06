@@ -1,0 +1,57 @@
+<!--suppress HtmlFormInputWithoutLabel -->
+{% extends "base.j2" %}
+{% import "components/icons.j2" as icons %}
+
+{% block title %}{{ "Edit {} by {}".format(user.TITLE, user.AUTHOR) }}{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+            <form action="{{ request.url.path }}" method="post" id="form">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text" style="width: 5rem">Username</span>
+                    <input class="form-control" type="text" name="username" placeholder="."
+                           value="{{ user.USERNAME }}" disabled>
+                </div>
+
+                <div class="form-floating mt-3">
+                    <textarea name="profile" class="form-control"
+                              style="height: 700px">{{ user.USERPAGE|prettify_html|e }}</textarea>
+                    <label>Profile</label>
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                    <button class="btn btn-sm btn-warning" type="reset" onclick="window.location.reload()">
+                        Reset
+                    </button>
+                    <button class="btn btn-sm btn-danger" type="submit" name="delete" value="true"
+                            onclick="return window.confirm('Deleted users cannot be recovered.\n\nDo you want to continue?')">
+                        Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        document.getElementById("form").onsubmit = (ev) => {
+            ev.preventDefault()
+            ev.stopPropagation()
+
+            if (ev.submitter.name === "delete") {
+                return fetch(ev.target.action, {method: "DELETE"})
+                    .then(() => window.open("/", "_self"))
+            }
+
+            const data = new FormData(ev.target)
+
+            console.log(Object.fromEntries(Array.from(data.keys()).map(k => [k, data.getAll(k)])))
+
+            fetch(ev.target.action, {method: ev.target.method, body: data})
+                .then(() => window.open("/user/{{ user.USERNAME }}", "_self"))
+        }
+    </script>
+{% endblock %}
