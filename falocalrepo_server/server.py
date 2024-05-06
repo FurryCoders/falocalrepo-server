@@ -673,6 +673,7 @@ async def submission_edit_save(request: Request):
             )
 
     database.database.submissions[new_sub["ID"]] = new_sub
+    database.database.commit()
 
     return Response()
 
@@ -840,6 +841,7 @@ async def journal_edit_save(request: Request):
         }
 
     database.database.journals[new_jrn["ID"]] = new_jrn
+    database.database.commit()
 
     return Response()
 
