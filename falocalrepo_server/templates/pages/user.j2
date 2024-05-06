@@ -58,6 +58,9 @@
                 <div class="separator"></div>
 
                 <div class="controls">
+                    {% if "editor" in request.auth.scopes %}
+                        <a href="/user/{{ username }}/edit" class="btn btn-sm btn-primary">Edit</a>
+                    {% endif %}
                     {% if user.ACTIVE or not user %}
                         <button class="btn btn-sm btn-primary position-relative w-100">
                             <a href="https://furaffinity.net/user/{{ username }}" class="stretched-link"></a>
