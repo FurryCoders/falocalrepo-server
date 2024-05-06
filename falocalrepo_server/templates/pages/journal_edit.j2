@@ -44,7 +44,7 @@
                         Reset
                     </button>
                     <button class="btn btn-sm btn-danger" type="submit" name="delete" value="true"
-                            onclick="return window.confirm('Deleted submissions cannot be recovered.\n\nDo you want to continue?')">
+                            onclick="return window.confirm('Deleted journals cannot be recovered.\n\nDo you want to continue?')">
                         Delete
                     </button>
                 </div>
@@ -61,7 +61,7 @@
 
             if (ev.submitter.name === "delete") {
                 return fetch(ev.target.action, {method: "DELETE"})
-                    .then(() => window.open("/"))
+                    .then(() => window.open("/", "_self"))
             }
 
             const data = new FormData(ev.target)
@@ -69,7 +69,7 @@
             console.log(Object.fromEntries(Array.from(data.keys()).map(k => [k, data.getAll(k)])))
 
             fetch(ev.target.action, {method: ev.target.method, body: data})
-                .then(() => window.open("/journal/{{ journal.ID }}"))
+                .then(() => window.open("/journal/{{ journal.ID }}", "_self"))
         }
     </script>
 {% endblock %}

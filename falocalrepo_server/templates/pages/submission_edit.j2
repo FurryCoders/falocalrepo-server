@@ -801,7 +801,7 @@
 
             if (ev.submitter.name === "delete") {
                 return fetch(ev.target.action, {method: "DELETE"})
-                    .then(() => window.open("/"))
+                    .then(() => window.open("/", "_self"))
             }
 
             const data = new FormData(ev.target)
@@ -811,7 +811,7 @@
             console.log(Object.fromEntries(Array.from(data.keys()).map(k => [k, data.getAll(k)])))
 
             fetch(ev.target.action, {method: ev.target.method, body: data})
-                .then(() => window.open("/submission/{{ submission.ID }}"))
+                .then(() => window.open("/submission/{{ submission.ID }}", "_self"))
         }
     </script>
 {% endblock %}
