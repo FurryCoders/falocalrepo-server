@@ -282,7 +282,7 @@ def make_lifespan(
                 logger.info("Using HTTP Basic authentication")
             if browser:
                 open_browser(address)
-            yield {"database": database}
+            yield {"database": database, "authentication": bool(authentication)}
 
     return _lifespan
 
