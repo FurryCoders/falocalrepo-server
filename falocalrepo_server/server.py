@@ -800,6 +800,60 @@ async def journal(request: Request):
 
 
 @requires(["authenticated"])
+async def journal_edit(request: Request):
+    if "editor" not in request.auth.scopes:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    database: Database = request.state.database
+    if not (jrn := database.journal(request.path_params["id"])):
+        return error_response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            "The journal is not in the database 😢",
+            [("Open on FA", f"https://furaffinity.net/journal/{request.path_params['id']}")],
+        )
+
+    return TemplateResponse(
+        request,
+        "pages/journal_edit.j2",
+        {"journal": jrn},
+    )
+
+
+@requires(["authenticated", "editor"])
+async def journal_edit_save(request: Request):
+    database: Database = request.state.database
+    if not (jrn := database.database.journals[request.path_params["id"]]):
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    new_jrn = deepcopy(jrn)
+
+    async with request.form() as form:
+        new_jrn["AUTHOR"] = form.get("author", "").strip() or new_jrn["AUTHOR"]
+        new_jrn["TITLE"] = form.get("title", "").strip()
+        new_jrn["DATE"] = datetime.fromisoformat(form.get("date")) if form.get("date") else new_jrn["DATE"]
+        new_jrn["CONTENT"] = form.get("description", "").strip()
+        new_jrn["MENTIONS"] = {
+            u
+            for a in BeautifulSoup(new_jrn["CONTENT"], "lxml").select("a")
+            if (m := match(r"^(?:(?:https?://)?(?:www\.)?furaffinity\.net)?/user/([^/#]+).*$", a.attrs["href"]))
+            and (u := clean_username(m[1]))
+        }
+
+    database.database.journals[new_jrn["ID"]] = new_jrn
+
+    return Response()
+
+
+@requires(["authenticated", "editor"])
+async def journal_edit_delete(request: Request):
+    database: Database = request.state.database
+    if not (jrn := database.journal(request.path_params["id"])):
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    del database.database.journals[jrn["ID"]]
+    return Response()
+
+
+@requires(["authenticated"])
 async def journal_zip(request: Request):
     database: Database = request.state.database
     if not (jrn := database.journal(request.path_params["id"])):
@@ -931,6 +985,9 @@ def server(
         Route("/submission/{id:int}/zip", submission_zip),
         Route("/submission/{id:int}/zip/{filename}", submission_zip),
         Route("/journal/{id:int}", journal),
+        Route("/journal/{id:int}/edit", journal_edit),
+        Route("/journal/{id:int}/edit", journal_edit_save, methods=["POST"]),
+        Route("/journal/{id:int}/edit", journal_edit_delete, methods=["DELETE"]),
         Route("/journal/{id:int}/zip", journal_zip),
         Route("/journal/{id:int}/zip/{filename}", journal_zip),
         Route("/comment/{parent_table}/{parent_id:int}/{comment_id:int}", comment),
