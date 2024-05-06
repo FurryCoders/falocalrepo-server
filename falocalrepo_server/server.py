@@ -673,8 +673,6 @@ async def submission_edit_save(request: Request):
             )
 
     database.database.submissions[new_sub["ID"]] = new_sub
-    if new_sub["ID"] != sub["ID"]:
-        del database.database.submissions[sub["ID"]]
 
     return Response()
 
