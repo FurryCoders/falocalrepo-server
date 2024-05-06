@@ -123,7 +123,9 @@ templates: Jinja2Templates = Jinja2Templates(
     ],
 )
 templates.env.filters["clean_broken_tags"] = lambda text: re_sub(r"<[^>]*$", "", text)
-templates.env.filters["prettify_html"] = lambda text: BeautifulSoup(text, "lxml").select_one("body").decode_contents()
+templates.env.filters["prettify_html"] = lambda text: (
+    (b := BeautifulSoup(text, "lxml")).select_one("body") or b
+).decode_contents()
 
 
 def is_request_mobile(request: Request) -> bool | None:
