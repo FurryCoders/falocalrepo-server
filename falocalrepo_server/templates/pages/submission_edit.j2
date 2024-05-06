@@ -1,0 +1,817 @@
+<!--suppress HtmlFormInputWithoutLabel -->
+{% extends "base.j2" %}
+{% import "components/icons.j2" as icons %}
+
+{% block title %}{{ "Edit {} by {}".format(submission.TITLE, submission.AUTHOR) }}{% endblock %}
+
+{% block head %}
+    <style>
+        :root {
+            counter-set: file-index 0;
+        }
+
+        :first-child > .file-arrow-up {
+            pointer-events: none !important;
+            cursor: initial !important;
+            opacity: .5;
+        }
+
+        :last-child > .file-arrow-down {
+            pointer-events: none !important;
+            cursor: initial !important;
+            opacity: .5;
+        }
+
+        .existing-file-index::before {
+            counter-increment: file-index;
+            content: counter(file-index)
+        }
+
+        .existing-file[data-delete=true] > :not(.file-restore) {
+            opacity: .5;
+            pointer-events: none !important;
+        }
+
+        .existing-file[data-delete=true] .file-delete {
+            display: none !important;
+        }
+
+        .existing-file:not([data-delete=true]) .file-restore {
+            display: none !important;
+        }
+
+        .existing-file .btn {
+            border: none;
+        }
+
+        .existing-file .btn:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .existing-file .btn:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+            <form action="{{ request.url.path }}" method="post" id="form">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text" style="width: 5rem">ID</span>
+                    <input class="form-control" type="number" name="id" placeholder="."
+                           value="{{ submission.ID }}" disabled>
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <span class="input-group-text" style="width: 5rem">Author</span>
+                    <input class="form-control" type="text" name="author" placeholder="."
+                           value="{{ submission.AUTHOR }}">
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <span class="input-group-text" style="width: 5rem">Title</span>
+                    <input class="form-control" type="text" name="title" placeholder="."
+                           value="{{ submission.TITLE }}">
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <span class="input-group-text" style="width: 5rem">Date</span>
+                    <input class="form-control" type="datetime-local" name="date" placeholder="."
+                           value="{{ submission.DATE }}">
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <span class="input-group-text" style="width: 5rem">Folder</span>
+                    <select class="form-select" name="folder">
+                        <option value="gallery" {{ "selected" if submission.FOLDER == "gallery" }}>Gallery</option>
+                        <option value="scraps" {{ "selected" if submission.FOLDER == "scraps" }}>Scraps</option>
+                    </select>
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <span class="input-group-text" style="width: 5rem">Category</span>
+                    <input class="form-control" type="text" name="category" placeholder="."
+                           value="{{ submission.CATEGORY.split("/")[0].strip() }}">
+                    <select class="form-select"
+                            onchange="this.form.querySelector('[name=category]').value = this.value; this.selectedIndex = 0">
+                        <option value="" disabled hidden selected>Choose existing category</option>
+                        <optgroup label="Visual Art">
+                            <option value="All">All</option>
+                            <option value="Artwork (Digital)">Artwork (Digital)</option>
+                            <option value="Artwork (Traditional)">Artwork (Traditional)</option>
+                            <option value="Cel Shading">Cel Shading</option>
+                            <option value="Crafting">Crafting</option>
+                            <option value="Designs">Designs</option>
+                            <option value="Fursuiting">Fursuiting</option>
+                            <option value="Icons">Icons</option>
+                            <option value="Mosaics">Mosaics</option>
+                            <option value="Photography">Photography</option>
+                            <option value="Food / Recipes">Food / Recipes</option>
+                            <option value="Sculpting">Sculpting</option>
+                        </optgroup>
+                        <optgroup label="Readable Art">
+                            <option value="Story">Story</option>
+                            <option value="Poetry">Poetry</option>
+                            <option value="Prose">Prose</option>
+                        </optgroup>
+                        <optgroup label="Audio Art">
+                            <option value="Music">Music</option>
+                            <option value="Podcasts">Podcasts</option>
+                        </optgroup>
+                        <optgroup label="Downloadable">
+                            <option value="Skins">Skins</option>
+                            <option value="Handhelds">Handhelds</option>
+                            <option value="Resources">Resources</option>
+                        </optgroup>
+                        <optgroup label="Other Stuff">
+                            <option value="Adoptables">Adoptables</option>
+                            <option value="Auctions">Auctions</option>
+                            <option value="Contests">Contests</option>
+                            <option value="Current Events">Current Events</option>
+                            <option value="Stockart">Stockart</option>
+                            <option value="Screenshots">Screenshots</option>
+                            <option value="Scraps">Scraps</option>
+                            <option value="Wallpaper">Wallpaper</option>
+                            <option value="YCH / Sale">YCH / Sale</option>
+                            <option value="Other">Other</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <span class="input-group-text" style="width: 5rem">Theme</span>
+                    <input class="form-control" type="text" name="theme" placeholder="."
+                           value="{{ submission.CATEGORY.split("/", 1)[1].strip() }}">
+                    <select class="form-select"
+                            onchange="this.form.querySelector('[name=theme]').value = this.value; this.selectedIndex = 0">
+                        <option value="" disabled hidden selected>Choose existing theme</option>
+                        <optgroup label="General Things">
+                            <option value="All">All</option>
+                            <option value="Abstract">Abstract</option>
+                            <option value="Animal related (non-anthro)">Animal related (non-anthro)</option>
+                            <option value="Anime">Anime</option>
+                            <option value="Comics">Comics</option>
+                            <option value="Doodle">Doodle</option>
+                            <option value="Fanart">Fanart</option>
+                            <option value="Fantasy">Fantasy</option>
+                            <option value="Human">Human</option>
+                            <option value="Portraits">Portraits</option>
+                            <option value="Scenery">Scenery</option>
+                            <option value="Still Life">Still Life</option>
+                            <option value="Tutorials">Tutorials</option>
+                            <option value="Miscellaneous">Miscellaneous</option>
+                        </optgroup>
+                        <optgroup label="Specialty">
+                            <option value="Baby fur">Baby fur</option>
+                            <option value="Bondage">Bondage</option>
+                            <option value="Digimon">Digimon</option>
+                            <option value="Fat Furs">Fat Furs</option>
+                            <option value="Fetish Other">Fetish Other</option>
+                            <option value="Fursuit">Fursuit</option>
+                            <option value="Gore / Macabre Art">Gore / Macabre Art</option>
+                            <option value="Hyper">Hyper</option>
+                            <option value="Hypnosis">Hypnosis</option>
+                            <option value="Inflation">Inflation</option>
+                            <option value="Macro / Micro">Macro / Micro</option>
+                            <option value="Muscle">Muscle</option>
+                            <option value="My Little Pony / Brony">My Little Pony / Brony</option>
+                            <option value="Paw">Paw</option>
+                            <option value="Pokemon">Pokemon</option>
+                            <option value="Pregnancy">Pregnancy</option>
+                            <option value="Sonic">Sonic</option>
+                            <option value="Transformation">Transformation</option>
+                            <option value="TF / TG">TF / TG</option>
+                            <option value="Vore">Vore</option>
+                            <option value="Water Sports">Water Sports</option>
+                            <option value="General Furry Art">General Furry Art</option>
+                        </optgroup>
+                        <optgroup label="Music">
+                            <option value="Techno">Techno</option>
+                            <option value="Trance">Trance</option>
+                            <option value="House">House</option>
+                            <option value="90s">90s</option>
+                            <option value="80s">80s</option>
+                            <option value="70s">70s</option>
+                            <option value="60s">60s</option>
+                            <option value="Pre-60s">Pre-60s</option>
+                            <option value="Classical">Classical</option>
+                            <option value="Game Music">Game Music</option>
+                            <option value="Rock">Rock</option>
+                            <option value="Pop">Pop</option>
+                            <option value="Rap">Rap</option>
+                            <option value="Industrial">Industrial</option>
+                            <option value="Other Music">Other Music</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <span class="input-group-text" style="width: 5rem">Species</span>
+                    <input class="form-control" type="text" name="species" placeholder="."
+                           value="{{ submission.SPECIES }}">
+                    <select class="form-select"
+                            onchange="this.form.querySelector('[name=species]').value = this.value; this.selectedIndex = 0">
+                        <option value="" disabled hidden selected>Choose existing species</option>
+                        <option value="Unspecified / Any">Unspecified / Any</option>
+                        <optgroup label="General">
+                            <option value="Airborne Vehicle">Airborne Vehicle</option>
+                            <option value="Alien (Other)">Alien (Other)</option>
+                            <option value="Amphibian (Other)">Amphibian (Other)</option>
+                            <option value="Aquatic (Other)">Aquatic (Other)</option>
+                            <option value="Avian (Other)">Avian (Other)</option>
+                            <option value="Bear (Other)">Bear (Other)</option>
+                            <option value="Bovine (Other)">Bovine (Other)</option>
+                            <option value="Canine (Other)">Canine (Other)</option>
+                            <option value="Cervine (Other)">Cervine (Other)</option>
+                            <option value="Dog (Other)">Dog (Other)</option>
+                            <option value="Dragon (Other)">Dragon (Other)</option>
+                            <option value="Equine (Other)">Equine (Other)</option>
+                            <option value="Exotic (Other)">Exotic (Other)</option>
+                            <option value="Feline (Other)">Feline (Other)</option>
+                            <option value="Fox (Other)">Fox (Other)</option>
+                            <option value="Goo / Slime">Goo / Slime</option>
+                            <option value="Hybrid Species">Hybrid Species</option>
+                            <option value="Inanimate">Inanimate</option>
+                            <option value="Insect (Other)">Insect (Other)</option>
+                            <option value="Land Vehicle">Land Vehicle</option>
+                            <option value="Mammal (Other)">Mammal (Other)</option>
+                            <option value="Marsupial (Other)">Marsupial (Other)</option>
+                            <option value="Mustelid (Other)">Mustelid (Other)</option>
+                            <option value="Plant / Fungus">Plant / Fungus</option>
+                            <option value="Primate (Other)">Primate (Other)</option>
+                            <option value="Reptilian (Other)">Reptilian (Other)</option>
+                            <option value="Robot / Android / Cyborg">Robot / Android / Cyborg</option>
+                            <option value="Rodent (Other)">Rodent (Other)</option>
+                            <option value="Sea Vehicle">Sea Vehicle</option>
+                            <option value="Taur (Other)">Taur (Other)</option>
+                            <option value="Vulpine (Other)">Vulpine (Other)</option>
+                        </optgroup>
+                        <optgroup label="Fandom Creations">
+                            <option value="Original Species">Original Species</option>
+                            <option value="Fan Species / Character">Fan Species / Character</option>
+                            <option value="Aeromorph">Aeromorph</option>
+                            <option value="Angel Dragon">Angel Dragon</option>
+                            <option value="Avali">Avali</option>
+                            <option value="Chakat">Chakat</option>
+                            <option value="Citra">Citra</option>
+                            <option value="Crux">Crux</option>
+                            <option value="Dracat">Dracat</option>
+                            <option value="Dutch Angel Dragon">Dutch Angel Dragon</option>
+                            <option value="Felkin">Felkin</option>
+                            <option value="Ferrin">Ferrin</option>
+                            <option value="Jogauni">Jogauni</option>
+                            <option value="Langurhali">Langurhali</option>
+                            <option value="Nevrean">Nevrean</option>
+                            <option value="Protogen">Protogen</option>
+                            <option value="Rexouium">Rexouium</option>
+                            <option value="Sergal">Sergal</option>
+                            <option value="Synx">Synx</option>
+                            <option value="Wickerbeast">Wickerbeast</option>
+                            <option value="Yinglet">Yinglet</option>
+                            <option value="Zorgoia">Zorgoia</option>
+                        </optgroup>
+                        <optgroup label="Mythological / Fantasy">
+                            <option value="Angel">Angel</option>
+                            <option value="Centaur">Centaur</option>
+                            <option value="Cerberus">Cerberus</option>
+                            <option value="Changeling / Shape Shifter">Changeling / Shape Shifter</option>
+                            <option value="Chimera">Chimera</option>
+                            <option value="Chupacabra">Chupacabra</option>
+                            <option value="Cockatrice">Cockatrice</option>
+                            <option value="Daemon">Daemon</option>
+                            <option value="Demon">Demon</option>
+                            <option value="Displacer Beast">Displacer Beast</option>
+                            <option value="Dragonborn">Dragonborn</option>
+                            <option value="Drow">Drow</option>
+                            <option value="Dwarf">Dwarf</option>
+                            <option value="Eastern Dragon">Eastern Dragon</option>
+                            <option value="Elf">Elf</option>
+                            <option value="Gargoyle">Gargoyle</option>
+                            <option value="Goblin">Goblin</option>
+                            <option value="Golem">Golem</option>
+                            <option value="Gryphon">Gryphon</option>
+                            <option value="Harpy">Harpy</option>
+                            <option value="Hellhound">Hellhound</option>
+                            <option value="Hippogriff">Hippogriff</option>
+                            <option value="Hobbit">Hobbit</option>
+                            <option value="Hydra">Hydra</option>
+                            <option value="Imp">Imp</option>
+                            <option value="Incubus">Incubus</option>
+                            <option value="Jackalope">Jackalope</option>
+                            <option value="Kirin">Kirin</option>
+                            <option value="Kitsune">Kitsune</option>
+                            <option value="Kobold">Kobold</option>
+                            <option value="Lamia">Lamia</option>
+                            <option value="Manticore">Manticore</option>
+                            <option value="Minotaur">Minotaur</option>
+                            <option value="Naga">Naga</option>
+                            <option value="Nephilim">Nephilim</option>
+                            <option value="Orc">Orc</option>
+                            <option value="Pegasus">Pegasus</option>
+                            <option value="Peryton">Peryton</option>
+                            <option value="Phoenix">Phoenix</option>
+                            <option value="Sasquatch">Sasquatch</option>
+                            <option value="Satyr">Satyr</option>
+                            <option value="Sphinx">Sphinx</option>
+                            <option value="Succubus">Succubus</option>
+                            <option value="Tiefling">Tiefling</option>
+                            <option value="Troll">Troll</option>
+                            <option value="Unicorn">Unicorn</option>
+                            <option value="Water Dragon">Water Dragon</option>
+                            <option value="Werewolf / Lycanthrope">Werewolf / Lycanthrope</option>
+                            <option value="Western Dragon">Western Dragon</option>
+                            <option value="Wyvern">Wyvern</option>
+                            <option value="Yokai">Yokai</option>
+                        </optgroup>
+                        <optgroup label="Games / Media">
+                            <option value="Alicorn (MLP)">Alicorn (MLP)</option>
+                            <option value="Argonian">Argonian</option>
+                            <option value="Asari">Asari</option>
+                            <option value="Bangaa">Bangaa</option>
+                            <option value="Bubble Dragon">Bubble Dragon</option>
+                            <option value="Burmecian">Burmecian</option>
+                            <option value="Charr">Charr</option>
+                            <option value="Chiss">Chiss</option>
+                            <option value="Chocobo">Chocobo</option>
+                            <option value="Deathclaw">Deathclaw</option>
+                            <option value="Digimon">Digimon</option>
+                            <option value="Draenei">Draenei</option>
+                            <option value="Drell">Drell</option>
+                            <option value="Elcor">Elcor</option>
+                            <option value="Ewok">Ewok</option>
+                            <option value="Hanar">Hanar</option>
+                            <option value="Hrothgar">Hrothgar</option>
+                            <option value="Iksar">Iksar</option>
+                            <option value="Kaiju / Giant Monster">Kaiju / Giant Monster</option>
+                            <option value="Kelpie">Kelpie</option>
+                            <option value="Kemonomimi">Kemonomimi</option>
+                            <option value="Khajiit">Khajiit</option>
+                            <option value="Koopa">Koopa</option>
+                            <option value="Krogan">Krogan</option>
+                            <option value="Lombax">Lombax</option>
+                            <option value="Mimiga">Mimiga</option>
+                            <option value="Mobian">Mobian</option>
+                            <option value="Moogle">Moogle</option>
+                            <option value="Neopet">Neopet</option>
+                            <option value="Nu Mou">Nu Mou</option>
+                            <option value="Pokemon">Pokemon</option>
+                            <option value="Pony (MLP)">Pony (MLP)</option>
+                            <option value="Protoss">Protoss</option>
+                            <option value="Quarian">Quarian</option>
+                            <option value="Ronso">Ronso</option>
+                            <option value="Salarian">Salarian</option>
+                            <option value="Sangheili / Elites">Sangheili / Elites</option>
+                            <option value="Tauntaun">Tauntaun</option>
+                            <option value="Tauren">Tauren</option>
+                            <option value="Trandoshan">Trandoshan</option>
+                            <option value="Transformer">Transformer</option>
+                            <option value="Turian">Turian</option>
+                            <option value="Twi'lek">Twi'lek</option>
+                            <option value="Viera">Viera</option>
+                            <option value="Wookiee">Wookiee</option>
+                            <option value="Xenomorph">Xenomorph</option>
+                            <option value="Yautja / Predator">Yautja / Predator</option>
+                            <option value="Yordle">Yordle</option>
+                            <option value="Yoshi">Yoshi</option>
+                            <option value="Zerg">Zerg</option>
+                        </optgroup>
+                        <optgroup label="Animal Kingdom">
+                            <option value="Aardvark">Aardvark</option>
+                            <option value="Aardwolf">Aardwolf</option>
+                            <option value="African Wild Dog">African Wild Dog</option>
+                            <option value="Akita">Akita</option>
+                            <option value="Albatross">Albatross</option>
+                            <option value="Alligator / Crocodile">Alligator / Crocodile</option>
+                            <option value="Alpaca">Alpaca</option>
+                            <option value="Anaconda">Anaconda</option>
+                            <option value="Anteater">Anteater</option>
+                            <option value="Antelope">Antelope</option>
+                            <option value="Arachnid">Arachnid</option>
+                            <option value="Arctic Fox">Arctic Fox</option>
+                            <option value="Armadillo">Armadillo</option>
+                            <option value="Axolotl">Axolotl</option>
+                            <option value="Baboon">Baboon</option>
+                            <option value="Badger">Badger</option>
+                            <option value="Bat">Bat</option>
+                            <option value="Beaver">Beaver</option>
+                            <option value="Bee">Bee</option>
+                            <option value="Binturong">Binturong</option>
+                            <option value="Bison">Bison</option>
+                            <option value="Blue Jay">Blue Jay</option>
+                            <option value="Border Collie">Border Collie</option>
+                            <option value="Brown Bear">Brown Bear</option>
+                            <option value="Buffalo">Buffalo</option>
+                            <option value="Buffalo / Bison">Buffalo / Bison</option>
+                            <option value="Bull Terrier">Bull Terrier</option>
+                            <option value="Butterfly">Butterfly</option>
+                            <option value="Caiman">Caiman</option>
+                            <option value="Camel">Camel</option>
+                            <option value="Capybara">Capybara</option>
+                            <option value="Caribou">Caribou</option>
+                            <option value="Caterpillar">Caterpillar</option>
+                            <option value="Cephalopod">Cephalopod</option>
+                            <option value="Chameleon">Chameleon</option>
+                            <option value="Cheetah">Cheetah</option>
+                            <option value="Chicken">Chicken</option>
+                            <option value="Chimpanzee">Chimpanzee</option>
+                            <option value="Chinchilla">Chinchilla</option>
+                            <option value="Chipmunk">Chipmunk</option>
+                            <option value="Civet">Civet</option>
+                            <option value="Clouded Leopard">Clouded Leopard</option>
+                            <option value="Coatimundi">Coatimundi</option>
+                            <option value="Cockatiel">Cockatiel</option>
+                            <option value="Corgi">Corgi</option>
+                            <option value="Corvid">Corvid</option>
+                            <option value="Cougar / Puma">Cougar / Puma</option>
+                            <option value="Cow">Cow</option>
+                            <option value="Coyote">Coyote</option>
+                            <option value="Crab">Crab</option>
+                            <option value="Crane">Crane</option>
+                            <option value="Crayfish">Crayfish</option>
+                            <option value="Crow">Crow</option>
+                            <option value="Crustacean">Crustacean</option>
+                            <option value="Dalmatian">Dalmatian</option>
+                            <option value="Deer">Deer</option>
+                            <option value="Dhole">Dhole</option>
+                            <option value="Dingo">Dingo</option>
+                            <option value="Dinosaur">Dinosaur</option>
+                            <option value="Doberman">Doberman</option>
+                            <option value="Dolphin">Dolphin</option>
+                            <option value="Donkey / Mule">Donkey / Mule</option>
+                            <option value="Duck">Duck</option>
+                            <option value="Eagle">Eagle</option>
+                            <option value="Eel">Eel</option>
+                            <option value="Elephant">Elephant</option>
+                            <option value="Falcon">Falcon</option>
+                            <option value="Fennec">Fennec</option>
+                            <option value="Ferret">Ferret</option>
+                            <option value="Finch">Finch</option>
+                            <option value="Fish">Fish</option>
+                            <option value="Flamingo">Flamingo</option>
+                            <option value="Fossa">Fossa</option>
+                            <option value="Frog">Frog</option>
+                            <option value="Gazelle">Gazelle</option>
+                            <option value="Gecko">Gecko</option>
+                            <option value="Genet">Genet</option>
+                            <option value="German Shepherd">German Shepherd</option>
+                            <option value="Gibbon">Gibbon</option>
+                            <option value="Giraffe">Giraffe</option>
+                            <option value="Goat">Goat</option>
+                            <option value="Goose">Goose</option>
+                            <option value="Gorilla">Gorilla</option>
+                            <option value="Gray Fox">Gray Fox</option>
+                            <option value="Great Dane">Great Dane</option>
+                            <option value="Grizzly Bear">Grizzly Bear</option>
+                            <option value="Guinea Pig">Guinea Pig</option>
+                            <option value="Hamster">Hamster</option>
+                            <option value="Hawk">Hawk</option>
+                            <option value="Hedgehog">Hedgehog</option>
+                            <option value="Heron">Heron</option>
+                            <option value="Hippopotamus">Hippopotamus</option>
+                            <option value="Honeybee / Bumblebee">Honeybee / Bumblebee</option>
+                            <option value="Horse">Horse</option>
+                            <option value="Housecat">Housecat</option>
+                            <option value="Human">Human</option>
+                            <option value="Humanoid">Humanoid</option>
+                            <option value="Hummingbird">Hummingbird</option>
+                            <option value="Husky">Husky</option>
+                            <option value="Hyena">Hyena</option>
+                            <option value="Iguana">Iguana</option>
+                            <option value="Impala">Impala</option>
+                            <option value="Jackal">Jackal</option>
+                            <option value="Jaguar">Jaguar</option>
+                            <option value="Kangaroo">Kangaroo</option>
+                            <option value="Kangaroo Mouse">Kangaroo Mouse</option>
+                            <option value="Kangaroo Rat">Kangaroo Rat</option>
+                            <option value="Kinkajou">Kinkajou</option>
+                            <option value="Kit Fox">Kit Fox</option>
+                            <option value="Koala">Koala</option>
+                            <option value="Kodiak Bear">Kodiak Bear</option>
+                            <option value="Komodo Dragon">Komodo Dragon</option>
+                            <option value="Labrador">Labrador</option>
+                            <option value="Lemur">Lemur</option>
+                            <option value="Leopard">Leopard</option>
+                            <option value="Liger">Liger</option>
+                            <option value="Linsang">Linsang</option>
+                            <option value="Lion">Lion</option>
+                            <option value="Lizard">Lizard</option>
+                            <option value="Llama">Llama</option>
+                            <option value="Lobster">Lobster</option>
+                            <option value="Longhair Cat">Longhair Cat</option>
+                            <option value="Lynx">Lynx</option>
+                            <option value="Magpie">Magpie</option>
+                            <option value="Maine Coon">Maine Coon</option>
+                            <option value="Malamute">Malamute</option>
+                            <option value="Mammal - Feline">Mammal - Feline</option>
+                            <option value="Mammal - Herd">Mammal - Herd</option>
+                            <option value="Mammal - Marsupial">Mammal - Marsupial</option>
+                            <option value="Mammal - Mustelid">Mammal - Mustelid</option>
+                            <option value="Mammal - Other Predator">Mammal - Other Predator</option>
+                            <option value="Mammal - Prey">Mammal - Prey</option>
+                            <option value="Mammal - Primate">Mammal - Primate</option>
+                            <option value="Mammal - Rodent">Mammal - Rodent</option>
+                            <option value="Manatee">Manatee</option>
+                            <option value="Mandrill">Mandrill</option>
+                            <option value="Maned Wolf">Maned Wolf</option>
+                            <option value="Mantid">Mantid</option>
+                            <option value="Marmoset">Marmoset</option>
+                            <option value="Marten">Marten</option>
+                            <option value="Meerkat">Meerkat</option>
+                            <option value="Mink">Mink</option>
+                            <option value="Mole">Mole</option>
+                            <option value="Mongoose">Mongoose</option>
+                            <option value="Monitor Lizard">Monitor Lizard</option>
+                            <option value="Monkey">Monkey</option>
+                            <option value="Moose">Moose</option>
+                            <option value="Moth">Moth</option>
+                            <option value="Mouse">Mouse</option>
+                            <option value="Musk Deer">Musk Deer</option>
+                            <option value="Musk Ox">Musk Ox</option>
+                            <option value="Newt">Newt</option>
+                            <option value="Ocelot">Ocelot</option>
+                            <option value="Octopus">Octopus</option>
+                            <option value="Okapi">Okapi</option>
+                            <option value="Olingo">Olingo</option>
+                            <option value="Opossum">Opossum</option>
+                            <option value="Orangutan">Orangutan</option>
+                            <option value="Orca">Orca</option>
+                            <option value="Oryx">Oryx</option>
+                            <option value="Ostrich">Ostrich</option>
+                            <option value="Otter">Otter</option>
+                            <option value="Owl">Owl</option>
+                            <option value="Panda">Panda</option>
+                            <option value="Pangolin">Pangolin</option>
+                            <option value="Panther">Panther</option>
+                            <option value="Parakeet">Parakeet</option>
+                            <option value="Parrot / Macaw">Parrot / Macaw</option>
+                            <option value="Peacock">Peacock</option>
+                            <option value="Penguin">Penguin</option>
+                            <option value="Persian Cat">Persian Cat</option>
+                            <option value="Pig / Swine">Pig / Swine</option>
+                            <option value="Pigeon">Pigeon</option>
+                            <option value="Pika">Pika</option>
+                            <option value="Pine Marten">Pine Marten</option>
+                            <option value="Platypus">Platypus</option>
+                            <option value="Polar Bear">Polar Bear</option>
+                            <option value="Pony">Pony</option>
+                            <option value="Poodle">Poodle</option>
+                            <option value="Porcupine">Porcupine</option>
+                            <option value="Porpoise">Porpoise</option>
+                            <option value="Procyonid">Procyonid</option>
+                            <option value="Puffin">Puffin</option>
+                            <option value="Quoll">Quoll</option>
+                            <option value="Rabbit / Hare">Rabbit / Hare</option>
+                            <option value="Raccoon">Raccoon</option>
+                            <option value="Rat">Rat</option>
+                            <option value="Ray">Ray</option>
+                            <option value="Red Fox">Red Fox</option>
+                            <option value="Red Panda">Red Panda</option>
+                            <option value="Reindeer">Reindeer</option>
+                            <option value="Reptillian">Reptillian</option>
+                            <option value="Rhinoceros">Rhinoceros</option>
+                            <option value="Robin">Robin</option>
+                            <option value="Rottweiler">Rottweiler</option>
+                            <option value="Sabercats">Sabercats</option>
+                            <option value="Sabertooth">Sabertooth</option>
+                            <option value="Salamander">Salamander</option>
+                            <option value="Scorpion">Scorpion</option>
+                            <option value="Seagull">Seagull</option>
+                            <option value="Seahorse">Seahorse</option>
+                            <option value="Seal">Seal</option>
+                            <option value="Secretary Bird">Secretary Bird</option>
+                            <option value="Serpent Dragon">Serpent Dragon</option>
+                            <option value="Serval">Serval</option>
+                            <option value="Shark">Shark</option>
+                            <option value="Sheep">Sheep</option>
+                            <option value="Shiba Inu">Shiba Inu</option>
+                            <option value="Shorthair Cat">Shorthair Cat</option>
+                            <option value="Shrew">Shrew</option>
+                            <option value="Siamese">Siamese</option>
+                            <option value="Sifaka">Sifaka</option>
+                            <option value="Silver Fox">Silver Fox</option>
+                            <option value="Skunk">Skunk</option>
+                            <option value="Sloth">Sloth</option>
+                            <option value="Snail">Snail</option>
+                            <option value="Snake / Serpent">Snake / Serpent</option>
+                            <option value="Snow Leopard">Snow Leopard</option>
+                            <option value="Sparrow">Sparrow</option>
+                            <option value="Squid">Squid</option>
+                            <option value="Squirrel">Squirrel</option>
+                            <option value="Stoat">Stoat</option>
+                            <option value="Stork">Stork</option>
+                            <option value="Sugar Glider">Sugar Glider</option>
+                            <option value="Sun Bear">Sun Bear</option>
+                            <option value="Swan">Swan</option>
+                            <option value="Swift Fox">Swift Fox</option>
+                            <option value="Tanuki">Tanuki</option>
+                            <option value="Tapir">Tapir</option>
+                            <option value="Tasmanian Devil">Tasmanian Devil</option>
+                            <option value="Thylacine">Thylacine</option>
+                            <option value="Tiger">Tiger</option>
+                            <option value="Toucan">Toucan</option>
+                            <option value="Turtle / Tortoise">Turtle / Tortoise</option>
+                            <option value="Vulture">Vulture</option>
+                            <option value="Wallaby">Wallaby</option>
+                            <option value="Walrus">Walrus</option>
+                            <option value="Wasp">Wasp</option>
+                            <option value="Weasel">Weasel</option>
+                            <option value="Whale">Whale</option>
+                            <option value="Wolf">Wolf</option>
+                            <option value="Wolverine">Wolverine</option>
+                            <option value="Zebra">Zebra</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <span class="input-group-text" style="width: 5rem">Gender</span>
+                    <input class="form-control" type="text" name="gender" placeholder="."
+                           value="{{ submission.GENDER }}">
+                    <select class="form-select"
+                            onchange="this.form.querySelector('[name=gender]').value = this.value; this.selectedIndex = 0">
+                        <option value="" disabled hidden selected>Choose existing gender</option>
+                        <option value="Any">Any</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Herm">Herm</option>
+                        <option value="Intersex">Intersex</option>
+                        <option value="Trans (Male)">Trans (Male)</option>
+                        <option value="Trans (Female)">Trans (Female)</option>
+                        <option value="Non-Binary">Non-Binary</option>
+                        <option value="Multiple characters">Multiple characters</option>
+                        <option value="Other / Not Specified">Other / Not Specified</option>
+                    </select>
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <span class="input-group-text" style="width: 5rem">Rating</span>
+                    <select class="form-select" name="rating">
+                        <option value="general" {{ "selected" if submission.RATING.lower() == "general" }}>
+                            General
+                        </option>
+                        <option value="mature" {{ "selected" if submission.RATING.lower() == "mature" }}>Mature</option>
+                        <option value="adult" {{ "selected" if submission.RATING.lower() == "adult" }}>Adult</option>
+                    </select>
+                </div>
+
+                <div class="form-floating mt-3">
+                    <textarea name="tags" class="form-control"
+                              placeholder="." style="height: 100px">{{ submission.TAGS|join(" ") }}</textarea>
+                    <label>Tags</label>
+                </div>
+
+                <div class="form-floating mt-3">
+                    <textarea name="favorites" class="form-control"
+                              style="height: 100px">{{ submission.FAVORITES|join(" ") }}</textarea>
+                    <label>Favorites</label>
+                </div>
+
+                <div class="form-floating mt-3">
+                    <textarea name="description" class="form-control"
+                              style="height: 700px">{{ submission.DESCRIPTION|prettify_html|e }}</textarea>
+                    <label>Description</label>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating border rounded mt-3">
+                            <input type="text" class="form-control" hidden>
+                            <label>Files</label>
+
+                            <div class="form-group mt-3 p-2">
+                                {% for file, mime in files %}
+                                    <div class="d-flex border rounded d-flex my-2 existing-file overflow-hidden"
+                                         data-index="{{ loop.index0 }}">
+                                        <div class="d-flex justify-content-between align-items-center small bg-secondary-subtle w-100 px-2 text-truncate">
+                                            <div class="existing-file-index"></div>
+                                            <div>{{ file.name }}</div>
+                                        </div>
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger d-inline-flex align-items-center file-delete"
+                                                onclick="this.parentElement.dataset.delete = 'true';">
+                                            {{ icons.Trash() }}
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger file-restore"
+                                                onclick="this.parentElement.dataset.delete = '';">
+                                            {{ icons.ArrowCounterclockwise() }}
+                                        </button>
+                                        <a class="btn btn-sm btn-info d-inline-flex align-items-center"
+                                           target="_blank"
+                                           href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ file.name }}">
+                                            {{ icons.Eye() }}
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-info file-arrow-up"
+                                                onclick="this.parentElement.after(this.parentElement.previousElementSibling);">
+                                            &uarr;
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-info file-arrow-down"
+                                                onclick="this.parentElement.before(this.parentElement.nextElementSibling);">
+                                            &darr;
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group p-2">
+                                <div class="d-flex border rounded d-flex existing-file thumbnail overflow-hidden">
+                                    <div class="d-flex align-items-center small bg-secondary-subtle w-100 px-2 text-truncate">
+                                        {{ thumbnail.name if thumbnail else ("<em>No thumbnail</em>"|s) }}
+                                    </div>
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger d-inline-flex align-items-center file-delete"
+                                            onclick="this.parentElement.dataset.delete = 'true';">
+                                        {{ icons.Trash() }}
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger file-restore"
+                                            onclick="this.parentElement.dataset.delete = '';">
+                                        {{ icons.ArrowCounterclockwise() }}
+                                    </button>
+                                    <a class="btn btn-sm btn-info d-inline-flex align-items-center pe-1"
+                                       target="_blank"
+                                       href="/submission/{{ submission.ID }}/thumbnail/{{ thumbnail.name if thumbnail }}"
+                                            {{ "disabled" if not thumbnail }}>
+                                        {{ icons.Eye() }}&nbsp;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating border rounded mt-3">
+                            <input type="text" class="form-control" hidden>
+                            <label>New Files</label>
+
+                            <div class="form-group mt-3 p-2">
+                                <div class="input-group input-group-sm my-2">
+                                    <input class="form-control" type="file" name="new_file">
+                                    <button type="button" class="btn btn-info"
+                                            onclick="let p = this.parentElement; p.parentElement.appendChild(p.cloneNode(true))">
+                                        +
+                                    </button>
+                                    <button type="button" class="btn btn-danger"
+                                            onclick="let p = this.parentElement; p.parentElement.childElementCount > 1 ? p.remove() : p.querySelector('input').value = ''">
+                                        -
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group p-2">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">Thumbnail</span>
+                                    <input class="form-control" type="file" name="new_thumbnail">
+                                    <button type="button" class="btn btn-danger"
+                                            onclick="this.previousElementSibling.value = ''">
+                                        -
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                    <button class="btn btn-sm btn-warning" type="reset" onclick="window.location.reload()">
+                        Reset
+                    </button>
+                    <button class="btn btn-sm btn-danger" type="submit" name="delete" value="true"
+                            onclick="return window.confirm('Deleted submissions cannot be recovered.\n\nDo you want to continue?')">
+                        Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        document.getElementById("form").onsubmit = (ev) => {
+            ev.preventDefault()
+            ev.stopPropagation()
+
+            if (ev.submitter.name === "delete") {
+                return fetch(ev.target.action, {method: "DELETE"})
+                    .then(() => window.open("/"))
+            }
+
+            const data = new FormData(ev.target)
+
+            document.querySelectorAll(".existing-file:not(.thumbnail)").forEach((f, i) => data.append("existing_file", `${f.dataset.index}:${i}:${!f.dataset.deleted}`))
+            data.append("existing_thumbnail", String(!document.querySelector(".existing-file.thumbnail").dataset.deleted))
+            console.log(Object.fromEntries(Array.from(data.keys()).map(k => [k, data.getAll(k)])))
+
+            fetch(ev.target.action, {method: ev.target.method, body: data})
+                .then(() => window.open("/submission/{{ submission.ID }}"))
+        }
+    </script>
+{% endblock %}
