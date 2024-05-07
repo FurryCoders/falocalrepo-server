@@ -633,20 +633,8 @@ async def submission_edit(request: Request):
         )
 
     fs, t = database.submission_files(request.path_params["id"])
-    fsm = database.submission_files_mime(*fs) if fs else []
-    cs = database.submission_comments(sub["ID"])
 
-    return TemplateResponse(
-        request,
-        "pages/submission_edit.j2",
-        {
-            "title": f"{sub['TITLE']} by {sub['AUTHOR']}",
-            "submission": sub,
-            "thumbnail": t,
-            "files": list(zip(fs, fsm)) if fs else [],
-            "comments": cs,
-        },
-    )
+    return TemplateResponse(request, "pages/submission_edit.j2", {"submission": sub, "files": fs or [], "thumbnail": t})
 
 
 @requires(["authenticated", "editor"])

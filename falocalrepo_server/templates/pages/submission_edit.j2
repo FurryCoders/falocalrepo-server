@@ -683,7 +683,7 @@
                             <label>Files</label>
 
                             <div class="form-group mt-3 p-2">
-                                {% for file, mime in files %}
+                                {% for file in files %}
                                     <div class="d-flex border rounded d-flex my-2 existing-file overflow-hidden"
                                          data-index="{{ loop.index0 }}">
                                         <div class="d-flex justify-content-between align-items-center small bg-secondary-subtle w-100 px-2 text-truncate">
