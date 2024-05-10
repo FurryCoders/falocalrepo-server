@@ -60,6 +60,13 @@
             --files-height: 75vh !important;
         }
 
+        #files.zoom .btn.btn-zoom {
+            --bs-btn-color: var(--bs-btn-active-color);
+            --bs-btn-bg: var(--bs-btn-active-bg);
+            --bs-btn-border-color: var(--bs-btn-active-border-color);
+            --bs-btn-shadow: var(--bs-btn-active-shadow);
+        }
+
         #files.floating {
             position: sticky;
             top: .25rem;
@@ -197,6 +204,7 @@
                     document.querySelectorAll("[data-file-index]").forEach(e => e.dataset.selected = String(e.dataset.fileIndex === index))
                     document.querySelectorAll("[data-selected-index]").forEach(e => e.dataset.selectedIndex = String(Number(index) + 1))
                     window.onresize(null)
+                    document.getElementById("files").classList.remove("zoom")
                     document.getElementById("modal-files").classList.remove("show")
                     document.querySelectorAll(".files-pagination .prev").forEach(b => b.dataset.index = String(index))
                     document.querySelectorAll(".files-pagination .next").forEach(b => b.dataset.index = String({{ (files|length) - 1 }} - index))
@@ -305,7 +313,14 @@
                     <div class="file-container overflow-scroll" data-file-index="{{ loop.index0 }}"
                          data-selected="{{ "true" if loop.first else "false" }}">
                         {% if text %}
-                            <div class="border rounded h-100 overflow-scroll p-2 bg-body">
+                            <div class="border rounded h-100 overflow-scroll p-2 pt-4 bg-body">
+                                <button class="btn btn-sm btn-outline-dark p-1 position-absolute top-0 end-0 m-1 btn-zoom"
+                                        style="aspect-ratio: 1 / 1" onclick="zoomFiles()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                         fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5"></path>
+                                    </svg>
+                                </button>
                                 <div class="col col-12 col-xl-10 mx-auto">
                                     <div class="text-start text-wrap font-monospace text-file"
                                          style="font-size: smaller;">
@@ -650,13 +665,6 @@
 
     {% if files or thumbnail %}
         <div class="position-fixed bottom-0 end-0 d-flex flex-column row-gap-1 p-2" style="z-index: 900;">
-            <button class="btn btn-secondary rounded-circle" style="aspect-ratio: 1 / 1"
-                    onclick="zoomFiles() ? this.classList.add('btn-success') : this.classList.remove('btn-success')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                     fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5"></path>
-                </svg>
-            </button>
             <button class="btn btn-secondary rounded-circle" style="aspect-ratio: 1 / 1"
                     onclick="floatingFiles() ? this.classList.add('btn-success') : this.classList.remove('btn-success')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
