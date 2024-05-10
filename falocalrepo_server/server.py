@@ -670,9 +670,10 @@ async def submission_edit_save(request: Request):
             for f in form.getlist("existing_file")
             if (m := match(r"(\d+):(\d+):(true|false)", f))
         }
+        files: dict[Path, int | None]
 
         if any(i != j for i, j in form_files.items()):
-            files: dict[Path, int | None] = {f: form_files.get(i, i) for i, f in enumerate(fs or [])}
+            files = {f: form_files.get(i, i) for i, f in enumerate(fs or [])}
             for file, new_index in files.items():
                 if new_index is None:
                     continue
@@ -687,6 +688,8 @@ async def submission_edit_save(request: Request):
             new_sub["FILEEXT"] = [
                 f.suffix.strip(".") for f, i in sorted(files.items(), key=lambda fi: fi[1]) if i is not None
             ]
+        else:
+            files = {f: i for i, f in enumerate(fs or [])}
 
         if t and form.get("thumbnail") == "false":
             t.unlink(missing_ok=True)
