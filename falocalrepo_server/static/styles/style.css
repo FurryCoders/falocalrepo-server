@@ -6,6 +6,14 @@
     --bs-border-color: #DEE2E6;
 }
 
+@media not (hover: hover) {
+    .btn:hover {
+        --bs-btn-hover-color: var(--bs-btn-color) !important;
+        --bs-btn-hover-bg: var(--bs-btn-bg) !important;
+        --bs-btn-hover-border-color: var(--bs-btn-border-color) !important;
+    }
+}
+
 [data-bs-theme="dark"] {
     --bs-body-bg: #1C1C1E;
     --bs-body-bg-rgb: 28, 28, 30;
