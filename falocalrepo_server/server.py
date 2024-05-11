@@ -189,7 +189,7 @@ class BasicAuthBackend(AuthenticationBackend):
 
     async def authenticate(self, conn: HTTPConnection):
         if any(ip.match(conn.client.host) for ip in self.allowed_ips):
-            return AuthCredentials(["authenticated"]), SimpleUser("")
+            return AuthCredentials(["authenticated", "editor"]), SimpleUser("")
 
         if conn.session.pop("logout", None):
             conn.session.pop("auth", None)
