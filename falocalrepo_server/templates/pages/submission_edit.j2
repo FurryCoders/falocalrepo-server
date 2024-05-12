@@ -27,7 +27,7 @@
             content: counter(file-index)
         }
 
-        .existing-file[data-delete=true] > :not(.file-restore) {
+        .existing-file[data-delete=true] > :not(.file-restore):not(.file-view) {
             opacity: .5;
             pointer-events: none !important;
         }
@@ -700,7 +700,7 @@
                                                 onclick="this.parentElement.dataset.delete = '';">
                                             {{ icons.ArrowCounterclockwise() }}
                                         </button>
-                                        <a class="btn btn-sm btn-info d-inline-flex align-items-center"
+                                        <a class="btn btn-sm btn-info d-inline-flex align-items-center file-view"
                                            target="_blank"
                                            href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ file.name }}">
                                             {{ icons.Eye() }}
