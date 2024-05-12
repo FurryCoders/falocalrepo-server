@@ -705,7 +705,11 @@ async def submission_edit_save(request: Request):
                 continue
             new_sub["FILEEXT"].append(
                 database.database.submissions.save_submission_file(
-                    new_sub["ID"], await f_new.read(), "submission", Path(f_new.filename).suffix.strip("."), len(files)
+                    new_sub["ID"],
+                    await f_new.read(),
+                    "submission",
+                    Path(f_new.filename).suffix.strip("."),
+                    len(new_sub["FILEEXT"]),
                 )
             )
 
