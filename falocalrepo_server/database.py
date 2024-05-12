@@ -208,6 +208,7 @@ class Database:
         self.use_cache: bool = use_cache
         self.max_results: int | None = max_results
         self.database: FADatabase | None = None
+        self.m_time: int = self.path.stat().st_mtime_ns
 
     def __enter__(self):
         self.connect()
@@ -236,10 +237,11 @@ class Database:
         return func(*args) if self.use_cache else func.__wrapped__(self, *args)
 
     def clear_cache(self):
-        self._clear_cache(self.path.stat().st_mtime)
+        self._clear_cache(self.path.stat().st_mtime_ns)
 
     @lru_cache(1)
-    def _clear_cache(self, _mtime: Any):
+    def _clear_cache(self, m_time: int):
+        self.m_time = m_time
         for attr_name in dir(self):
             if hasattr(getattr(self, attr_name), "cache_clear"):
                 self.__getattribute__(attr_name).cache_clear()
