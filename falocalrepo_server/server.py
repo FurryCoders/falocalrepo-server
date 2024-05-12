@@ -688,8 +688,6 @@ async def submission_edit_save(request: Request):
             new_sub["FILEEXT"] = [
                 f.suffix.strip(".") for f, i in sorted(files.items(), key=lambda fi: fi[1]) if i is not None
             ]
-        else:
-            files = {f: i for i, f in enumerate(fs or [])}
 
         if t and form.get("thumbnail") == "false":
             t.unlink(missing_ok=True)
