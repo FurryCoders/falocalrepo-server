@@ -678,12 +678,12 @@ async def submission_edit_save(request: Request):
                 if new_index is None:
                     continue
                 copy2(file, file.with_stem(f".submission{new_index or ''}"))
-            for file, new_index in files.items():
+            for file in files.keys():
                 file.unlink(missing_ok=True)
-                if new_index is not None:
-                    file.with_stem(f".submission{new_index or ''}").replace(
-                        file.with_stem(f"submission{new_index or ''}")
-                    )
+            for file, new_index in files.items():
+                if new_index is None:
+                    continue
+                file.with_stem(f".submission{new_index or ''}").replace(file.with_stem(f"submission{new_index or ''}"))
 
             new_sub["FILEEXT"] = [
                 f.suffix.strip(".") for f, i in sorted(files.items(), key=lambda fi: fi[1]) if i is not None
