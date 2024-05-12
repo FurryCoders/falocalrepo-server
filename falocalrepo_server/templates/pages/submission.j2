@@ -243,7 +243,7 @@
                                          onclick="selectFile(this.dataset.fileIndex); modalFiles(false)">
                                         <div class="position-relative d-flex justify-content-center align-items-center thumbnail">
                                             {% if mime.startswith("image/") %}
-                                                <img src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ "{:010d}-{}{}".format(submission.ID, loop.index0, file.suffix) }}"
+                                                <img src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ "{:010d}-{}{}?m={}".format(submission.ID, loop.index0, file.suffix, request.state.database.m_time) }}"
                                                      alt=""
                                                      class="loading-element loading-error-hide mh-100 mw-100 rounded"
                                                      loading="lazy" onload="this.classList.add('loaded')"
@@ -298,7 +298,7 @@
                 </div>
             {% elif not files and thumbnail %}
                 <div class="file-container overflow-scroll position-relative" data-file-index="0" data-selected="true">
-                    <img src="/submission/{{ submission.ID }}/thumbnail/{{ "{:010d}-thumbnail{}".format(submission.ID, thumbnail.suffix) }}"
+                    <img src="/submission/{{ submission.ID }}/thumbnail/{{ "{:010d}-thumbnail{}?m={}".format(submission.ID, thumbnail.suffix, request.state.database.m_time) }}"
                          alt="" class="loading-element loading-error-hide" loading="lazy"
                          onload="this.classList.add('loaded')" onerror="this.classList.add('loading-error')"
                          onclick="modalImage(this)" style="height: calc(100% - 2rem)">
@@ -312,7 +312,7 @@
                 </div>
             {% else %}
                 {% for file, mime, text in files %}
-                    {% set name = "{:010d}-{}{}".format(submission.ID, loop.index0, file.suffix) %}
+                    {% set name = "{:010d}-{}{}?m={}".format(submission.ID, loop.index0, file.suffix, request.state.database.m_time) %}
                     {% set mime = mime or "" %}
                     <div class="file-container overflow-scroll" data-file-index="{{ loop.index0 }}"
                          data-selected="{{ "true" if loop.first else "false" }}">
