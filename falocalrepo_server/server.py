@@ -595,7 +595,6 @@ async def submission(request: Request):
         search_id, search_terms, search_index = decode_search_id(search_id_param)
         if search_terms and search_index is not None:
             results = database.search(*search_terms)
-            print(len(results.rows))
             sp = results.rows[search_index - 1]["ID"] if search_index > 0 else None
             sn = results.rows[search_index + 1]["ID"] if search_index < len(results.rows) - 1 else None
 
