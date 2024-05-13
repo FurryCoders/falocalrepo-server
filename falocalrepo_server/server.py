@@ -489,6 +489,7 @@ async def user_edit_delete(request: Request):
     if not (usr := database.user(request.path_params["username"])):
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     del database.database.users[usr["USERNAME"]]
+    database.database.commit()
     return Response()
 
 
@@ -670,6 +671,10 @@ async def submission_edit_save(request: Request):
             for f in form.getlist("existing_file")
             if (m := match(r"(\d+):(\d+):(true|false)", f))
         }
+        form_files = {
+            i: None if j is None else j - len([i for i2, j2 in form_files.items() if j2 is None and i2 < j])
+            for i, j in form_files.items()
+        }
         files: dict[Path, int | None]
 
         if any(i != j for i, j in form_files.items()):
@@ -728,6 +733,7 @@ async def submission_edit_delete(request: Request):
     if t:
         t.unlink(missing_ok=True)
     del database.database.submissions[sub["ID"]]
+    database.database.commit()
     return Response()
 
 
@@ -892,6 +898,7 @@ async def journal_edit_delete(request: Request):
     if not (jrn := database.journal(request.path_params["id"])):
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     del database.database.journals[jrn["ID"]]
+    database.database.commit()
     return Response()
 
 
