@@ -690,9 +690,8 @@ async def submission_edit_save(request: Request):
                     continue
                 file.with_stem(f".submission{new_index or ''}").replace(file.with_stem(f"submission{new_index or ''}"))
 
-            new_sub["FILEEXT"] = [
-                f.suffix.strip(".") for f, i in sorted(files.items(), key=lambda fi: fi[1]) if i is not None
-            ]
+            files = {f: i for f, i in files.items() if i is not None}
+            new_sub["FILEEXT"] = [f.suffix.strip(".") for f, i in sorted(files.items(), key=lambda fi: fi[1])]
 
         if t and form.get("thumbnail") == "false":
             t.unlink(missing_ok=True)
