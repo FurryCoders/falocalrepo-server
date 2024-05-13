@@ -22,6 +22,14 @@
             opacity: .5;
         }
 
+        form.loading input,
+        form.loading select,
+        form.loading button,
+        form.loading a {
+            pointer-events: none !important;
+            opacity: .75;
+        }
+
         .existing-file-index::before {
             counter-increment: file-index;
             content: counter(file-index)
@@ -734,7 +742,7 @@
                                             onclick="this.parentElement.dataset.delete = '';">
                                         {{ icons.ArrowCounterclockwise() }}
                                     </button>
-                                    <a class="btn btn-sm btn-info d-inline-flex align-items-center pe-1"
+                                    <a class="btn btn-sm btn-info d-inline-flex align-items-center pe-1 file-view"
                                        target="_blank"
                                        href="/submission/{{ submission.ID }}/thumbnail/{{ thumbnail.name if thumbnail }}"
                                             {{ "disabled" if not thumbnail }}>
@@ -810,8 +818,11 @@
             data.append("existing_thumbnail", String(!document.querySelector(".existing-file.thumbnail").dataset.delete))
             console.log(Object.fromEntries(Array.from(data.keys()).map(k => [k, data.getAll(k)])))
 
+            ev.target.classList.add("loading")
+
             fetch(ev.target.action, {method: ev.target.method, body: data})
                 .then(() => window.open("/submission/{{ submission.ID }}", "_self"))
+                .finally(() => ev.target.classList.add("loading"))
         }
     </script>
 {% endblock %}

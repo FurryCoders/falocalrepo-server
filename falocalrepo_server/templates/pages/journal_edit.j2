@@ -4,6 +4,18 @@
 
 {% block title %}{{ "Edit {} by {}".format(journal.TITLE, journal.AUTHOR) }}{% endblock %}
 
+{% block head %}
+    <style>
+        form.loading input,
+        form.loading select,
+        form.loading button,
+        form.loading a {
+            pointer-events: none !important;
+            opacity: .75;
+        }
+    </style>
+{% endblock %}
+
 {% block main %}
     <div class="row">
         <div class="col-12 col-lg-10 col-xl-8 mx-auto">
@@ -68,8 +80,11 @@
 
             console.log(Object.fromEntries(Array.from(data.keys()).map(k => [k, data.getAll(k)])))
 
+            ev.target.classList.add("loading")
+
             fetch(ev.target.action, {method: ev.target.method, body: data})
                 .then(() => window.open("/journal/{{ journal.ID }}", "_self"))
+                .finally(() => ev.target.classList.add("loading"))
         }
     </script>
 {% endblock %}
