@@ -806,8 +806,8 @@
 
             const data = new FormData(ev.target)
 
-            document.querySelectorAll(".existing-file:not(.thumbnail)").forEach((f, i) => data.append("existing_file", `${f.dataset.index}:${i}:${!f.dataset.deleted}`))
-            data.append("existing_thumbnail", String(!document.querySelector(".existing-file.thumbnail").dataset.deleted))
+            document.querySelectorAll(".existing-file:not(.thumbnail)").forEach((f, i) => data.append("existing_file", `${f.dataset.index}:${i}:${!f.dataset.delete}`))
+            data.append("existing_thumbnail", String(!document.querySelector(".existing-file.thumbnail").dataset.delete))
             console.log(Object.fromEntries(Array.from(data.keys()).map(k => [k, data.getAll(k)])))
 
             fetch(ev.target.action, {method: ev.target.method, body: data})
