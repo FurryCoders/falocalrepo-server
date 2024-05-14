@@ -218,6 +218,67 @@
     {% endif %}
 {% endblock %}
 
+{% set search_pagination %}
+{% if search_id %}
+    <div class="btn-group btn-group-sm">
+        <a class="btn btn-primary {{ "disabled" if not search_prev }}"
+           href="/submission/{{ search_prev }}?sid={{ search_index - 1 }}.{{ search_id|urlencode }}">
+            &laquo;
+        </a>
+        <a class="btn btn-primary" href="/submissions?sid={{ search_id|urlencode }}">
+            Search
+        </a>
+        <a class="btn btn-primary {{ "disabled" if not search_next }}"
+           href="/submission/{{ search_next }}?sid={{ search_index + 1 }}.{{ search_id|urlencode }}">
+            &raquo;
+        </a>
+    </div>
+{% endif %}
+{% endset %}
+
+{% set gallery_pagination %}
+<div class="btn-group btn-group-sm">
+    <a class="btn btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
+        &laquo;
+    </a>
+    <a class="btn btn-primary" href="/gallery/{{ submission.AUTHOR|urlencode }}">
+        Gallery
+    </a>
+    <a class="btn btn-primary" href="/submissions/{{ submission.AUTHOR|urlencode }}">
+        All
+    </a>
+    <a class="btn btn-primary" href="/scraps/{{ submission.AUTHOR|urlencode }}">
+        Scraps
+    </a>
+    <a class="btn btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
+        &raquo;
+    </a>
+</div>
+{% endset %}
+
+{% set files_pagination %}
+<div class="btn-group btn-group-sm files-pagination">
+    <button class="btn btn-primary prev" data-selected-index="1" data-index="0"
+            onclick="selectFile(Number(this.dataset.selectedIndex) - 2)">
+        &laquo;
+    </button>
+
+    <button class="btn btn-primary counter">
+        <span><span data-selected-index="1"></span> of {{ files|length }}</span>
+    </button>
+
+    <button class="btn btn-primary" onclick="modalFiles()">
+        Files
+    </button>
+
+    <button class="btn btn-primary next" data-selected-index="1"
+            data-index="{{ (files|length) - 1 }}"
+            onclick="selectFile(Number(this.dataset.selectedIndex))">
+        &raquo;
+    </button>
+</div>
+{% endset %}
+
 {% block main %}
     <div class="modal fade blur text-center p-2" id="modal-image" onclick="modalImage()">
         <img id="modal-image-img" src="" alt="">
@@ -399,65 +460,18 @@
         <div class="col col-12 col-lg-5 col-xl-4 mt-3 mt-lg-0 h-100" id="metadata">
             <div class="properties-card d-lg-none mb-2">
                 <div class="controls">
-                    <div class="btn-group btn-group-sm">
-                        <a class="btn btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
-                            &laquo;
-                        </a>
-                        <a class="btn btn-primary" href="/gallery/{{ submission.AUTHOR|urlencode }}">
-                            Gallery
-                        </a>
-                        <a class="btn btn-primary" href="/submissions/{{ submission.AUTHOR|urlencode }}">
-                            All
-                        </a>
-                        <a class="btn btn-primary" href="/scraps/{{ submission.AUTHOR|urlencode }}">
-                            Scraps
-                        </a>
-                        <a class="btn btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
-                            &raquo;
-                        </a>
-                    </div>
+                    {{ gallery_pagination }}
                 </div>
 
                 {% if search_id %}
                     <div class="controls">
-                        <div class="btn-group btn-group-sm">
-                            <a class="btn btn-primary {{ "disabled" if not search_prev }}"
-                               href="/submission/{{ search_prev }}?sid={{ search_index - 1 }}.{{ search_id|urlencode }}">
-                                &laquo;
-                            </a>
-                            <a class="btn btn-primary" href="/submissions?sid={{ search_id|urlencode }}">
-                                Search
-                            </a>
-                            <a class="btn btn-primary {{ "disabled" if not search_next }}"
-                               href="/submission/{{ search_next }}?sid={{ search_index + 1 }}.{{ search_id|urlencode }}">
-                                &raquo;
-                            </a>
-                        </div>
+                        {{ search_pagination }}
                     </div>
                 {% endif %}
 
                 {% if files|length > 1 %}
                     <div class="controls">
-                        <div class="btn-group btn-group-sm files-pagination">
-                            <button class="btn btn-primary prev" data-selected-index="1" data-index="0"
-                                    onclick="selectFile(Number(this.dataset.selectedIndex) - 2)">
-                                &laquo;
-                            </button>
-
-                            <button class="btn btn-primary counter">
-                                <span><span data-selected-index="1"></span> of {{ files|length }}</span>
-                            </button>
-
-                            <button class="btn btn-primary" onclick="modalFiles()">
-                                Files
-                            </button>
-
-                            <button class="btn btn-primary next" data-selected-index="1"
-                                    data-index="{{ (files|length) - 1 }}"
-                                    onclick="selectFile(Number(this.dataset.selectedIndex))">
-                                &raquo;
-                            </button>
-                        </div>
+                        {{ files_pagination }}
                     </div>
                 {% endif %}
             </div>
@@ -573,64 +587,17 @@
 
                 {% if files|length > 1 %}
                     <div class="controls d-none d-lg-flex">
-                        <div class="btn-group btn-group-sm files-pagination">
-                            <button class="btn btn-primary prev" data-selected-index="1" data-index="0"
-                                    onclick="selectFile(Number(this.dataset.selectedIndex) - 2)">
-                                &laquo;
-                            </button>
-
-                            <button class="btn btn-primary counter">
-                                <span><span data-selected-index="1"></span> of {{ files|length }}</span>
-                            </button>
-
-                            <button class="btn btn-primary" onclick="modalFiles()">
-                                Files
-                            </button>
-
-                            <button class="btn btn-primary next" data-selected-index="1"
-                                    data-index="{{ (files|length) - 1 }}"
-                                    onclick="selectFile(Number(this.dataset.selectedIndex))">
-                                &raquo;
-                            </button>
-                        </div>
+                        {{ files_pagination }}
                     </div>
                 {% endif %}
 
                 <div class="controls d-none d-lg-flex">
-                    <div class="btn-group btn-group-sm">
-                        <a class="btn btn-primary {{ "disabled" if not next }}" href="/submission/{{ next }}">
-                            &laquo;
-                        </a>
-                        <a class="btn btn-primary" href="/gallery/{{ submission.AUTHOR|urlencode }}">
-                            Gallery
-                        </a>
-                        <a class="btn btn-primary" href="/submissions/{{ submission.AUTHOR|urlencode }}">
-                            All
-                        </a>
-                        <a class="btn btn-primary" href="/scraps/{{ submission.AUTHOR|urlencode }}">
-                            Scraps
-                        </a>
-                        <a class="btn btn-primary {{ "disabled" if not prev }}" href="/submission/{{ prev }}">
-                            &raquo;
-                        </a>
-                    </div>
+                    {{ gallery_pagination }}
                 </div>
 
                 {% if search_id %}
                     <div class="controls d-none d-lg-flex">
-                        <div class="btn-group btn-group-sm">
-                            <a class="btn btn-primary {{ "disabled" if not search_prev }}"
-                               href="/submission/{{ search_prev }}?sid={{ search_index - 1 }}.{{ search_id|urlencode }}">
-                                &laquo;
-                            </a>
-                            <a class="btn btn-primary" href="/submissions?sid={{ search_id|urlencode }}">
-                                Search
-                            </a>
-                            <a class="btn btn-primary {{ "disabled" if not search_next }}"
-                               href="/submission/{{ search_next }}?sid={{ search_index + 1 }}.{{ search_id|urlencode }}">
-                                &raquo;
-                            </a>
-                        </div>
+                        {{ search_pagination }}
                     </div>
                 {% endif %}
             </div>
