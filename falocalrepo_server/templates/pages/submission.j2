@@ -344,7 +344,8 @@
                             </div>
                         {% elif mime.startswith("audio/") %}
                             <div class="mt-5 col-12 col-md-10 mx-auto" style="height: 3rem">
-                                <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
+                                <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/
+                                        {{ name }}{{ cache_flag }}"
                                        class="loading-element loading-error-hide w-100" preload="metadata"
                                        onloadedmetadata="this.classList.add('loaded')"
                                        onerror="this.classList.add('loading-error')" controls>
@@ -359,7 +360,8 @@
                                    poster="/submission/{{ submission.ID }}/thumbnail{{ cache_flag }}"
                                    preload="metadata" onloadedmetadata="this.classList.add('loaded')"
                                    playsinline controls>
-                                <source src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
+                                <source src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/
+                                        {{ name }}{{ cache_flag }}"
                                         onerror="this.parentElement.classList.add('loading-error')"/>
                             </video>
                             <div class="loading-spinner mt-5"></div>
@@ -368,7 +370,8 @@
                             </div>
                         {% elif mime == "application/pdf" and not is_mobile %}
                             <div class="h-100 overflow-hidden rounded position-relative">
-                                <iframe src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
+                                <iframe src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/
+                                        {{ name }}{{ cache_flag }}"
                                         class="h-100 w-100"></iframe>
                             </div>
                         {% else %}
@@ -382,7 +385,8 @@
                                      style="height: 6rem; aspect-ratio: 1 / 1"></div>
                             </div>
                             <button class="btn btn-sm btn-primary position-relative mt-3">
-                                <a href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
+                                <a href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/
+                                        {{ name }}{{ cache_flag }}"
                                    class="stretched-link" download="{{ name }}"></a>
                                 Download {{ file.suffix.upper().strip(".") or "file" }}
                             </button>
