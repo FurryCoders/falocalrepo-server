@@ -312,7 +312,8 @@
                 </div>
             {% else %}
                 {% for file, mime, text in files %}
-                    {% set name = "{:010d}-{}{}?m={}".format(submission.ID, loop.index0, file.suffix, request.state.database.m_time) %}
+                    {% set name = "{:010d}-{}{}".format(submission.ID, loop.index0, file.suffix) %}
+                    {% set cache_flag = "?m={}".format(request.state.database.m_time) %}
                     {% set mime = mime or "" %}
                     <div class="file-container overflow-scroll" data-file-index="{{ loop.index0 }}"
                          data-selected="{{ "true" if loop.first else "false" }}">
@@ -333,7 +334,7 @@
                                 </div>
                             </div>
                         {% elif mime.startswith("image/") %}
-                            <img src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}"
+                            <img src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
                                  alt="" class="loading-element loading-error-hide" loading="lazy"
                                  onload="this.classList.add('loaded')" onerror="this.classList.add('loading-error')"
                                  onclick="modalImage(this)">
@@ -343,7 +344,7 @@
                             </div>
                         {% elif mime.startswith("audio/") %}
                             <div class="mt-5 col-12 col-md-10 mx-auto" style="height: 3rem">
-                                <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}"
+                                <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
                                        class="loading-element loading-error-hide w-100" preload="metadata"
                                        onloadedmetadata="this.classList.add('loaded')"
                                        onerror="this.classList.add('loading-error')" controls>
@@ -355,10 +356,10 @@
                             </div>
                         {% elif mime.startswith("video/") %}
                             <video class="loading-element loading-error-hide rounded mw-100 mh-100"
-                                   poster="/submission/{{ submission.ID }}/thumbnail"
+                                   poster="/submission/{{ submission.ID }}/thumbnail{{ cache_flag }}"
                                    preload="metadata" onloadedmetadata="this.classList.add('loaded')"
                                    playsinline controls>
-                                <source src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}"
+                                <source src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
                                         onerror="this.parentElement.classList.add('loading-error')"/>
                             </video>
                             <div class="loading-spinner mt-5"></div>
@@ -367,12 +368,12 @@
                             </div>
                         {% elif mime == "application/pdf" and not is_mobile %}
                             <div class="h-100 overflow-hidden rounded position-relative">
-                                <iframe src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}"
+                                <iframe src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
                                         class="h-100 w-100"></iframe>
                             </div>
                         {% else %}
                             <div class="d-flex align-items-center justify-content-center" style="height: 8rem">
-                                <img src="/submission/{{ submission.ID }}/thumbnail"
+                                <img src="/submission/{{ submission.ID }}/thumbnail{{ cache_flag }}"
                                      alt="" class="loading-element loading-error-hide mh-100 mw-100 rounded"
                                      loading="lazy" onload="this.classList.add('loaded')"
                                      onerror="this.classList.add('loading-error')">
@@ -381,7 +382,7 @@
                                      style="height: 6rem; aspect-ratio: 1 / 1"></div>
                             </div>
                             <button class="btn btn-sm btn-primary position-relative mt-3">
-                                <a href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}"
+                                <a href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
                                    class="stretched-link" download="{{ name }}"></a>
                                 Download {{ file.suffix.upper().strip(".") or "file" }}
                             </button>
