@@ -1,4 +1,5 @@
 from collections import namedtuple
+from datetime import datetime
 from functools import lru_cache
 from os import PathLike
 from pathlib import Path
@@ -261,12 +262,17 @@ class Database:
         }
 
     @lru_cache
-    def _stats(self) -> tuple[int, int, int, int]:
+    def _stats(self) -> tuple[int, int, int, int, datetime]:
         return (
             len(self.database.users),
             len(self.database.submissions),
             len(self.database.journals),
             len(self.database.comments),
+            (
+                event["TIME"]
+                if (event := next(self.database.history.select(order=["time desc"], limit=1), None))
+                else None
+            ),
         )
 
     @lru_cache
