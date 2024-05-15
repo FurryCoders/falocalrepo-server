@@ -318,7 +318,7 @@ async def home(request: Request):
             "submissions_total": stats[1],
             "journals_total": stats[2],
             "comments_total": stats[3],
-            "last_update": datetime.fromtimestamp(database.path.stat().st_mtime),
+            "last_update": stats[4] or datetime.fromtimestamp(database.path.stat().st_mtime),
         },
     )
 
