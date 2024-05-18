@@ -657,7 +657,7 @@ async def submission_edit_save(request: Request):
         new_sub["GENDER"] = form.get("gender", "").strip()
         new_sub["RATING"] = form.get("rating", "").strip()
         new_sub["TAGS"] = [t for t in form.get("tags", "").strip().split(" ") if t]
-        new_sub["FAVORITE"] = {u for f in form.get("tags", "").strip().split(" ") if (u := clean_username(f))}
+        new_sub["FAVORITE"] = {u for f in form.get("favorites", "").strip().split(" ") if (u := clean_username(f))}
         new_sub["DESCRIPTION"] = form.get("description", "").strip()
         new_sub["MENTIONS"] = {
             u
