@@ -375,6 +375,7 @@
                 {% for file, mime, text in files %}
                     {% set name = "{:010d}-{}{}".format(submission.ID, loop.index0, file.suffix) %}
                     {% set cache_flag = "?m={}".format(request.state.database.m_time) %}
+                    {% set name_cache = name + cache_flag %}
                     {% set mime = mime or "" %}
                     <div class="file-container overflow-scroll" data-file-index="{{ loop.index0 }}"
                          data-selected="{{ "true" if loop.first else "false" }}">
@@ -395,7 +396,7 @@
                                 </div>
                             </div>
                         {% elif mime.startswith("image/") %}
-                            <img src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name }}{{ cache_flag }}"
+                            <img src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name_cache }}"
                                  alt="" class="loading-element loading-error-hide" loading="lazy"
                                  onload="this.classList.add('loaded')" onerror="this.classList.add('loading-error')"
                                  onclick="modalImage(this)">
@@ -405,8 +406,7 @@
                             </div>
                         {% elif mime.startswith("audio/") %}
                             <div class="mt-5 col-12 col-md-10 mx-auto" style="height: 3rem">
-                                <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/
-                                        {{ name }}{{ cache_flag }}"
+                                <audio src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name_cache }}"
                                        class="loading-element loading-error-hide w-100" preload="metadata"
                                        onloadedmetadata="this.classList.add('loaded')"
                                        onerror="this.classList.add('loading-error')" controls>
@@ -421,8 +421,7 @@
                                    poster="/submission/{{ submission.ID }}/thumbnail{{ cache_flag }}"
                                    preload="metadata" onloadedmetadata="this.classList.add('loaded')"
                                    playsinline controls>
-                                <source src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/
-                                        {{ name }}{{ cache_flag }}"
+                                <source src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name_cache }}"
                                         onerror="this.parentElement.classList.add('loading-error')"/>
                             </video>
                             <div class="loading-spinner mt-5"></div>
@@ -431,9 +430,9 @@
                             </div>
                         {% elif mime == "application/pdf" and not is_mobile %}
                             <div class="h-100 overflow-hidden rounded position-relative">
-                                <iframe src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/
-                                        {{ name }}{{ cache_flag }}"
-                                        class="h-100 w-100"></iframe>
+                                <iframe class="h-100 w-100"
+                                        src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name_cache }}">
+                                </iframe>
                             </div>
                         {% else %}
                             <div class="d-flex align-items-center justify-content-center" style="height: 8rem">
@@ -446,8 +445,7 @@
                                      style="height: 6rem; aspect-ratio: 1 / 1"></div>
                             </div>
                             <button class="btn btn-sm btn-primary position-relative mt-3">
-                                <a href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/
-                                        {{ name }}{{ cache_flag }}"
+                                <a href="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name_cache }}"
                                    class="stretched-link" download="{{ name }}"></a>
                                 Download {{ file.suffix.upper().strip(".") or "file" }}
                             </button>
