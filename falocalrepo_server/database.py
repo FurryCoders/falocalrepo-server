@@ -668,7 +668,7 @@ class Database:
             self.database.commit()
             self._settings.cache_clear()
 
-    def stats(self) -> tuple[int, int, int, int]:
+    def stats(self) -> tuple[int, int, int, int, datetime]:
         return self.call_cached_method(self._stats)
 
     def bbcode(self) -> bool:
