@@ -1,5 +1,66 @@
 # Changelog
 
+## v3.4.0
+
+### New Features
+
+* Editing 📝
+    * User profiles, submissions, and journals can be edited or deleted directly from the web UI
+    * Files can be sorted, deleted, or added
+    * When using authentication, specific users can be given editing rights with the new `--editor` option
+* Comments search 💬
+    * Search comments and open the relevant submission or journal
+* Advanced search operators 🔎
+    * Exact matches with equal (`==`) and not equal (`!=`) instead of using `^` and `$`
+    * Comparison matches with greater-than (`>`, `>=`) and lower-than (`<`, `<=`)
+    * Substring matches (`%=`) (to force it on columns that do not use it by default)
+    * Mix & match operators `@date %-03-% >= 2020`
+* Completely overhauled server application with [starlette](https://starlette.io)
+    * Overhauled database queries and caching system
+    * Faster loading of submissions, journals, and user pages
+    * Added option to limit results for faster queries
+    * Added option to turn off caching to save on memory
+    * Support multiple users/passwords for authentication
+    * Support logging out
+* Rewritten frontend
+    * Navigate search results directly from submission and journal pages (only available when caching is enabled)
+    * Support viewing PDF files in the browser (desktop only)
+    * Improve file selector for submissions
+    * Better zoom behaviour for images
+    * Collapsible comment trees
+    * Improved loading placeholders
+    * Show user icons in comments and gallery, scraps, favorites, etc. pages
+    * Sort tables by clicking on headers
+
+### Changes
+
+* Search URLs have been simplified
+    * `/{entries type}` to search entries (users, submissions, journals, comments)
+    * `/{entries type}/{user}` to search entries (submissions, gallery, scraps, favorites, journals, comments) for a
+      specific user
+* Removed `/submission/{id}/files` routes, can use `/submission/{id}/zip` instead
+* Removed JSON endpoints
+* Journals can only be viewed as a list
+* Removed floating comments button from submission and journal pages
+    * The comments counter un the properties box can be clicked instead
+
+### Dependencies
+
+* [bootstrap 5.3.3](https://blog.getbootstrap.com/2024/02/20/bootstrap-5-3-3/)
+* [starlette ^0.37.2](https://pypi.org/project/starlette/0.37.2)
+* [itsdangerous ^2.2.0](https://pypi.org/project/itsdangerous/2.2.0)
+* [orjson ^3.10.3](https://pypi.org/project/orjson/3.10.3)
+    * Fix [CVE-2024-27454](https://cve.org/CVERecord?id=CVE-2024-27454)
+* [baize ^0.20.8](https://pypi.org/project/baize/0.20.8)
+* [python-multipart ^0.0.9](https://pypi.org/project/python-multipart/0.0.9)
+* [pillow ^10.3.0](https://pypi.org/project/pillow/^10.3.0)
+* [uvicorn ^0.29.0](https://pypi.org/project/uvicorn/^0.29.0)
+* [Jinja2 ^3.1.4](https://pypi.org/project/Jinja2/^3.1.4)
+* [click-help-colors ^0.9.4](https://pypi.org/project/click-help-colors/^0.9.4)
+* [beautifulsoup4 ^4.12.3](https://pypi.org/project/beautifulsoup4/^4.12.3)
+* [lxml ^5.2.1](https://pypi.org/project/lxml/^5.2.1)
+* removed: [fastapi ^0.109.2](https://pypi.org/project/fastapi/^0.109.2)
+
 ## v3.3.6
 
 ### Fixes
