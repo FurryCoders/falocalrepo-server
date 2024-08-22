@@ -26,7 +26,7 @@ falocalrepo-server = "falocalrepo_server.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-falocalrepo-database = "~5.4.5"
+falocalrepo-database = "~5.4.6"
 chardet = "^5.2.0"
 pillow = "^10.4.0"
 starlette = "^0.38.2"
