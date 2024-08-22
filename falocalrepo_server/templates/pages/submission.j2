@@ -420,6 +420,7 @@
                             <video class="loading-element loading-error-hide rounded mw-100 mh-100"
                                    poster="/submission/{{ submission.ID }}/thumbnail{{ cache_flag }}"
                                    preload="metadata" onloadedmetadata="this.classList.add('loaded')"
+                                   onplay="this.loop = this.duration <= 120"
                                    playsinline controls>
                                 <source src="/submission/{{ submission.ID }}/file/{{ loop.index0 }}/{{ name_cache }}"
                                         onerror="this.parentElement.classList.add('loading-error')"/>
