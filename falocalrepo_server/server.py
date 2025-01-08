@@ -35,7 +35,6 @@ from chardet import detect as detect_encoding
 from falocalrepo_database import __package__ as __package_database__
 from falocalrepo_database import __version__ as __version_database__
 from falocalrepo_database.tables import comments_table
-from htmlmin import minify
 from orjson import dumps
 from orjson import loads
 from PIL import Image
@@ -150,7 +149,6 @@ class TemplateResponse(HTMLResponse):
     ):
         context |= reduce(lambda c, p: c | p(request), templates.context_processors, {}) | {"request": request}
         content: str = templates.get_template(template_name).render(context)
-        content = minify(content, remove_comments=True)
         super().__init__(content, status_code, headers, media_type, background)
 
 
