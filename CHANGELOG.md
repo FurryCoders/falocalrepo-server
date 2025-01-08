@@ -1,5 +1,22 @@
 # Changelog
 
+## v3.4.1
+
+### Fixes
+
+* Fix install issue caused by one of the libraries
+
+### Dependencies
+
+* [baize ^0.22.2](https://pypi.org/project/baize/0.22.2)
+* [click ^8.1.8](https://pypi.org/project/click/8.1.8)
+* [orjson ^3.10.14](https://pypi.org/project/orjson/3.10.14)
+* [pillow ^11.1.0](https://pypi.org/project/pillow/11.1.0)
+* [python-multipart ^0.0.19](https://pypi.org/project/python-multipart/0.0.20)
+* [starlette ^0.40.0](https://pypi.org/project/starlette/0.45.2)
+* [uvicorn ^0.34.0](https://pypi.org/project/uvicorn/0.34.0)
+* [~~htmlmin (removed)~~](https://pypi.org/project/htmlmin)
+
 ## v3.4.0
 
 ### New Features
