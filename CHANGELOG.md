@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.4.2
+
+### Fixes
+
+* Use "-" in submission gender field if it is empty
+
 ## v3.4.1
 
 ### Fixes
