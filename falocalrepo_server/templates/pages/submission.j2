@@ -520,7 +520,7 @@
                 <div class="property" data-key="Gender">
                     <a class="btn btn-xs btn-primary w-100 text-truncate"
                        href="/submissions?query=%40=gender%20%22{{ submission.GENDER }}%22">
-                        {{ submission.GENDER|title }}
+                        {{ (submission.GENDER or "-")|title }}
                     </a>
                 </div>
                 <div class="property" data-key="Rating">
