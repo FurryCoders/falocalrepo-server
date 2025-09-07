@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.4.3
+
+### New Features
+
+* Re-introduce Ruffle to play Flash files
+
+### Dependencies
+
+* [pillow ^11.3.0](https://pypi.org/project/pillow/11.3.0)
+* [starlette ^0.47.3](https://pypi.org/project/starlette/0.47.3)
+* [uvicorn ^0.35.0](https://pypi.org/project/uvicorn/0.35.0)
+* [beautifulsoup4 ^4.13.5](https://pypi.org/project/beautifulsoup4/4.13.5)
+* [lxml ^6.0.1](https://pypi.org/project/lxml/6.0.1)
+* [orjson ^3.11.3](https://pypi.org/project/orjson/3.11.3)
+* [baize ^0.23.1](https://pypi.org/project/baize/0.23.1)
+
 ## v3.4.2
 
 ### Fixes
